@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe Final - Módulo Actividades – VIERNES CRM</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0d1117;
+            --surface: #161b22;
+            --surface2: #1c2333;
+            --border: #30363d;
+            --text: #e6edf3;
+            --text-muted: #8b949e;
+            --accent: #388bfd;
+            --accent-soft: #1f3a6e;
+            --green: #3fb950;
+            --green-soft: #1a3d2b;
+            --purple: #bc8cff;
+            --cyan: #39c5cf;
+            --cyan-soft: #0e3444;
+            --radius: 12px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; padding: 40px; }
+        header { text-align: center; margin-bottom: 50px; }
+        h1 { font-size: 36px; color: var(--accent); margin-bottom: 10px; }
+        h2 { font-size: 24px; color: var(--cyan); margin: 30px 0 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        p { color: var(--text-muted); margin-bottom: 20px; }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 20px; }
+        .diagram-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 20px; display: flex; justify-content: center; }
+        pre { background: var(--surface2); padding: 15px; border-radius: 8px; font-family: 'Fira Code', monospace; font-size: 14px; overflow-x: auto; border: 1px solid var(--border); margin-bottom: 20px; color: var(--green); }
+        .status-badge { display: inline-block; padding: 5px 10px; border-radius: 20px; font-size: 14px; font-weight: bold; background: var(--green-soft); color: var(--green); border: 1px solid var(--green); }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Informe Final Módulo 5: Actividades y Seguimiento</h1>
+    <p>Documentación técnica y funcional del motor de transacciones diarias del CRM.</p>
+    <div class="status-badge">ESTADO: LISTO (V1)</div>
+</header>
+
+<section>
+    <h2>1. Propósito y Alcance</h2>
+    <div class="card">
+        <p>El módulo permite registrar, editar y controlar las acciones que realizan los vendedores durante la gestión de clientes, leads y oportunidades. Actúa como el puente principal para el seguimiento comercial.</p>
+        <p>Responde a las preguntas: <strong>¿Qué se hizo, quién lo hizo, con quién, sobre qué oportunidad, está vencida y cuál es su estado?</strong></p>
+    </div>
+</section>
+
+<section>
+    <h2>2. Correcciones Implementadas (Cierre de Módulo)</h2>
+    <div class="card">
+        <ul>
+            <li style="color:var(--text-muted); margin-bottom: 8px;"><strong>Edición Completa:</strong> Se habilitó el método `actualizar` mediante `PUT /api/v1/actividades/{id}`, permitiendo la modificación integral de la actividad.</li>
+            <li style="color:var(--text-muted); margin-bottom: 8px;"><strong>idUsuario Unificado:</strong> Tras analizar `Clientes`, `Leads` y `Oportunidades`, se mantuvo y validó el uso de `String responsable` para evitar rupturas arquitectónicas. El campo final es `idUsuario (String)`.</li>
+            <li style="color:var(--text-muted); margin-bottom: 8px;"><strong>Validación de Relaciones Cruzadas:</strong> Se implementó `RelacionValidationPort` aislando las dependencias. Antes de guardar/editar se valida que el `idCliente`, `idLead` e `idOportunidad` existan en DB (vía `SpringDataRepository`).</li>
+            <li style="color:var(--text-muted); margin-bottom: 8px;"><strong>Actividades Vencidas:</strong> Se añadió lógica derivada `(PENDIENTE + fecha pasada)`. No es un estado en base de datos. Se refleja en el API mediante `?vencidas=true` y un flag booleano `vencida` en el Response.</li>
+            <li style="color:var(--text-muted); margin-bottom: 8px;"><strong>Testing Completo:</strong> Se implementó `ActividadControllerTest` (Mockito + WebMvcTest/StandaloneSetup) y `ActividadServiceTest`, validando exitosamente flujos válidos y excepciones de negocio.</li>
+        </ul>
+    </div>
+</section>
+
+<section>
+    <h2>3. Endpoints de la API Final</h2>
+    <div class="card">
+        <p>Todos los endpoints respetan el diseño REST y las reglas de validación hexagonal:</p>
+        <pre>
+POST   /api/v1/actividades              # Registrar nueva actividad (Valida relaciones)
+GET    /api/v1/actividades              # Listar (Filtros: ?estado=, ?idCliente=, ?vencidas=true)
+GET    /api/v1/actividades/{id}         # Obtener detalle (Muestra flag vencida)
+PUT    /api/v1/actividades/{id}         # Edición completa (Valida existencias)
+PATCH  /api/v1/actividades/{id}/estado  # Cambio rápido de estado (Ej. Completada)
+DELETE /api/v1/actividades/{id}         # Eliminar registro
+        </pre>
+    </div>
+</section>
+
+<section>
+    <h2>4. Arquitectura y Persistencia</h2>
+    <div class="card">
+        <p>Se consolidó la persistencia oficial utilizando <strong>Oracle XE</strong>. La tabla principal sigue siendo <code>CRM_ACTIVIDADES</code> y mapea correctamente llaves foráneas lógicas.</p>
+        <pre><span style="color:#8b949e">com.viernes.actividades/</span>
+├── <span style="color:#3fb950">domain/</span>                      <span style="color:#8b949e"># Actividad, TipoActividad, EstadoActividad</span>
+├── <span style="color:#3fb950">application/</span>
+│   ├── <span style="color:#e3b341">dto/</span>                 <span style="color:#8b949e"># ActividadRequest, ActividadResponse (+ vencida)</span>
+│   ├── <span style="color:#e3b341">port/in/</span>             <span style="color:#8b949e"># ManageActividadUseCase</span>
+│   ├── <span style="color:#e3b341">port/out/</span>            <span style="color:#8b949e"># ActividadPersistencePort, RelacionValidationPort</span>
+│   └── <span style="color:#e3b341">service/</span>             <span style="color:#8b949e"># ActividadService (Orquestador y Validador)</span>
+└── <span style="color:#bc8cff">adapters/</span>
+    ├── <span style="color:#bc8cff">in/web/</span>              <span style="color:#8b949e"># ActividadController</span>
+    └── <span style="color:#bc8cff">out/persistence/</span>     <span style="color:#8b949e"># Adapters (Validaciones + Persistencia en Oracle)</span></pre>
+    </div>
+</section>
+
+<section>
+    <h2>5. Próximos Pasos (Dependencias)</h2>
+    <div class="card">
+        <p>El Módulo 5 se encuentra completado y testeado en su fase actual (V1). Lo único pendiente en el futuro es:</p>
+        <ul style="color:var(--text-muted); padding-left: 20px;">
+            <li>Modificar <code>RelacionValidationAdapter.existeUsuario()</code> para integrarse con el Módulo de Usuarios (actualmente devuelve true).</li>
+            <li>Conectar las métricas directamente con el <code>DashboardService</code> cuando éste implemente los gráficos de barras y embudos.</li>
+        </ul>
+    </div>
+</section>
+
+</body>
+</html>

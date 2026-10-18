@@ -1,0 +1,31 @@
+.dashboard-container {
+  padding: 20px;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.kpi-value {
+  font-size: 3rem;
+  font-weight: 500;
+  margin: 10px 0;
+  color: #3f51b5; /* Primary Material Color */
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 50px;
+}
+
+.error-message {
+  color: red;
+  padding: 20px;
+  background: #ffebee;
+  border-radius: 4px;
+}

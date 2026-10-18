@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validación Previa — Módulo 7: Propuestas Comerciales | Viernes V1</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* ── Variables ─────────────────────────────────────── */
+        :root {
+            --indigo: #4F46E5;
+            --indigo-light: #EEF2FF;
+            --indigo-dark: #3730A3;
+            --emerald: #059669;
+            --emerald-light: #ECFDF5;
+            --amber: #D97706;
+            --amber-light: #FFFBEB;
+            --red: #DC2626;
+            --red-light: #FEF2F2;
+            --blue: #2563EB;
+            --blue-light: #EFF6FF;
+            --slate-50: #F8FAFC;
+            --slate-100: #F1F5F9;
+            --slate-200: #E2E8F0;
+            --slate-300: #CBD5E1;
+            --slate-400: #94A3B8;
+            --slate-500: #64748B;
+            --slate-600: #475569;
+            --slate-700: #334155;
+            --slate-800: #1E293B;
+            --slate-900: #0F172A;
+            --white: #FFFFFF;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,.06);
+            --shadow: 0 4px 6px -1px rgba(0,0,0,.10), 0 2px 4px -2px rgba(0,0,0,.10);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,.10), 0 4px 6px -4px rgba(0,0,0,.10);
+            --radius: 10px;
+            --radius-sm: 6px;
+        }
+
+        /* ── Reset & Base ───────────────────────────────────── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--slate-100);
+            color: var(--slate-800);
+            line-height: 1.7;
+            font-size: 15px;
+        }
+
+        /* ── Sidebar ToC ────────────────────────────────────── */
+        .toc-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            background: var(--slate-900);
+            overflow-y: auto;
+            z-index: 100;
+            padding: 28px 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .toc-sidebar .logo {
+            padding: 0 20px 24px;
+            border-bottom: 1px solid rgba(255,255,255,.1);
+            margin-bottom: 16px;
+        }
+        .toc-sidebar .logo span {
+            display: block;
+            font-size: .7rem;
+            font-weight: 600;
+            color: var(--slate-400);
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            margin-bottom: 4px;
+        }
+        .toc-sidebar .logo h2 {
+            font-size: .95rem;
+            font-weight: 700;
+            color: var(--white);
+            line-height: 1.3;
+        }
+        .toc-sidebar a {
+            display: block;
+            padding: 7px 20px;
+            color: var(--slate-400);
+            text-decoration: none;
+            font-size: .8rem;
+            font-weight: 500;
+            transition: all .2s;
+            border-left: 3px solid transparent;
+        }
+        .toc-sidebar a:hover {
+            color: var(--white);
+            background: rgba(255,255,255,.06);
+            border-left-color: var(--indigo);
+        }
+        .toc-sidebar a.active { color: var(--white); border-left-color: var(--indigo); background: rgba(79,70,229,.15); }
+        .toc-label {
+            padding: 4px 20px;
+            font-size: .65rem;
+            font-weight: 700;
+            color: var(--slate-500);
+            text-transform: uppercase;
+            letter-spacing: .12em;
+            margin-top: 12px;
+        }
+
+        /* ── Main Layout ────────────────────────────────────── */
+        .main-content {
+            margin-left: 240px;
+            min-height: 100vh;
+        }
+
+        /* ── Header ─────────────────────────────────────────── */
+        .hero {
+            background: linear-gradient(135deg, var(--slate-900) 0%, var(--indigo-dark) 100%);
+            padding: 56px 56px 48px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        .hero .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(79,70,229,.4);
+            border: 1px solid rgba(79,70,229,.5);
+            color: #A5B4FC;
+            font-size: .75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            margin-bottom: 16px;
+        }
+        .hero h1 {
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: var(--white);
+            line-height: 1.15;
+            margin-bottom: 12px;
+        }
+        .hero h1 span { color: #A5B4FC; }
+        .hero p {
+            font-size: 1rem;
+            color: var(--slate-400);
+            max-width: 640px;
+        }
+        .hero-meta {
+            display: flex;
+            gap: 24px;
+            margin-top: 28px;
+            flex-wrap: wrap;
+        }
+        .meta-chip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,.07);
+            border: 1px solid rgba(255,255,255,.12);
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: .82rem;
+            color: var(--slate-300);
+        }
+        .meta-chip strong { color: var(--white); }
+
+        /* ── Content area ───────────────────────────────────── */
+        .content-area {
+            padding: 40px 56px 80px;
+        }
+
+        /* ── Section Card ───────────────────────────────────── */
+        .section {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 36px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--slate-200);
+        }
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+        .section-num {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: var(--indigo);
+            color: var(--white);
+            font-size: .85rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .section h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--slate-900);
+        }
+        .section h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--slate-700);
+            margin: 20px 0 10px;
+        }
+        .section p {
+            color: var(--slate-600);
+            margin-bottom: 14px;
+        }
+        .section ul, .section ol {
+            color: var(--slate-600);
+            padding-left: 20px;
+        }
+        .section li { margin-bottom: 5px; }
+
+        /* ── Tables ─────────────────────────────────────────── */
+        .tbl-wrapper { overflow-x: auto; margin: 16px 0; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .88rem;
+        }
+        thead th {
+            background: var(--slate-800);
+            color: var(--white);
+            font-weight: 600;
+            padding: 10px 14px;
+            text-align: left;
+            white-space: nowrap;
+        }
+        thead th:first-child { border-radius: var(--radius-sm) 0 0 0; }
+        thead th:last-child  { border-radius: 0 var(--radius-sm) 0 0; }
+        tbody td {
+            padding: 9px 14px;
+            border-bottom: 1px solid var(--slate-100);
+            color: var(--slate-700);
+            vertical-align: top;
+        }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover td { background: var(--slate-50); }
+
+        /* ── Code ───────────────────────────────────────────── */
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .82em;
+            background: var(--slate-100);
+            color: var(--indigo);
+            padding: 2px 7px;
+            border-radius: 4px;
+            border: 1px solid var(--slate-200);
+        }
+        pre {
+            background: var(--slate-900);
+            border-radius: var(--radius-sm);
+            padding: 20px;
+            overflow-x: auto;
+            margin: 16px 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .83rem;
+            line-height: 1.65;
+            color: #CBD5E1;
+        }
+        pre code { background: transparent; color: inherit; padding: 0; border: none; font-size: 1em; }
+        .kw  { color: #C792EA; }
+        .str { color: #ADDB67; }
+        .cmt { color: #546E7A; }
+        .typ { color: #82AAFF; }
+        .num { color: #F78C6C; }
+
+        /* ── Alerts ─────────────────────────────────────────── */
+        .alert {
+            display: flex;
+            gap: 12px;
+            padding: 14px 16px;
+            border-radius: var(--radius-sm);
+            margin: 16px 0;
+            border: 1px solid;
+            font-size: .88rem;
+            line-height: 1.6;
+        }
+        .alert-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 2px; }
+        .alert-content strong { display: block; margin-bottom: 4px; font-size: .9rem; }
+        .alert-note    { background: var(--blue-light);    border-color: #BFDBFE; color: #1E40AF; }
+        .alert-tip     { background: var(--emerald-light); border-color: #A7F3D0; color: #065F46; }
+        .alert-warn    { background: var(--amber-light);   border-color: #FDE68A; color: #92400E; }
+        .alert-danger  { background: var(--red-light);     border-color: #FECACA; color: #991B1B; }
+
+        /* ── State flow ─────────────────────────────────────── */
+        .flow {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            flex-wrap: wrap;
+            margin: 16px 0;
+        }
+        .flow-state {
+            padding: 8px 18px;
+            border-radius: 9999px;
+            font-size: .82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+        }
+        .flow-arrow { font-size: 1.2rem; color: var(--slate-400); padding: 0 8px; }
+        .state-borrador  { background: var(--slate-200); color: var(--slate-700); }
+        .state-enviada   { background: #DBEAFE; color: #1E40AF; }
+        .state-aprobada  { background: var(--emerald-light); color: #065F46; }
+        .state-rechazada { background: var(--red-light); color: #991B1B; }
+        .state-cancelada { background: var(--amber-light); color: #92400E; }
+
+        /* ── API method badges ──────────────────────────────── */
+        .method {
+            display: inline-block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .73rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            letter-spacing: .03em;
+        }
+        .m-get    { background: #DBEAFE; color: #1D4ED8; }
+        .m-post   { background: #D1FAE5; color: #065F46; }
+        .m-put    { background: #FEF3C7; color: #92400E; }
+        .m-patch  { background: #EDE9FE; color: #5B21B6; }
+        .m-delete { background: #FEE2E2; color: #991B1B; }
+
+        /* ── Badges / pills ─────────────────────────────────── */
+        .pill {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 9999px;
+            font-size: .75rem;
+            font-weight: 600;
+        }
+        .pill-green  { background: #D1FAE5; color: #065F46; }
+        .pill-red    { background: #FEE2E2; color: #991B1B; }
+        .pill-amber  { background: #FEF3C7; color: #92400E; }
+        .pill-gray   { background: var(--slate-200); color: var(--slate-700); }
+
+        /* ── Risk meter ─────────────────────────────────────── */
+        .risk-item { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--slate-100); }
+        .risk-item:last-child { border-bottom: none; }
+        .risk-num { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: .82rem; flex-shrink: 0; }
+        .risk-high { background: var(--red-light); color: var(--red); }
+        .risk-med  { background: var(--amber-light); color: var(--amber); }
+        .risk-low  { background: var(--emerald-light); color: var(--emerald); }
+        .risk-body strong { font-size: .9rem; color: var(--slate-800); display: block; margin-bottom: 4px; }
+        .risk-body p { font-size: .85rem; color: var(--slate-500); margin: 0; }
+
+        /* ── Decisions checklist ────────────────────────────── */
+        .decision-list { list-style: none; padding: 0; }
+        .decision-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--slate-100);
+            font-size: .9rem;
+            color: var(--slate-700);
+        }
+        .decision-list li:last-child { border-bottom: none; }
+        .decision-num {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--indigo-light);
+            color: var(--indigo);
+            font-size: .72rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        /* ── Structure tree ─────────────────────────────────── */
+        .tree {
+            background: var(--slate-900);
+            border-radius: var(--radius-sm);
+            padding: 20px 24px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .83rem;
+            line-height: 1.8;
+            color: var(--slate-300);
+        }
+        .tree .dir { color: #82AAFF; font-weight: 500; }
+        .tree .file { color: #ADDB67; }
+        .tree .cmt-tree { color: #546E7A; }
+
+        /* ── DB schema ──────────────────────────────────────── */
+        .schema-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .schema-box {
+            border: 1px solid var(--slate-200);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+        }
+        .schema-box-header {
+            background: var(--slate-800);
+            color: var(--white);
+            padding: 10px 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .82rem;
+            font-weight: 600;
+        }
+        .schema-field {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 7px 16px;
+            border-bottom: 1px solid var(--slate-100);
+            font-size: .82rem;
+            gap: 8px;
+        }
+        .schema-field:last-child { border-bottom: none; }
+        .sf-name { font-family: 'JetBrains Mono', monospace; color: var(--slate-700); font-weight: 500; }
+        .sf-type { font-size: .75rem; color: var(--slate-400); font-family: 'JetBrains Mono', monospace; }
+        .sf-badges { display: flex; gap: 4px; }
+        .tag-pk  { background: #FEF3C7; color: #92400E; font-size: .65rem; padding: 1px 5px; border-radius: 3px; font-weight: 700; }
+        .tag-fk  { background: #EDE9FE; color: #5B21B6; font-size: .65rem; padding: 1px 5px; border-radius: 3px; font-weight: 700; }
+        .tag-nn  { background: #FEE2E2; color: #991B1B; font-size: .65rem; padding: 1px 5px; border-radius: 3px; font-weight: 700; }
+
+        /* ── Footer ─────────────────────────────────────────── */
+        .footer {
+            background: var(--slate-900);
+            color: var(--slate-400);
+            text-align: center;
+            padding: 24px;
+            font-size: .82rem;
+            margin-left: 240px;
+        }
+
+        @media (max-width: 900px) {
+            .toc-sidebar { display: none; }
+            .main-content, .footer { margin-left: 0; }
+            .hero, .content-area { padding: 24px; }
+            .schema-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── Sidebar ──────────────────────────────────────────────────── -->
+<nav class="toc-sidebar">
+    <div class="logo">
+        <span>Viernes V1 CRM</span>
+        <h2>Módulo 7<br>Propuestas Comerciales</h2>
+    </div>
+    <span class="toc-label">Índice</span>
+    <a href="#s1">1. Estado del proyecto</a>
+    <a href="#s2">2. Dependencias</a>
+    <a href="#s3">3. Propósito</a>
+    <a href="#s4">4. Entidades</a>
+    <a href="#s5">5. Objetos de valor</a>
+    <a href="#s6">6. Tablas propuestas</a>
+    <a href="#s7">7. Campos (DDL)</a>
+    <a href="#s8">8. Relaciones</a>
+    <a href="#s9">9. Reglas de negocio</a>
+    <a href="#s10">10. Casos de uso</a>
+    <a href="#s11">11. API REST</a>
+    <a href="#s12">12. DTOs</a>
+    <a href="#s13">13. Arquitectura</a>
+    <a href="#s14">14. Oracle XE</a>
+    <a href="#s15">15. Impacto</a>
+    <a href="#s16">16. Pruebas</a>
+    <a href="#s17">17. Riesgos</a>
+    <a href="#s18">18. Decisiones</a>
+</nav>
+
+<!-- ── Hero ─────────────────────────────────────────────────────── -->
+<div class="main-content">
+<header class="hero">
+    <div class="badge">📋 Informe de Validación Previa</div>
+    <h1>Módulo 7 — <span>Propuestas Comerciales</span></h1>
+    <p>Diseño técnico completo previo a la implementación del módulo de propuestas comerciales del CRM Viernes V1. Cubre 18 fases de análisis desde la arquitectura hasta las pruebas propuestas.</p>
+    <div class="hero-meta">
+        <div class="meta-chip">🏗️ Stack: <strong>Spring Boot 4 · Java 21 · Oracle XE</strong></div>
+        <div class="meta-chip">🧩 Patrón: <strong>Hexagonal + Spring Modulith</strong></div>
+        <div class="meta-chip">📅 Fecha: <strong>03 Oct 2026</strong></div>
+        <div class="meta-chip" style="background:rgba(16,185,129,.2); border-color:rgba(16,185,129,.3);">✅ Estado: <strong style="color:#6EE7B7;">Implementado y compilado</strong></div>
+    </div>
+</header>
+
+<div class="content-area">
+
+<!-- ── 1 ──────────────────────────────────────────────────────── -->
+<section class="section" id="s1">
+    <div class="section-header">
+        <div class="section-num">1</div>
+        <h2>Estado actual del proyecto</h2>
+    </div>
+
+    <p>El CRM <strong>Viernes V1</strong> es una aplicación <strong>Spring Boot 4.0.7</strong> con Java 21, Oracle XE (FREEPDB1), Spring Modulith, Lombok, MapStruct y Springdoc OpenAPI. Usa <code>hibernate.ddl-auto: update</code> para el esquema de BD.</p>
+
+    <h3>Módulos existentes</h3>
+    <pre>com.viernes
+├── ViernesApplication.java
+├── clientes/        <span class="cmt">(Módulo 3 — CRUD completo)</span>
+├── leads/           <span class="cmt">(Módulo 2 — CRUD completo)</span>
+├── oportunidades/   <span class="cmt">(Módulo 4 — CRUD + pipeline)</span>
+├── actividades/     <span class="cmt">(Módulo 5 — CRUD + relaciones + vencidas)</span>
+├── dashboard/       <span class="cmt">(Módulo 6 — Métricas agregadas, solo lectura)</span>
+└── shared/          <span class="cmt">(Config CORS, OpenAPI, excepciones, filtros)</span></pre>
+
+    <h3>Estructura hexagonal real por módulo</h3>
+    <div class="tbl-wrapper">
+        <table>
+            <thead><tr><th>Capa</th><th>Paquete real</th><th>Contenido</th></tr></thead>
+            <tbody>
+                <tr><td><strong>Domain</strong></td><td><code>modulo/domain/</code></td><td>Clase de dominio + enums</td></tr>
+                <tr><td><strong>Application DTOs</strong></td><td><code>modulo/application/dto/</code></td><td>Records <code>XxxRequest</code>, <code>XxxResponse</code></td></tr>
+                <tr><td><strong>Port In</strong></td><td><code>modulo/application/port/in/</code></td><td>Interface <code>ManageXxxUseCase</code></td></tr>
+                <tr><td><strong>Port Out</strong></td><td><code>modulo/application/port/out/</code></td><td>Interface <code>XxxPersistencePort</code></td></tr>
+                <tr><td><strong>Service</strong></td><td><code>modulo/application/service/</code></td><td><code>XxxService implements ManageXxxUseCase</code></td></tr>
+                <tr><td><strong>Adapter In (web)</strong></td><td><code>modulo/adapters/in/web/</code></td><td><code>XxxController</code></td></tr>
+                <tr><td><strong>Adapter Out</strong></td><td><code>modulo/adapters/out/persistence/</code></td><td><code>XxxPersistenceAdapter</code>, entity, repository</td></tr>
+                <tr><td><strong>Entity</strong></td><td><code>modulo/adapters/out/persistence/entity/</code></td><td><code>XxxEntity</code> (JPA)</td></tr>
+                <tr><td><strong>Repository</strong></td><td><code>modulo/adapters/out/persistence/repository/</code></td><td><code>XxxSpringDataRepository extends JpaRepository</code></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="alert alert-danger">
+        <div class="alert-icon">⚠️</div>
+        <div class="alert-content">
+            <strong>IMPORTANTE — Convención Lombok</strong>
+            El módulo <code>actividades</code> no usa Lombok. Los demás módulos (clientes, leads, oportunidades) sí. Para el Módulo 7 se sigue la convención mayoritaria: <strong>Lombok</strong>.
+        </div>
+    </div>
+
+    <h3>Convenciones clave detectadas</h3>
+    <div class="tbl-wrapper">
+        <table>
+            <thead><tr><th>Aspecto</th><th>Convención real</th></tr></thead>
+            <tbody>
+                <tr><td>PK</td><td><code>GenerationType.IDENTITY</code> (todas las entidades)</td></tr>
+                <tr><td>Tablas</td><td>Prefijo <code>CRM_</code> + nombre en MAYÚSCULAS</td></tr>
+                <tr><td>Columnas</td><td>MAYÚSCULAS para Clientes/Leads/Oportunidades; <code>snake_case</code> para Actividades</td></tr>
+                <tr><td>Relaciones entre módulos</td><td><strong>Sin FK físicas</strong> — referencia por ID numérico (<code>Long</code>)</td></tr>
+                <tr><td>DTOs</td><td>Java <code>record</code></td></tr>
+                <tr><td>Mapeo Entity↔Domain</td><td>Manual en el PersistenceAdapter (<code>toDomain</code> / <code>toEntity</code>)</td></tr>
+                <tr><td>Excepciones</td><td><code>ResourceNotFoundException</code> en <code>shared.exception</code>, manejada por <code>GlobalExceptionHandler</code></td></tr>
+                <tr><td>Validación</td><td>Bean Validation en records de request (<code>@NotBlank</code>, <code>@NotNull</code>, <code>@Size</code>, etc.)</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- ── 2 ──────────────────────────────────────────────────────── -->
+<section class="section" id="s2">
+    <div class="section-header">
+        <div class="section-num">2</div>
+        <h2>Dependencias detectadas</h2>
+    </div>
+    <div class="tbl-wrapper">
+        <table>
+            <thead><tr><th>Entidad externa</th><th>Cómo la referencia el proyecto</th><th>Impacto en Módulo 7</th></tr></thead>
+            <tbody>
+                <tr><td><strong>Oportunidad</strong></td><td>ID <code>Long</code>, tabla <code>CRM_OPORTUNIDADES</code></td><td>La propuesta se vincula a una oportunidad → <code>Long idOportunidad</code></td></tr>
+                <tr><td><strong>Cliente</strong></td><td>ID <code>Long</code>, tabla <code>CRM_CLIENTES</code>. Oportunidades usa <code>clienteNombre</code> (String)</td><td><code>Long idCliente</code> + <code>clienteNombre</code> desnormalizado</td></tr>
+                <tr><td><strong>Responsable/Usuario</strong></td><td>String libre. No hay módulo de Usuarios</td><td><code>String responsable</code> (max 100)</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="alert alert-note">
+        <div class="alert-icon">💡</div>
+        <div class="alert-content">
+            <strong>Patrón de validación de relaciones</strong>
+            El módulo de <strong>Actividades</strong> ya resolvió este problema con <code>RelacionValidationPort</code> + <code>RelacionValidationAdapter</code>. El Módulo 7 crea su propio <code>PropuestaRelacionValidationPort</code> siguiendo el mismo patrón para mantener el desacoplamiento modular.
+        </div>
+    </div>
+</section>
+
+<!-- ── 3 ──────────────────────────────────────────────────────── -->
+<section class="section" id="s3">
+    <div class="section-header">
+        <div class="section-num">3</div>
+        <h2>Propósito del módulo</h2>
+    </div>
+    <p>El pipeline de oportunidades (<code>PROSPECCION → CONTACTO → CALIFICACION → <strong>PROPUESTA</strong> → NEGOCIACION → GANADA → PERDIDA</code>) ya incluye la etapa <code>PROPUESTA</code> en el enum <code>EtapaOportunidad</code>, lo que confirma que el flujo comercial esperaba este módulo.</p>
+    <p>El módulo representa una <strong>propuesta comercial formal</strong> asociada a una oportunidad: un documento que detalla productos/servicios ofertados, cantidades, precios unitarios y un monto total, con un flujo de estados que refleja el proceso de negociación.</p>
+    <ul>
+        <li>Relación obligatoria con una oportunidad existente.</li>
+        <li>Cliente derivado de la oportunidad o especificado explícitamente.</li>
+        <li>Múltiples líneas de detalle (productos/servicios).</li>
+        <li>Flujo de vida controlado con estados.</li>
+    </ul>
+</section>
+
+<!-- ── 4 ──────────────────────────────────────────────────────── -->
+<section class="section" id="s4">
+    <div class="section-header">
+        <div class="section-num">4</div>
+        <h2>Entidades</h2>
+    </div>
+    <div class="tbl-wrapper">
+        <table>
+            <thead><tr><th>Entidad</th><th>Justificación</th></tr></thead>
+            <tbody>
+                <tr><td><strong>Propuesta</strong></td><td>Necesita identidad propia. Ciclo de vida independiente (borrador, enviada, aprobada). Una oportunidad puede tener múltiples propuestas.</td></tr>
+                <tr><td><strong>DetallePropuesta</strong></td><td>Cada línea necesita identidad dentro de la propuesta. Representa un concepto/servicio/producto con cantidad y precio.</td></tr>
+                <tr><td><strong>Oportunidad</strong> (externa)</td><td>Referenciada por ID, no modificada.</td></tr>
+                <tr><td><strong>Cliente</strong> (externa)</td><td>Referenciada por ID, no modificada.</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- ── 5 ──────────────────────────────────────────────────────── -->
+<section class="section" id="s5">
+    <div class="section-header">
+        <div class="section-num">5</div>
+        <h2>Objetos de valor</h2>
+    </div>
+    <div class="tbl-wrapper">
+        <table>
+            <thead><tr><th>Concepto</th><th>Implementación</th><th>Justificación</th></tr></thead>
+            <tbody>
+                <tr><td>Montos</td><td><code>BigDecimal</code></td><td>Coherente con <code>OportunidadEntity.valor</code></td></tr>
+                <tr><td>Estado de la propuesta</td><td><code>enum EstadoPropuesta</code></td><td>Coherente con <code>EstadoCliente</code>, <code>EtapaOportunidad</code>, etc.</td></tr>
+                <tr><td>Fechas de emisión/vencimiento</td><td><code>LocalDate</code></td><td>Coherente con <code>LeadEntity.fecha</code></td></tr>
+                <tr><td>Timestamp de creación</td><td><code>LocalDateTime</code></td><td>Coherente con todos los módulos</td></tr>
+                <tr><td>Versión</td><td><code>Integer version</code></td><td>Simple, no necesita clase propia en V1</td></tr>
+                <tr><td>Número de propuesta</td><td><code>String numeroPropuesta</code></td><td>Generado automáticamente, formato <code>PROP-YYYY-NNNN</code></td></tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="alert alert-tip">
+        <div class="alert-icon">💚</div>
+        <div class="alert-content">
+            <strong>Decisión de diseño</strong>
+            No se proponen clases <code>Dinero</code>, <code>RangoFecha</code> ni <code>Porcentaje</code> porque <strong>ningún módulo existente las usa</strong>. Introducirlas solo para Propuestas rompería la coherencia del proyecto. Se podrán refactorizar en V2.
+        </div>
+    </div>
+</section>
+
+<!-- ── 6 ──────────────────────────────────────────────────────── -->
+<section class="section" id="s6">
+    <div class="section-header">
+        <div class="section-num">6</div>
+        <h2>Tablas propuestas</h2>
+    </div>
+    <p>Se proponen <strong>dos tablas</strong>. Una propuesta comercial típica contiene múltiples ítems, modelar todo en una tabla obligaría a serializar JSON (anti-patrón en Oracle) o limitar a un solo concepto (insuficiente).</p>
+    <div class="schema-grid">
+        <div class="schema-box">
+            <div class="schema-box-header">CRM_PROPUESTAS (cabecera)</div>
+            <div style="padding:4px 0;">
+                <div class="schema-field"><span class="sf-name">ID</span><span class="sf-type">NUMBER IDENTITY</span><span class="sf-badges"><span class="tag-pk">PK</span><span class="tag-nn">NN</span></span></div>
+                <div class="schema-field"><span class="sf-name">NUMERO_PROPUESTA</span><span class="sf-type">VARCHAR2(50)</span><span class="sf-badges"><span class="tag-nn">NN</span></span></div>
+                <div class="schema-field"><span class="sf-name">ID_OPORTUNIDAD</span><span class="sf-type">NUMBER(19)</span><span class="sf-badges"><span class="tag-nn">NN</span></span></div>
+                <div class="schema-field"><span class="sf-name">ID_CLIENTE</span><span class="sf-type">NUMBER(19)</span><span class="sf-badges"><span class="tag-nn">NN</span></span></div>
+                <div class="schema-field"><span class="sf-name">CLIENTE_NOMBRE</span><span class="sf-type">VARCHAR2(150)</span><span class="sf-badges"></span></div>
+                <div class="schema-field"><span class="sf-name">ESTADO</span><span class="sf-type">VARCHAR2(20)</span><span class="sf-badges"><span class="tag-nn">NN</span></span></div>
+                <div class="schema-field"><span class="sf-name">VERSION</span><span class="sf-type">NUMBER(5)</span><span class="sf-badges"><span class="tag-nn">NN</span></span></div>
+                <div class="schema-field"><span class="sf-name">SUBTOTAL</span><span class="sf-type">NUMBER(14,2)</span><span class="sf-badges"><span class="tag-nn">NN</span></span></div>
+                <div class="schema-field"><span class="sf-name">DESCUENTO</span><span class="sf-type">NUMBER(14,2)</span><span class="sf-badges"><span class="tag-nn">NN</span></span></div>
+                <div class="schema-field"><span class="sf-name">TOTAL</span><span class="sf-type">NUMBER(14,2)</span><span class="sf-badges"><span class="tag-nn">NN</span></span></div>
+                <div class="schema-field"><span class="sf-name">RESPONSABLE</span><span class="sf-type">VARCHAR2(100)</span><span class="sf-badges"></span></div>
+                <div class="schema-field"><span class="sf-name">FECHA_EMISION</span><span class="sf-type">DATE</span><span class="sf-badges"><span class="tag-nn">NN</span></span></div>
+                <div class="schema-field"><span class="sf-name">FECHA_VENCIMIENTO</span><span class="sf-type">DATE</span><span class="sf-badges"></span></div>
+                <div class="schema-field"><span class="sf-name">OBSERVACIONES</span><span class="sf-type">CLOB</span><span class="sf-badges"></span></div>
+                <div class="schema-field"><span class="sf-name">CREADO_EN</span><span class="sf-type">TIMESTAMP</span><span class="sf-badges"><span class="tag-nn">NN</span></span></div>
+            </div>
+        </div>
+        <div class="schema-box">
+            <div class="schema-box-header">CRM_PROPUESTA_DETALLES (líneas)</div>
+            <div style="padding:4px 0;">
+                <div class="schema-field"><span class="sf-name">ID</span><span class="sf-type">NUMBER IDENTITY</span><span class="sf-badges"><span class="tag-pk">PK</span><span class="tag-nn">NN</span></span></div>
+                <div class="schema-field"><span class="sf-name">ID_PROPUESTA</span><span class="sf-type">NUMBER(19)</span><span class="sf-badges"><span class="tag-fk">FK</span><span class="tag-nn">NN</span></span></div>
+                <div class="schema-field"><span class="sf-name">DESCRIPCION</span><span class="sf-type">VARCHAR2(500)</span><span class="sf-badges"><span class="tag-nn">NN</span></span></div>
+                <div class="schema-field"><span class="sf-name">CANTIDAD</span><span class="sf-type">NUMBER(10)</span><span class="sf-badges"><span class="tag-nn">NN</span></span></div>
+                <div class="schema-field"><span class="sf-name">PRECIO_UNITARIO</span><span class="sf-type">NUMBER(14,2)</span><span class="sf-badges"><span class="tag-nn">NN</span></span></div>
+                <div class="schema-field"><span class="sf-name">SUBTOTAL</span><span class="sf-type">NUMBER(14,2)</span><span class="sf-badges"><span class="tag-nn">NN</span></span></div>
+            </div>
+        </div>
+    </div>
+    <div class="alert alert-danger">
+        <div class="alert-icon">🔑</div>
+        <div class="alert-content">
+            <strong>FK física solo en Detalles → Propuesta</strong>
+            <code>ID_PROPUESTA</code> en <code>CRM_PROPUESTA_DETALLES</code> usa FK física con <code>ON DELETE CASCADE</code>. Es la <em>única</em> FK física del módulo. Las referencias a Oportunidades y Clientes son lógicas (por ID).
+        </div>
+    </div>
+</section>
+
+<!-- ── 7 ──────────────────────────────────────────────────────── -->
+<section class="section" id="s7">
+    <div class="section-header">
+        <div class="section-num">7</div>
+        <h2>DDL de referencia — Oracle XE</h2>
+    </div>
+    <pre><span class="kw">CREATE TABLE</span> <span class="typ">CRM_PROPUESTAS</span> (
+    ID               <span class="typ">NUMBER</span> <span class="kw">GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY</span>,
+    NUMERO_PROPUESTA <span class="typ">VARCHAR2</span>(<span class="num">50</span>)    <span class="kw">NOT NULL UNIQUE</span>,
+    ID_OPORTUNIDAD   <span class="typ">NUMBER</span>(<span class="num">19</span>)      <span class="kw">NOT NULL</span>,
+    ID_CLIENTE       <span class="typ">NUMBER</span>(<span class="num">19</span>)      <span class="kw">NOT NULL</span>,
+    CLIENTE_NOMBRE   <span class="typ">VARCHAR2</span>(<span class="num">150</span>),
+    ESTADO           <span class="typ">VARCHAR2</span>(<span class="num">20</span>)    <span class="kw">NOT NULL</span>,
+    VERSION          <span class="typ">NUMBER</span>(<span class="num">5</span>)       <span class="kw">DEFAULT</span> <span class="num">1</span> <span class="kw">NOT NULL</span>,
+    SUBTOTAL         <span class="typ">NUMBER</span>(<span class="num">14</span>,<span class="num">2</span>)    <span class="kw">NOT NULL</span>,
+    DESCUENTO        <span class="typ">NUMBER</span>(<span class="num">14</span>,<span class="num">2</span>)    <span class="kw">DEFAULT</span> <span class="num">0</span> <span class="kw">NOT NULL</span>,
+    TOTAL            <span class="typ">NUMBER</span>(<span class="num">14</span>,<span class="num">2</span>)    <span class="kw">NOT NULL</span>,
+    RESPONSABLE      <span class="typ">VARCHAR2</span>(<span class="num">100</span>),
+    FECHA_EMISION    <span class="typ">DATE</span>            <span class="kw">NOT NULL</span>,
+    FECHA_VENCIMIENTO <span class="typ">DATE</span>,
+    OBSERVACIONES    <span class="typ">CLOB</span>,
+    CREADO_EN        <span class="typ">TIMESTAMP</span>       <span class="kw">NOT NULL</span>
+);
+
+<span class="kw">CREATE TABLE</span> <span class="typ">CRM_PROPUESTA_DETALLES</span> (
+    ID               <span class="typ">NUMBER</span> <span class="kw">GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY</span>,
+    ID_PROPUESTA     <span class="typ">NUMBER</span>(<span class="num">19</span>)      <span class="kw">NOT NULL</span>,
+    DESCRIPCION      <span class="typ">VARCHAR2</span>(<span class="num">500</span>)   <span class="kw">NOT NULL</span>,
+    CANTIDAD         <span class="typ">NUMBER</span>(<span class="num">10</span>)      <span class="kw">NOT NULL</span>,
+    PRECIO_UNITARIO  <span class="typ">NUMBER</span>(<span class="num">14</span>,<span class="num">2</span>)    <span class="kw">NOT NULL</span>,
+    SUBTOTAL         <span class="typ">NUMBER</span>(<span class="num">14</span>,<span class="num">2</span>)    <span class="kw">NOT NULL</span>,
+    <span class="kw">CONSTRAINT</span> FK_DETALLE_PROPUESTA <span class="kw">FOREIGN KEY</span> (ID_PROPUESTA)
+        <span class="kw">REFERENCES</span> CRM_PROPUESTAS(ID) <span class="kw">ON DELETE CASCADE</span>
+);</pre>
+</section>
+
+<!-- ── 8 ──────────────────────────────────────────────────────── -->
+<section class="section" id="s8">
+    <div class="section-header">
+        <div class="section-num">8</div>
+        <h2>Relaciones</h2>
+    </div>
+    <pre>CRM_CLIENTES
+   │
+   └──── CRM_PROPUESTAS  <span class="cmt">(referencia lógica vía ID_CLIENTE, Long)</span>
+
+CRM_OPORTUNIDADES
+   │
+   └──── CRM_PROPUESTAS  <span class="cmt">(referencia lógica vía ID_OPORTUNIDAD, Long)</span>
+
+CRM_PROPUESTAS
+   │
+   └──── N CRM_PROPUESTA_DETALLES  <span class="cmt">(FK física, ON DELETE CASCADE)</span></pre>
+    <div class="tbl-wrapper">
+        <table>
+            <thead><tr><th>Relación</th><th>Tipo</th><th>Justificación</th></tr></thead>
+            <tbody>
+                <tr><td>Propuesta → Oportunidad</td><td><code>Long idOportunidad</code> (lógica)</td><td>Coherente con Actividades. Sin FK para desacoplamiento modular.</td></tr>
+                <tr><td>Propuesta → Cliente</td><td><code>Long idCliente</code> + <code>clienteNombre</code></td><td>Coherente con <code>OportunidadEntity.clienteNombre</code>.</td></tr>
+                <tr><td>Propuesta → Detalles</td><td><code>@OneToMany</code> + FK física</td><td>Son del mismo aggregate. Integridad referencial esencial.</td></tr>
+                <tr><td>Propuesta → Responsable</td><td><code>String</code> libre</td><td>Coherente con todos los módulos existentes.</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- ── 9 ──────────────────────────────────────────────────────── -->
+<section class="section" id="s9">
+    <div class="section-header">
+        <div class="section-num">9</div>
+        <h2>Reglas de negocio</h2>
+    </div>
+    <div class="tbl-wrapper">
+        <table>
+            <thead><tr><th>#</th><th>Regla</th><th>Veredicto</th></tr></thead>
+            <tbody>
+                <tr><td>R1</td><td>Una propuesta debe estar asociada a una oportunidad existente</td><td><span class="pill pill-green">✅ Aceptada</span></td></tr>
+                <tr><td>R2</td><td>Una propuesta debe tener un cliente existente</td><td><span class="pill pill-green">✅ Aceptada</span></td></tr>
+                <tr><td>R3</td><td>Una propuesta debe tener al menos un detalle</td><td><span class="pill pill-green">✅ Aceptada</span></td></tr>
+                <tr><td>R4</td><td>Una propuesta APROBADA o RECHAZADA no puede modificarse</td><td><span class="pill pill-green">✅ Aceptada</span></td></tr>
+                <tr><td>R5</td><td>El total se calcula: <code>SUBTOTAL − DESCUENTO</code> (serverside)</td><td><span class="pill pill-green">✅ Aceptada</span></td></tr>
+                <tr><td>R6</td><td>Montos no pueden ser negativos; cantidad mínima 1</td><td><span class="pill pill-green">✅ Aceptada</span></td></tr>
+                <tr><td>R7</td><td><code>fechaVencimiento</code> no puede ser anterior a <code>fechaEmision</code></td><td><span class="pill pill-green">✅ Aceptada</span></td></tr>
+                <tr><td>R8</td><td>Solo se puede ENVIAR una propuesta en estado BORRADOR</td><td><span class="pill pill-green">✅ Aceptada</span></td></tr>
+                <tr><td>R9</td><td>Solo se puede APROBAR o RECHAZAR una propuesta ENVIADA</td><td><span class="pill pill-green">✅ Aceptada</span></td></tr>
+                <tr><td>R10</td><td>Una propuesta CANCELADA no puede volver a estados anteriores</td><td><span class="pill pill-green">✅ Aceptada</span></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h3>Flujo de estados</h3>
+    <div class="flow">
+        <span class="flow-state state-borrador">BORRADOR</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-state state-enviada">ENVIADA</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-state state-aprobada">APROBADA</span>
+    </div>
+    <div class="flow" style="margin-top:8px;">
+        <span class="flow-state state-borrador">BORRADOR</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-state state-enviada">ENVIADA</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-state state-rechazada">RECHAZADA</span>
+    </div>
+    <div class="flow" style="margin-top:8px;">
+        <span class="flow-state state-borrador">BORRADOR</span>
+        <span class="flow-arrow">/</span>
+        <span class="flow-state state-enviada">ENVIADA</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-state state-cancelada">CANCELADA</span>
+    </div>
+</section>
+
+<!-- ── 10 ─────────────────────────────────────────────────────── -->
+<section class="section" id="s10">
+    <div class="section-header">
+        <div class="section-num">10</div>
+        <h2>Casos de uso</h2>
+    </div>
+    <div class="tbl-wrapper">
+        <table>
+            <thead><tr><th>Caso de uso</th><th>Método</th><th>Descripción</th></tr></thead>
+            <tbody>
+                <tr><td>Crear propuesta</td><td><code>crear()</code></td><td>Crea con detalles. Estado inicial: BORRADOR. Calcula subtotal y total.</td></tr>
+                <tr><td>Listar propuestas</td><td><code>listar()</code></td><td>Lista todas las propuestas.</td></tr>
+                <tr><td>Obtener por ID</td><td><code>obtener()</code></td><td>Retorna propuesta con sus detalles.</td></tr>
+                <tr><td>Actualizar</td><td><code>actualizar()</code></td><td>Solo en BORRADOR. Actualiza cabecera y detalles.</td></tr>
+                <tr><td>Enviar</td><td><code>enviar()</code></td><td>BORRADOR → ENVIADA.</td></tr>
+                <tr><td>Aprobar</td><td><code>aprobar()</code></td><td>ENVIADA → APROBADA.</td></tr>
+                <tr><td>Rechazar</td><td><code>rechazar()</code></td><td>ENVIADA → RECHAZADA.</td></tr>
+                <tr><td>Cancelar</td><td><code>cancelar()</code></td><td>Cancela desde cualquier estado no terminal.</td></tr>
+                <tr><td>Listar por oportunidad</td><td><code>listarPorOportunidad()</code></td><td>Propuestas de una oportunidad.</td></tr>
+                <tr><td>Listar por cliente</td><td><code>listarPorCliente()</code></td><td>Propuestas de un cliente.</td></tr>
+                <tr><td>Eliminar</td><td><code>eliminar()</code></td><td>Solo en BORRADOR.</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- ── 11 ─────────────────────────────────────────────────────── -->
+<section class="section" id="s11">
+    <div class="section-header">
+        <div class="section-num">11</div>
+        <h2>API REST — <code>/api/v1/propuestas</code></h2>
+    </div>
+    <div class="tbl-wrapper">
+        <table>
+            <thead><tr><th>Método</th><th>Endpoint</th><th>Función</th><th>Códigos HTTP</th></tr></thead>
+            <tbody>
+                <tr><td><span class="method m-post">POST</span></td><td><code>/api/v1/propuestas</code></td><td>Crear propuesta con detalles</td><td>201, 400, 404</td></tr>
+                <tr><td><span class="method m-get">GET</span></td><td><code>/api/v1/propuestas</code></td><td>Listar (filtros: <code>?idOportunidad</code>, <code>?idCliente</code>, <code>?estado</code>)</td><td>200</td></tr>
+                <tr><td><span class="method m-get">GET</span></td><td><code>/api/v1/propuestas/{id}</code></td><td>Obtener propuesta con detalles</td><td>200, 404</td></tr>
+                <tr><td><span class="method m-put">PUT</span></td><td><code>/api/v1/propuestas/{id}</code></td><td>Actualizar (solo BORRADOR)</td><td>200, 400, 404, 409</td></tr>
+                <tr><td><span class="method m-patch">PATCH</span></td><td><code>/api/v1/propuestas/{id}/enviar</code></td><td>BORRADOR → ENVIADA</td><td>200, 404, 409</td></tr>
+                <tr><td><span class="method m-patch">PATCH</span></td><td><code>/api/v1/propuestas/{id}/aprobar</code></td><td>ENVIADA → APROBADA</td><td>200, 404, 409</td></tr>
+                <tr><td><span class="method m-patch">PATCH</span></td><td><code>/api/v1/propuestas/{id}/rechazar</code></td><td>ENVIADA → RECHAZADA</td><td>200, 404, 409</td></tr>
+                <tr><td><span class="method m-patch">PATCH</span></td><td><code>/api/v1/propuestas/{id}/cancelar</code></td><td>Cancelar propuesta</td><td>200, 404, 409</td></tr>
+                <tr><td><span class="method m-delete">DELETE</span></td><td><code>/api/v1/propuestas/{id}</code></td><td>Eliminar (solo BORRADOR)</td><td>204, 404, 409</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h3>Ejemplo: POST Request</h3>
+    <pre>{
+  <span class="str">"idOportunidad"</span>: <span class="num">1</span>,
+  <span class="str">"idCliente"</span>: <span class="num">1</span>,
+  <span class="str">"clienteNombre"</span>: <span class="str">"Empresa XYZ"</span>,
+  <span class="str">"responsable"</span>: <span class="str">"Juan Pérez"</span>,
+  <span class="str">"fechaEmision"</span>: <span class="str">"2026-10-03"</span>,
+  <span class="str">"fechaVencimiento"</span>: <span class="str">"2026-11-03"</span>,
+  <span class="str">"descuento"</span>: <span class="num">100.00</span>,
+  <span class="str">"observaciones"</span>: <span class="str">"Propuesta inicial"</span>,
+  <span class="str">"detalles"</span>: [
+    { <span class="str">"descripcion"</span>: <span class="str">"Consultoría estratégica"</span>, <span class="str">"cantidad"</span>: <span class="num">10</span>, <span class="str">"precioUnitario"</span>: <span class="num">500.00</span> },
+    { <span class="str">"descripcion"</span>: <span class="str">"Licencia software CRM"</span>,   <span class="str">"cantidad"</span>: <span class="num">1</span>,  <span class="str">"precioUnitario"</span>: <span class="num">3000.00</span> }
+  ]
+}</pre>
+
+    <h3>Ejemplo: GET Response</h3>
+    <pre>{
+  <span class="str">"id"</span>: <span class="num">1</span>, <span class="str">"numeroPropuesta"</span>: <span class="str">"PROP-2026-0001"</span>,
+  <span class="str">"estado"</span>: <span class="str">"BORRADOR"</span>, <span class="str">"version"</span>: <span class="num">1</span>,
+  <span class="str">"subtotal"</span>: <span class="num">8000.00</span>, <span class="str">"descuento"</span>: <span class="num">100.00</span>, <span class="str">"total"</span>: <span class="num">7900.00</span>,
+  <span class="str">"detalles"</span>: [
+    { <span class="str">"id"</span>: <span class="num">1</span>, <span class="str">"descripcion"</span>: <span class="str">"Consultoría estratégica"</span>, <span class="str">"cantidad"</span>: <span class="num">10</span>, <span class="str">"precioUnitario"</span>: <span class="num">500.00</span>, <span class="str">"subtotal"</span>: <span class="num">5000.00</span> },
+    { <span class="str">"id"</span>: <span class="num">2</span>, <span class="str">"descripcion"</span>: <span class="str">"Licencia software CRM"</span>,   <span class="str">"cantidad"</span>: <span class="num">1</span>,  <span class="str">"precioUnitario"</span>: <span class="num">3000.00</span>, <span class="str">"subtotal"</span>: <span class="num">3000.00</span> }
+  ]
+}</pre>
+</section>
+
+<!-- ── 12 ─────────────────────────────────────────────────────── -->
+<section class="section" id="s12">
+    <div class="section-header">
+        <div class="section-num">12</div>
+        <h2>DTOs</h2>
+    </div>
+    <div class="tbl-wrapper">
+        <table>
+            <thead><tr><th>DTO</th><th>Tipo</th><th>Función</th></tr></thead>
+            <tbody>
+                <tr><td><code>PropuestaRequest</code></td><td><code>record</code></td><td>Entrada para crear/actualizar. Incluye lista de <code>DetallePropuestaRequest</code>.</td></tr>
+                <tr><td><code>PropuestaResponse</code></td><td><code>record</code></td><td>Response completo con todos los campos y detalles.</td></tr>
+                <tr><td><code>DetallePropuestaRequest</code></td><td><code>record</code></td><td>Ítem de detalle: descripción, cantidad, precio.</td></tr>
+                <tr><td><code>DetallePropuestaResponse</code></td><td><code>record</code></td><td>Ítem de detalle en respuesta: incluye <code>id</code> y <code>subtotal</code> calculado.</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <h3>Validaciones en PropuestaRequest</h3>
+    <ul>
+        <li><code>idOportunidad</code>: <code>@NotNull</code></li>
+        <li><code>idCliente</code>: <code>@NotNull</code></li>
+        <li><code>clienteNombre</code>: <code>@Size(max = 150)</code></li>
+        <li><code>fechaEmision</code>: <code>@NotNull</code></li>
+        <li><code>descuento</code>: <code>@DecimalMin("0.00")</code></li>
+        <li><code>responsable</code>: <code>@Size(max = 100)</code></li>
+        <li><code>detalles</code>: <code>@NotEmpty</code> + <code>@Valid</code> (validación en cascada)</li>
+    </ul>
+    <h3>Validaciones en DetallePropuestaRequest</h3>
+    <ul>
+        <li><code>descripcion</code>: <code>@NotBlank</code>, <code>@Size(max = 500)</code></li>
+        <li><code>cantidad</code>: <code>@NotNull</code>, <code>@Min(1)</code></li>
+        <li><code>precioUnitario</code>: <code>@NotNull</code>, <code>@DecimalMin("0.00")</code></li>
+    </ul>
+</section>
+
+<!-- ── 13 ─────────────────────────────────────────────────────── -->
+<section class="section" id="s13">
+    <div class="section-header">
+        <div class="section-num">13</div>
+        <h2>Arquitectura del módulo</h2>
+    </div>
+    <div class="tree">
+<span class="dir">com.viernes.propuestas</span>
+│
+├── <span class="dir">domain/</span>
+│   ├── <span class="file">Propuesta.java</span>           <span class="cmt-tree">← lógica de cálculo de totales y validación de estado</span>
+│   ├── <span class="file">DetallePropuesta.java</span>    <span class="cmt-tree">← calcularSubtotal()</span>
+│   └── <span class="file">EstadoPropuesta.java</span>     <span class="cmt-tree">← BORRADOR | ENVIADA | APROBADA | RECHAZADA | CANCELADA</span>
+│
+├── <span class="dir">application/</span>
+│   ├── <span class="dir">dto/</span>
+│   │   ├── <span class="file">PropuestaRequest.java</span>
+│   │   ├── <span class="file">PropuestaResponse.java</span>
+│   │   ├── <span class="file">DetallePropuestaRequest.java</span>
+│   │   └── <span class="file">DetallePropuestaResponse.java</span>
+│   ├── <span class="dir">port/</span>
+│   │   ├── <span class="dir">in/</span>
+│   │   │   └── <span class="file">ManagePropuestaUseCase.java</span>
+│   │   └── <span class="dir">out/</span>
+│   │       ├── <span class="file">PropuestaPersistencePort.java</span>
+│   │       └── <span class="file">PropuestaRelacionValidationPort.java</span>
+│   └── <span class="dir">service/</span>
+│       └── <span class="file">PropuestaService.java</span>     <span class="cmt-tree">← toda la lógica de negocio</span>
+│
+├── <span class="dir">adapters/</span>
+│   ├── <span class="dir">in/web/</span>
+│   │   └── <span class="file">PropuestaController.java</span>  <span class="cmt-tree">← REST + Swagger annotations</span>
+│   └── <span class="dir">out/persistence/</span>
+│       ├── <span class="file">PropuestaPersistenceAdapter.java</span>
+│       ├── <span class="file">PropuestaRelacionValidationAdapter.java</span>
+│       ├── <span class="dir">entity/</span>
+│       │   ├── <span class="file">PropuestaEntity.java</span>
+│       │   └── <span class="file">DetallePropuestaEntity.java</span>
+│       └── <span class="dir">repository/</span>
+│           └── <span class="file">PropuestaSpringDataRepository.java</span>
+│
+└── <span class="file">package-info.java</span>          <span class="cmt-tree">← @ApplicationModule de Spring Modulith</span>
+    </div>
+</section>
+
+<!-- ── 14 ─────────────────────────────────────────────────────── -->
+<section class="section" id="s14">
+    <div class="section-header">
+        <div class="section-num">14</div>
+        <h2>Estrategia Oracle XE</h2>
+    </div>
+    <ul>
+        <li><strong>PK:</strong> <code>GenerationType.IDENTITY</code> — coherente con <code>ClienteEntity</code>, <code>LeadEntity</code>, <code>OportunidadEntity</code> y <code>ActividadEntity</code>.</li>
+        <li><strong>Esquema:</strong> <code>ddl-auto: update</code> — Hibernate crea/actualiza las tablas automáticamente.</li>
+    </ul>
+    <h3>Índices recomendados</h3>
+    <div class="tbl-wrapper">
+        <table>
+            <thead><tr><th>Índice</th><th>Columna(s)</th><th>Justificación</th></tr></thead>
+            <tbody>
+                <tr><td><code>IDX_PROP_OPORTUNIDAD</code></td><td><code>ID_OPORTUNIDAD</code></td><td>Consulta frecuente: propuestas por oportunidad</td></tr>
+                <tr><td><code>IDX_PROP_CLIENTE</code></td><td><code>ID_CLIENTE</code></td><td>Consulta frecuente: propuestas por cliente</td></tr>
+                <tr><td><code>IDX_PROP_ESTADO</code></td><td><code>ESTADO</code></td><td>Filtrado por estado</td></tr>
+                <tr><td><code>UK_NUMERO_PROPUESTA</code></td><td><code>NUMERO_PROPUESTA</code></td><td>Unicidad del código de propuesta</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="alert alert-note">
+        <div class="alert-icon">📌</div>
+        <div class="alert-content">Con <code>ddl-auto: update</code>, Hibernate crea las tablas y la FK automáticamente. Los índices adicionales pueden crearse manualmente si se necesitan.</div>
+    </div>
+</section>
+
+<!-- ── 15 ─────────────────────────────────────────────────────── -->
+<section class="section" id="s15">
+    <div class="section-header">
+        <div class="section-num">15</div>
+        <h2>Impacto en módulos existentes</h2>
+    </div>
+    <div class="tbl-wrapper">
+        <table>
+            <thead><tr><th>Módulo</th><th>¿Requiere modificación?</th><th>Detalle</th></tr></thead>
+            <tbody>
+                <tr><td><strong>Clientes</strong></td><td><span class="pill pill-green">❌ No</span></td><td>Se referencia por ID sin modificar su código.</td></tr>
+                <tr><td><strong>Leads</strong></td><td><span class="pill pill-green">❌ No</span></td><td>Sin relación directa.</td></tr>
+                <tr><td><strong>Oportunidades</strong></td><td><span class="pill pill-green">❌ No</span></td><td>Se referencia por ID sin modificar su código.</td></tr>
+                <tr><td><strong>Actividades</strong></td><td><span class="pill pill-green">❌ No</span></td><td>Sin relación directa en V1.</td></tr>
+                <tr><td><strong>Dashboard</strong></td><td><span class="pill pill-green">❌ No (esta fase)</span></td><td>Las métricas de propuestas se agregarán en fase posterior.</td></tr>
+                <tr><td><strong>Shared</strong></td><td><span class="pill pill-amber">⚠️ Posiblemente</span></td><td>Se podría agregar handler para <code>IllegalStateException</code> (409) en <code>GlobalExceptionHandler</code>.</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- ── 16 ─────────────────────────────────────────────────────── -->
+<section class="section" id="s16">
+    <div class="section-header">
+        <div class="section-num">16</div>
+        <h2>Pruebas propuestas</h2>
+    </div>
+    <h3>PropuestaServiceTest (unitarias con Mockito)</h3>
+    <div class="tbl-wrapper">
+        <table>
+            <thead><tr><th>Método de prueba</th><th>Qué verifica</th></tr></thead>
+            <tbody>
+                <tr><td><code>crear_conDatosValidos_retornaResponse</code></td><td>Creación exitosa con cálculo correcto de subtotal/total</td></tr>
+                <tr><td><code>crear_sinDetalles_lanzaExcepcion</code></td><td>Regla R3: al menos un detalle</td></tr>
+                <tr><td><code>crear_oportunidadInexistente_lanzaNotFound</code></td><td>Validación de existencia de oportunidad</td></tr>
+                <tr><td><code>crear_clienteInexistente_lanzaNotFound</code></td><td>Validación de existencia de cliente</td></tr>
+                <tr><td><code>crear_descuentoNegativo_lanzaExcepcion</code></td><td>Regla R6</td></tr>
+                <tr><td><code>crear_fechaVencimientoAnterior_lanzaExcepcion</code></td><td>Regla R7</td></tr>
+                <tr><td><code>actualizar_enBorrador_exitoso</code></td><td>Actualización permitida</td></tr>
+                <tr><td><code>actualizar_enEnviada_lanzaConflict</code></td><td>Regla R4</td></tr>
+                <tr><td><code>enviar_desdeBorrador_cambiaEstado</code></td><td>Transición válida</td></tr>
+                <tr><td><code>enviar_desdeAprobada_lanzaConflict</code></td><td>Transición inválida</td></tr>
+                <tr><td><code>aprobar_desdeEnviada_cambiaEstado</code></td><td>Transición válida</td></tr>
+                <tr><td><code>rechazar_desdeEnviada_cambiaEstado</code></td><td>Transición válida</td></tr>
+                <tr><td><code>cancelar_desdeBorrador_cambiaEstado</code></td><td>Transición válida</td></tr>
+                <tr><td><code>eliminar_enBorrador_exitoso</code></td><td>Eliminación permitida</td></tr>
+                <tr><td><code>eliminar_enEnviada_lanzaConflict</code></td><td>Eliminación no permitida</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <h3>PropuestaControllerTest (MockMvc)</h3>
+    <div class="tbl-wrapper">
+        <table>
+            <thead><tr><th>Método de prueba</th><th>Qué verifica</th></tr></thead>
+            <tbody>
+                <tr><td><code>POST_valido_retorna201</code></td><td>Endpoint de creación</td></tr>
+                <tr><td><code>POST_sinDetalles_retorna400</code></td><td>Validación de request</td></tr>
+                <tr><td><code>GET_listar_retorna200</code></td><td>Listado general</td></tr>
+                <tr><td><code>GET_porId_retorna200</code></td><td>Obtener con detalles</td></tr>
+                <tr><td><code>GET_porId_inexistente_retorna404</code></td><td>No encontrado</td></tr>
+                <tr><td><code>PUT_enBorrador_retorna200</code></td><td>Actualización exitosa</td></tr>
+                <tr><td><code>PUT_enEnviada_retorna409</code></td><td>Conflicto de estado</td></tr>
+                <tr><td><code>PATCH_enviar_retorna200</code></td><td>Transición de estado</td></tr>
+                <tr><td><code>PATCH_transicionInvalida_retorna409</code></td><td>Conflicto</td></tr>
+                <tr><td><code>DELETE_enBorrador_retorna204</code></td><td>Eliminación exitosa</td></tr>
+                <tr><td><code>DELETE_enEnviada_retorna409</code></td><td>Conflicto</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- ── 17 ─────────────────────────────────────────────────────── -->
+<section class="section" id="s17">
+    <div class="section-header">
+        <div class="section-num">17</div>
+        <h2>Riesgos e inconsistencias</h2>
+    </div>
+    <div>
+        <div class="risk-item">
+            <div class="risk-num risk-med">1</div>
+            <div class="risk-body">
+                <strong>Sin FK físicas entre módulos — registros huérfanos</strong>
+                <p>Si se elimina una oportunidad o cliente, las propuestas quedarán con IDs inválidos. Mitigación: coherente con la arquitectura actual del proyecto. Las FK lógicas son una decisión deliberada para el desacoplamiento modular.</p>
+            </div>
+        </div>
+        <div class="risk-item">
+            <div class="risk-num risk-low">2</div>
+            <div class="risk-body">
+                <strong><code>clienteNombre</code> desnormalizado</strong>
+                <p>Puede quedar desactualizado si se cambia el nombre del cliente. Patrón ya existente en <code>OportunidadEntity.clienteNombre</code>. Aceptado como trade-off.</p>
+            </div>
+        </div>
+        <div class="risk-item">
+            <div class="risk-num risk-low">3</div>
+            <div class="risk-body">
+                <strong><code>responsable</code> es String libre</strong>
+                <p>Sin validación contra un módulo de Usuarios (que aún no existe). Coherente con todos los módulos del sistema.</p>
+            </div>
+        </div>
+        <div class="risk-item">
+            <div class="risk-num risk-med">4</div>
+            <div class="risk-body">
+                <strong>Generación del número de propuesta — race conditions</strong>
+                <p>El formato <code>PROP-YYYY-NNNN</code> generado con <code>SELECT COUNT</code> puede tener colisiones en concurrencia alta. Mitigación: en V1 el tráfico es bajo. En V2 se puede usar una SEQUENCE de Oracle.</p>
+            </div>
+        </div>
+        <div class="risk-item">
+            <div class="risk-num risk-low">5</div>
+            <div class="risk-body">
+                <strong>Inconsistencia en convención de columnas</strong>
+                <p>Actividades usa <code>snake_case</code>, los demás módulos usan <code>MAYUSCULAS</code>. El Módulo 7 sigue la convención mayoritaria: <code>MAYUSCULAS</code>.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── 18 ─────────────────────────────────────────────────────── -->
+<section class="section" id="s18">
+    <div class="section-header">
+        <div class="section-num">18</div>
+        <h2>Decisiones de diseño aprobadas</h2>
+    </div>
+    <ul class="decision-list">
+        <li><div class="decision-num">1</div>Estructura de 2 tablas: <code>CRM_PROPUESTAS</code> + <code>CRM_PROPUESTA_DETALLES</code> con relación 1:N.</li>
+        <li><div class="decision-num">2</div>Estados de propuesta: <code>BORRADOR</code>, <code>ENVIADA</code>, <code>APROBADA</code>, <code>RECHAZADA</code>, <code>CANCELADA</code>.</li>
+        <li><div class="decision-num">3</div>Relación con oportunidad: referencia lógica por <code>ID_OPORTUNIDAD</code> (Long), sin FK física, obligatoria.</li>
+        <li><div class="decision-num">4</div>Relación con cliente: referencia lógica por <code>ID_CLIENTE</code> (Long) + <code>CLIENTE_NOMBRE</code> desnormalizado.</li>
+        <li><div class="decision-num">5</div>FK física solo entre Propuesta → Detalles (<code>ON DELETE CASCADE</code>), al ser del mismo aggregate.</li>
+        <li><div class="decision-num">6</div>Modelo financiero V1: <code>SUBTOTAL</code>, <code>DESCUENTO</code>, <code>TOTAL</code>. Sin impuestos ni moneda.</li>
+        <li><div class="decision-num">7</div>Cálculo automático del total: <code>subtotal = Σ(cantidad × precioUnitario)</code>, <code>total = subtotal − descuento</code>.</li>
+        <li><div class="decision-num">8</div>Reglas de transición de estado: BORRADOR→ENVIADA→APROBADA/RECHAZADA, cancelable desde no-terminal.</li>
+        <li><div class="decision-num">9</div>Inmutabilidad: propuestas en estado APROBADA, RECHAZADA o CANCELADA no se pueden modificar.</li>
+        <li><div class="decision-num">10</div>Eliminación solo en BORRADOR.</li>
+        <li><div class="decision-num">11</div>Endpoints REST con <code>PATCH</code> para transiciones de estado.</li>
+        <li><div class="decision-num">12</div>DTOs como <code>record</code> (4 DTOs: request/response para propuesta y detalle).</li>
+        <li><div class="decision-num">13</div>Excepción de conflicto de estado en <code>GlobalExceptionHandler</code> con código <code>409</code>.</li>
+        <li><div class="decision-num">14</div>Generación automática de <code>numeroPropuesta</code> (formato <code>PROP-YYYY-NNNN</code>).</li>
+        <li><div class="decision-num">15</div>NO se modifica el Dashboard en esta fase.</li>
+        <li><div class="decision-num">16</div>Estrategia Oracle XE: <code>GenerationType.IDENTITY</code>, <code>ddl-auto: update</code>.</li>
+    </ul>
+
+    <div style="margin-top:24px; padding:20px; background:linear-gradient(135deg,#ECFDF5,#D1FAE5); border-radius:10px; border: 1px solid #6EE7B7; display:flex; align-items:center; gap:16px;">
+        <span style="font-size:2rem;">✅</span>
+        <div>
+            <div style="font-size:1.1rem; font-weight:700; color:#065F46;">ESTADO: IMPLEMENTADO Y COMPILADO</div>
+            <div style="font-size:.85rem; color:#047857; margin-top:4px;">BUILD SUCCESS — 86 archivos compilados sin errores — 03 Oct 2026, 12:55 PM</div>
+        </div>
+    </div>
+</section>
+
+</div><!-- /content-area -->
+
+<footer class="footer">
+    <p>Viernes V1 CRM — Módulo 7: Propuestas Comerciales | Spring Boot 4 · Java 21 · Oracle XE · Arquitectura Hexagonal</p>
+</footer>
+</div><!-- /main-content -->
+
+<script>
+    // Highlight active sidebar link on scroll
+    const sections = document.querySelectorAll('section[id]');
+    const links = document.querySelectorAll('.toc-sidebar a');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+            if (e.isIntersecting) {
+                links.forEach(l => l.classList.remove('active'));
+                const active = document.querySelector(`.toc-sidebar a[href="#${e.target.id}"]`);
+                if (active) active.classList.add('active');
+            }
+        });
+    }, { rootMargin: '-20% 0px -75% 0px' });
+    sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

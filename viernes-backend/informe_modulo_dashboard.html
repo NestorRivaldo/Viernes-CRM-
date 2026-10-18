@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe Final - Módulo Dashboard – VIERNES CRM</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0d1117;
+            --surface: #161b22;
+            --surface2: #1c2333;
+            --border: #30363d;
+            --text: #e6edf3;
+            --text-muted: #8b949e;
+            --accent: #388bfd;
+            --accent-soft: #1f3a6e;
+            --green: #3fb950;
+            --green-soft: #1a3d2b;
+            --purple: #bc8cff;
+            --cyan: #39c5cf;
+            --cyan-soft: #0e3444;
+            --radius: 12px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; padding: 40px; }
+        header { text-align: center; margin-bottom: 50px; }
+        h1 { font-size: 36px; color: var(--accent); margin-bottom: 10px; }
+        h2 { font-size: 24px; color: var(--cyan); margin: 30px 0 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        p { color: var(--text-muted); margin-bottom: 20px; }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 20px; }
+        .diagram-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 20px; display: flex; justify-content: center; }
+        pre { background: var(--surface2); padding: 15px; border-radius: 8px; font-family: 'Fira Code', monospace; font-size: 14px; overflow-x: auto; border: 1px solid var(--border); margin-bottom: 20px; color: var(--green); }
+        .status-badge { display: inline-block; padding: 5px 10px; border-radius: 20px; font-size: 14px; font-weight: bold; background: var(--green-soft); color: var(--green); border: 1px solid var(--green); }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Informe Final Módulo 6: Dashboard y Métricas</h1>
+    <p>Documentación técnica y funcional del orquestador de KPIs estadísticos del CRM.</p>
+    <div class="status-badge">ESTADO: LISTO (V1)</div>
+</header>
+
+<section>
+    <h2>1. Propósito y Alcance</h2>
+    <div class="card">
+        <p>El Módulo 6 proporciona una visión agregada y estadística de los módulos de Clientes, Leads, Oportunidades y Actividades. Funciona de manera pasiva y optimizada: no crea tablas nuevas, ni modifica los datos existentes, sino que los lee mediante consultas JPQL eficientes para construir indicadores comerciales (KPIs).</p>
+        <p>Responde a la pregunta: <strong>¿Cuál es el estado general del negocio en tiempo real?</strong></p>
+    </div>
+</section>
+
+<section>
+    <h2>2. Implementaciones Realizadas (Lógica de Módulo)</h2>
+    <div class="card">
+        <ul>
+            <li style="color:var(--text-muted); margin-bottom: 8px;"><strong>Separación por DTOs:</strong> Se crearon DTOs anidados y estructuras de respuesta (`DashboardResumenResponse`, `EstadoCantidadResponse`, etc.) garantizando que las Entidades JPA jamás lleguen al Controller.</li>
+            <li style="color:var(--text-muted); margin-bottom: 8px;"><strong>Lectura Pasiva:</strong> No se han añadido entidades al contexto. Se delegó en `DashboardQueryRepository` inyectando `EntityManager` para realizar consultas de agregación a las tablas nativas de Oracle XE (`CRM_CLIENTES`, `CRM_OPORTUNIDADES`, etc.).</li>
+            <li style="color:var(--text-muted); margin-bottom: 8px;"><strong>Cálculos Agrupados:</strong> Las operaciones matemáticas (Pipeline, Valor ganado, Cantidad por Etapa) se ejecutan mediante JPQL (ej. `SUM(o.valor)`, `COUNT(l)`), permitiendo una respuesta rápida sin cargar el servidor de Java con grandes cantidades de datos.</li>
+            <li style="color:var(--text-muted); margin-bottom: 8px;"><strong>Manejo de Dinero y Nulos:</strong> Los cálculos monetarios emplean estrictamente `BigDecimal`. Se han manejado apropiadamente los valores vacíos, retornando `0` si la base de datos está vacía.</li>
+            <li style="color:var(--text-muted); margin-bottom: 8px;"><strong>Testing Completo:</strong> Se incluyeron `DashboardServiceTest` y `DashboardControllerTest` (usando Mockito y MockMvc), validando las métricas en escenarios vacíos y poblados, asegurando que el módulo compile y pase las pruebas unitarias satisfactoriamente.</li>
+        </ul>
+    </div>
+</section>
+
+<section>
+    <h2>3. Endpoints de la API</h2>
+    <div class="card">
+        <p>Los endpoints exponen información consolidada y siguen el principio del mínimo acoplamiento en la Arquitectura Hexagonal:</p>
+        <pre>
+GET    /api/v1/dashboard/resumen        # Consolidado general (Devuelve todos los bloques)
+GET    /api/v1/dashboard/kpis           # Totales y conversiones (Clientes, Leads, Oportunidades)
+GET    /api/v1/dashboard/pipeline       # Totales de ventas, Oportunidades por Etapa y valor financiero
+GET    /api/v1/dashboard/leads          # Cantidad de leads y agrupación por estado
+GET    /api/v1/dashboard/actividades    # Cantidad de actividades y agrupación por tipo y estado
+        </pre>
+    </div>
+</section>
+
+<section>
+    <h2>4. Arquitectura y Persistencia</h2>
+    <div class="card">
+        <p>Apegado estrictamente al marco de Spring Modulith y a la estructura Hexagonal. Las consultas directas de lectura evitan romper el aislamiento de dominios. Todos los datos provienen de <strong>Oracle XE</strong>.</p>
+        <pre><span style="color:#8b949e">com.viernes.dashboard/</span>
+├── <span style="color:#3fb950">application/</span>
+│   ├── <span style="color:#e3b341">dto/</span>                 <span style="color:#8b949e"># DashboardResumenResponse, TipoCantidadResponse, etc.</span>
+│   ├── <span style="color:#e3b341">port/in/</span>             <span style="color:#8b949e"># DashboardUseCase</span>
+│   ├── <span style="color:#e3b341">port/out/</span>            <span style="color:#8b949e"># DashboardPersistencePort</span>
+│   └── <span style="color:#e3b341">service/</span>             <span style="color:#8b949e"># DashboardService (orquesta las peticiones)</span>
+└── <span style="color:#bc8cff">adapters/</span>
+    ├── <span style="color:#bc8cff">in/web/</span>              <span style="color:#8b949e"># DashboardController (Controlador REST)</span>
+    └── <span style="color:#bc8cff">out/persistence/</span>     <span style="color:#8b949e"># DashboardPersistenceAdapter y DashboardQueryRepository</span></pre>
+    </div>
+</section>
+
+<section>
+    <h2>5. Próximos Pasos (Limitaciones Actuales)</h2>
+    <div class="card">
+        <p>De acuerdo con la directiva de no sobre-diseñar (V1), se han documentado las siguientes oportunidades de mejora para el futuro:</p>
+        <ul style="color:var(--text-muted); padding-left: 20px;">
+            <li><strong>Filtros Temporales:</strong> No se implementaron en esta fase. A futuro, se podrían agregar los parámetros <code>?fechaInicio=</code> y <code>?fechaFin=</code> en los endpoints para hacer reportes acotados.</li>
+            <li><strong>Agrupación por Responsable:</strong> Debido a la ausencia del Módulo de Usuarios, no se agruparon estadísticas por vendedores. Esto será útil al tener la tabla usuarios implementada.</li>
+            <li><strong>Frontend:</strong> El backend se encuentra 100% preparado para ser conectado a cualquier cliente JavaScript o HTML para la graficación de los resultados mediante charts (e.g. Chart.js o Recharts).</li>
+        </ul>
+    </div>
+</section>
+
+</body>
+</html>

@@ -1,0 +1,162 @@
+<div class="form-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>{{ isEdit ? 'Editar Cliente' : 'Nuevo Cliente' }}</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="guardar()">
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nombre</mat-label>
+            <input matInput formControlName="nombre" required>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Empresa</mat-label>
+            <input matInput formControlName="empresa">
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Correo</mat-label>
+            <input matInput formControlName="correo" type="email" required>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Teléfono</mat-label>
+            <input matInput formControlName="telefono">
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Estado</mat-label>
+            <mat-select formControlName="estado" required>
+              <mat-option *ngFor="let est of estados" [value]="est">{{ est }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Responsable</mat-label>
+            <input matInput formControlName="responsable">
+          </mat-form-field>
+        </div>
+
+        <div class="form-actions">
+          <button mat-button type="button" routerLink="/clientes">Cancelar</button>
+          <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || loading">
+            {{ loading ? 'Guardando...' : 'Guardar' }}
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card *ngIf="isEdit" class="contactos-card">
+    <mat-card-header>
+      <mat-card-title>Contactos</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div *ngIf="contactosLoading" class="loading-state">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+
+      <div *ngIf="contactosError" class="error-message">{{ contactosError }}</div>
+
+      <div *ngIf="!contactosLoading && contactos.length === 0 && !contactosError" class="empty-state">
+        Este cliente aún no tiene contactos.
+      </div>
+
+      <table mat-table [dataSource]="contactos" *ngIf="contactos.length > 0 && !contactosLoading">
+
+        <ng-container matColumnDef="nombre">
+          <th mat-header-cell *matHeaderCellDef> Nombre </th>
+          <td mat-cell *matCellDef="let c"> {{c.nombre}} {{c.apellido}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="cargo">
+          <th mat-header-cell *matHeaderCellDef> Cargo </th>
+          <td mat-cell *matCellDef="let c"> {{c.cargo || '-'}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="correo">
+          <th mat-header-cell *matHeaderCellDef> Correo </th>
+          <td mat-cell *matCellDef="let c"> {{c.correo || '-'}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="telefono">
+          <th mat-header-cell *matHeaderCellDef> Teléfono </th>
+          <td mat-cell *matCellDef="let c"> {{c.telefono || '-'}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="principal">
+          <th mat-header-cell *matHeaderCellDef> Principal </th>
+          <td mat-cell *matCellDef="let c">
+            <mat-icon color="accent" *ngIf="c.principal">star</mat-icon>
+            <span *ngIf="!c.principal">-</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef> Acciones </th>
+          <td mat-cell *matCellDef="let c">
+            <button mat-icon-button color="primary" type="button" (click)="editarContacto(c)">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" type="button" (click)="eliminarContacto(c.id)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="contactosColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: contactosColumns;"></tr>
+      </table>
+
+      <h4>{{ editandoContactoId ? 'Editar Contacto' : 'Agregar Contacto' }}</h4>
+      <form [formGroup]="contactoForm" (ngSubmit)="guardarContacto()">
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nombre</mat-label>
+            <input matInput formControlName="nombre" required>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Apellido</mat-label>
+            <input matInput formControlName="apellido">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Cargo</mat-label>
+            <input matInput formControlName="cargo">
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Correo</mat-label>
+            <input matInput formControlName="correo" type="email">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Teléfono</mat-label>
+            <input matInput formControlName="telefono">
+          </mat-form-field>
+
+          <mat-checkbox formControlName="principal" class="principal-checkbox">Contacto principal</mat-checkbox>
+        </div>
+
+        <div class="form-actions">
+          <button mat-button type="button" (click)="cancelarEdicionContacto()" *ngIf="editandoContactoId">
+            Cancelar
+          </button>
+          <button mat-raised-button color="primary" type="submit" [disabled]="contactoForm.invalid || contactosLoading">
+            {{ editandoContactoId ? 'Actualizar Contacto' : 'Agregar Contacto' }}
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

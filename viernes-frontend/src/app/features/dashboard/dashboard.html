@@ -1,0 +1,67 @@
+<div class="dashboard-container">
+  <h2>Dashboard</h2>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Cargando información del CRM...</p>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="error-message">
+      {{ error() }}
+    </div>
+  }
+
+  @if (hasResumen()) {
+    <div class="kpi-grid">
+
+      <mat-card>
+        <mat-card-header>
+          <mat-card-subtitle>Clientes</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <h1 class="kpi-value">{{ resumen()!.clientes?.total || 0 }}</h1>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card>
+        <mat-card-header>
+          <mat-card-subtitle>Leads</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <h1 class="kpi-value">{{ resumen()!.leads?.total || 0 }}</h1>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card>
+        <mat-card-header>
+          <mat-card-subtitle>Oportunidades</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <h1 class="kpi-value">{{ resumen()!.oportunidades?.total || 0 }}</h1>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card>
+        <mat-card-header>
+          <mat-card-subtitle>Actividades Pendientes</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <h1 class="kpi-value">{{ resumen()!.actividades?.pendientes || 0 }}</h1>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card>
+        <mat-card-header>
+          <mat-card-subtitle>Propuestas</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <h1 class="kpi-value">{{ resumen()!.propuestas?.total || 0 }}</h1>
+        </mat-card-content>
+      </mat-card>
+
+    </div>
+  }
+</div>

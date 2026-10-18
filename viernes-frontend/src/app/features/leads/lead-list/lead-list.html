@@ -1,0 +1,70 @@
+<div class="list-container">
+  <div class="header-actions">
+    <h2>Leads</h2>
+    <button mat-raised-button color="primary" routerLink="/leads/nuevo">
+      <mat-icon>add</mat-icon> Nuevo Lead
+    </button>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="error-message">{{ error() }}</div>
+  }
+
+  @if (isEmpty()) {
+    <div class="empty-state">
+      No hay leads registrados.
+    </div>
+  }
+
+  @if (hasLeads()) {
+    <table mat-table [dataSource]="leads()" class="mat-elevation-z8">
+      
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef> ID </th>
+        <td mat-cell *matCellDef="let lead"> {{lead.id}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="nombre">
+        <th mat-header-cell *matHeaderCellDef> Nombre </th>
+        <td mat-cell *matCellDef="let lead"> {{lead.nombre}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="empresa">
+        <th mat-header-cell *matHeaderCellDef> Empresa </th>
+        <td mat-cell *matCellDef="let lead"> {{lead.empresa || '-'}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="estado">
+        <th mat-header-cell *matHeaderCellDef> Estado </th>
+        <td mat-cell *matCellDef="let lead"> {{lead.estado}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="fuente">
+        <th mat-header-cell *matHeaderCellDef> Fuente </th>
+        <td mat-cell *matCellDef="let lead"> {{lead.fuente || '-'}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="acciones">
+        <th mat-header-cell *matHeaderCellDef> Acciones </th>
+        <td mat-cell *matCellDef="let lead">
+          <button mat-icon-button color="primary" (click)="editar(lead.id)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="eliminar(lead.id)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  }
+</div>
+

@@ -1,0 +1,70 @@
+<div class="form-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>{{ isEdit ? 'Editar Actividad' : 'Nueva Actividad' }}</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="guardar()">
+        
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Título</mat-label>
+            <input matInput formControlName="titulo" required>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Descripción</mat-label>
+            <textarea matInput formControlName="descripcion" rows="3"></textarea>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Tipo</mat-label>
+            <mat-select formControlName="tipo" required>
+              <mat-option *ngFor="let t of tipos" [value]="t">{{ t }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Estado</mat-label>
+            <mat-select formControlName="estado">
+              <mat-option *ngFor="let e of estados" [value]="e">{{ e }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Fecha y Hora</mat-label>
+            <input matInput formControlName="fecha" type="datetime-local" required>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>ID Cliente (Opcional)</mat-label>
+            <input matInput formControlName="idCliente" type="number">
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>ID Lead (Opcional)</mat-label>
+            <input matInput formControlName="idLead" type="number">
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>ID Oportunidad (Opcional)</mat-label>
+            <input matInput formControlName="idOportunidad" type="number">
+          </mat-form-field>
+        </div>
+
+        <div class="form-actions">
+          <button mat-button type="button" routerLink="/actividades">Cancelar</button>
+          <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || loading">
+            {{ loading ? 'Guardando...' : 'Guardar' }}
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VIERNES – CRM Híbrido de Gestión Comercial y Marketing</title>
+  <meta name="description" content="VIERNES V1 – CRM Híbrido de Gestión Comercial y Marketing. Dashboard, Clientes, Leads y Oportunidades." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="brand">
+        <div class="brand-icon">V</div>
+        <div class="brand-text">
+          <span class="brand-name">VIERNES</span>
+          <span class="brand-sub">CRM Comercial</span>
+        </div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="nav-item active" data-page="dashboard" onclick="navigate('dashboard')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <a class="nav-item" data-page="clientes" onclick="navigate('clientes')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Clientes
+      </a>
+      <a class="nav-item" data-page="leads" onclick="navigate('leads')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.64 12a19.79 19.79 0 0 1-3-8.63A2 2 0 0 1 3.62 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.56a16 16 0 0 0 5.51 5.51l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21 16.92z"/></svg>
+        Leads
+      </a>
+      <a class="nav-item" data-page="oportunidades" onclick="navigate('oportunidades')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Oportunidades
+      </a>
+      <div class="nav-divider"></div>
+      <a class="nav-item nav-config" href="/swagger-ui/index.html" target="_blank">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a1 1 0 0 0-1.44 0L16.24 6.3A7 7 0 0 0 8 5.06L7.25 3.62A1 1 0 0 0 5.83 3.2L4.22 4.39a1 1 0 0 0-.22 1.4l.75 1.05A7 7 0 0 0 5 10.5V12a7 7 0 0 0 .75 3.16l-.75 1.05a1 1 0 0 0 .22 1.4l1.61 1.19a1 1 0 0 0 1.42-.42l.75-1.44A7 7 0 0 0 16.24 17.7l1.39 1.37a1 1 0 0 0 1.44 0l1.17-1.17a1 1 0 0 0 0-1.44l-1.37-1.39A7 7 0 0 0 19 12V10.5a7 7 0 0 0-.25-3.16l.75-1.05a1 1 0 0 0-.22-1.4z"/></svg>
+        API Swagger
+      </a>
+    </nav>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+    <!-- HEADER -->
+    <header class="top-header">
+      <div class="header-left">
+        <h1 id="page-title">Dashboard</h1>
+        <span id="page-sub" class="page-sub">Resumen del sistema CRM</span>
+      </div>
+      <div class="header-right">
+        <button class="btn-primary" id="header-action-btn" onclick="headerAction()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Nueva acción
+        </button>
+      </div>
+    </header>
+
+    <!-- PAGES -->
+    <div id="page-dashboard" class="page active">
+      <!-- KPI CARDS -->
+      <div class="kpi-grid" id="kpi-grid">
+        <div class="kpi-card loading-card"><div class="skeleton"></div></div>
+        <div class="kpi-card loading-card"><div class="skeleton"></div></div>
+        <div class="kpi-card loading-card"><div class="skeleton"></div></div>
+        <div class="kpi-card loading-card"><div class="skeleton"></div></div>
+        <div class="kpi-card loading-card"><div class="skeleton"></div></div>
+      </div>
+      <!-- CHARTS -->
+      <div class="charts-grid">
+        <div class="card chart-card">
+          <div class="card-header">
+            <h2 class="card-title">Pipeline por Etapa</h2>
+          </div>
+          <div class="chart-wrapper"><canvas id="chartPipeline"></canvas></div>
+        </div>
+        <div class="card chart-card">
+          <div class="card-header">
+            <h2 class="card-title">Leads por Estado</h2>
+          </div>
+          <div class="chart-wrapper"><canvas id="chartLeads"></canvas></div>
+        </div>
+      </div>
+      <!-- ALERTS -->
+      <div class="card alerts-card">
+        <div class="card-header">
+          <h2 class="card-title">⚠ Requiere Atención</h2>
+        </div>
+        <div id="alertas-list" class="alertas-list">
+          <div class="alerta-item skeleton-row"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CLIENTES -->
+    <div id="page-clientes" class="page">
+      <div class="toolbar">
+        <input type="text" id="clientes-search" class="search-input" placeholder="Buscar cliente..." oninput="buscarClientes(this.value)" />
+        <div class="filter-group">
+          <select id="clientes-estado-filter" class="filter-select" onchange="filtrarClientes(this.value)">
+            <option value="">Todos los estados</option>
+            <option value="ACTIVO">Activo</option>
+            <option value="INACTIVO">Inactivo</option>
+          </select>
+        </div>
+      </div>
+      <div class="card table-card">
+        <div class="table-wrapper">
+          <table id="clientes-table" class="crm-table">
+            <thead>
+              <tr>
+                <th>Empresa</th>
+                <th>Contacto</th>
+                <th>Correo</th>
+                <th>Teléfono</th>
+                <th>Estado</th>
+                <th>Responsable</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="clientes-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- LEADS -->
+    <div id="page-leads" class="page">
+      <div class="toolbar">
+        <input type="text" id="leads-search" class="search-input" placeholder="Buscar lead..." oninput="buscarLeads(this.value)" />
+        <div class="badge-filters" id="leads-badge-filters">
+          <span class="badge-filter active" onclick="filtrarLeadsBadge(this, '')">Todos</span>
+          <span class="badge-filter nuevo" onclick="filtrarLeadsBadge(this, 'NUEVO')">Nuevo</span>
+          <span class="badge-filter contactado" onclick="filtrarLeadsBadge(this, 'CONTACTADO')">Contactado</span>
+          <span class="badge-filter calificado" onclick="filtrarLeadsBadge(this, 'CALIFICADO')">Calificado</span>
+          <span class="badge-filter convertido" onclick="filtrarLeadsBadge(this, 'CONVERTIDO')">Convertido</span>
+          <span class="badge-filter descartado" onclick="filtrarLeadsBadge(this, 'DESCARTADO')">Descartado</span>
+        </div>
+      </div>
+      <div class="card table-card">
+        <div class="table-wrapper">
+          <table class="crm-table">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Empresa</th>
+                <th>Correo</th>
+                <th>Fuente</th>
+                <th>Estado</th>
+                <th>Responsable</th>
+                <th>Fecha</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="leads-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- OPORTUNIDADES -->
+    <div id="page-oportunidades" class="page">
+      <div class="toolbar">
+        <input type="text" id="opor-search" class="search-input" placeholder="Buscar oportunidad..." oninput="buscarOportunidades(this.value)" />
+        <div class="filter-group">
+          <select id="opor-etapa-filter" class="filter-select" onchange="filtrarOportunidades(this.value)">
+            <option value="">Todas las etapas</option>
+            <option value="PROSPECCION">Prospección</option>
+            <option value="CONTACTO">Contacto</option>
+            <option value="CALIFICACION">Calificación</option>
+            <option value="PROPUESTA">Propuesta</option>
+            <option value="NEGOCIACION">Negociación</option>
+            <option value="GANADA">Ganada</option>
+            <option value="PERDIDA">Perdida</option>
+          </select>
+        </div>
+      </div>
+      <div class="card table-card">
+        <div class="table-wrapper">
+          <table class="crm-table">
+            <thead>
+              <tr>
+                <th>Oportunidad</th>
+                <th>Cliente</th>
+                <th>Valor</th>
+                <th>Prob.</th>
+                <th>Valor Pond.</th>
+                <th>Etapa</th>
+                <th>Responsable</th>
+                <th>Cierre</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="opor-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL -->
+  <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+    <div class="modal" id="modal">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modal-title">Formulario</h2>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<div class="list-container">
+  <div class="header-actions">
+    <h2>Propuestas</h2>
+    <button mat-raised-button color="primary" routerLink="/propuestas/nuevo">
+      <mat-icon>add</mat-icon> Nueva Propuesta
+    </button>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="error-message">{{ error() }}</div>
+  }
+
+  @if (isEmpty()) {
+    <div class="empty-state">
+      No hay propuestas registradas.
+    </div>
+  }
+
+  @if (hasPropuestas()) {
+    <table mat-table [dataSource]="propuestas()" class="mat-elevation-z8">
+      
+      <ng-container matColumnDef="numeroPropuesta">
+        <th mat-header-cell *matHeaderCellDef> Número </th>
+        <td mat-cell *matCellDef="let p"> {{p.numeroPropuesta || p.id}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="cliente">
+        <th mat-header-cell *matHeaderCellDef> Cliente </th>
+        <td mat-cell *matCellDef="let p"> {{p.clienteNombre}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="estado">
+        <th mat-header-cell *matHeaderCellDef> Estado </th>
+        <td mat-cell *matCellDef="let p"> {{p.estado}} (v{{p.version}}) </td>
+      </ng-container>
+
+      <ng-container matColumnDef="total">
+        <th mat-header-cell *matHeaderCellDef> Total </th>
+        <td mat-cell *matCellDef="let p"> {{p.total | currency}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="fechaEmision">
+        <th mat-header-cell *matHeaderCellDef> Fecha Emisión </th>
+        <td mat-cell *matCellDef="let p"> {{p.fechaEmision | date:'shortDate'}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="acciones">
+        <th mat-header-cell *matHeaderCellDef> Acciones </th>
+        <td mat-cell *matCellDef="let p">
+          <button mat-icon-button color="primary" (click)="editar(p.id)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          @if (p.estado === 'BORRADOR') {
+            <button mat-icon-button color="warn" (click)="eliminar(p.id)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          }
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  }
+</div>

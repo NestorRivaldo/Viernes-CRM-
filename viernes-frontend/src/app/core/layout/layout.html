@@ -1,0 +1,36 @@
+<header class="header">
+  <h1>
+    <a routerLink="/" class="home-link">
+      <img src="favicon.ico" alt="" height="30" />
+    </a>
+    Viernes
+  </h1>
+  <div class="header-right">
+    @if (usuario) {
+      <span class="usuario-info">
+        {{ usuario.nombre ? usuario.nombre + ' ' + (usuario.apellido || '') : usuario.correo }}{{ usuario.rol ? ' · ' + usuario.rol : '' }}
+      </span>
+    }
+    <button (click)="logout()" class="logout-btn">Cerrar Sesión</button>
+  </div>
+</header>
+
+<div class="body">
+  <aside class="sidebar">
+    <nav>
+      <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+      <a routerLink="/clientes" routerLinkActive="active">Clientes</a>
+      <a routerLink="/leads" routerLinkActive="active">Leads</a>
+      <a routerLink="/oportunidades" routerLinkActive="active">Oportunidades</a>
+      <a routerLink="/actividades" routerLinkActive="active">Actividades</a>
+      <a routerLink="/propuestas" routerLinkActive="active">Propuestas</a>
+      @if (esAdmin) {
+        <a routerLink="/usuarios" routerLinkActive="active">Usuarios</a>
+      }
+    </nav>
+  </aside>
+
+  <main class="content">
+    <router-outlet />
+  </main>
+</div>

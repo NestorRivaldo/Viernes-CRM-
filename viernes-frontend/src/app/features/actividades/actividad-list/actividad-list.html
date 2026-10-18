@@ -1,0 +1,85 @@
+<div class="list-container">
+  <div class="header-actions">
+    <h2>Actividades</h2>
+    <button mat-raised-button color="primary" routerLink="/actividades/nuevo">
+      <mat-icon>add</mat-icon> Nueva Actividad
+    </button>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="error-message">{{ error() }}</div>
+  }
+
+  @if (isEmpty()) {
+    <div class="empty-state">
+      No hay actividades registradas.
+    </div>
+  }
+
+  @if (hasActividades()) {
+    <table mat-table [dataSource]="actividades()" class="mat-elevation-z8">
+      
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef> ID </th>
+        <td mat-cell *matCellDef="let act"> {{act.id}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="titulo">
+        <th mat-header-cell *matHeaderCellDef> Título </th>
+        <td mat-cell *matCellDef="let act"> {{act.titulo}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="tipo">
+        <th mat-header-cell *matHeaderCellDef> Tipo </th>
+        <td mat-cell *matCellDef="let act"> {{act.tipo}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="estado">
+        <th mat-header-cell *matHeaderCellDef> Estado </th>
+        <td mat-cell *matCellDef="let act"> {{act.estado}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="fecha">
+        <th mat-header-cell *matHeaderCellDef> Fecha </th>
+        <td mat-cell *matCellDef="let act"> {{act.fecha | date:'short'}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="vencida">
+        <th mat-header-cell *matHeaderCellDef> Vencida </th>
+        <td mat-cell *matCellDef="let act"> 
+          @if (act.vencida) {
+            <mat-icon color="warn">warning</mat-icon>
+          } @else {
+            <span>-</span>
+          }
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="acciones">
+        <th mat-header-cell *matHeaderCellDef> Acciones </th>
+        <td mat-cell *matCellDef="let act">
+          @if (act.estado !== 'COMPLETADA') {
+            <button mat-icon-button color="accent" (click)="completar(act.id)">
+              <mat-icon>check_circle</mat-icon>
+            </button>
+          }
+          <button mat-icon-button color="primary" (click)="editar(act.id)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="eliminar(act.id)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  }
+</div>

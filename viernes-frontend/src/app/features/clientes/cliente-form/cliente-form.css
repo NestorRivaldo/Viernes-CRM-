@@ -1,0 +1,46 @@
+.form-container {
+  padding: 20px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.full-width {
+  flex: 1;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.contactos-card {
+  margin-top: 20px;
+}
+
+.contactos-card table {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.principal-checkbox {
+  align-self: center;
+  padding-bottom: 20px;
+}
+
+.loading-state, .empty-state {
+  text-align: center;
+  padding: 20px;
+}
+
+.error-message {
+  color: #b00020;
+  padding: 10px 0;
+}
