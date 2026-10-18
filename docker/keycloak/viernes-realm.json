@@ -1,0 +1,123 @@
+{
+  "realm": "viernes-realm",
+  "displayName": "Viernes V1 CRM",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": true,
+  "accessTokenLifespan": 1800,
+  "ssoSessionIdleTimeout": 36000,
+  "ssoSessionMaxLifespan": 72000,
+  "roles": {
+    "realm": [
+      {
+        "name": "ADMIN",
+        "description": "Administrador del sistema con acceso total a configuraciones y usuarios"
+      },
+      {
+        "name": "JEFE",
+        "description": "Jefe de ventas con acceso a metricas, aprobaciones y pipeline"
+      },
+      {
+        "name": "VENDEDOR",
+        "description": "Vendedor comercial con gestion de cartera de clientes, leads y actividades"
+      }
+    ]
+  },
+  "defaultRoles": [
+    "VENDEDOR"
+  ],
+  "clients": [
+    {
+      "clientId": "viernes-frontend",
+      "name": "Viernes Frontend SPA (Angular)",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "rootUrl": "http://localhost:4200",
+      "baseUrl": "http://localhost:4200",
+      "redirectUris": [
+        "http://localhost:4200/*",
+        "http://localhost:4200"
+      ],
+      "webOrigins": [
+        "http://localhost:4200",
+        "+"
+      ],
+      "protocol": "openid-connect",
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "http://localhost:4200/*##http://localhost:4200"
+      }
+    },
+    {
+      "clientId": "viernes-backend",
+      "name": "Viernes Backend (Spring Boot Resource Server)",
+      "enabled": true,
+      "bearerOnly": true,
+      "protocol": "openid-connect"
+    }
+  ],
+  "users": [
+    {
+      "username": "admin@viernes.com",
+      "email": "admin@viernes.com",
+      "firstName": "Nestor",
+      "lastName": "Barrantes",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Admin12345",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "ADMIN"
+      ]
+    },
+    {
+      "username": "jefe@viernes.com",
+      "email": "jefe@viernes.com",
+      "firstName": "Carlos",
+      "lastName": "Mendoza",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Jefe12345",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "JEFE"
+      ]
+    },
+    {
+      "username": "vendedor@viernes.com",
+      "email": "vendedor@viernes.com",
+      "firstName": "Ana",
+      "lastName": "Lopez",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Vendedor12345",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "VENDEDOR"
+      ]
+    }
+  ]
+}

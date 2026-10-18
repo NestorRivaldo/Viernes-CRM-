@@ -1,0 +1,47 @@
+name: viernes-keycloak
+
+services:
+  keycloak-db:
+    image: postgres:16-alpine
+    container_name: viernes-keycloak-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: password123
+    volumes:
+      - keycloak-db-data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keycloak"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:25.0.6
+    container_name: viernes-keycloak
+    restart: unless-stopped
+    command: start-dev --import-realm
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak-db:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: password123
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HTTP_PORT: 8080
+      KC_HEALTH_ENABLED: "true"
+      KC_METRICS_ENABLED: "true"
+      KC_HTTP_RELATIVE_PATH: "/"
+    volumes:
+      - ./viernes-realm.json:/opt/keycloak/data/import/viernes-realm.json:ro
+    ports:
+      - "8180:8080"
+    depends_on:
+      keycloak-db:
+        condition: service_healthy
+
+volumes:
+  keycloak-db-data:

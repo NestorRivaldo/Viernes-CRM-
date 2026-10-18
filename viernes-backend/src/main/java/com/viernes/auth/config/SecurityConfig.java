@@ -17,11 +17,16 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpMethod;
+
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@Profile("!keycloak")
 @RequiredArgsConstructor
 public class SecurityConfig {
 

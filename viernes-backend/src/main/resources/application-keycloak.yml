@@ -1,0 +1,25 @@
+# ==============================================================================
+# PERFIL KEYCLOAK — VIERNES CRM V1
+# Activar con: --spring.profiles.active=dev,keycloak
+# ==============================================================================
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8180/realms/viernes-realm
+          jwk-set-uri: http://localhost:8180/realms/viernes-realm/protocol/openid-connect/certs
+
+viernes:
+  auth:
+    provider: keycloak
+    keycloak:
+      realm: viernes-realm
+      auth-server-url: http://localhost:8180
+      resource: viernes-backend
+      principal-attribute: preferred_username
+
+logging:
+  level:
+    org.springframework.security.oauth2: DEBUG
