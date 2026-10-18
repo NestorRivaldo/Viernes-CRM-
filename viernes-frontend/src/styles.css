@@ -210,7 +210,8 @@ html, body {
   border-radius: var(--radius-lg);
   border: 1px solid var(--surface-border-subtle);
   box-shadow: var(--shadow-card);
-  overflow: hidden;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .mac-table-card table {
