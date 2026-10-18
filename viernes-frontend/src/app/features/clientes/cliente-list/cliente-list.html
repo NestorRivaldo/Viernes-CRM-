@@ -1,76 +1,132 @@
-<div class="list-container">
-  <div class="header-actions">
-    <h2>Clientes</h2>
-    <button mat-raised-button color="primary" routerLink="/clientes/nuevo">
-      <mat-icon>add</mat-icon> Nuevo Cliente
-    </button>
+<div class="module-view-container">
+  
+  <!-- VIEW TOOLBAR -->
+  <div class="view-toolbar">
+    <div class="view-title-group">
+      <h2>Clientes</h2>
+      <p>Directorio y cuentas comerciales activas</p>
+    </div>
+
+    <div class="toolbar-actions-group">
+      <!-- Search Pill -->
+      <div class="toolbar-search-pill">
+        <mat-icon>search</mat-icon>
+        <input 
+          type="text" 
+          placeholder="Buscar por cliente, empresa o correo..." 
+          [ngModel]="filtroTexto()" 
+          (ngModelChange)="filtroTexto.set($event)"
+        />
+        @if (filtroTexto()) {
+          <button class="clear-search-btn" (click)="filtroTexto.set('')">
+            <mat-icon>close</mat-icon>
+          </button>
+        }
+      </div>
+
+      <!-- New Client Button -->
+      <button class="btn-primary-mac" routerLink="/clientes/nuevo">
+        <mat-icon>add</mat-icon> Nuevo Cliente
+      </button>
+    </div>
   </div>
 
   @if (loading()) {
     <div class="loading-state">
       <mat-spinner diameter="40"></mat-spinner>
+      <p>Cargando cartera de clientes...</p>
     </div>
   }
 
   @if (error()) {
-    <div class="error-message">{{ error() }}</div>
+    <div class="error-message">
+      {{ error() }}
+    </div>
   }
 
   @if (isEmpty()) {
     <div class="empty-state">
-      No hay clientes registrados.
+      <mat-icon>business</mat-icon>
+      <h3>No hay clientes registrados</h3>
+      <p>Comienza registrando a tu primera cuenta de cliente en el sistema.</p>
+      <button class="btn-primary-mac" routerLink="/clientes/nuevo" style="margin-top: 16px;">
+        <mat-icon>add</mat-icon> Registrar primer Cliente
+      </button>
     </div>
   }
 
   @if (hasClientes()) {
-    <table mat-table [dataSource]="clientes()" class="mat-elevation-z8">
-      
-      <ng-container matColumnDef="id">
-        <th mat-header-cell *matHeaderCellDef> ID </th>
-        <td mat-cell *matCellDef="let cliente"> {{cliente.id}} </td>
-      </ng-container>
+    <div class="mac-table-card">
+      <table mat-table [dataSource]="clientesFiltrados()">
+        
+        <!-- ID Column -->
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef> ID </th>
+          <td mat-cell *matCellDef="let cliente" class="id-cell"> #{{ cliente.id }} </td>
+        </ng-container>
 
-      <ng-container matColumnDef="nombre">
-        <th mat-header-cell *matHeaderCellDef> Nombre </th>
-        <td mat-cell *matCellDef="let cliente"> {{cliente.nombre}} </td>
-      </ng-container>
+        <!-- Nombre Column -->
+        <ng-container matColumnDef="nombre">
+          <th mat-header-cell *matHeaderCellDef> Cliente </th>
+          <td mat-cell *matCellDef="let cliente">
+            <div class="client-avatar-row">
+              <div class="client-mini-avatar">{{ (cliente.nombre || 'C').charAt(0).toUpperCase() }}</div>
+              <div class="client-meta-col">
+                <strong class="client-name-bold">{{ cliente.nombre }}</strong>
+                <small class="client-resp-sub">{{ cliente.responsable ? 'Resp: ' + cliente.responsable : 'Sin responsable' }}</small>
+              </div>
+            </div>
+          </td>
+        </ng-container>
 
-      <ng-container matColumnDef="empresa">
-        <th mat-header-cell *matHeaderCellDef> Empresa </th>
-        <td mat-cell *matCellDef="let cliente"> {{cliente.empresa || '-'}} </td>
-      </ng-container>
+        <!-- Empresa Column -->
+        <ng-container matColumnDef="empresa">
+          <th mat-header-cell *matHeaderCellDef> Empresa </th>
+          <td mat-cell *matCellDef="let cliente">
+            <span class="empresa-label">{{ cliente.empresa || '-' }}</span>
+          </td>
+        </ng-container>
 
-      <ng-container matColumnDef="correo">
-        <th mat-header-cell *matHeaderCellDef> Correo </th>
-        <td mat-cell *matCellDef="let cliente"> {{cliente.correo}} </td>
-      </ng-container>
+        <!-- Correo Column -->
+        <ng-container matColumnDef="correo">
+          <th mat-header-cell *matHeaderCellDef> Correo </th>
+          <td mat-cell *matCellDef="let cliente">
+            <span class="correo-text">{{ cliente.correo }}</span>
+          </td>
+        </ng-container>
 
-      <ng-container matColumnDef="estado">
-        <th mat-header-cell *matHeaderCellDef> Estado </th>
-        <td mat-cell *matCellDef="let cliente"> {{cliente.estado}} </td>
-      </ng-container>
+        <!-- Estado Column -->
+        <ng-container matColumnDef="estado">
+          <th mat-header-cell *matHeaderCellDef> Estado </th>
+          <td mat-cell *matCellDef="let cliente">
+            <span class="status-pill {{ cliente.estado === 'ACTIVO' ? 'success' : 'danger' }}">
+              {{ cliente.estado }}
+            </span>
+          </td>
+        </ng-container>
 
-      <ng-container matColumnDef="acciones">
-        <th mat-header-cell *matHeaderCellDef> Acciones </th>
-        <td mat-cell *matCellDef="let cliente">
-          <button mat-icon-button color="primary" (click)="editar(cliente.id)">
-            <mat-icon>edit</mat-icon>
-          </button>
-          @if (cliente.estado === 'ACTIVO') {
-            <button mat-icon-button color="warn" (click)="desactivar(cliente)">
-              <mat-icon>block</mat-icon>
+        <!-- Acciones Column -->
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef class="actions-header"> Acciones </th>
+          <td mat-cell *matCellDef="let cliente" class="actions-cell">
+            <button class="mac-action-btn edit" title="Editar y gestionar contactos" (click)="editar(cliente.id)">
+              <mat-icon>edit</mat-icon>
             </button>
-          }
-          @if (cliente.estado === 'INACTIVO') {
-            <button mat-icon-button color="warn" (click)="eliminar(cliente.id)">
-              <mat-icon>delete</mat-icon>
+            @if (cliente.estado === 'ACTIVO') {
+              <button class="mac-action-btn deactivate" title="Desactivar cliente" (click)="desactivar(cliente)">
+                <mat-icon>block</mat-icon>
+              </button>
+            }
+            <button class="mac-action-btn delete" title="Eliminar cliente" (click)="eliminar(cliente.id)">
+              <mat-icon>delete_outline</mat-icon>
             </button>
-          }
-        </td>
-      </ng-container>
+          </td>
+        </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </div>
   }
+
 </div>

@@ -1,71 +1,128 @@
-<div class="list-container">
-  <div class="header-actions">
-    <h2>Propuestas</h2>
-    <button mat-raised-button color="primary" routerLink="/propuestas/nuevo">
-      <mat-icon>add</mat-icon> Nueva Propuesta
-    </button>
+<div class="module-view-container">
+  
+  <!-- VIEW TOOLBAR -->
+  <div class="view-toolbar">
+    <div class="view-title-group">
+      <h2>Propuestas Comerciales</h2>
+      <p>Cotizaciones, presupuestos y documentos de venta • Total emitido: <strong>{{ formatearSoles(totalPropuestasValor()) }}</strong></p>
+    </div>
+
+    <div class="toolbar-actions-group">
+      <!-- Search Pill -->
+      <div class="toolbar-search-pill">
+        <mat-icon>search</mat-icon>
+        <input 
+          type="text" 
+          placeholder="Buscar por número, cliente o estado..." 
+          [ngModel]="filtroTexto()" 
+          (ngModelChange)="filtroTexto.set($event)"
+        />
+        @if (filtroTexto()) {
+          <button class="clear-search-btn" (click)="filtroTexto.set('')">
+            <mat-icon>close</mat-icon>
+          </button>
+        }
+      </div>
+
+      <!-- New Button -->
+      <button class="btn-primary-mac" routerLink="/propuestas/nuevo">
+        <mat-icon>add</mat-icon> Nueva Propuesta
+      </button>
+    </div>
   </div>
 
   @if (loading()) {
     <div class="loading-state">
       <mat-spinner diameter="40"></mat-spinner>
+      <p>Cargando propuestas comerciales...</p>
     </div>
   }
 
   @if (error()) {
-    <div class="error-message">{{ error() }}</div>
+    <div class="error-message">
+      {{ error() }}
+    </div>
   }
 
   @if (isEmpty()) {
     <div class="empty-state">
-      No hay propuestas registradas.
+      <mat-icon>description</mat-icon>
+      <h3>No hay propuestas registradas</h3>
+      <p>Genera cotizaciones y presupuestos formales para tus oportunidades comerciales.</p>
+      <button class="btn-primary-mac" routerLink="/propuestas/nuevo" style="margin-top: 16px;">
+        <mat-icon>add</mat-icon> Crear primera Propuesta
+      </button>
     </div>
   }
 
   @if (hasPropuestas()) {
-    <table mat-table [dataSource]="propuestas()" class="mat-elevation-z8">
-      
-      <ng-container matColumnDef="numeroPropuesta">
-        <th mat-header-cell *matHeaderCellDef> Número </th>
-        <td mat-cell *matCellDef="let p"> {{p.numeroPropuesta || p.id}} </td>
-      </ng-container>
+    <div class="mac-table-card">
+      <table mat-table [dataSource]="propuestasFiltradas()">
+        
+        <!-- Número Column -->
+        <ng-container matColumnDef="numeroPropuesta">
+          <th mat-header-cell *matHeaderCellDef> Número </th>
+          <td mat-cell *matCellDef="let p" class="id-cell">
+            <span class="prop-num-tag">{{ p.numeroPropuesta || ('#' + p.id) }}</span>
+          </td>
+        </ng-container>
 
-      <ng-container matColumnDef="cliente">
-        <th mat-header-cell *matHeaderCellDef> Cliente </th>
-        <td mat-cell *matCellDef="let p"> {{p.clienteNombre}} </td>
-      </ng-container>
+        <!-- Cliente Column -->
+        <ng-container matColumnDef="cliente">
+          <th mat-header-cell *matHeaderCellDef> Cliente / Cuenta </th>
+          <td mat-cell *matCellDef="let p">
+            <div class="prop-client-col">
+              <strong class="prop-client-name">{{ p.clienteNombre || 'Cliente no asignado' }}</strong>
+              <small class="prop-resp-sub">{{ p.responsable ? 'Resp: ' + p.responsable : 'Versión ' + p.version }}</small>
+            </div>
+          </td>
+        </ng-container>
 
-      <ng-container matColumnDef="estado">
-        <th mat-header-cell *matHeaderCellDef> Estado </th>
-        <td mat-cell *matCellDef="let p"> {{p.estado}} (v{{p.version}}) </td>
-      </ng-container>
+        <!-- Estado Column -->
+        <ng-container matColumnDef="estado">
+          <th mat-header-cell *matHeaderCellDef> Estado </th>
+          <td mat-cell *matCellDef="let p">
+            <span class="status-pill {{ getEstadoClass(p.estado) }}">
+              {{ p.estado }} (v{{ p.version }})
+            </span>
+          </td>
+        </ng-container>
 
-      <ng-container matColumnDef="total">
-        <th mat-header-cell *matHeaderCellDef> Total </th>
-        <td mat-cell *matCellDef="let p"> {{p.total | currency}} </td>
-      </ng-container>
+        <!-- Total Column -->
+        <ng-container matColumnDef="total">
+          <th mat-header-cell *matHeaderCellDef> Total </th>
+          <td mat-cell *matCellDef="let p">
+            <strong class="prop-total-amount">{{ formatearSoles(p.total) }}</strong>
+          </td>
+        </ng-container>
 
-      <ng-container matColumnDef="fechaEmision">
-        <th mat-header-cell *matHeaderCellDef> Fecha Emisión </th>
-        <td mat-cell *matCellDef="let p"> {{p.fechaEmision | date:'shortDate'}} </td>
-      </ng-container>
+        <!-- Fecha Emisión Column -->
+        <ng-container matColumnDef="fechaEmision">
+          <th mat-header-cell *matHeaderCellDef> Emisión </th>
+          <td mat-cell *matCellDef="let p">
+            <span class="prop-date-label">{{ p.fechaEmision | date:'mediumDate' }}</span>
+          </td>
+        </ng-container>
 
-      <ng-container matColumnDef="acciones">
-        <th mat-header-cell *matHeaderCellDef> Acciones </th>
-        <td mat-cell *matCellDef="let p">
-          <button mat-icon-button color="primary" (click)="editar(p.id)">
-            <mat-icon>edit</mat-icon>
-          </button>
-          @if (p.estado === 'BORRADOR') {
-            <button mat-icon-button color="warn" (click)="eliminar(p.id)">
-              <mat-icon>delete</mat-icon>
+        <!-- Acciones Column -->
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef class="actions-header"> Acciones </th>
+          <td mat-cell *matCellDef="let p" class="actions-cell">
+            <button class="mac-action-btn edit" title="Ver / Editar" (click)="editar(p.id)">
+              <mat-icon>edit</mat-icon>
             </button>
-          }
-        </td>
-      </ng-container>
+            @if (p.estado === 'BORRADOR') {
+              <button class="mac-action-btn delete" title="Eliminar borrador" (click)="eliminar(p.id)">
+                <mat-icon>delete_outline</mat-icon>
+              </button>
+            }
+          </td>
+        </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </div>
   }
+
 </div>

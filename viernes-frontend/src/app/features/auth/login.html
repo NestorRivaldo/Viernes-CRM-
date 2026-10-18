@@ -1,36 +1,101 @@
-<div class="login-container">
-  <mat-card class="login-card">
-    <mat-card-header>
-      <mat-card-title>Iniciar sesión en Viernes</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Correo electrónico</mat-label>
-          <input matInput formControlName="correo" type="email" required>
-        </mat-form-field>
-        
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Contraseña</mat-label>
-          <input matInput formControlName="password" type="password" required>
-        </mat-form-field>
+<div class="login-wrapper">
+  
+  <!-- Subtle decorative ambient lights -->
+  <div class="ambient-glow top-left"></div>
+  <div class="ambient-glow bottom-right"></div>
 
-        <div *ngIf="error" class="error-message">
+  <!-- Login Card (Glassmorphic) -->
+  <div class="login-glass-card">
+    
+    <!-- Brand Header -->
+    <div class="login-brand-header">
+      <div class="login-brand-logo">
+        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 8L16 26L26 8" stroke="url(#loginBrandGrad)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <defs>
+            <linearGradient id="loginBrandGrad" x1="6" y1="8" x2="26" y2="26" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#38BDF8"/>
+              <stop offset="0.5" stop-color="#3B82F6"/>
+              <stop offset="1" stop-color="#818CF8"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <div class="login-brand-text">
+        <span class="brand-title">Viernes</span>
+        <span class="brand-v1-tag">V1</span>
+      </div>
+      <p class="login-tagline">CRM híbrido de gestión comercial</p>
+    </div>
+
+    <!-- Login Form -->
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-inner-form">
+      
+      <div class="login-field-group">
+        <label class="field-label">Correo electrónico</label>
+        <div class="input-with-icon">
+          <span class="input-icon-glyph">@</span>
+          <input 
+            type="email" 
+            formControlName="correo" 
+            placeholder="admin@viernes.com" 
+            class="mac-input"
+            required
+          />
+        </div>
+      </div>
+      
+      <div class="login-field-group">
+        <label class="field-label">Contraseña</label>
+        <div class="input-with-icon">
+          <span class="input-icon-glyph">🔒</span>
+          <input 
+            type="password" 
+            formControlName="password" 
+            placeholder="••••••••" 
+            class="mac-input"
+            required
+          />
+        </div>
+      </div>
+
+      @if (error) {
+        <div class="login-error-pill">
           {{ error }}
         </div>
+      }
 
-        <button mat-raised-button color="primary" type="submit" [disabled]="loginForm.invalid || loading" class="full-width">
-          {{ loading ? 'Cargando...' : 'Iniciar sesión' }}
-        </button>
+      <button 
+        type="submit" 
+        [disabled]="loginForm.invalid || loading" 
+        class="login-btn-primary"
+      >
+        {{ loading ? 'Iniciando sesión...' : 'Iniciar sesión' }}
+      </button>
 
-        <button mat-stroked-button type="button" class="full-width dev-bypass" (click)="entrarSinLogin()">
-          Entrar sin login (modo demo)
-        </button>
+      <button 
+        type="button" 
+        class="login-btn-demo" 
+        (click)="entrarSinLogin()"
+      >
+        Entrar sin login (modo demo)
+      </button>
 
-        <div style="margin-top: 16px; font-size: 12px; color: #6b7280; text-align: center;">
-          Usuario: <strong>admin@viernes.com</strong> | Contraseña: <strong>Admin12345</strong>
+      <!-- Test Credentials Note -->
+      <div class="credentials-helper-box">
+        <div class="helper-badge">Credenciales de prueba</div>
+        <div class="helper-text">
+          <span>Usuario: <strong>admin@viernes.com</strong></span>
+          <span>Contraseña: <strong>Admin12345</strong></span>
         </div>
-      </form>
-    </mat-card-content>
-  </mat-card>
+      </div>
+
+    </form>
+
+  </div>
+
+  <div class="login-footer-copy">
+    Viernes CRM V1.0 • Sistema Comercial
+  </div>
+
 </div>

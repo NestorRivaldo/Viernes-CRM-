@@ -1,85 +1,148 @@
-<div class="list-container">
-  <div class="header-actions">
-    <h2>Actividades</h2>
-    <button mat-raised-button color="primary" routerLink="/actividades/nuevo">
-      <mat-icon>add</mat-icon> Nueva Actividad
-    </button>
+<div class="module-view-container">
+  
+  <!-- VIEW TOOLBAR -->
+  <div class="view-toolbar">
+    <div class="view-title-group">
+      <h2>Actividades</h2>
+      <p>Gestión de tareas, llamadas, reuniones y seguimiento de clientes</p>
+    </div>
+
+    <div class="toolbar-actions-group">
+      <!-- Search Pill -->
+      <div class="toolbar-search-pill">
+        <mat-icon>search</mat-icon>
+        <input 
+          type="text" 
+          placeholder="Buscar por título, tipo o estado..." 
+          [ngModel]="filtroTexto()" 
+          (ngModelChange)="filtroTexto.set($event)"
+        />
+        @if (filtroTexto()) {
+          <button class="clear-search-btn" (click)="filtroTexto.set('')">
+            <mat-icon>close</mat-icon>
+          </button>
+        }
+      </div>
+
+      <!-- New Button -->
+      <button class="btn-primary-mac" routerLink="/actividades/nuevo">
+        <mat-icon>add</mat-icon> Nueva Actividad
+      </button>
+    </div>
   </div>
 
   @if (loading()) {
     <div class="loading-state">
       <mat-spinner diameter="40"></mat-spinner>
+      <p>Cargando agenda de actividades...</p>
     </div>
   }
 
   @if (error()) {
-    <div class="error-message">{{ error() }}</div>
+    <div class="error-message">
+      {{ error() }}
+    </div>
   }
 
   @if (isEmpty()) {
     <div class="empty-state">
-      No hay actividades registradas.
+      <mat-icon>event</mat-icon>
+      <h3>No hay actividades registradas</h3>
+      <p>Planifica reuniones, llamadas y tareas de seguimiento con tus prospectos.</p>
+      <button class="btn-primary-mac" routerLink="/actividades/nuevo" style="margin-top: 16px;">
+        <mat-icon>add</mat-icon> Programar Actividad
+      </button>
     </div>
   }
 
   @if (hasActividades()) {
-    <table mat-table [dataSource]="actividades()" class="mat-elevation-z8">
-      
-      <ng-container matColumnDef="id">
-        <th mat-header-cell *matHeaderCellDef> ID </th>
-        <td mat-cell *matCellDef="let act"> {{act.id}} </td>
-      </ng-container>
+    <div class="mac-table-card">
+      <table mat-table [dataSource]="actividadesFiltradas()">
+        
+        <!-- ID Column -->
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef> ID </th>
+          <td mat-cell *matCellDef="let act" class="id-cell"> #{{ act.id }} </td>
+        </ng-container>
 
-      <ng-container matColumnDef="titulo">
-        <th mat-header-cell *matHeaderCellDef> Título </th>
-        <td mat-cell *matCellDef="let act"> {{act.titulo}} </td>
-      </ng-container>
+        <!-- Título Column -->
+        <ng-container matColumnDef="titulo">
+          <th mat-header-cell *matHeaderCellDef> Actividad </th>
+          <td mat-cell *matCellDef="let act">
+            <div class="act-title-row">
+              <strong class="act-name-bold">{{ act.titulo }}</strong>
+              <small class="act-desc-sub">{{ act.descripcion || 'Sin descripción adicional' }}</small>
+            </div>
+          </td>
+        </ng-container>
 
-      <ng-container matColumnDef="tipo">
-        <th mat-header-cell *matHeaderCellDef> Tipo </th>
-        <td mat-cell *matCellDef="let act"> {{act.tipo}} </td>
-      </ng-container>
+        <!-- Tipo Column -->
+        <ng-container matColumnDef="tipo">
+          <th mat-header-cell *matHeaderCellDef> Tipo </th>
+          <td mat-cell *matCellDef="let act">
+            <span class="type-pill">
+              <mat-icon class="mini-icon">
+                {{ act.tipo === 'REUNION' ? 'groups' : (act.tipo === 'LLAMADA' ? 'call' : 'check_circle_outline') }}
+              </mat-icon>
+              {{ act.tipo }}
+            </span>
+          </td>
+        </ng-container>
 
-      <ng-container matColumnDef="estado">
-        <th mat-header-cell *matHeaderCellDef> Estado </th>
-        <td mat-cell *matCellDef="let act"> {{act.estado}} </td>
-      </ng-container>
+        <!-- Estado Column -->
+        <ng-container matColumnDef="estado">
+          <th mat-header-cell *matHeaderCellDef> Estado </th>
+          <td mat-cell *matCellDef="let act">
+            <span class="status-pill {{ getEstadoClass(act.estado) }}">
+              {{ act.estado }}
+            </span>
+          </td>
+        </ng-container>
 
-      <ng-container matColumnDef="fecha">
-        <th mat-header-cell *matHeaderCellDef> Fecha </th>
-        <td mat-cell *matCellDef="let act"> {{act.fecha | date:'short'}} </td>
-      </ng-container>
+        <!-- Fecha Column -->
+        <ng-container matColumnDef="fecha">
+          <th mat-header-cell *matHeaderCellDef> Fecha / Hora </th>
+          <td mat-cell *matCellDef="let act">
+            <span class="date-time-label">{{ act.fecha | date:'medium' }}</span>
+          </td>
+        </ng-container>
 
-      <ng-container matColumnDef="vencida">
-        <th mat-header-cell *matHeaderCellDef> Vencida </th>
-        <td mat-cell *matCellDef="let act"> 
-          @if (act.vencida) {
-            <mat-icon color="warn">warning</mat-icon>
-          } @else {
-            <span>-</span>
-          }
-        </td>
-      </ng-container>
+        <!-- Vencida Column -->
+        <ng-container matColumnDef="vencida">
+          <th mat-header-cell *matHeaderCellDef> Alerta </th>
+          <td mat-cell *matCellDef="let act">
+            @if (act.vencida) {
+              <span class="status-pill danger" title="Actividad vencida">
+                <mat-icon class="mini-icon">warning</mat-icon> Vencida
+              </span>
+            } @else {
+              <span class="on-time-text">A tiempo</span>
+            }
+          </td>
+        </ng-container>
 
-      <ng-container matColumnDef="acciones">
-        <th mat-header-cell *matHeaderCellDef> Acciones </th>
-        <td mat-cell *matCellDef="let act">
-          @if (act.estado !== 'COMPLETADA') {
-            <button mat-icon-button color="accent" (click)="completar(act.id)">
-              <mat-icon>check_circle</mat-icon>
+        <!-- Acciones Column -->
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef class="actions-header"> Acciones </th>
+          <td mat-cell *matCellDef="let act" class="actions-cell">
+            @if (act.estado !== 'COMPLETADA') {
+              <button class="mac-action-btn complete" title="Marcar completada" (click)="completar(act.id)">
+                <mat-icon>done</mat-icon>
+              </button>
+            }
+            <button class="mac-action-btn edit" title="Editar" (click)="editar(act.id)">
+              <mat-icon>edit</mat-icon>
             </button>
-          }
-          <button mat-icon-button color="primary" (click)="editar(act.id)">
-            <mat-icon>edit</mat-icon>
-          </button>
-          <button mat-icon-button color="warn" (click)="eliminar(act.id)">
-            <mat-icon>delete</mat-icon>
-          </button>
-        </td>
-      </ng-container>
+            <button class="mac-action-btn delete" title="Eliminar" (click)="eliminar(act.id)">
+              <mat-icon>delete_outline</mat-icon>
+            </button>
+          </td>
+        </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </div>
   }
+
 </div>

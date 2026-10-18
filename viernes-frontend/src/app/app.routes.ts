@@ -94,7 +94,12 @@ export const routes: Routes = [
         loadComponent: () => import('./features/usuarios/usuario-form/usuario-form').then((m) => m.UsuarioForm),
         canActivate: [roleGuard],
         data: { roles: ['ADMIN'] },
-      }
+      },
+      { path: 'contactos', redirectTo: 'clientes', pathMatch: 'full' },
+      { path: 'pipeline', redirectTo: 'oportunidades', pathMatch: 'full' },
+      { path: 'indicadores', redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: 'campanas', redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: 'configuracion', redirectTo: 'dashboard', pathMatch: 'full' }
     ],
   },
   { path: '**', redirectTo: '' }

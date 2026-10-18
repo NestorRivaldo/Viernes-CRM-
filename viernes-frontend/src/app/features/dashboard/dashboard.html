@@ -1,67 +1,324 @@
-<div class="dashboard-container">
-  <h2>Dashboard</h2>
+<div class="dashboard-wrapper">
+  
+  <!-- GREETING & PERIOD HEADER (Reference) -->
+  <div class="dashboard-greeting-bar">
+    <div class="greeting-left">
+      <div class="greeting-sun-icon">
+        <mat-icon>wb_sunny</mat-icon>
+      </div>
+      <div class="greeting-text">
+        <h1>{{ saludo() }}, {{ nombreUsuario() }}</h1>
+        <p>Aquí tienes un resumen de la actividad comercial de esta semana.</p>
+      </div>
+    </div>
+
+    <div class="greeting-date-pill">
+      <span>{{ fechaActualFormateada() }}</span>
+      <mat-icon>calendar_month</mat-icon>
+    </div>
+  </div>
 
   @if (loading()) {
     <div class="loading-state">
       <mat-spinner diameter="40"></mat-spinner>
-      <p>Cargando información del CRM...</p>
+      <p>Actualizando indicadores comerciales...</p>
     </div>
   }
 
-  @if (error()) {
-    <div class="error-message">
-      {{ error() }}
+  <!-- ROW OF 5 KPI METRIC CARDS -->
+  <div class="kpi-metrics-row">
+    
+    <!-- 1. Clientes -->
+    <div class="kpi-stat-card">
+      <div class="kpi-card-top">
+        <div class="kpi-icon-bubble blue">
+          <mat-icon>group</mat-icon>
+        </div>
+      </div>
+      <div class="kpi-title">Clientes</div>
+      <div class="kpi-number">{{ totalClientes() }}</div>
+      <div class="kpi-trend positive">
+        <span class="trend-arrow">↑</span> 12% <span class="trend-label">vs. mes ant.</span>
+      </div>
     </div>
-  }
 
-  @if (hasResumen()) {
-    <div class="kpi-grid">
+    <!-- 2. Leads -->
+    <div class="kpi-stat-card">
+      <div class="kpi-card-top">
+        <div class="kpi-icon-bubble purple">
+          <mat-icon>person</mat-icon>
+        </div>
+      </div>
+      <div class="kpi-title">Leads</div>
+      <div class="kpi-number">{{ totalLeads() }}</div>
+      <div class="kpi-trend positive">
+        <span class="trend-arrow">↑</span> 8% <span class="trend-label">vs. mes ant.</span>
+      </div>
+    </div>
 
-      <mat-card>
-        <mat-card-header>
-          <mat-card-subtitle>Clientes</mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
-          <h1 class="kpi-value">{{ resumen()!.clientes?.total || 0 }}</h1>
-        </mat-card-content>
-      </mat-card>
+    <!-- 3. Oportunidades -->
+    <div class="kpi-stat-card">
+      <div class="kpi-card-top">
+        <div class="kpi-icon-bubble emerald">
+          <mat-icon>adjust</mat-icon>
+        </div>
+      </div>
+      <div class="kpi-title">Oportunidades</div>
+      <div class="kpi-number">{{ totalOportunidades() }}</div>
+      <div class="kpi-trend positive">
+        <span class="trend-arrow">↑</span> 15% <span class="trend-label">vs. mes ant.</span>
+      </div>
+    </div>
 
-      <mat-card>
-        <mat-card-header>
-          <mat-card-subtitle>Leads</mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
-          <h1 class="kpi-value">{{ resumen()!.leads?.total || 0 }}</h1>
-        </mat-card-content>
-      </mat-card>
+    <!-- 4. Propuestas -->
+    <div class="kpi-stat-card">
+      <div class="kpi-card-top">
+        <div class="kpi-icon-bubble orange">
+          <mat-icon>show_chart</mat-icon>
+        </div>
+      </div>
+      <div class="kpi-title">Propuestas</div>
+      <div class="kpi-number">{{ totalPropuestas() }}</div>
+      <div class="kpi-trend positive">
+        <span class="trend-arrow">↑</span> 4% <span class="trend-label">vs. mes ant.</span>
+      </div>
+    </div>
 
-      <mat-card>
-        <mat-card-header>
-          <mat-card-subtitle>Oportunidades</mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
-          <h1 class="kpi-value">{{ resumen()!.oportunidades?.total || 0 }}</h1>
-        </mat-card-content>
-      </mat-card>
+    <!-- 5. Conversión -->
+    <div class="kpi-stat-card">
+      <div class="kpi-card-top">
+        <div class="kpi-icon-bubble violet">
+          <mat-icon>assignment_turned_in</mat-icon>
+        </div>
+      </div>
+      <div class="kpi-title">Conversión</div>
+      <div class="kpi-number">{{ tasaConversion() }}</div>
+      <div class="kpi-trend positive">
+        <span class="trend-arrow">↑</span> 4.2% <span class="trend-label">vs. mes ant.</span>
+      </div>
+    </div>
 
-      <mat-card>
-        <mat-card-header>
-          <mat-card-subtitle>Actividades Pendientes</mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
-          <h1 class="kpi-value">{{ resumen()!.actividades?.pendientes || 0 }}</h1>
-        </mat-card-content>
-      </mat-card>
+  </div>
 
-      <mat-card>
-        <mat-card-header>
-          <mat-card-subtitle>Propuestas</mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
-          <h1 class="kpi-value">{{ resumen()!.propuestas?.total || 0 }}</h1>
-        </mat-card-content>
-      </mat-card>
+  <!-- MAIN DASHBOARD CONTENT GRID (2 Columns: Main area + Right Sidebar area) -->
+  <div class="dashboard-main-grid">
+    
+    <!-- LEFT COLUMN (~68% width) -->
+    <div class="dashboard-col-left">
+      
+      <!-- Card: Evolución del Pipeline -->
+      <div class="mac-card chart-pipeline-card">
+        <div class="card-header-between">
+          <h2 class="card-main-title">Evolución del Pipeline</h2>
+          <div class="period-selector-pill">
+            <span>Últimos 6 meses</span>
+            <mat-icon>keyboard_arrow_down</mat-icon>
+          </div>
+        </div>
+
+        <!-- Pipeline Line Chart with SVG -->
+        <div class="pipeline-chart-container">
+          <div class="y-axis-labels">
+            <span>S/ 260k</span>
+            <span>S/ 195k</span>
+            <span>S/ 130k</span>
+            <span>S/ 65k</span>
+            <span>S/ 0k</span>
+          </div>
+
+          <div class="chart-canvas-area">
+            
+            <!-- Tooltip floating above peak point (Junio) -->
+            <div class="chart-tooltip-floating" style="right: 28px; top: 15px;">
+              <span class="tooltip-month">Junio</span>
+              <strong class="tooltip-val">{{ valorPipelineFormateado() }}</strong>
+            </div>
+
+            <!-- SVG Smooth Spline Chart -->
+            <svg class="pipeline-svg" viewBox="0 0 540 180" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#3B82F6" stop-opacity="0.25"/>
+                  <stop offset="100%" stop-color="#3B82F6" stop-opacity="0.0"/>
+                </linearGradient>
+              </defs>
+
+              <!-- Grid horizontal guide lines -->
+              <line x1="0" y1="20" x2="540" y2="20" stroke="#f1f5f9" stroke-width="1"/>
+              <line x1="0" y1="60" x2="540" y2="60" stroke="#f1f5f9" stroke-width="1"/>
+              <line x1="0" y1="100" x2="540" y2="100" stroke="#f1f5f9" stroke-width="1"/>
+              <line x1="0" y1="140" x2="540" y2="140" stroke="#f1f5f9" stroke-width="1"/>
+              <line x1="0" y1="178" x2="540" y2="178" stroke="#e2e8f0" stroke-width="1"/>
+
+              <!-- Area Fill under curve -->
+              <path d="M 30 115 C 90 90, 150 95, 210 110 C 270 120, 330 85, 390 70 C 440 60, 480 35, 510 30 L 510 178 L 30 178 Z" fill="url(#chartGradient)"/>
+
+              <!-- Main Blue Curve Line -->
+              <path d="M 30 115 C 90 90, 150 95, 210 110 C 270 120, 330 85, 390 70 C 440 60, 480 35, 510 30" fill="none" stroke="#2563EB" stroke-width="3" stroke-linecap="round"/>
+
+              <!-- Interactive Points -->
+              <circle cx="30" cy="115" r="4.5" fill="#2563EB" stroke="#ffffff" stroke-width="2"/>
+              <circle cx="126" cy="93" r="4.5" fill="#2563EB" stroke="#ffffff" stroke-width="2"/>
+              <circle cx="210" cy="110" r="4.5" fill="#2563EB" stroke="#ffffff" stroke-width="2"/>
+              <circle cx="330" cy="85" r="4.5" fill="#2563EB" stroke="#ffffff" stroke-width="2"/>
+              <circle cx="420" cy="65" r="4.5" fill="#2563EB" stroke="#ffffff" stroke-width="2"/>
+              <circle cx="510" cy="30" r="6" fill="#2563EB" stroke="#ffffff" stroke-width="2.5"/>
+            </svg>
+
+            <!-- X-Axis Month Labels -->
+            <div class="x-axis-labels">
+              <span>Ene</span>
+              <span>Feb</span>
+              <span>Mar</span>
+              <span>Abr</span>
+              <span>May</span>
+              <span>Jun</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTTOM ROW OF 2 CARDS (Oportunidades por etapa & Próximas actividades) -->
+      <div class="left-bottom-cards-grid">
+        
+        <!-- Card: Oportunidades por etapa -->
+        <div class="mac-card stage-breakdown-card">
+          <div class="card-header-between">
+            <h3 class="card-subtitle-title">Oportunidades por etapa</h3>
+            <a routerLink="/oportunidades" class="card-link-action">Ver todas</a>
+          </div>
+
+          <div class="stage-items-list">
+            @for (etapa of etapasDesglose(); track etapa.nombre) {
+              <div class="stage-row-item">
+                <div class="stage-dot-label">
+                  <span class="stage-indicator-dot {{ etapa.colorClass }}"></span>
+                  <span class="stage-name-text">{{ etapa.nombre }}</span>
+                </div>
+
+                <div class="stage-progress-track">
+                  <div class="stage-progress-bar {{ etapa.colorClass }}" [style.width.%]="etapa.porcentaje"></div>
+                </div>
+
+                <div class="stage-count-badge">{{ etapa.cantidad }}</div>
+                <div class="stage-amount-text">{{ formatearSoles(etapa.valor) }}</div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Card: Próximas actividades -->
+        <div class="mac-card upcoming-tasks-card">
+          <div class="card-header-between">
+            <h3 class="card-subtitle-title">Próximas actividades</h3>
+            <a routerLink="/actividades" class="card-link-action">Ver todas</a>
+          </div>
+
+          <div class="upcoming-activities-list">
+            @for (act of proximasActividades; track act.titulo) {
+              <div class="activity-timeline-row">
+                <div class="activity-calendar-pill">
+                  <span class="calendar-day">{{ act.dia }}</span>
+                  <span class="calendar-month">{{ act.mes }}</span>
+                </div>
+
+                <div class="activity-type-bubble">
+                  <mat-icon>{{ act.icon }}</mat-icon>
+                </div>
+
+                <div class="activity-text-meta">
+                  <span class="activity-headline">{{ act.titulo }}</span>
+                  <span class="activity-subline">{{ act.cliente }} • {{ act.hora }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+      </div>
 
     </div>
-  }
+
+    <!-- RIGHT COLUMN (~32% width) -->
+    <div class="dashboard-col-right">
+      
+      <!-- Card: Actividad reciente -->
+      <div class="mac-card recent-feed-card">
+        <div class="card-header-between">
+          <h3 class="card-subtitle-title">Actividad reciente</h3>
+          <a routerLink="/actividades" class="card-link-action">Ver todas</a>
+        </div>
+
+        <div class="recent-events-feed">
+          @for (item of actividadesRecientes; track item.titulo) {
+            <div class="feed-event-item">
+              <div class="feed-icon-circle {{ item.colorClass }}">
+                <mat-icon>{{ item.icon }}</mat-icon>
+              </div>
+              <div class="feed-event-text">
+                <strong class="feed-event-title">{{ item.titulo }}</strong>
+                <span class="feed-event-meta">{{ item.tiempo }} • {{ item.detalle }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Card: ¡Vamos por más! (CTA Banner) -->
+      <div class="mac-card cta-target-card">
+        <div class="cta-banner-content">
+          <div class="cta-icon-circle">
+            <mat-icon>rocket_launch</mat-icon>
+          </div>
+          <div class="cta-text-group">
+            <h3>¡Vamos por más!</h3>
+            <p>Tienes 3 oportunidades próximas a vencer en los próximos 7 días.</p>
+          </div>
+          <a routerLink="/oportunidades" class="btn-primary-mac cta-action-btn">
+            Ver oportunidades <mat-icon>arrow_forward</mat-icon>
+          </a>
+        </div>
+      </div>
+
+      <!-- Card: Accesos rápidos -->
+      <div class="mac-card quick-actions-card">
+        <h3 class="card-subtitle-title" style="margin-bottom: 16px;">Accesos rápidos</h3>
+        
+        <div class="quick-actions-2x2">
+          
+          <a routerLink="/clientes/nuevo" class="quick-action-tile">
+            <div class="tile-icon-circle blue">
+              <mat-icon>person</mat-icon>
+            </div>
+            <span class="tile-label">Nuevo cliente</span>
+          </a>
+
+          <a routerLink="/oportunidades/nuevo" class="quick-action-tile">
+            <div class="tile-icon-circle emerald">
+              <mat-icon>adjust</mat-icon>
+            </div>
+            <span class="tile-label">Nueva oportunidad</span>
+          </a>
+
+          <a routerLink="/actividades/nuevo" class="quick-action-tile">
+            <div class="tile-icon-circle cyan">
+              <mat-icon>calendar_today</mat-icon>
+            </div>
+            <span class="tile-label">Nueva actividad</span>
+          </a>
+
+          <a routerLink="/propuestas/nuevo" class="quick-action-tile">
+            <div class="tile-icon-circle purple">
+              <mat-icon>description</mat-icon>
+            </div>
+            <span class="tile-label">Nueva propuesta</span>
+          </a>
+
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
 </div>

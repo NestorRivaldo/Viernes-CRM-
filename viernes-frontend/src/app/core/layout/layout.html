@@ -1,36 +1,237 @@
-<header class="header">
-  <h1>
-    <a routerLink="/" class="home-link">
-      <img src="favicon.ico" alt="" height="30" />
-    </a>
-    Viernes
-  </h1>
-  <div class="header-right">
-    @if (usuario) {
-      <span class="usuario-info">
-        {{ usuario.nombre ? usuario.nombre + ' ' + (usuario.apellido || '') : usuario.correo }}{{ usuario.rol ? ' · ' + usuario.rol : '' }}
-      </span>
-    }
-    <button (click)="logout()" class="logout-btn">Cerrar Sesión</button>
-  </div>
-</header>
+<div class="app-shell">
+  <!-- SIDEBAR (Reference: Dark Navy Blue with Section Groups) -->
+  <aside class="app-sidebar" [class.collapsed]="!sidebarOpen">
+    
+    <!-- Brand Header -->
+    <div class="sidebar-brand">
+      <div class="brand-logo-container">
+        <div class="brand-logo-icon">
+          <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 8L16 26L26 8" stroke="url(#brandGrad)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <defs>
+              <linearGradient id="brandGrad" x1="6" y1="8" x2="26" y2="26" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#38BDF8"/>
+                <stop offset="0.5" stop-color="#3B82F6"/>
+                <stop offset="1" stop-color="#818CF8"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <span class="brand-name">Viernes</span>
+        <span class="brand-version-pill">V1</span>
+      </div>
+    </div>
 
-<div class="body">
-  <aside class="sidebar">
-    <nav>
-      <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
-      <a routerLink="/clientes" routerLinkActive="active">Clientes</a>
-      <a routerLink="/leads" routerLinkActive="active">Leads</a>
-      <a routerLink="/oportunidades" routerLinkActive="active">Oportunidades</a>
-      <a routerLink="/actividades" routerLinkActive="active">Actividades</a>
-      <a routerLink="/propuestas" routerLinkActive="active">Propuestas</a>
-      @if (esAdmin) {
-        <a routerLink="/usuarios" routerLinkActive="active">Usuarios</a>
-      }
+    <!-- Navigation Menu -->
+    <nav class="sidebar-nav">
+      
+      <!-- Top Primary: Inicio -->
+      <div class="nav-section-standalone">
+        <a routerLink="/dashboard" routerLinkActive="active" class="nav-item">
+          <mat-icon class="nav-icon">home</mat-icon>
+          <span class="nav-label">Inicio</span>
+        </a>
+      </div>
+
+      <!-- Section: VENTAS Y CRM -->
+      <div class="nav-section">
+        <div class="nav-section-title">VENTAS Y CRM</div>
+        
+        <a routerLink="/clientes" routerLinkActive="active" class="nav-item">
+          <mat-icon class="nav-icon">person_outline</mat-icon>
+          <span class="nav-label">Clientes</span>
+        </a>
+
+        <a routerLink="/clientes" [queryParams]="{tab: 'contactos'}" routerLinkActive="active" class="nav-item">
+          <mat-icon class="nav-icon">people_outline</mat-icon>
+          <span class="nav-label">Contactos</span>
+        </a>
+
+        <a routerLink="/leads" routerLinkActive="active" class="nav-item">
+          <mat-icon class="nav-icon">adjust</mat-icon>
+          <span class="nav-label">Leads</span>
+        </a>
+
+        <a routerLink="/oportunidades" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-item">
+          <mat-icon class="nav-icon">paid</mat-icon>
+          <span class="nav-label">Oportunidades</span>
+        </a>
+
+        <a routerLink="/oportunidades" [queryParams]="{vista: 'pipeline'}" routerLinkActive="active" class="nav-item">
+          <mat-icon class="nav-icon">view_kanban</mat-icon>
+          <span class="nav-label">Pipeline</span>
+        </a>
+
+        <a routerLink="/actividades" routerLinkActive="active" class="nav-item">
+          <mat-icon class="nav-icon">calendar_today</mat-icon>
+          <span class="nav-label">Actividades</span>
+        </a>
+
+        <a routerLink="/propuestas" routerLinkActive="active" class="nav-item">
+          <mat-icon class="nav-icon">description</mat-icon>
+          <span class="nav-label">Propuestas</span>
+        </a>
+      </div>
+
+      <!-- Section: MARKETING -->
+      <div class="nav-section">
+        <div class="nav-section-title">MARKETING</div>
+
+        <a routerLink="/dashboard" class="nav-item nav-item-disabled" title="Próximamente en V2">
+          <mat-icon class="nav-icon">campaign</mat-icon>
+          <span class="nav-label">Campañas</span>
+        </a>
+
+        <a routerLink="/dashboard" class="nav-item">
+          <mat-icon class="nav-icon">bar_chart</mat-icon>
+          <span class="nav-label">Indicadores</span>
+        </a>
+      </div>
+
+      <!-- Section: ADMINISTRACIÓN -->
+      <div class="nav-section">
+        <div class="nav-section-title">ADMINISTRACIÓN</div>
+
+        @if (esAdmin) {
+          <a routerLink="/usuarios" routerLinkActive="active" class="nav-item">
+            <mat-icon class="nav-icon">manage_accounts</mat-icon>
+            <span class="nav-label">Usuarios y roles</span>
+          </a>
+        }
+
+        <a routerLink="/dashboard" class="nav-item" title="Configuración del CRM">
+          <mat-icon class="nav-icon">settings</mat-icon>
+          <span class="nav-label">Configuración</span>
+        </a>
+      </div>
+
     </nav>
+
+    <!-- Sidebar Bottom Card & Version -->
+    <div class="sidebar-footer">
+      <div class="sidebar-growth-card">
+        <div class="growth-icon">
+          <mat-icon>rocket_launch</mat-icon>
+        </div>
+        <div class="growth-text">
+          <span>Tu crecimiento,</span>
+          <span>nuestra meta</span>
+        </div>
+      </div>
+      <div class="sidebar-version-tag">v1.0.0</div>
+    </div>
+
   </aside>
 
-  <main class="content">
-    <router-outlet />
-  </main>
+  <!-- MAIN WRAPPER (Header + View Content) -->
+  <div class="app-main-wrapper">
+    
+    <!-- HEADER (Reference: macOS Monterey Sunset Subtle Gradient + Search Pill + User Capsule) -->
+    <header class="app-header">
+      
+      <!-- Mobile sidebar toggle -->
+      <button class="mobile-toggle-btn" (click)="toggleSidebar()">
+        <mat-icon>menu</mat-icon>
+      </button>
+
+      <!-- Broad Search Pill Input -->
+      <div class="header-search-container">
+        <mat-icon class="search-icon">search</mat-icon>
+        <input 
+          type="text" 
+          class="header-search-input" 
+          placeholder="Buscar clientes, oportunidades, leads, actividades..."
+          (keyup.enter)="onSearch($event)"
+        />
+      </div>
+
+      <!-- Header Actions: Notifications & User Profile -->
+      <div class="header-actions">
+        
+        <!-- Notifications button with red badge -->
+        <button class="header-icon-btn" title="Notificaciones" [matMenuTriggerFor]="notifMenu">
+          <mat-icon>notifications</mat-icon>
+          <span class="notification-badge-dot"></span>
+        </button>
+
+        <!-- Notifications Dropdown Menu -->
+        <mat-menu #notifMenu="matMenu" class="notif-dropdown-menu">
+          <div class="dropdown-notif-header">
+            <strong>Notificaciones</strong>
+            <span class="badge-count">3 nuevas</span>
+          </div>
+          <mat-divider></mat-divider>
+          <div class="notif-item" routerLink="/oportunidades">
+            <div class="notif-icon-circle blue">
+              <mat-icon>trending_up</mat-icon>
+            </div>
+            <div class="notif-content">
+              <p class="notif-title">3 oportunidades próximas a vencer</p>
+              <span class="notif-time">En los próximos 7 días</span>
+            </div>
+          </div>
+          <div class="notif-item" routerLink="/actividades">
+            <div class="notif-icon-circle amber">
+              <mat-icon>event</mat-icon>
+            </div>
+            <div class="notif-content">
+              <p class="notif-title">Reunión con cliente TechNova SAC</p>
+              <span class="notif-time">Hoy a las 10:30 a. m.</span>
+            </div>
+          </div>
+          <div class="notif-item" routerLink="/propuestas">
+            <div class="notif-icon-circle emerald">
+              <mat-icon>check_circle</mat-icon>
+            </div>
+            <div class="notif-content">
+              <p class="notif-title">Propuesta aprobada por Inversiones Sur</p>
+              <span class="notif-time">Ayer, 4:15 p. m.</span>
+            </div>
+          </div>
+        </mat-menu>
+
+        <!-- User Profile Pill / Menu Trigger -->
+        <div class="user-profile-capsule" [matMenuTriggerFor]="userMenu">
+          <div class="user-avatar-circle">
+            {{ iniciales }}
+          </div>
+          <div class="user-meta-info">
+            <span class="user-meta-name">{{ nombreCompleto }}</span>
+            <span class="user-meta-role">{{ rolEtiqueta }}</span>
+          </div>
+          <mat-icon class="dropdown-chevron">keyboard_arrow_down</mat-icon>
+        </div>
+
+        <mat-menu #userMenu="matMenu" class="user-dropdown-menu">
+          <div class="dropdown-user-header">
+            <strong>{{ nombreCompleto }}</strong>
+            <small>{{ usuario?.correo }}</small>
+          </div>
+          <mat-divider></mat-divider>
+          <button mat-menu-item routerLink="/dashboard">
+            <mat-icon>dashboard</mat-icon>
+            <span>Dashboard</span>
+          </button>
+          @if (esAdmin) {
+            <button mat-menu-item routerLink="/usuarios">
+              <mat-icon>manage_accounts</mat-icon>
+              <span>Gestión de Usuarios</span>
+            </button>
+          }
+          <mat-divider></mat-divider>
+          <button mat-menu-item (click)="logout()" class="logout-menu-item">
+            <mat-icon color="warn">logout</mat-icon>
+            <span>Cerrar Sesión</span>
+          </button>
+        </mat-menu>
+
+      </div>
+    </header>
+
+    <!-- MAIN SCROLLABLE CONTENT VIEW -->
+    <main class="app-content-body">
+      <router-outlet />
+    </main>
+
+  </div>
 </div>

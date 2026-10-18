@@ -1,74 +1,210 @@
-<div class="list-container">
-  <div class="header-actions">
-    <h2>Oportunidades</h2>
-    <button mat-raised-button color="primary" routerLink="/oportunidades/nuevo">
-      <mat-icon>add</mat-icon> Nueva Oportunidad
-    </button>
+<div class="module-view-container">
+  
+  <!-- VIEW TOOLBAR -->
+  <div class="view-toolbar">
+    <div class="view-title-group">
+      <h2>Oportunidades</h2>
+      <p>Pipeline comercial y seguimiento de negociaciones • Total en cartera: <strong>{{ formatearSoles(totalPipeline()) }}</strong></p>
+    </div>
+
+    <div class="toolbar-actions-group">
+      
+      <!-- View Mode Toggle (Lista vs Pipeline) -->
+      <div class="view-mode-toggle-capsule">
+        <button 
+          class="toggle-btn" 
+          [class.active]="vistaActual() === 'lista'" 
+          (click)="setVista('lista')"
+          title="Vista de tabla"
+        >
+          <mat-icon>format_list_bulleted</mat-icon>
+          <span>Lista</span>
+        </button>
+
+        <button 
+          class="toggle-btn" 
+          [class.active]="vistaActual() === 'pipeline'" 
+          (click)="setVista('pipeline')"
+          title="Vista de pipeline Kanban"
+        >
+          <mat-icon>view_kanban</mat-icon>
+          <span>Pipeline</span>
+        </button>
+      </div>
+
+      <!-- Search Pill -->
+      <div class="toolbar-search-pill">
+        <mat-icon>search</mat-icon>
+        <input 
+          type="text" 
+          placeholder="Buscar oportunidad, cliente o etapa..." 
+          [ngModel]="filtroTexto()" 
+          (ngModelChange)="filtroTexto.set($event)"
+        />
+        @if (filtroTexto()) {
+          <button class="clear-search-btn" (click)="filtroTexto.set('')">
+            <mat-icon>close</mat-icon>
+          </button>
+        }
+      </div>
+
+      <!-- New Button -->
+      <button class="btn-primary-mac" routerLink="/oportunidades/nuevo">
+        <mat-icon>add</mat-icon> Nueva Oportunidad
+      </button>
+    </div>
   </div>
 
   @if (loading()) {
     <div class="loading-state">
       <mat-spinner diameter="40"></mat-spinner>
+      <p>Cargando oportunidades...</p>
     </div>
   }
 
   @if (error()) {
-    <div class="error-message">{{ error() }}</div>
+    <div class="error-message">
+      {{ error() }}
+    </div>
   }
 
   @if (isEmpty()) {
     <div class="empty-state">
-      No hay oportunidades registradas.
+      <mat-icon>paid</mat-icon>
+      <h3>No hay oportunidades registradas</h3>
+      <p>Crea tu primera oportunidad comercial para hacer seguimiento a tus ventas.</p>
+      <button class="btn-primary-mac" routerLink="/oportunidades/nuevo" style="margin-top: 16px;">
+        <mat-icon>add</mat-icon> Registrar Oportunidad
+      </button>
     </div>
   }
 
-  @if (hasOportunidades()) {
-    <table mat-table [dataSource]="oportunidades()" class="mat-elevation-z8">
-      
-      <ng-container matColumnDef="id">
-        <th mat-header-cell *matHeaderCellDef> ID </th>
-        <td mat-cell *matCellDef="let op"> {{op.id}} </td>
-      </ng-container>
+  <!-- 1. VISTA TABULAR (LISTA) -->
+  @if (hasOportunidades() && vistaActual() === 'lista') {
+    <div class="mac-table-card">
+      <table mat-table [dataSource]="oportunidadesFiltradas()">
+        
+        <!-- ID Column -->
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef> ID </th>
+          <td mat-cell *matCellDef="let op" class="id-cell"> #{{ op.id }} </td>
+        </ng-container>
 
-      <ng-container matColumnDef="nombre">
-        <th mat-header-cell *matHeaderCellDef> Nombre </th>
-        <td mat-cell *matCellDef="let op"> {{op.nombre}} </td>
-      </ng-container>
+        <!-- Nombre Column -->
+        <ng-container matColumnDef="nombre">
+          <th mat-header-cell *matHeaderCellDef> Oportunidad </th>
+          <td mat-cell *matCellDef="let op">
+            <div class="op-title-row">
+              <strong class="op-name-bold">{{ op.nombre }}</strong>
+              <small class="op-date-sub">{{ op.fechaCierre ? 'Cierre: ' + (op.fechaCierre | date:'shortDate') : 'Sin fecha estimada' }}</small>
+            </div>
+          </td>
+        </ng-container>
 
-      <ng-container matColumnDef="clienteNombre">
-        <th mat-header-cell *matHeaderCellDef> Cliente </th>
-        <td mat-cell *matCellDef="let op"> {{op.clienteNombre || '-'}} </td>
-      </ng-container>
+        <!-- Cliente Column -->
+        <ng-container matColumnDef="clienteNombre">
+          <th mat-header-cell *matHeaderCellDef> Cliente / Cuenta </th>
+          <td mat-cell *matCellDef="let op">
+            <span class="client-text">{{ op.clienteNombre || '-' }}</span>
+          </td>
+        </ng-container>
 
-      <ng-container matColumnDef="valor">
-        <th mat-header-cell *matHeaderCellDef> Valor </th>
-        <td mat-cell *matCellDef="let op"> {{op.valor | currency}} </td>
-      </ng-container>
+        <!-- Valor Column -->
+        <ng-container matColumnDef="valor">
+          <th mat-header-cell *matHeaderCellDef> Valor </th>
+          <td mat-cell *matCellDef="let op">
+            <strong class="amount-bold">{{ formatearSoles(op.valor) }}</strong>
+          </td>
+        </ng-container>
 
-      <ng-container matColumnDef="probabilidad">
-        <th mat-header-cell *matHeaderCellDef> Probabilidad </th>
-        <td mat-cell *matCellDef="let op"> {{op.probabilidad}}% </td>
-      </ng-container>
+        <!-- Probabilidad Column -->
+        <ng-container matColumnDef="probabilidad">
+          <th mat-header-cell *matHeaderCellDef> Probabilidad </th>
+          <td mat-cell *matCellDef="let op">
+            <div class="prob-progress-cell">
+              <span class="prob-pct-text">{{ op.probabilidad || 0 }}%</span>
+              <div class="prob-mini-track">
+                <div class="prob-mini-bar" [style.width.%]="op.probabilidad || 0"></div>
+              </div>
+            </div>
+          </td>
+        </ng-container>
 
-      <ng-container matColumnDef="etapa">
-        <th mat-header-cell *matHeaderCellDef> Etapa </th>
-        <td mat-cell *matCellDef="let op"> {{op.etapa}} </td>
-      </ng-container>
+        <!-- Etapa Column -->
+        <ng-container matColumnDef="etapa">
+          <th mat-header-cell *matHeaderCellDef> Etapa </th>
+          <td mat-cell *matCellDef="let op">
+            <span class="status-pill {{ getEtapaClass(op.etapa) }}">
+              {{ op.etapa }}
+            </span>
+          </td>
+        </ng-container>
 
-      <ng-container matColumnDef="acciones">
-        <th mat-header-cell *matHeaderCellDef> Acciones </th>
-        <td mat-cell *matCellDef="let op">
-          <button mat-icon-button color="primary" (click)="editar(op.id)">
-            <mat-icon>edit</mat-icon>
-          </button>
-          <button mat-icon-button color="warn" (click)="eliminar(op.id)">
-            <mat-icon>delete</mat-icon>
-          </button>
-        </td>
-      </ng-container>
+        <!-- Acciones Column -->
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef class="actions-header"> Acciones </th>
+          <td mat-cell *matCellDef="let op" class="actions-cell">
+            <button class="mac-action-btn edit" title="Editar" (click)="editar(op.id)">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button class="mac-action-btn delete" title="Eliminar" (click)="eliminar(op.id)">
+              <mat-icon>delete_outline</mat-icon>
+            </button>
+          </td>
+        </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </div>
   }
+
+  <!-- 2. VISTA KANBAN PIPELINE -->
+  @if (hasOportunidades() && vistaActual() === 'pipeline') {
+    <div class="pipeline-kanban-board">
+      @for (col of columnasKanban; track col.id) {
+        <div class="kanban-stage-column">
+          
+          <!-- Column Header -->
+          <div class="stage-col-header">
+            <div class="stage-col-title-group">
+              <span class="col-color-dot {{ col.colorClass }}"></span>
+              <strong class="col-title-text">{{ col.titulo }}</strong>
+              <span class="col-count-pill">{{ getOportunidadesPorEtapa(col.id).length }}</span>
+            </div>
+            <div class="col-total-amount">{{ formatearSoles(getTotalEtapa(col.id)) }}</div>
+          </div>
+
+          <!-- Cards List -->
+          <div class="stage-cards-container">
+            @for (op of getOportunidadesPorEtapa(col.id); track op.id) {
+              <div class="kanban-op-card" (click)="editar(op.id)">
+                <div class="kanban-card-top">
+                  <span class="op-card-client">{{ op.clienteNombre || 'Sin cliente' }}</span>
+                  <button class="kanban-edit-icon" (click)="$event.stopPropagation(); editar(op.id)">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                </div>
+
+                <div class="op-card-title">{{ op.nombre }}</div>
+
+                <div class="kanban-card-footer">
+                  <div class="op-card-value">{{ formatearSoles(op.valor) }}</div>
+                  <div class="op-card-prob-pill">{{ op.probabilidad || 0 }}%</div>
+                </div>
+              </div>
+            }
+
+            @if (getOportunidadesPorEtapa(col.id).length === 0) {
+              <div class="kanban-empty-slot">
+                <span>Sin acuerdos</span>
+              </div>
+            }
+          </div>
+
+        </div>
+      }
+    </div>
+  }
+
 </div>

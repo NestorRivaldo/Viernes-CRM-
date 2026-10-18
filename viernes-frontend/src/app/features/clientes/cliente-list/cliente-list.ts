@@ -1,31 +1,57 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ClientesService } from '../clientes.service';
 import { ClienteResponse } from '../clientes.model';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-cliente-list',
   standalone: true,
-  imports: [CommonModule, MatTableModule, MatButtonModule, MatIconModule, RouterLink, MatProgressSpinnerModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatTableModule,
+    MatButtonModule,
+    MatIconModule,
+    RouterLink,
+    MatProgressSpinnerModule
+  ],
   templateUrl: './cliente-list.html',
   styleUrl: './cliente-list.css'
 })
 export class ClienteList implements OnInit {
   private clientesService = inject(ClientesService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   clientes = signal<ClienteResponse[]>([]);
-  displayedColumns: string[] = ['id', 'nombre', 'empresa', 'correo', 'estado', 'acciones'];
+  filtroTexto = signal('');
+  filtroEstado = signal<string>('TODOS');
   loading = signal(false);
   error = signal('');
 
-  hasClientes = computed(() => this.clientes().length > 0 && !this.loading());
-  isEmpty = computed(() => !this.loading() && this.clientes().length === 0 && !this.error());
+  displayedColumns: string[] = ['id', 'nombre', 'empresa', 'correo', 'estado', 'acciones'];
+
+  clientesFiltrados = computed(() => {
+    const q = this.filtroTexto().toLowerCase().trim();
+    const est = this.filtroEstado();
+    return this.clientes().filter(c => {
+      const matchText = !q || 
+        c.nombre?.toLowerCase().includes(q) || 
+        c.empresa?.toLowerCase().includes(q) || 
+        c.correo?.toLowerCase().includes(q);
+      const matchEstado = est === 'TODOS' || c.estado === est;
+      return matchText && matchEstado;
+    });
+  });
+
+  hasClientes = computed(() => this.clientesFiltrados().length > 0 && !this.loading());
+  isEmpty = computed(() => !this.loading() && this.clientesFiltrados().length === 0 && !this.error());
 
   ngOnInit() {
     this.cargarClientes();
@@ -40,7 +66,7 @@ export class ClienteList implements OnInit {
         this.loading.set(false);
       },
       error: () => {
-        this.error.set('Error al cargar clientes.');
+        this.error.set('Error al cargar clientes. Verifique que el backend esté disponible.');
         this.loading.set(false);
       }
     });
@@ -59,7 +85,7 @@ export class ClienteList implements OnInit {
     if (confirm(`¿Está seguro de desactivar al cliente ${cliente.nombre}?`)) {
       this.clientesService.desactivar(cliente.id).subscribe({
         next: () => this.cargarClientes(),
-        error: (err) => alert(err?.friendlyMessage || 'Error al desactivar el cliente')
+        error: (err) => alert(err?.friendlyMessage || 'Error al desactivar')
       });
     }
   }
@@ -68,4 +94,3 @@ export class ClienteList implements OnInit {
     this.router.navigate(['/clientes', id, 'editar']);
   }
 }
-
