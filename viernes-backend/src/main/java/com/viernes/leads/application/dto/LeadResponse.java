@@ -14,5 +14,8 @@ public record LeadResponse(
     EstadoLead estado,
     String responsable,
     LocalDate fecha,
-    LocalDateTime creadoEn
+    LocalDateTime creadoEn,
+    Long fuenteId,
+    String fuenteCodigo,
+    String fuenteNombre
 ) {}

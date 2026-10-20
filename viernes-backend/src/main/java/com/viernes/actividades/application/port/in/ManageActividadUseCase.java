@@ -2,6 +2,7 @@ package com.viernes.actividades.application.port.in;
 
 import com.viernes.actividades.application.dto.ActividadRequest;
 import com.viernes.actividades.application.dto.ActividadResponse;
+import com.viernes.actividades.application.dto.ParticipanteResponse;
 import com.viernes.actividades.domain.EstadoActividad;
 import java.util.List;
 
@@ -18,4 +19,8 @@ public interface ManageActividadUseCase {
     List<ActividadResponse> filtrarPorUsuario(String idUsuario);
     ActividadResponse cambiarEstado(Long id, EstadoActividad estado);
     void eliminar(Long id);
+
+    ParticipanteResponse agregarParticipante(Long actividadId, Long contactoId);
+    void quitarParticipante(Long actividadId, Long contactoId);
+    List<ParticipanteResponse> listarParticipantes(Long actividadId);
 }

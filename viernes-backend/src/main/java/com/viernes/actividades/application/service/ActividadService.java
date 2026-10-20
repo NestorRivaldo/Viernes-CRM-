@@ -2,11 +2,16 @@ package com.viernes.actividades.application.service;
 
 import com.viernes.actividades.application.dto.ActividadRequest;
 import com.viernes.actividades.application.dto.ActividadResponse;
+import com.viernes.actividades.application.dto.ParticipanteResponse;
 import com.viernes.actividades.application.port.in.ManageActividadUseCase;
+import com.viernes.actividades.application.port.out.ActividadParticipantePersistencePort;
 import com.viernes.actividades.application.port.out.ActividadPersistencePort;
+import com.viernes.actividades.application.port.out.ContactoQueryPort;
 import com.viernes.actividades.application.port.out.RelacionValidationPort;
 import com.viernes.actividades.domain.Actividad;
+import com.viernes.actividades.domain.ActividadParticipante;
 import com.viernes.actividades.domain.EstadoActividad;
+import com.viernes.clientes.application.dto.ContactoResponse;
 import com.viernes.shared.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,10 +26,15 @@ public class ActividadService implements ManageActividadUseCase {
 
     private final ActividadPersistencePort persistencePort;
     private final RelacionValidationPort validationPort;
+    private final ActividadParticipantePersistencePort participantePort;
+    private final ContactoQueryPort contactoQueryPort;
 
-    public ActividadService(ActividadPersistencePort persistencePort, RelacionValidationPort validationPort) {
+    public ActividadService(ActividadPersistencePort persistencePort, RelacionValidationPort validationPort,
+                            ActividadParticipantePersistencePort participantePort, ContactoQueryPort contactoQueryPort) {
         this.persistencePort = persistencePort;
         this.validationPort = validationPort;
+        this.participantePort = participantePort;
+        this.contactoQueryPort = contactoQueryPort;
     }
 
     @Override
@@ -138,7 +148,48 @@ public class ActividadService implements ManageActividadUseCase {
         if (persistencePort.findById(id).isEmpty()) {
             throw new ResourceNotFoundException("Actividad no encontrada con ID: " + id);
         }
+        participantePort.deleteByIdActividad(id);
         persistencePort.deleteById(id);
+    }
+
+    @Override
+    public ParticipanteResponse agregarParticipante(Long actividadId, Long contactoId) {
+        if (persistencePort.findById(actividadId).isEmpty()) {
+            throw new ResourceNotFoundException("Actividad no encontrada con ID: " + actividadId);
+        }
+        ContactoResponse contacto = contactoQueryPort.buscarPorId(contactoId)
+                .orElseThrow(() -> new ResourceNotFoundException("Contacto no encontrado con ID: " + contactoId));
+        if (participantePort.existsByIdActividadAndIdContacto(actividadId, contactoId)) {
+            throw new IllegalArgumentException("El contacto ya es participante de la actividad");
+        }
+
+        ActividadParticipante participante = new ActividadParticipante();
+        participante.setIdActividad(actividadId);
+        participante.setIdContacto(contactoId);
+        participante.setCreadoEn(LocalDateTime.now());
+
+        ActividadParticipante saved = participantePort.save(participante);
+        return toParticipanteResponse(saved, contacto);
+    }
+
+    @Override
+    public void quitarParticipante(Long actividadId, Long contactoId) {
+        ActividadParticipante participante = participantePort
+                .findByIdActividadAndIdContacto(actividadId, contactoId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "El contacto " + contactoId + " no es participante de la actividad " + actividadId));
+        participantePort.delete(participante);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ParticipanteResponse> listarParticipantes(Long actividadId) {
+        if (persistencePort.findById(actividadId).isEmpty()) {
+            throw new ResourceNotFoundException("Actividad no encontrada con ID: " + actividadId);
+        }
+        return participantePort.findByIdActividad(actividadId).stream()
+                .map(p -> toParticipanteResponse(p, contactoQueryPort.buscarPorId(p.getIdContacto()).orElse(null)))
+                .collect(Collectors.toList());
     }
 
     private void validarRelaciones(ActividadRequest request) {
@@ -154,6 +205,25 @@ public class ActividadService implements ManageActividadUseCase {
         if (request.idUsuario() != null && !validationPort.existeUsuario(request.idUsuario())) {
             throw new ResourceNotFoundException("Usuario no encontrado con ID: " + request.idUsuario());
         }
+    }
+
+    private ParticipanteResponse toParticipanteResponse(ActividadParticipante participante, ContactoResponse contacto) {
+        String nombre = null;
+        String correo = null;
+        if (contacto != null) {
+            nombre = contacto.apellido() != null && !contacto.apellido().isBlank()
+                    ? contacto.nombre() + " " + contacto.apellido()
+                    : contacto.nombre();
+            correo = contacto.correo();
+        }
+        return new ParticipanteResponse(
+                participante.getId(),
+                participante.getIdActividad(),
+                participante.getIdContacto(),
+                nombre,
+                correo,
+                participante.getCreadoEn()
+        );
     }
 
     private ActividadResponse toResponse(Actividad actividad) {

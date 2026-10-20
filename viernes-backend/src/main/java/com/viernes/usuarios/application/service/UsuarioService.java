@@ -110,6 +110,16 @@ public class UsuarioService implements ManageUsuarioUseCase, UsuarioConsultaPort
     }
 
     @Override
+    public Optional<UsuarioResumen> buscarPorId(Long id) {
+        return persistencePort.findById(id).map(u -> new UsuarioResumen(
+                u.getId(), u.getNombre(), u.getApellido(), u.getCorreo(),
+                u.getPasswordHash(),
+                u.getRol() != null ? u.getRol().name() : null,
+                u.getEstado() != null ? u.getEstado().name() : null,
+                u.getCreadoEn()));
+    }
+
+    @Override
     public Optional<UsuarioResumen> buscarPorCorreo(String correo) {
         return persistencePort.findByCorreo(correo).map(u -> new UsuarioResumen(
                 u.getId(), u.getNombre(), u.getApellido(), u.getCorreo(),

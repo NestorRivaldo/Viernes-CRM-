@@ -2,8 +2,10 @@ package com.viernes.leads.application.service;
 
 import com.viernes.leads.application.dto.LeadRequest;
 import com.viernes.leads.application.dto.LeadResponse;
+import com.viernes.leads.application.port.out.FuentePersistencePort;
 import com.viernes.leads.application.port.out.LeadPersistencePort;
 import com.viernes.leads.domain.EstadoLead;
+import com.viernes.leads.domain.Fuente;
 import com.viernes.leads.domain.Lead;
 import com.viernes.shared.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +29,9 @@ class LeadServiceTest {
     @Mock
     private LeadPersistencePort persistencePort;
 
+    @Mock
+    private FuentePersistencePort fuentePersistencePort;
+
     @InjectMocks
     private LeadService servicio;
 
@@ -36,7 +41,7 @@ class LeadServiceTest {
     @BeforeEach
     void setUp() {
         validRequest = new LeadRequest(
-                "Ana", "Empresa SA", "ana@mail.com", "999888777", "WEB", null, "usr1", LocalDate.now()
+                "Ana", "Empresa SA", "ana@mail.com", "999888777", "WEB", null, "usr1", LocalDate.now(), null
         );
 
         entidadGuardada = Lead.builder()
@@ -75,7 +80,7 @@ class LeadServiceTest {
     void actualizar_existente_retornaActualizado() {
         LeadRequest cambios = new LeadRequest(
                 "Ana Maria", "Empresa SA", "ana@mail.com", "999888777", "WEB",
-                EstadoLead.CONTACTADO, "usr1", LocalDate.now()
+                EstadoLead.CONTACTADO, "usr1", LocalDate.now(), null
         );
         when(persistencePort.findById(1L)).thenReturn(Optional.of(entidadGuardada));
         when(persistencePort.save(any(Lead.class))).thenAnswer(i -> i.getArgument(0));
@@ -113,5 +118,32 @@ class LeadServiceTest {
 
         assertThrows(ResourceNotFoundException.class, () -> servicio.eliminar(99L));
         verify(persistencePort, never()).deleteById(any());
+    }
+
+    @Test
+    void crear_conFuenteId_validaYEnriqueceRespuesta() {
+        LeadRequest conFuente = new LeadRequest(
+                "Ana", "Empresa SA", "ana@mail.com", "999888777", "WEB", null, "usr1", LocalDate.now(), 2L
+        );
+        Fuente fuente = Fuente.builder().id(2L).codigo("WEB").nombre("Sitio Web").activa(true).build();
+        when(fuentePersistencePort.findById(2L)).thenReturn(Optional.of(fuente));
+        when(persistencePort.save(any(Lead.class))).thenAnswer(i -> i.getArgument(0));
+
+        LeadResponse response = servicio.crear(conFuente);
+
+        assertEquals(2L, response.fuenteId());
+        assertEquals("WEB", response.fuenteCodigo());
+        assertEquals("Sitio Web", response.fuenteNombre());
+    }
+
+    @Test
+    void crear_conFuenteIdInexistente_lanzaNotFound() {
+        LeadRequest conFuente = new LeadRequest(
+                "Ana", "Empresa SA", "ana@mail.com", "999888777", "WEB", null, "usr1", LocalDate.now(), 99L
+        );
+        when(fuentePersistencePort.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> servicio.crear(conFuente));
+        verify(persistencePort, never()).save(any());
     }
 }

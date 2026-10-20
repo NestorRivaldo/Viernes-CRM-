@@ -31,6 +31,9 @@ public class LeadEntity {
     @Column(name = "FUENTE", length = 80)
     private String fuente;
 
+    @Column(name = "FUENTE_ID")
+    private Long fuenteId;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "ESTADO", nullable = false, length = 20)
     @Builder.Default

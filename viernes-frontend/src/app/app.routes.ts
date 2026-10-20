@@ -54,6 +54,18 @@ export const routes: Routes = [
         loadComponent: () => import('./features/oportunidades/oportunidad-form/oportunidad-form').then((m) => m.OportunidadForm),
       },
       {
+        path: 'productos',
+        loadComponent: () => import('./features/productos/producto-list/producto-list').then((m) => m.ProductoList),
+      },
+      {
+        path: 'productos/nuevo',
+        loadComponent: () => import('./features/productos/producto-form/producto-form').then((m) => m.ProductoForm),
+      },
+      {
+        path: 'productos/:id/editar',
+        loadComponent: () => import('./features/productos/producto-form/producto-form').then((m) => m.ProductoForm),
+      },
+      {
         path: 'actividades',
         loadComponent: () => import('./features/actividades/actividad-list/actividad-list').then((m) => m.ActividadList),
       },

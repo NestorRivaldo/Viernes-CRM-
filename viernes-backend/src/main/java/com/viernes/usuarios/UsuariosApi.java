@@ -9,6 +9,8 @@ import java.util.Optional;
  */
 public interface UsuariosApi {
 
+    Optional<UsuarioResumen> buscarPorId(Long id);
+
     Optional<UsuarioResumen> buscarPorCorreo(String correo);
 
     boolean existePorId(Long id);

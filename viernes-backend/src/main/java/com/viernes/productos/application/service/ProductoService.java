@@ -57,6 +57,9 @@ public class ProductoService implements ManageProductoUseCase {
     @Transactional
     public ProductoResponse actualizar(Long id, ProductoRequest request) {
         Producto p = findOrThrow(id);
+        if (!p.getCodigo().equals(request.codigo()) && persistencePort.existsByCodigo(request.codigo())) {
+            throw new IllegalArgumentException("Ya existe un producto con el código: " + request.codigo());
+        }
         apply(p, request);
         return toResponse(persistencePort.save(p));
     }

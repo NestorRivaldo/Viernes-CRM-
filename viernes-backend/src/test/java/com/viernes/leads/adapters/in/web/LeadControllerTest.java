@@ -47,7 +47,7 @@ class LeadControllerTest {
 
         validResponse = new LeadResponse(
                 1L, "Ana", "Empresa SA", "ana@mail.com", "999888777", "WEB",
-                EstadoLead.NUEVO, "usr1", LocalDate.now(), LocalDateTime.now()
+                EstadoLead.NUEVO, "usr1", LocalDate.now(), LocalDateTime.now(), null, null, null
         );
     }
 
@@ -135,7 +135,7 @@ class LeadControllerTest {
     void cambiarEstadoLead() throws Exception {
         LeadResponse contactadoResponse = new LeadResponse(
                 1L, "Ana", "Empresa SA", "ana@mail.com", "999888777", "WEB",
-                EstadoLead.CONTACTADO, "usr1", LocalDate.now(), LocalDateTime.now()
+                EstadoLead.CONTACTADO, "usr1", LocalDate.now(), LocalDateTime.now(), null, null, null
         );
         when(useCase.cambiarEstado(eq(1L), eq(EstadoLead.CONTACTADO))).thenReturn(contactadoResponse);
 
@@ -150,5 +150,21 @@ class LeadControllerTest {
                 .andExpect(status().isNoContent());
 
         verify(useCase).eliminar(1L);
+    }
+
+    @Test
+    void obtenerLeadConFuente() throws Exception {
+        LeadResponse conFuente = new LeadResponse(
+                1L, "Ana", "Empresa SA", "ana@mail.com", "999888777", "WEB",
+                EstadoLead.NUEVO, "usr1", LocalDate.now(), LocalDateTime.now(),
+                2L, "WEB", "Sitio Web"
+        );
+        when(useCase.obtener(1L)).thenReturn(conFuente);
+
+        mockMvc.perform(get("/api/v1/leads/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.fuenteId").value(2L))
+                .andExpect(jsonPath("$.fuenteCodigo").value("WEB"))
+                .andExpect(jsonPath("$.fuenteNombre").value("Sitio Web"));
     }
 }

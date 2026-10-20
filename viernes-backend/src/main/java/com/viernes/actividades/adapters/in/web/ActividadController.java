@@ -2,6 +2,8 @@ package com.viernes.actividades.adapters.in.web;
 
 import com.viernes.actividades.application.dto.ActividadRequest;
 import com.viernes.actividades.application.dto.ActividadResponse;
+import com.viernes.actividades.application.dto.ParticipanteRequest;
+import com.viernes.actividades.application.dto.ParticipanteResponse;
 import com.viernes.actividades.application.port.in.ManageActividadUseCase;
 import com.viernes.actividades.domain.EstadoActividad;
 import jakarta.validation.Valid;
@@ -76,6 +78,27 @@ public class ActividadController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         useCase.eliminar(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    // --- Endpoints de Participantes ---
+
+    @GetMapping("/{id}/participantes")
+    public ResponseEntity<List<ParticipanteResponse>> listarParticipantes(@PathVariable Long id) {
+        return ResponseEntity.ok(useCase.listarParticipantes(id));
+    }
+
+    @PostMapping("/{id}/participantes")
+    public ResponseEntity<ParticipanteResponse> agregarParticipante(
+            @PathVariable Long id,
+            @Valid @RequestBody ParticipanteRequest request) {
+        ParticipanteResponse response = useCase.agregarParticipante(id, request.contactoId());
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/{id}/participantes/{contactoId}")
+    public ResponseEntity<Void> quitarParticipante(@PathVariable Long id, @PathVariable Long contactoId) {
+        useCase.quitarParticipante(id, contactoId);
         return ResponseEntity.noContent().build();
     }
 }

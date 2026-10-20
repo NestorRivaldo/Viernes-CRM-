@@ -12,6 +12,7 @@ public class Lead {
     private String correo;
     private String telefono;
     private String fuente;
+    private Long fuenteId;
     private EstadoLead estado;
     private String responsable;
     private LocalDate fecha;

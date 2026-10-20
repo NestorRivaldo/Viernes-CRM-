@@ -14,5 +14,6 @@ public record LeadRequest(
     @Size(max = 80) String fuente,
     EstadoLead estado,
     @Size(max = 100) String responsable,
-    LocalDate fecha
+    LocalDate fecha,
+    Long fuenteId
 ) {}

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.viernes.actividades.application.dto.ActividadRequest;
 import com.viernes.actividades.application.dto.ActividadResponse;
+import com.viernes.actividades.application.dto.ParticipanteRequest;
+import com.viernes.actividades.application.dto.ParticipanteResponse;
 import com.viernes.actividades.application.port.in.ManageActividadUseCase;
 import com.viernes.actividades.domain.EstadoActividad;
 import com.viernes.actividades.domain.TipoActividad;
@@ -23,6 +25,7 @@ import java.util.Collections;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -133,5 +136,80 @@ class ActividadControllerTest {
         mockMvc.perform(get("/api/v1/actividades?vencidas=true"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray());
+    }
+
+    @Test
+    void listarParticipantes() throws Exception {
+        when(useCase.listarParticipantes(1L)).thenReturn(Collections.emptyList());
+
+        mockMvc.perform(get("/api/v1/actividades/1/participantes"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray());
+    }
+
+    @Test
+    void agregarParticipanteValido() throws Exception {
+        ParticipanteRequest request = new ParticipanteRequest(5L);
+        ParticipanteResponse response = new ParticipanteResponse(
+                10L, 1L, 5L, "Ana Perez", "ana@mail.com", LocalDateTime.now()
+        );
+
+        when(useCase.agregarParticipante(eq(1L), eq(5L))).thenReturn(response);
+
+        mockMvc.perform(post("/api/v1/actividades/1/participantes")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.contactoId").value(5L))
+                .andExpect(jsonPath("$.nombreContacto").value("Ana Perez"));
+    }
+
+    @Test
+    void agregarParticipanteSinContactoId() throws Exception {
+        mockMvc.perform(post("/api/v1/actividades/1/participantes")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void agregarParticipanteActividadInexistente() throws Exception {
+        ParticipanteRequest request = new ParticipanteRequest(5L);
+
+        when(useCase.agregarParticipante(eq(99L), eq(5L)))
+                .thenThrow(new ResourceNotFoundException("Actividad no encontrada con ID: 99"));
+
+        mockMvc.perform(post("/api/v1/actividades/99/participantes")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void agregarParticipanteDuplicado() throws Exception {
+        ParticipanteRequest request = new ParticipanteRequest(5L);
+
+        when(useCase.agregarParticipante(eq(1L), eq(5L)))
+                .thenThrow(new IllegalArgumentException("El contacto ya es participante de la actividad"));
+
+        mockMvc.perform(post("/api/v1/actividades/1/participantes")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void quitarParticipanteExistente() throws Exception {
+        mockMvc.perform(delete("/api/v1/actividades/1/participantes/5"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void quitarParticipanteInexistente() throws Exception {
+        doThrow(new ResourceNotFoundException("El contacto 5 no es participante de la actividad 1"))
+                .when(useCase).quitarParticipante(1L, 5L);
+
+        mockMvc.perform(delete("/api/v1/actividades/1/participantes/5"))
+                .andExpect(status().isNotFound());
     }
 }
