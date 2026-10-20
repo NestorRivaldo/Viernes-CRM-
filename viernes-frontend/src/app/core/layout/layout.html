@@ -42,11 +42,6 @@
           <span class="nav-label">Clientes</span>
         </a>
 
-        <a routerLink="/clientes" [queryParams]="{tab: 'contactos'}" routerLinkActive="active" class="nav-item">
-          <mat-icon class="nav-icon">people_outline</mat-icon>
-          <span class="nav-label">Contactos</span>
-        </a>
-
         <a routerLink="/leads" routerLinkActive="active" class="nav-item">
           <mat-icon class="nav-icon">adjust</mat-icon>
           <span class="nav-label">Leads</span>
@@ -73,21 +68,6 @@
         </a>
       </div>
 
-      <!-- Section: MARKETING -->
-      <div class="nav-section">
-        <div class="nav-section-title">MARKETING</div>
-
-        <a routerLink="/dashboard" class="nav-item nav-item-disabled" title="Próximamente en V2">
-          <mat-icon class="nav-icon">campaign</mat-icon>
-          <span class="nav-label">Campañas</span>
-        </a>
-
-        <a routerLink="/dashboard" class="nav-item">
-          <mat-icon class="nav-icon">bar_chart</mat-icon>
-          <span class="nav-label">Indicadores</span>
-        </a>
-      </div>
-
       <!-- Section: ADMINISTRACIÓN -->
       <div class="nav-section">
         <div class="nav-section-title">ADMINISTRACIÓN</div>
@@ -99,7 +79,7 @@
           </a>
         }
 
-        <a routerLink="/dashboard" class="nav-item" title="Configuración del CRM">
+        <a routerLink="/configuracion" routerLinkActive="active" class="nav-item" title="Configuración del CRM">
           <mat-icon class="nav-icon">settings</mat-icon>
           <span class="nav-label">Configuración</span>
         </a>
@@ -107,17 +87,8 @@
 
     </nav>
 
-    <!-- Sidebar Bottom Card & Version -->
+    <!-- Sidebar Bottom & Version -->
     <div class="sidebar-footer">
-      <div class="sidebar-growth-card">
-        <div class="growth-icon">
-          <mat-icon>rocket_launch</mat-icon>
-        </div>
-        <div class="growth-text">
-          <span>Tu crecimiento,</span>
-          <span>nuestra meta</span>
-        </div>
-      </div>
       <div class="sidebar-version-tag">v1.0.0</div>
     </div>
 

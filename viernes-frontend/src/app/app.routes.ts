@@ -99,7 +99,10 @@ export const routes: Routes = [
       { path: 'pipeline', redirectTo: 'oportunidades', pathMatch: 'full' },
       { path: 'indicadores', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'campanas', redirectTo: 'dashboard', pathMatch: 'full' },
-      { path: 'configuracion', redirectTo: 'dashboard', pathMatch: 'full' }
+      {
+        path: 'configuracion',
+        loadComponent: () => import('./features/configuracion/configuracion').then(m => m.Configuracion)
+      }
     ],
   },
   { path: '**', redirectTo: '' }

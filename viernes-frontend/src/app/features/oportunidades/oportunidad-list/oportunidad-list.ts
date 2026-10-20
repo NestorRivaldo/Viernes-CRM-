@@ -6,6 +6,8 @@ import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatMenuModule } from '@angular/material/menu';
+import { DragDropModule, CdkDragDrop } from '@angular/cdk/drag-drop';
 import { OportunidadesService } from '../oportunidades.service';
 import { OportunidadResponse, EtapaOportunidad } from '../oportunidades.model';
 
@@ -24,6 +26,8 @@ export interface ColumnaKanban {
     MatTableModule,
     MatButtonModule,
     MatIconModule,
+    MatMenuModule,
+    DragDropModule,
     RouterLink,
     MatProgressSpinnerModule
   ],
@@ -137,6 +141,78 @@ export class OportunidadList implements OnInit {
         next: () => this.cargarOportunidades(),
         error: () => alert('Error al eliminar')
       });
+    }
+  }
+
+  readonly etapasOrdenadas: EtapaOportunidad[] = [
+    EtapaOportunidad.PROSPECCION,
+    EtapaOportunidad.CALIFICACION,
+    EtapaOportunidad.PROPUESTA,
+    EtapaOportunidad.NEGOCIACION,
+    EtapaOportunidad.GANADA,
+    EtapaOportunidad.PERDIDA
+  ];
+
+  esPrimeraEtapa(etapa: EtapaOportunidad | string): boolean {
+    return this.etapasOrdenadas.indexOf(etapa as EtapaOportunidad) <= 0;
+  }
+
+  esUltimaEtapa(etapa: EtapaOportunidad | string): boolean {
+    const idx = this.etapasOrdenadas.indexOf(etapa as EtapaOportunidad);
+    return idx < 0 || idx >= this.etapasOrdenadas.length - 1;
+  }
+
+  moverEtapaAnterior(op: OportunidadResponse, event?: Event) {
+    if (event) event.stopPropagation();
+    const idx = this.etapasOrdenadas.indexOf(op.etapa as EtapaOportunidad);
+    if (idx > 0) {
+      this.moverEtapa(op, this.etapasOrdenadas[idx - 1]);
+    }
+  }
+
+  moverEtapaSiguiente(op: OportunidadResponse, event?: Event) {
+    if (event) event.stopPropagation();
+    const idx = this.etapasOrdenadas.indexOf(op.etapa as EtapaOportunidad);
+    if (idx >= 0 && idx < this.etapasOrdenadas.length - 1) {
+      this.moverEtapa(op, this.etapasOrdenadas[idx + 1]);
+    }
+  }
+
+  moverEtapa(op: OportunidadResponse, nuevaEtapa: EtapaOportunidad, event?: Event) {
+    if (event) event.stopPropagation();
+    if (op.etapa === nuevaEtapa) return;
+
+    const etapaPrevia = op.etapa;
+    // Actualización optimista local
+    this.oportunidades.update(ops => 
+      ops.map(o => o.id === op.id ? { ...o, etapa: nuevaEtapa } : o)
+    );
+
+    this.oportunidadesService.cambiarEtapa(op.id, nuevaEtapa).subscribe({
+      next: (actualizada) => {
+        this.oportunidades.update(ops => 
+          ops.map(o => o.id === op.id ? { ...o, etapa: actualizada.etapa } : o)
+        );
+      },
+      error: (err) => {
+        console.error('Error al cambiar etapa:', err);
+        // Revertir en caso de falla
+        this.oportunidades.update(ops => 
+          ops.map(o => o.id === op.id ? { ...o, etapa: etapaPrevia } : o)
+        );
+        alert('No se pudo actualizar la etapa de la oportunidad en el servidor.');
+      }
+    });
+  }
+
+  onCardDrop(event: CdkDragDrop<EtapaOportunidad>) {
+    if (event.previousContainer === event.container) {
+      return;
+    }
+    const op = event.item.data as OportunidadResponse;
+    const nuevaEtapa = event.container.data;
+    if (op && nuevaEtapa) {
+      this.moverEtapa(op, nuevaEtapa);
     }
   }
 

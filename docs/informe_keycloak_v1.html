@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe Técnico - Módulo de Seguridad Keycloak (OAuth2 / OIDC) – VIERNES CRM</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #090d16;
+            --surface: #111726;
+            --surface2: #172033;
+            --surface-hover: #1e2942;
+            --border: #232f48;
+            --border-highlight: #3b82f6;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --text-subtle: #64748b;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.25);
+            --accent-soft: rgba(59, 130, 246, 0.12);
+            --green: #10b981;
+            --green-glow: rgba(16, 185, 129, 0.2);
+            --green-soft: rgba(16, 185, 129, 0.12);
+            --purple: #a855f7;
+            --purple-soft: rgba(168, 85, 247, 0.12);
+            --amber: #f59e0b;
+            --amber-soft: rgba(245, 158, 11, 0.12);
+            --cyan: #06b6d4;
+            --cyan-soft: rgba(6, 182, 212, 0.12);
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            padding: 40px 20px;
+            background-image: 
+                radial-gradient(circle at 15% 10%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 90%, rgba(168, 85, 247, 0.06) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            position: relative;
+            padding-bottom: 30px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .brand-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--accent-soft);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            letter-spacing: 0.04em;
+        }
+
+        h1 {
+            font-size: 38px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #ffffff 40%, #93c5fd 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 12px;
+        }
+
+        .subtitle {
+            font-size: 17px;
+            color: var(--text-muted);
+            max-width: 720px;
+            margin: 0 auto 24px;
+        }
+
+        .status-pill-group {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12.5px;
+            font-weight: 600;
+        }
+
+        .pill-green {
+            background: var(--green-soft);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .pill-blue {
+            background: var(--accent-soft);
+            color: #93c5fd;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .pill-purple {
+            background: var(--purple-soft);
+            color: #c084fc;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+        }
+
+        /* Headings */
+        h2 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 40px 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        h2 .icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--accent-soft);
+            color: #60a5fa;
+            font-size: 16px;
+        }
+
+        h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #93c5fd;
+            margin: 20px 0 10px;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+            transition: border-color 0.2s;
+        }
+
+        .card:hover {
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+
+        /* Metrics */
+        .metric-card {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 18px;
+        }
+
+        .metric-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: var(--text-subtle);
+            margin-bottom: 6px;
+        }
+
+        .metric-value {
+            font-size: 24px;
+            font-weight: 800;
+            color: #ffffff;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .metric-desc {
+            font-size: 12.5px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Code Blocks */
+        pre {
+            background: #080c14;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 16px 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13.5px;
+            color: #e2e8f0;
+            overflow-x: auto;
+            margin: 14px 0 20px;
+            line-height: 1.6;
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(255, 255, 255, 0.06);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #93c5fd;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 16px 0 24px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+        }
+
+        th {
+            background: var(--surface2);
+            color: #94a3b8;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-weight: 700;
+            text-align: left;
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 13px 16px;
+            border-bottom: 1px solid rgba(35, 47, 72, 0.6);
+            font-size: 13.5px;
+            color: var(--text);
+            background: var(--surface);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: var(--surface-hover);
+        }
+
+        /* Diagram Box */
+        .diagram-box {
+            background: #090e1a;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: #38bdf8;
+            overflow-x: auto;
+            white-space: pre;
+            line-height: 1.5;
+            margin: 18px 0;
+        }
+
+        /* Stepper List */
+        .steps {
+            list-style: none;
+            counter-reset: step-counter;
+        }
+
+        .step-item {
+            position: relative;
+            padding-left: 50px;
+            margin-bottom: 24px;
+        }
+
+        .step-item::before {
+            counter-increment: step-counter;
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .step-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 6px;
+        }
+
+        .step-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        /* Links & Buttons */
+        .btn-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--accent);
+            color: #ffffff;
+            text-decoration: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-size: 13.5px;
+            font-weight: 600;
+            transition: all 0.2s;
+            margin-right: 12px;
+            margin-top: 8px;
+        }
+
+        .btn-link:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Roles badge in table */
+        .role-chip {
+            display: inline-block;
+            background: var(--accent-soft);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-right: 4px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 0 20px;
+            color: var(--text-subtle);
+            font-size: 13px;
+            border-top: 1px solid var(--border);
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Header -->
+    <header>
+        <div class="brand-badge">🛡️ VIERNES CRM V1 • SEGURIDAD EMPRESARIAL</div>
+        <h1>Informe Técnico de Implementación de Keycloak</h1>
+        <p class="subtitle">
+            Arquitectura de Autenticación Centralizada OAuth2 / OpenID Connect, configuración de Resource Server en Spring Boot y cliente SPA en Angular.
+        </p>
+        <div class="status-pill-group">
+            <span class="status-pill pill-green">● ESTADO: ACTIVO Y VERIFICADO (100%)</span>
+            <span class="status-pill pill-blue">Keycloak 25.0.6 (Quarkus)</span>
+            <span class="status-pill pill-purple">Spring Boot 4 / Java 21</span>
+            <span class="status-pill pill-blue">Angular 22 (SPA)</span>
+        </div>
+    </header>
+
+    <!-- 1. Resumen Ejecutivo y Métricas -->
+    <section>
+        <h2><span class="icon">📊</span> 1. Resumen Ejecutivo</h2>
+        <div class="grid-3">
+            <div class="metric-card">
+                <div class="metric-title">Puerto Keycloak OIDC</div>
+                <div class="metric-value">8180</div>
+                <div class="metric-desc">Aislado para evitar colisión con Spring Boot (8080).</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-title">Algoritmo de Firma</div>
+                <div class="metric-value">RS256 (JWKS)</div>
+                <div class="metric-desc">Validación de llaves públicas criptográficas en tiempo real.</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-title">Usuarios Activos</div>
+                <div class="metric-value">1 (Total)</div>
+                <div class="metric-desc">Usuario único con acceso global (ADMIN, JEFE, VENDEDOR).</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <p style="color: var(--text); margin-bottom: 12px;">
+                La autenticación de <strong>Viernes CRM V1</strong> ha migrado de un esquema JWT local en base de datos hacia una infraestructura profesional <strong>IAM (Identity and Access Management)</strong> basada en <strong>Keycloak 25</strong>. 
+            </p>
+            <p style="color: var(--text-muted);">
+                Esta actualización garantiza desacoplamiento de identidades, cumplimiento del estándar <strong>OAuth 2.0 / OpenID Connect (OIDC)</strong>, inicio de sesión único (SSO), protección contra fuerza bruta y renovación programada de tokens (PKCE S256).
+            </p>
+        </div>
+    </section>
+
+    <!-- 2. Arquitectura de Integración -->
+    <section>
+        <h2><span class="icon">🏗️</span> 2. Arquitectura y Flujo de Autenticación</h2>
+        <div class="diagram-box">
+┌────────────────────────────────────────────────────────────────────────┐
+│                        KEYCLOAK 25 (Docker)                            │
+│                       http://localhost:8180                            │
+│                       Realm: viernes-realm                             │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │
+    1. Direct Grant / SSO (OIDC)   │  4. Validación de firma JWKS
+    2. Emisión de Access Token      │     (/protocol/openid-connect/certs)
+       (RS256 con roles y claims)   │
+                                    │
+┌───────────────────────────┐       │       ┌────────────────────────────┐
+│     VIERNES FRONTEND      │ ──────┴─────> │      VIERNES BACKEND       │
+│     Angular (Port 4200)   │ 3. Bearer JWT │   Spring Boot (Port 8080)  │
+│  Client: viernes-frontend │               │  OAuth2 Resource Server    │
+│  (Direct Grant + OIDC)    │               │  Profile: keycloak         │
+└───────────────────────────┘               └────────────────────────────┘
+        </div>
+
+        <div class="card">
+            <h3>Flujo Transaccional:</h3>
+            <ol style="margin-left: 20px; color: var(--text-muted);">
+                <li style="margin-bottom: 8px;"><strong>Autenticación:</strong> El cliente Angular se comunica directamente con el endpoint <code>/protocol/openid-connect/token</code> de Keycloak mediante Direct Grant o redirección OIDC.</li>
+                <li style="margin-bottom: 8px;"><strong>Emisión de Tokens:</strong> Keycloak valida las credenciales y devuelve un <code>access_token</code> firmado criptográficamente que contiene los claims del usuario y sus roles asignados (<code>realm_access.roles</code>).</li>
+                <li style="margin-bottom: 8px;"><strong>Consumo de APIs:</strong> El frontend adjunta el token en la cabecera <code>Authorization: Bearer &lt;token&gt;</code> en cada llamada REST a través de <code>jwtInterceptor</code>.</li>
+                <li style="margin-bottom: 8px;"><strong>Validación Descentralizada:</strong> Spring Boot valida la autenticidad del token mediante las llaves públicas expuestas en Keycloak (JWKS <code>/certs</code>) sin realizar consultas a la base de datos de usuarios.</li>
+            </ol>
+        </div>
+    </section>
+
+    <!-- 3. Configuración del Realm y Usuario -->
+    <section>
+        <h2><span class="icon">👥</span> 3. Realm y Usuario Único Configurado</h2>
+        <div class="card">
+            <p style="color: var(--text-muted); margin-bottom: 16px;">
+                Siguiendo las instrucciones del proyecto, se configuró un <strong>único usuario administrador</strong> en el archivo <code>viernes-realm.json</code> que concentra todos los privilegios del CRM:
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parámetro</th>
+                        <th>Valor Configurado</th>
+                        <th>Descripción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Correo / Usuario</strong></td>
+                        <td><code>admin@viernes.com</code></td>
+                        <td>Identificador principal de inicio de sesión.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Contraseña</strong></td>
+                        <td><code>Admin12345</code></td>
+                        <td>Contraseña permanente (no temporal).</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Nombre</strong></td>
+                        <td>Nestor Barrantes</td>
+                        <td>Mapeado en los claims <code>given_name</code> y <code>family_name</code>.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Roles Asignados</strong></td>
+                        <td>
+                            <span class="role-chip">ADMIN</span>
+                            <span class="role-chip">JEFE</span>
+                            <span class="role-chip">VENDEDOR</span>
+                        </td>
+                        <td>Acceso irrestricto a clientes, leads, pipeline, métricas y administración.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cliente SPA</strong></td>
+                        <td><code>viernes-frontend</code></td>
+                        <td>Cliente público con soporte Direct Grant y PKCE S256.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cliente Backend</strong></td>
+                        <td><code>viernes-backend</code></td>
+                        <td>Cliente <code>bearerOnly</code> utilizado como Resource Server.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- 4. Funcionamiento Técnico por Capa -->
+    <section>
+        <h2><span class="icon">⚙️</span> 4. Funcionamiento Técnico por Capa</h2>
+        
+        <div class="grid-2">
+            <!-- Backend -->
+            <div class="card">
+                <h3>Backend (Spring Boot Resource Server)</h3>
+                <ul style="margin-left: 18px; color: var(--text-muted); font-size: 13.5px;">
+                    <li style="margin-bottom: 10px;">
+                        <strong>KeycloakSecurityConfig:</strong> Activado únicamente con <code>@Profile("keycloak")</code>. Desactiva CSRF (por ser stateless) y configura CORS permitiendo peticiones desde <code>http://localhost:4200</code>.
+                    </li>
+                    <li style="margin-bottom: 10px;">
+                        <strong>KeycloakJwtAuthenticationConverter:</strong> Extrae los roles del claim <code>realm_access.roles</code> de Keycloak y les añade el prefijo <code>ROLE_</code> requerido por Spring Security (ej. <code>ROLE_ADMIN</code>).
+                    </li>
+                    <li style="margin-bottom: 10px;">
+                        <strong>Aislamiento de Perfiles:</strong> La clase antigua <code>SecurityConfig</code> y el filtro <code>JwtAuthFilter</code> fueron protegidos con <code>@Profile("!keycloak")</code>, garantizando que no haya conflictos entre ambos sistemas.
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Frontend -->
+            <div class="card">
+                <h3>Frontend (Angular 22 SPA)</h3>
+                <ul style="margin-left: 18px; color: var(--text-muted); font-size: 13.5px;">
+                    <li style="margin-bottom: 10px;">
+                        <strong>AuthService Centralizado:</strong> Realiza login contra <code>/openid-connect/token</code> y procesa callbacks SSO con <code>?code=...</code>. Decodifica el token en memoria para el perfil de usuario.
+                    </li>
+                    <li style="margin-bottom: 10px;">
+                        <strong>Eliminación de Bypass Demo:</strong> Se removió <code>loginSinCredenciales</code> y los datos simulados en <code>dashboard.service.ts</code>. Toda la data ahora proviene de la base de datos Oracle XE.
+                    </li>
+                    <li style="margin-bottom: 10px;">
+                        <strong>Protección de CORS:</strong> <code>trace-id-interceptor.ts</code> fue optimizado para no inyectar cabeceras personalizadas hacia Keycloak, permitiendo preflights limpios.
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. Guía de Activación y Despliegue -->
+    <section>
+        <h2><span class="icon">🚀</span> 5. Guía Paso a Paso para Activar Keycloak</h2>
+        
+        <div class="card">
+            <ul class="steps">
+                <li class="step-item">
+                    <div class="step-title">Levantar la Infraestructura Docker (Keycloak + DB)</div>
+                    <div class="step-desc">
+                        En la raíz del proyecto (<code>e:\LPII\Viernes</code>), ejecuta:
+                        <pre>docker compose -f compose-keycloak.yml up -d</pre>
+                        Esto iniciará el contenedor <code>viernes-keycloak</code> (puerto 8180) y <code>viernes-keycloak-db</code> (PostgreSQL en puerto 5433), importando automáticamente el archivo <code>viernes-realm.json</code>.
+                    </div>
+                </li>
+
+                <li class="step-item">
+                    <div class="step-title">Verificar la Disponibilidad del Servicio</div>
+                    <div class="step-desc">
+                        Abre en el navegador el endpoint de metadatos OpenID para comprobar que el Realm esté activo:
+                        <pre>http://localhost:8180/realms/viernes-realm/.well-known/openid-configuration</pre>
+                    </div>
+                </li>
+
+                <li class="step-item">
+                    <div class="step-title">Iniciar el Backend con el Perfil Keycloak</div>
+                    <div class="step-desc">
+                        El archivo <code>application.yml</code> ya tiene configurado <code>active: dev,keycloak</code>. Para iniciarlo manualmente:
+                        <pre>cd viernes-backend
+.\mvnw.cmd spring-boot:run</pre>
+                        Spring Boot se conectará a Keycloak y validará cada Bearer token recibido en <code>http://localhost:8080/api/v1/**</code>.
+                    </div>
+                </li>
+
+                <li class="step-item">
+                    <div class="step-title">Iniciar y Utilizar el Frontend</div>
+                    <div class="step-desc">
+                        En el directorio del frontend:
+                        <pre>cd viernes-frontend
+npx ng serve</pre>
+                        Ingresa a <code>http://localhost:4200/login</code> y autentícate con <code>admin@viernes.com</code> / <code>Admin12345</code>.
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- 6. Estrategia de Rollback -->
+    <section>
+        <h2><span class="icon">🔄</span> 6. Estrategia de Rollback Inmediato</h2>
+        <div class="card">
+            <p style="color: var(--text-muted); margin-bottom: 12px;">
+                Si en algún momento requieres operar sin Docker o sin Keycloak, el sistema puede revertirse al modo JWT nativo en menos de 1 minuto sin alterar código:
+            </p>
+            <ol style="margin-left: 20px; color: var(--text-muted); font-size: 13.5px;">
+                <li style="margin-bottom: 8px;">En <code>viernes-backend/src/main/resources/application.yml</code>, cambia <code>active: dev,keycloak</code> a <code>active: dev</code>.</li>
+                <li style="margin-bottom: 8px;">Reinicia el backend. Al no detectar el perfil <code>keycloak</code>, Spring Boot reactivará automáticamente <code>SecurityConfig</code> y <code>JwtAuthFilter</code>.</li>
+            </ol>
+        </div>
+    </section>
+
+    <!-- 7. Enlaces y Accesos Rápidos -->
+    <section>
+        <h2><span class="icon">🔗</span> 7. Enlaces Locales de Gestión</h2>
+        <div class="card">
+            <p style="margin-bottom: 16px; color: var(--text-muted);">Accesos directos para administración y auditoría del sistema:</p>
+            <div>
+                <a href="http://localhost:8180/admin/" target="_blank" class="btn-link">⚙️ Consola Admin Keycloak (8180)</a>
+                <a href="http://localhost:8180/realms/viernes-realm/account/" target="_blank" class="btn-link btn-secondary">👤 Mi Cuenta Keycloak</a>
+                <a href="http://localhost:4200/login" target="_blank" class="btn-link btn-secondary">💻 Viernes CRM Login (4200)</a>
+                <a href="http://localhost:8080/swagger-ui.html" target="_blank" class="btn-link btn-secondary">📚 Swagger Backend (8080)</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>VIERNES CRM V1.0 • Sistema Integral de Gestión Comercial</p>
+        <p style="margin-top: 4px; font-size: 12px; color: #475569;">Documento generado automáticamente tras la verificación funcional de Keycloak OIDC.</p>
+    </footer>
+
+</div>
+
+</body>
+</html>

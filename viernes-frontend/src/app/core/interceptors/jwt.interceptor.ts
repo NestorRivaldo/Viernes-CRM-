@@ -8,20 +8,16 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const router = inject(Router);
   const token = authService.getToken();
-  const devBypass = authService.isDevBypass();
 
-  if (token && !req.url.includes('/auth/login')) {
-    // Si el token es real (JWT), lo adjuntamos como Bearer token
-    if (!devBypass) {
-      req = req.clone({
-        setHeaders: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-    }
+  const isAuthRequest = req.url.includes('/protocol/openid-connect') || req.url.includes('/api/v1/auth/');
+
+  if (token && !isAuthRequest) {
+    req = req.clone({
+      setHeaders: {
+        Authorization: `Bearer ${token}`
+      }
+    });
   }
-
-
 
   return next(req).pipe(
     timeout(15000),
@@ -30,7 +26,7 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
         (error as any).friendlyMessage = 'El servidor no responde. Verifique que el backend esté disponible.';
         return throwError(() => error);
       }
-      if ((error.status === 401 || (error.status === 403 && devBypass)) && !req.url.includes('/auth/login')) {
+      if (error.status === 401 && !isAuthRequest) {
         authService.logout();
         router.navigate(['/login']);
       } else if (error.status === 403) {
@@ -44,7 +40,7 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
 
 function buildFriendlyMessage(error: HttpErrorResponse): string {
   if (error.status === 0) {
-    return 'No se pudo conectar con el servidor. Verifique que el backend esté disponible.';
+    return 'No se pudo conectar con el servidor. Verifique que el backend y Keycloak estén disponibles.';
   }
   const body: any = error.error;
   if (body?.fieldErrors) {
@@ -53,6 +49,9 @@ function buildFriendlyMessage(error: HttpErrorResponse): string {
   }
   if (typeof body?.message === 'string' && body.message) {
     return body.message;
+  }
+  if (typeof body?.error_description === 'string' && body.error_description) {
+    return body.error_description;
   }
   if (error.status === 403) {
     return 'No tiene permisos para realizar esta acción.';

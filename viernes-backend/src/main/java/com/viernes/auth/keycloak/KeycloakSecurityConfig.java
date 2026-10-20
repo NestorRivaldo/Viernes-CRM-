@@ -28,10 +28,13 @@ import java.util.List;
 @EnableWebSecurity
 @EnableMethodSecurity
 @Profile("keycloak")
-@RequiredArgsConstructor
 public class KeycloakSecurityConfig {
 
     private final KeycloakJwtAuthenticationConverter keycloakJwtAuthenticationConverter;
+
+    public KeycloakSecurityConfig(KeycloakJwtAuthenticationConverter keycloakJwtAuthenticationConverter) {
+        this.keycloakJwtAuthenticationConverter = keycloakJwtAuthenticationConverter;
+    }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource(
@@ -62,6 +65,7 @@ public class KeycloakSecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/v1/usuarios").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.PUT, "/api/v1/usuarios/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.PATCH, "/api/v1/usuarios/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/usuarios/**").hasRole("ADMIN")
                 // Todo lo demás requiere token válido de Keycloak
                 .anyRequest().authenticated()
             )

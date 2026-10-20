@@ -80,42 +80,8 @@
         }
       ],
       "realmRoles": [
-        "ADMIN"
-      ]
-    },
-    {
-      "username": "jefe@viernes.com",
-      "email": "jefe@viernes.com",
-      "firstName": "Carlos",
-      "lastName": "Mendoza",
-      "enabled": true,
-      "emailVerified": true,
-      "credentials": [
-        {
-          "type": "password",
-          "value": "Jefe12345",
-          "temporary": false
-        }
-      ],
-      "realmRoles": [
-        "JEFE"
-      ]
-    },
-    {
-      "username": "vendedor@viernes.com",
-      "email": "vendedor@viernes.com",
-      "firstName": "Ana",
-      "lastName": "Lopez",
-      "enabled": true,
-      "emailVerified": true,
-      "credentials": [
-        {
-          "type": "password",
-          "value": "Vendedor12345",
-          "temporary": false
-        }
-      ],
-      "realmRoles": [
+        "ADMIN",
+        "JEFE",
         "VENDEDOR"
       ]
     }

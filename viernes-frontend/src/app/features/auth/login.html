@@ -25,7 +25,7 @@
         <span class="brand-title">Viernes</span>
         <span class="brand-v1-tag">V1</span>
       </div>
-      <p class="login-tagline">CRM híbrido de gestión comercial</p>
+      <p class="login-tagline">CRM híbrido • Seguridad Keycloak OIDC</p>
     </div>
 
     <!-- Login Form -->
@@ -70,23 +70,37 @@
         [disabled]="loginForm.invalid || loading" 
         class="login-btn-primary"
       >
-        {{ loading ? 'Iniciando sesión...' : 'Iniciar sesión' }}
+        {{ loading ? 'Autenticando en Keycloak...' : 'Iniciar sesión' }}
       </button>
 
       <button 
         type="button" 
-        class="login-btn-demo" 
-        (click)="entrarSinLogin()"
+        class="login-btn-sso" 
+        (click)="loginWithKeycloakSSO()"
       >
-        Entrar sin login (modo demo)
+        <span class="sso-shield">🛡️</span> Iniciar con Keycloak SSO
       </button>
 
-      <!-- Test Credentials Note -->
+      <!-- Keycloak Credentials Note -->
       <div class="credentials-helper-box">
-        <div class="helper-badge">Credenciales de prueba</div>
+        <div class="helper-badge">🛡️ Credenciales Keycloak (Acceso Total)</div>
         <div class="helper-text">
-          <span>Usuario: <strong>admin@viernes.com</strong></span>
-          <span>Contraseña: <strong>Admin12345</strong></span>
+          <div class="helper-row">
+            <span class="helper-label">Correo:</span>
+            <strong class="helper-value">admin&#64;viernes.com</strong>
+          </div>
+          <div class="helper-row">
+            <span class="helper-label">Contraseña:</span>
+            <strong class="helper-value">Admin12345</strong>
+          </div>
+          <div class="helper-row roles-row">
+            <span class="helper-label">Roles:</span>
+            <span class="roles-chips">
+              <span class="badge-role">ADMIN</span>
+              <span class="badge-role">JEFE</span>
+              <span class="badge-role">VENDEDOR</span>
+            </span>
+          </div>
         </div>
       </div>
 
@@ -95,7 +109,7 @@
   </div>
 
   <div class="login-footer-copy">
-    Viernes CRM V1.0 • Sistema Comercial
+    Viernes CRM V1.0 • Autenticación OAuth2 / OIDC con Keycloak
   </div>
 
 </div>

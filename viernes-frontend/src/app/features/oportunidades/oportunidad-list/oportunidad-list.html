@@ -161,7 +161,7 @@
 
   <!-- 2. VISTA KANBAN PIPELINE -->
   @if (hasOportunidades() && vistaActual() === 'pipeline') {
-    <div class="pipeline-kanban-board">
+    <div class="pipeline-kanban-board" cdkDropListGroup>
       @for (col of columnasKanban; track col.id) {
         <div class="kanban-stage-column">
           
@@ -175,23 +175,76 @@
             <div class="col-total-amount">{{ formatearSoles(getTotalEtapa(col.id)) }}</div>
           </div>
 
-          <!-- Cards List -->
-          <div class="stage-cards-container">
+          <!-- Cards List (CDK Drop List) -->
+          <div class="stage-cards-container"
+               cdkDropList
+               [cdkDropListData]="col.id"
+               (cdkDropListDropped)="onCardDrop($event)">
             @for (op of getOportunidadesPorEtapa(col.id); track op.id) {
-              <div class="kanban-op-card" (click)="editar(op.id)">
+              <div class="kanban-op-card" 
+                   cdkDrag 
+                   [cdkDragData]="op"
+                   (click)="editar(op.id)">
+                
                 <div class="kanban-card-top">
                   <span class="op-card-client">{{ op.clienteNombre || 'Sin cliente' }}</span>
-                  <button class="kanban-edit-icon" (click)="$event.stopPropagation(); editar(op.id)">
-                    <mat-icon>edit</mat-icon>
-                  </button>
+                  <div class="kanban-card-actions">
+                    <!-- Quick Stage Selector Menu Button -->
+                    <button class="kanban-stage-chip" 
+                            [matMenuTriggerFor]="cardStageMenu" 
+                            (click)="$event.stopPropagation()"
+                            title="Cambiar etapa">
+                      <span class="stage-mini-dot {{ getEtapaClass(op.etapa) }}"></span>
+                      <mat-icon class="icon-expand">expand_more</mat-icon>
+                    </button>
+
+                    <button class="kanban-edit-icon" (click)="$event.stopPropagation(); editar(op.id)" title="Editar detalle">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                  </div>
                 </div>
 
                 <div class="op-card-title">{{ op.nombre }}</div>
 
                 <div class="kanban-card-footer">
                   <div class="op-card-value">{{ formatearSoles(op.valor) }}</div>
-                  <div class="op-card-prob-pill">{{ op.probabilidad || 0 }}%</div>
+                  
+                  <!-- Stage Stepper Controls -->
+                  <div class="kanban-stage-stepper" (click)="$event.stopPropagation()">
+                    <button class="stepper-arrow-btn" 
+                            [disabled]="esPrimeraEtapa(op.etapa)" 
+                            (click)="moverEtapaAnterior(op, $event)" 
+                            title="Retroceder a etapa previa">
+                      <mat-icon>chevron_left</mat-icon>
+                    </button>
+
+                    <span class="op-card-prob-pill">{{ op.probabilidad || 0 }}%</span>
+
+                    <button class="stepper-arrow-btn" 
+                            [disabled]="esUltimaEtapa(op.etapa)" 
+                            (click)="moverEtapaSiguiente(op, $event)" 
+                            title="Avanzar a siguiente etapa">
+                      <mat-icon>chevron_right</mat-icon>
+                    </button>
+                  </div>
                 </div>
+
+                <!-- Dropdown Menu for Immediate Stage Switch -->
+                <mat-menu #cardStageMenu="matMenu" class="mac-stage-dropdown-menu">
+                  <div class="menu-stage-header">Mover a etapa:</div>
+                  @for (c of columnasKanban; track c.id) {
+                    <button mat-menu-item 
+                            (click)="moverEtapa(op, c.id, $event)" 
+                            [class.active-stage]="op.etapa === c.id">
+                      <span class="col-color-dot {{ c.colorClass }}" style="display: inline-block; margin-right: 8px;"></span>
+                      <span>{{ c.titulo }}</span>
+                      @if (op.etapa === c.id) {
+                        <mat-icon style="margin-left: auto; font-size: 16px; width: 16px; height: 16px; color: var(--primary-blue);">check</mat-icon>
+                      }
+                    </button>
+                  }
+                </mat-menu>
+
               </div>
             }
 

@@ -222,37 +222,96 @@
   border-color: rgba(255, 255, 255, 0.2);
 }
 
-/* Test Credentials Box */
+.login-btn-sso {
+  background: rgba(59, 130, 246, 0.08);
+  color: #93c5fd;
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  border-radius: var(--radius-full);
+  padding: 10px 18px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.login-btn-sso:hover {
+  background: rgba(59, 130, 246, 0.18);
+  color: #ffffff;
+  border-color: rgba(59, 130, 246, 0.5);
+}
+
+.sso-shield {
+  font-size: 14px;
+}
+
+/* Keycloak Credentials Box */
 .credentials-helper-box {
-  margin-top: 8px;
+  margin-top: 10px;
   padding: 12px 14px;
   background: rgba(255, 255, 255, 0.03);
-  border: 1px dashed rgba(255, 255, 255, 0.12);
+  border: 1px dashed rgba(59, 130, 246, 0.3);
   border-radius: var(--radius-md);
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .helper-badge {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
   color: #60a5fa;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
 }
 
 .helper-text {
   display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 8px;
+  flex-direction: column;
+  gap: 6px;
   font-size: 12px;
-  color: #cbd5e1;
+  color: #94a3b8;
 }
 
-.helper-text strong {
-  color: #ffffff;
+.helper-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.helper-label {
+  color: #64748b;
+  font-size: 11.5px;
+}
+
+.helper-value {
+  color: #f1f5f9;
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+}
+
+.roles-row {
+  margin-top: 2px;
+}
+
+.roles-chips {
+  display: flex;
+  gap: 4px;
+}
+
+.badge-role {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
 }
 
 .login-footer-copy {

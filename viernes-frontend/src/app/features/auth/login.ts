@@ -26,8 +26,8 @@ export class Login {
     private router: Router
   ) {
     this.loginForm = this.fb.group({
-      correo: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required]
+      correo: ['admin@viernes.com', [Validators.required, Validators.email]],
+      password: ['Admin12345', Validators.required]
     });
   }
 
@@ -42,32 +42,13 @@ export class Login {
         this.router.navigate(['/dashboard']);
       },
       error: (err) => {
-        this.error = err?.friendlyMessage || 'Credenciales inválidas';
+        this.error = err?.friendlyMessage || 'Credenciales inválidas en Keycloak';
         this.loading = false;
       }
     });
   }
 
-  entrarSinLogin() {
-    this.loading = true;
-    this.error = '';
-    // Intenta autenticación real con admin@viernes.com
-    this.authService.login({ correo: 'admin@viernes.com', password: 'Admin12345' }).subscribe({
-      next: () => {
-        this.router.navigate(['/dashboard']);
-      },
-      error: () => {
-        // Fallback sólo si el backend está caído
-        this.authService.loginSinCredenciales().subscribe({
-          next: () => {
-            this.router.navigate(['/dashboard']);
-          },
-          error: () => {
-            this.loading = false;
-          }
-        });
-      }
-    });
+  loginWithKeycloakSSO() {
+    this.authService.loginWithKeycloakSSO();
   }
-
 }

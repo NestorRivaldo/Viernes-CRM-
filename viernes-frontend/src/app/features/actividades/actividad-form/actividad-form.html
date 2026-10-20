@@ -1,70 +1,306 @@
-<div class="form-container">
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>{{ isEdit ? 'Editar Actividad' : 'Nueva Actividad' }}</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <form [formGroup]="form" (ngSubmit)="guardar()">
-        
-        <div class="form-row">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Título</mat-label>
-            <input matInput formControlName="titulo" required>
-          </mat-form-field>
+<div class="form-page-wrapper">
+  
+  <!-- Header / Breadcrumb -->
+  <div class="form-header-bar">
+    <div class="breadcrumb-trail">
+      <a routerLink="/actividades" class="breadcrumb-back-link">
+        <mat-icon>arrow_back</mat-icon> Actividades
+      </a>
+      <span class="breadcrumb-separator">/</span>
+      <span class="breadcrumb-current">{{ isEdit ? 'Editar Actividad' : 'Nueva Actividad' }}</span>
+    </div>
+    <div class="form-title-group">
+      <h2>{{ isEdit ? 'Modificar Actividad Comercial' : 'Programar Nueva Actividad' }}</h2>
+      <p>Registra compromisos, llamadas, reuniones y tareas de seguimiento con clientes o prospectos.</p>
+    </div>
+  </div>
+
+  <!-- Form Main Card -->
+  <div class="form-card-container">
+    <form [formGroup]="form" (ngSubmit)="guardar()" class="activity-smart-form">
+
+      <!-- SECTION 1: DETALLES DE LA ACTIVIDAD -->
+      <div class="form-card-section">
+        <div class="section-badge-header">
+          <span class="step-num">1</span>
+          <div>
+            <h3>Detalles de la Actividad</h3>
+            <p>Define el objetivo y tipo de interacción comercial</p>
+          </div>
         </div>
 
-        <div class="form-row">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Descripción</mat-label>
-            <textarea matInput formControlName="descripcion" rows="3"></textarea>
-          </mat-form-field>
+        <!-- Tipo de Actividad Selector Pills -->
+        <div class="type-selector-container">
+          <label class="field-label">Tipo de Actividad *</label>
+          <div class="type-pills-grid">
+            <button 
+              type="button" 
+              class="type-pill" 
+              [class.selected]="form.get('tipo')?.value === 'LLAMADA'"
+              (click)="setTipo(tipos[0])">
+              <mat-icon class="icon-llamada">phone</mat-icon>
+              <span>Llamada</span>
+            </button>
+            <button 
+              type="button" 
+              class="type-pill" 
+              [class.selected]="form.get('tipo')?.value === 'REUNION'"
+              (click)="setTipo(tipos[1])">
+              <mat-icon class="icon-reunion">groups</mat-icon>
+              <span>Reunión</span>
+            </button>
+            <button 
+              type="button" 
+              class="type-pill" 
+              [class.selected]="form.get('tipo')?.value === 'TAREA'"
+              (click)="setTipo(tipos[2])">
+              <mat-icon class="icon-tarea">task_alt</mat-icon>
+              <span>Tarea</span>
+            </button>
+            <button 
+              type="button" 
+              class="type-pill" 
+              [class.selected]="form.get('tipo')?.value === 'SEGUIMIENTO'"
+              (click)="setTipo(tipos[3])">
+              <mat-icon class="icon-seguimiento">sync</mat-icon>
+              <span>Seguimiento</span>
+            </button>
+          </div>
         </div>
 
-        <div class="form-row">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Tipo</mat-label>
-            <mat-select formControlName="tipo" required>
-              <mat-option *ngFor="let t of tipos" [value]="t">{{ t }}</mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Estado</mat-label>
-            <mat-select formControlName="estado">
-              <mat-option *ngFor="let e of estados" [value]="e">{{ e }}</mat-option>
-            </mat-select>
-          </mat-form-field>
+        <!-- Título -->
+        <div class="input-group">
+          <label class="field-label" for="tituloInput">Título o Asunto *</label>
+          <input 
+            id="tituloInput"
+            type="text" 
+            class="mac-input" 
+            placeholder="Ej: Llamada de seguimiento de propuesta comercial con TechNova" 
+            formControlName="titulo"
+            required
+          />
+          @if (form.get('titulo')?.invalid && form.get('titulo')?.touched) {
+            <span class="error-hint">El título de la actividad es obligatorio</span>
+          }
         </div>
 
-        <div class="form-row">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Fecha y Hora</mat-label>
-            <input matInput formControlName="fecha" type="datetime-local" required>
-          </mat-form-field>
+        <!-- Descripción -->
+        <div class="input-group">
+          <label class="field-label" for="descInput">Descripción y Puntos a Tratar</label>
+          <textarea 
+            id="descInput"
+            class="mac-textarea" 
+            rows="3" 
+            placeholder="Añade notas, acuerdos previos, agenda de la reunión o detalles importantes..."
+            formControlName="descripcion">
+          </textarea>
         </div>
 
-        <div class="form-row">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>ID Cliente (Opcional)</mat-label>
-            <input matInput formControlName="idCliente" type="number">
-          </mat-form-field>
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>ID Lead (Opcional)</mat-label>
-            <input matInput formControlName="idLead" type="number">
-          </mat-form-field>
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>ID Oportunidad (Opcional)</mat-label>
-            <input matInput formControlName="idOportunidad" type="number">
-          </mat-form-field>
+        <!-- Estado -->
+        <div class="input-group">
+          <label class="field-label">Estado Inicial</label>
+          <div class="status-pills-row">
+            @for (est of estados; track est) {
+              <button 
+                type="button" 
+                class="status-pill"
+                [class.selected]="form.get('estado')?.value === est"
+                (click)="setEstado(est)">
+                {{ est }}
+              </button>
+            }
+          </div>
         </div>
 
-        <div class="form-actions">
-          <button mat-button type="button" routerLink="/actividades">Cancelar</button>
-          <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || loading">
-            {{ loading ? 'Guardando...' : 'Guardar' }}
+      </div>
+
+      <!-- SECTION 2: PROGRAMACIÓN DE FECHA Y HORA -->
+      <div class="form-card-section">
+        <div class="section-badge-header">
+          <span class="step-num">2</span>
+          <div>
+            <h3>Fecha y Horario Programado</h3>
+            <p>Selección ágil sin dificultades con el calendario y horarios sugeridos</p>
+          </div>
+        </div>
+
+        <div class="datetime-columns-grid">
+          
+          <!-- Columna Día -->
+          <div class="datetime-col">
+            <label class="field-label" for="fechaDiaInput">
+              <mat-icon class="col-icon">calendar_month</mat-icon> Fecha Programada *
+            </label>
+            <input 
+              id="fechaDiaInput"
+              type="date" 
+              class="mac-input date-input"
+              formControlName="fechaDia"
+              required
+            />
+
+            <!-- Atajos rápidos para la fecha -->
+            <div class="quick-presets-box">
+              <span class="quick-presets-label">Atajos de fecha:</span>
+              <div class="quick-chips-row">
+                <button type="button" class="quick-chip" (click)="setDatePreset('hoy')">
+                  Hoy
+                </button>
+                <button type="button" class="quick-chip" (click)="setDatePreset('manana')">
+                  Mañana
+                </button>
+                <button type="button" class="quick-chip" (click)="setDatePreset('en_2dias')">
+                  En 2 días
+                </button>
+                <button type="button" class="quick-chip" (click)="setDatePreset('proxima_semana')">
+                  Próx. lunes
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Columna Hora -->
+          <div class="datetime-col">
+            <label class="field-label" for="fechaHoraInput">
+              <mat-icon class="col-icon">schedule</mat-icon> Hora *
+            </label>
+            <input 
+              id="fechaHoraInput"
+              type="time" 
+              class="mac-input time-input"
+              formControlName="fechaHora"
+              required
+            />
+
+            <!-- Atajos de horarios de oficina -->
+            <div class="quick-presets-box">
+              <span class="quick-presets-label">Horarios sugeridos:</span>
+              <div class="quick-chips-row">
+                <button type="button" class="quick-chip" (click)="setTimePreset('09:00')">
+                  09:00 AM
+                </button>
+                <button type="button" class="quick-chip" (click)="setTimePreset('11:00')">
+                  11:00 AM
+                </button>
+                <button type="button" class="quick-chip" (click)="setTimePreset('15:00')">
+                  03:00 PM
+                </button>
+                <button type="button" class="quick-chip" (click)="setTimePreset('17:00')">
+                  05:00 PM
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- SECTION 3: VINCULACIÓN COMERCIAL -->
+      <div class="form-card-section">
+        <div class="section-badge-header">
+          <span class="step-num">3</span>
+          <div>
+            <h3>Vinculación Comercial</h3>
+            <p>Asocia esta actividad a una cuenta, prospecto o negociación para mantener trazabilidad</p>
+          </div>
+        </div>
+
+        <!-- Selector de Tipo de Vinculación -->
+        <div class="vinculacion-selector-bar">
+          <button 
+            type="button" 
+            class="vinculacion-tab" 
+            [class.active]="form.get('vinculacionTipo')?.value === 'NINGUNO'"
+            (click)="setVinculacionTipo('NINGUNO')">
+            <mat-icon>cancel</mat-icon> Sin Vincular
+          </button>
+          <button 
+            type="button" 
+            class="vinculacion-tab" 
+            [class.active]="form.get('vinculacionTipo')?.value === 'CLIENTE'"
+            (click)="setVinculacionTipo('CLIENTE')">
+            <mat-icon>business</mat-icon> Cliente
+          </button>
+          <button 
+            type="button" 
+            class="vinculacion-tab" 
+            [class.active]="form.get('vinculacionTipo')?.value === 'LEAD'"
+            (click)="setVinculacionTipo('LEAD')">
+            <mat-icon>adjust</mat-icon> Lead
+          </button>
+          <button 
+            type="button" 
+            class="vinculacion-tab" 
+            [class.active]="form.get('vinculacionTipo')?.value === 'OPORTUNIDAD'"
+            (click)="setVinculacionTipo('OPORTUNIDAD')">
+            <mat-icon>paid</mat-icon> Oportunidad
           </button>
         </div>
-      </form>
-    </mat-card-content>
-  </mat-card>
+
+        <!-- Dropdowns Dinámicos según la selección -->
+        @if (form.get('vinculacionTipo')?.value === 'CLIENTE') {
+          <div class="entity-select-box">
+            <label class="field-label" for="clienteSelect">Seleccionar Cliente de la Cartera:</label>
+            <select id="clienteSelect" class="mac-select" formControlName="idCliente">
+              <option [ngValue]="null">-- Elige un Cliente --</option>
+              @for (c of clientes; track c.id) {
+                <option [ngValue]="c.id">
+                  {{ c.nombre }} {{ c.empresa ? '(' + c.empresa + ')' : '' }}
+                </option>
+              }
+            </select>
+          </div>
+        }
+
+        @if (form.get('vinculacionTipo')?.value === 'LEAD') {
+          <div class="entity-select-box">
+            <label class="field-label" for="leadSelect">Seleccionar Lead / Prospecto:</label>
+            <select id="leadSelect" class="mac-select" formControlName="idLead">
+              <option [ngValue]="null">-- Elige un Lead --</option>
+              @for (l of leads; track l.id) {
+                <option [ngValue]="l.id">
+                  {{ l.nombre }} {{ l.empresa ? '(' + l.empresa + ')' : '' }} - [{{ l.estado }}]
+                </option>
+              }
+            </select>
+          </div>
+        }
+
+        @if (form.get('vinculacionTipo')?.value === 'OPORTUNIDAD') {
+          <div class="entity-select-box">
+            <label class="field-label" for="oportunidadSelect">Seleccionar Oportunidad de Negocio:</label>
+            <select id="oportunidadSelect" class="mac-select" formControlName="idOportunidad">
+              <option [ngValue]="null">-- Elige una Oportunidad --</option>
+              @for (o of oportunidades; track o.id) {
+                <option [ngValue]="o.id">
+                  {{ o.nombre }} ({{ o.clienteNombre || 'Sin cliente' }}) - S/ {{ o.valor || 0 }}
+                </option>
+              }
+            </select>
+          </div>
+        }
+
+        @if (form.get('vinculacionTipo')?.value === 'NINGUNO') {
+          <div class="vinculacion-info-hint">
+            <mat-icon>info</mat-icon>
+            <span>Actividad general de agenda interna (no asociada directamente a una cuenta específica).</span>
+          </div>
+        }
+
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="form-actions-footer">
+        <button type="button" class="btn-cancel" routerLink="/actividades">
+          Cancelar
+        </button>
+        <button type="submit" class="btn-submit" [disabled]="form.invalid || loading">
+          <mat-icon>{{ isEdit ? 'check' : 'add_task' }}</mat-icon>
+          <span>{{ loading ? 'Guardando actividad...' : (isEdit ? 'Actualizar Actividad' : 'Guardar Actividad') }}</span>
+        </button>
+      </div>
+
+    </form>
+  </div>
+
 </div>

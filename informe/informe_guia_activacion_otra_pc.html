@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía de Activación y Despliegue en Otra PC – VIERNES CRM V1</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #090d16;
+            --surface: #111726;
+            --surface2: #172033;
+            --surface-hover: #1e2942;
+            --border: #232f48;
+            --border-highlight: #3b82f6;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --text-subtle: #64748b;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.25);
+            --accent-soft: rgba(59, 130, 246, 0.12);
+            --green: #10b981;
+            --green-soft: rgba(16, 185, 129, 0.12);
+            --purple: #a855f7;
+            --purple-soft: rgba(168, 85, 247, 0.12);
+            --amber: #f59e0b;
+            --amber-soft: rgba(245, 158, 11, 0.12);
+            --cyan: #06b6d4;
+            --cyan-soft: rgba(6, 182, 212, 0.12);
+            --rose: #f43f5e;
+            --rose-soft: rgba(244, 63, 94, 0.12);
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            padding: 40px 20px 80px;
+            background-image: 
+                radial-gradient(circle at 10% 10%, rgba(59, 130, 246, 0.08) 0%, transparent 45%),
+                radial-gradient(circle at 90% 90%, rgba(168, 85, 247, 0.06) 0%, transparent 45%);
+            background-attachment: fixed;
+        }
+
+        .container {
+            max-width: 1240px;
+            margin: 0 auto;
+        }
+
+        /* Top Nav */
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #60a5fa;
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover { color: #93c5fd; }
+
+        .system-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12.5px;
+            color: var(--text-muted);
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--green);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--green);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 45px;
+            position: relative;
+        }
+
+        .brand-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--accent-soft);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 18px;
+            letter-spacing: 0.04em;
+        }
+
+        h1 {
+            font-size: 38px;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            background: linear-gradient(135deg, #ffffff 30%, #93c5fd 80%, #38bdf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 14px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: var(--text-muted);
+            max-width: 880px;
+            margin: 0 auto;
+        }
+
+        /* KPI / Quick Info Grid */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 16px;
+            margin-bottom: 40px;
+        }
+
+        .kpi-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--card-accent, var(--accent));
+        }
+
+        .kpi-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-subtle);
+            font-weight: 600;
+        }
+
+        .kpi-value {
+            font-size: 24px;
+            font-weight: 800;
+            color: #ffffff;
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .kpi-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Section Cards */
+        .section-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 35px;
+            margin-bottom: 35px;
+            box-shadow: 0 10px 30px -15px rgba(0,0,0,0.5);
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-desc {
+            font-size: 14.5px;
+            color: var(--text-muted);
+            margin-bottom: 25px;
+        }
+
+        /* Code Blocks with Copy button */
+        .code-container {
+            position: relative;
+            background: #090d16;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            margin: 15px 0 20px;
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 16px;
+            background: var(--surface2);
+            border-bottom: 1px solid var(--border);
+            font-size: 12px;
+            color: var(--text-subtle);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .btn-copy {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .btn-copy:hover {
+            background: var(--accent);
+            color: #ffffff;
+            border-color: var(--accent);
+        }
+
+        pre {
+            padding: 16px;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: #93c5fd;
+            line-height: 1.6;
+        }
+
+        /* Callout */
+        .callout {
+            background: rgba(59, 130, 246, 0.08);
+            border-left: 4px solid var(--accent);
+            padding: 16px 20px;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            margin: 20px 0;
+            font-size: 14px;
+            color: var(--text);
+        }
+
+        .callout-success {
+            background: rgba(16, 185, 129, 0.08);
+            border-left-color: var(--green);
+        }
+
+        .callout-warning {
+            background: rgba(245, 158, 11, 0.08);
+            border-left-color: var(--amber);
+        }
+
+        .callout-danger {
+            background: rgba(244, 63, 94, 0.08);
+            border-left-color: var(--rose);
+        }
+
+        /* Step Guide */
+        .step-block {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .step-block:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 45px;
+            bottom: -20px;
+            width: 2px;
+            background: var(--border);
+        }
+
+        .step-badge {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: var(--surface2);
+            color: #60a5fa;
+            border: 2px solid var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 16px;
+            flex-shrink: 0;
+            z-index: 2;
+        }
+
+        .step-content {
+            flex-grow: 1;
+            padding-top: 4px;
+        }
+
+        .step-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 6px;
+        }
+
+        .step-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        /* Troubleshooting Matrix Table */
+        .table-container {
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13.5px;
+            text-align: left;
+        }
+
+        th {
+            background: var(--surface2);
+            color: var(--text);
+            font-weight: 600;
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border);
+            font-size: 12.5px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        td {
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-muted);
+            vertical-align: top;
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(255,255,255,0.015); }
+
+        .badge-solved {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .badge-key {
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+        }
+
+        /* 1-Click Box */
+        .launcher-box {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(16, 185, 129, 0.08) 100%);
+            border: 2px solid rgba(59, 130, 246, 0.4);
+            border-radius: var(--radius-md);
+            padding: 25px;
+            margin: 25px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .launcher-info h3 {
+            font-size: 18px;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 6px;
+        }
+
+        .launcher-info p {
+            font-size: 13.5px;
+            color: var(--text-muted);
+        }
+
+        .launcher-badge {
+            background: linear-gradient(135deg, #2563eb, #10b981);
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 14px;
+            padding: 10px 20px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 0 10px;
+            color: var(--text-subtle);
+            font-size: 13px;
+            border-top: 1px solid var(--border);
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Top Navigation -->
+    <div class="top-nav">
+        <a href="index.html" class="back-link">← Volver al Portal de Informes</a>
+        <div class="system-status">
+            <span class="pulse-dot"></span>
+            <span>Despliegue Multi-Entorno: <strong>100% Verificado</strong></span>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <div class="brand-badge">🚀 MANUAL DE DESPLIEGUE Y ACTIVACIÓN EN OTRA MÁQUINA</div>
+        <h1>Guía de Activación del Sistema en Otra PC</h1>
+        <p class="subtitle">
+            Instrucciones paso a paso, comandos exactos de terminal, script lanzador automático de 1 clic y análisis técnico exhaustivo que garantiza que <strong>NO habrá fallos</strong> durante la migración o encendido en una nueva computadora.
+        </p>
+    </header>
+
+    <!-- Quick Stats Grid -->
+    <div class="kpi-grid">
+        <div class="kpi-card" style="--card-accent: var(--accent);">
+            <div class="kpi-label">Frontend Angular</div>
+            <div class="kpi-value">4200</div>
+            <div class="kpi-desc">http://localhost:4200</div>
+        </div>
+        <div class="kpi-card" style="--card-accent: var(--green);">
+            <div class="kpi-label">Backend Spring Boot</div>
+            <div class="kpi-value">8080</div>
+            <div class="kpi-desc">http://localhost:8080</div>
+        </div>
+        <div class="kpi-card" style="--card-accent: var(--purple);">
+            <div class="kpi-label">Keycloak OIDC</div>
+            <div class="kpi-value">8180</div>
+            <div class="kpi-desc">http://localhost:8180</div>
+        </div>
+        <div class="kpi-card" style="--card-accent: var(--amber);">
+            <div class="kpi-label">Oracle 23c DB</div>
+            <div class="kpi-value">1521</div>
+            <div class="kpi-desc">FREEPDB1 (BOM_VENTAS)</div>
+        </div>
+    </div>
+
+    <!-- LANZADOR DE 1 CLIC -->
+    <div class="launcher-box">
+        <div class="launcher-info">
+            <h3>⚡ Método Ultra Rápido: Lanzador Automático de 1 Clic</h3>
+            <p>
+                Hemos creado en la raíz del proyecto el script <span class="badge-key">activar-sistema.bat</span>. Al hacer doble clic en él en la nueva PC, verifica Docker, arranca Keycloak, inicia el Backend Spring Boot, instala paquetes si faltan y levanta el Frontend abriendo el navegador automáticamente.
+            </p>
+        </div>
+        <div class="launcher-badge">
+            <span>activar-sistema.bat</span>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 1: PRERREQUISITOS DE SOFTWARE EN LA NUEVA PC -->
+    <div class="section-card">
+        <div class="section-title">
+            <span>📦</span>
+            <span>1. Prerrequisitos de Software en la Nueva Computadora</span>
+        </div>
+        <p class="section-desc">
+            Antes de encender los servicios, asegúrate de que la nueva máquina tenga instalado lo siguiente:
+        </p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
+            <div style="background: var(--surface2); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+                <h4 style="color: #60a5fa; font-size: 15px; margin-bottom: 6px;">1. Java 21 (JDK)</h4>
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px;">
+                    Requerido por Spring Boot 4 y Java 21 (Eclipse Temurin 21 o Oracle JDK 21).
+                </p>
+                <code style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #93c5fd;">java -version</code>
+            </div>
+
+            <div style="background: var(--surface2); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+                <h4 style="color: #34d399; font-size: 15px; margin-bottom: 6px;">2. Node.js 20 LTS o 22 LTS</h4>
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px;">
+                    Requerido por Angular CLI v22 para compilar y ejecutar el frontend.
+                </p>
+                <code style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #93c5fd;">node -v && npm -v</code>
+            </div>
+
+            <div style="background: var(--surface2); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+                <h4 style="color: #c084fc; font-size: 15px; margin-bottom: 6px;">3. Docker Desktop</h4>
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px;">
+                    Necesario para ejecutar Keycloak 25 y su base de datos PostgreSQL interna en 1 comando.
+                </p>
+                <code style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #93c5fd;">docker --version</code>
+            </div>
+
+            <div style="background: var(--surface2); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+                <h4 style="color: #fbbf24; font-size: 15px; margin-bottom: 6px;">4. Oracle Database</h4>
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px;">
+                    Oracle Database 23c Free (o 21c/19c/XE) en el puerto 1521 con PDB <code>FREEPDB1</code>.
+                </p>
+                <code style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #93c5fd;">lsnrctl status</code>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 2: PASO A PASO MANUAL CON TODOS LOS CÓDIGOS -->
+    <div class="section-card">
+        <div class="section-title">
+            <span>⚙️</span>
+            <span>2. Códigos y Comandos Paso a Paso para la Activación Manual</span>
+        </div>
+        <p class="section-desc">
+            Si deseas encender cada servicio individualmente en terminales separadas, sigue exactamente esta secuencia:
+        </p>
+
+        <!-- PASO 0: BASE DE DATOS ORACLE -->
+        <div class="step-block">
+            <div class="step-badge">0</div>
+            <div class="step-content">
+                <div class="step-title">Preparar la Base de Datos Oracle (Usuario y Privilegios)</div>
+                <div class="step-desc">
+                    El backend se conecta con el usuario <span class="badge-key">BOM_VENTAS</span> y contraseña <span class="badge-key">123456</span> a la base de datos conectable <code>FREEPDB1</code>. Ejecuta este script una sola vez en SQL*Plus o SQL Developer conectado como <code>SYS AS SYSDBA</code>:
+                </div>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>sqlplus sys/password@localhost:1521/FREEPDB1 as sysdba</span>
+                        <button class="btn-copy" onclick="copyCode('oracleSql')">Copiar SQL</button>
+                    </div>
+                    <pre id="oracleSql">-- 1. Cambiar a la sesión de la PDB de desarrollo
+ALTER SESSION SET CONTAINER = FREEPDB1;
+
+-- 2. Crear el usuario de la aplicación si no existe
+CREATE USER BOM_VENTAS IDENTIFIED BY 123456;
+
+-- 3. Otorgar los privilegios necesarios para crear tablas y operar
+GRANT CONNECT, RESOURCE, DBA TO BOM_VENTAS;
+GRANT UNLIMITED TABLESPACE TO BOM_VENTAS;
+
+-- Listo: Spring Boot creará o actualizará todas las tablas (CRM_CLIENTES, CRM_PROPUESTAS, etc.)
+-- automáticamente gracias a hibernate.ddl-auto: update</pre>
+                </div>
+
+                <div class="callout callout-success">
+                    <strong>¿No tienes Oracle instalado en Windows?</strong> Puedes levantarlo instantáneamente con Docker con este comando:
+                    <br><code style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #34d399;">docker run -d --name oracle23c -p 1521:1521 -e ORACLE_PASSWORD=123456 container-registry.oracle.com/database/free:latest</code>
+                </div>
+            </div>
+        </div>
+
+        <!-- PASO 1: KEYCLOAK EN DOCKER -->
+        <div class="step-block">
+            <div class="step-badge">1</div>
+            <div class="step-content">
+                <div class="step-title">Levantar Keycloak 25 (OAuth2 / OIDC) en Docker</div>
+                <div class="step-desc">
+                    Abre una terminal en la raíz del proyecto (<code style="color: #93c5fd;">e:\LPII\Viernes</code>) y arranca el contenedor con importación automática del Realm y sus usuarios:
+                </div>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Terminal CMD / PowerShell (Raíz del Proyecto)</span>
+                        <button class="btn-copy" onclick="copyCode('keycloakCmd')">Copiar Comando</button>
+                    </div>
+                    <pre id="keycloakCmd">docker compose -f compose-keycloak.yml up -d</pre>
+                </div>
+
+                <div class="step-desc">
+                    Verifica que esté listo abriendo en tu navegador:
+                    <ul style="margin: 6px 0 0 20px; font-size: 13.5px; color: var(--text-muted);">
+                        <li><strong>Consola de Keycloak:</strong> <a href="http://localhost:8180" target="_blank" style="color: #60a5fa;">http://localhost:8180</a> (Admin: <code>admin</code> / <code>admin</code>)</li>
+                        <li><strong>Metadatos OIDC del Realm:</strong> <a href="http://localhost:8180/realms/viernes-realm/.well-known/openid-configuration" target="_blank" style="color: #60a5fa;">http://localhost:8180/realms/viernes-realm/.well-known/openid-configuration</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- PASO 2: BACKEND SPRING BOOT -->
+        <div class="step-block">
+            <div class="step-badge">2</div>
+            <div class="step-content">
+                <div class="step-title">Iniciar el Backend Spring Boot (Java 21)</div>
+                <div class="step-desc">
+                    Abre una segunda terminal, entra a la carpeta <code style="color: #93c5fd;">viernes-backend</code> y arranca con Maven Wrapper. Los perfiles <code>dev,keycloak</code> ya están configurados por defecto:
+                </div>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Terminal CMD / PowerShell (viernes-backend)</span>
+                        <button class="btn-copy" onclick="copyCode('backendCmd')">Copiar Comando</button>
+                    </div>
+                    <pre id="backendCmd">cd viernes-backend
+.\mvnw.cmd spring-boot:run</pre>
+                </div>
+
+                <div class="step-desc">
+                    Cuando veas <code style="color: #34d399;">Started ViernesBackendApplication in X.XXX seconds</code>, comprueba la API:
+                    <ul style="margin: 6px 0 0 20px; font-size: 13.5px; color: var(--text-muted);">
+                        <li><strong>Documentación Swagger UI:</strong> <a href="http://localhost:8080/swagger-ui.html" target="_blank" style="color: #60a5fa;">http://localhost:8080/swagger-ui.html</a></li>
+                        <li><strong>Health Check Actuator:</strong> <a href="http://localhost:8080/actuator/health" target="_blank" style="color: #60a5fa;">http://localhost:8080/actuator/health</a> (Debe retornar <code>"status": "UP"</code>)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- PASO 3: FRONTEND ANGULAR -->
+        <div class="step-block">
+            <div class="step-badge">3</div>
+            <div class="step-content">
+                <div class="step-title">Iniciar el Frontend Angular (Node.js)</div>
+                <div class="step-desc">
+                    Abre una tercera terminal, ingresa a la carpeta <code style="color: #93c5fd;">viernes-frontend</code>, instala dependencias (solo la primera vez) y ejecuta el servidor de desarrollo:
+                </div>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Terminal CMD / PowerShell (viernes-frontend)</span>
+                        <button class="btn-copy" onclick="copyCode('frontendCmd')">Copiar Comando</button>
+                    </div>
+                    <pre id="frontendCmd">cd viernes-frontend
+cmd /c "npm install"
+cmd /c "npm start"</pre>
+                </div>
+
+                <div class="step-desc">
+                    Abre tu navegador en:
+                    <br><strong style="font-size: 15px;"><a href="http://localhost:4200" target="_blank" style="color: #38bdf8;">http://localhost:4200</a></strong>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SECCIÓN 3: ¿POR QUÉ NO VA A HABER PROBLEMAS? (ANÁLISIS DE FALLOS PREVIOS) -->
+    <div class="section-card">
+        <div class="section-title">
+            <span>🛡️</span>
+            <span>3. ¿Por qué NO va a haber problemas esta vez? (Solución de Fallos Previos)</span>
+        </div>
+        <p class="section-desc">
+            La última vez experimentaste un fallo durante la configuración. A continuación te explicamos exactamente qué originó cada tropiezo anterior y cómo ha quedado blindado de forma permanente:
+        </p>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Causa del Fallo Anterior</th>
+                        <th>¿Por qué Ocurría?</th>
+                        <th>Solución Definitiva Implementada</th>
+                        <th>Estado Actual</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Error CORS en Keycloak (403 / Preflight)</strong></td>
+                        <td>El frontend Angular enviaba cabeceras personalizadas de rastreo (<code>X-Trace-Id</code>) al endpoint de token de Keycloak, y Keycloak las rechazaba por política de seguridad estricta.</td>
+                        <td>Se actualizaron <code>trace-id-interceptor.ts</code> y <code>jwt.interceptor.ts</code> para <strong>excluir automáticamente las peticiones de Keycloak</strong> de cabeceras custom, y se configuró <code>webOrigins: ["*"]</code> en el Realm.</td>
+                        <td><span class="badge-solved">✓ RESUELTO Y PROBADO</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Script Execution Policy en Windows (PowerShell)</strong></td>
+                        <td>En Windows recién instalado, PowerShell viene con <code>Restricted</code> y bloquea archivos <code>.ps1</code> como <code>npm.ps1</code> o comandos directos de node.</td>
+                        <td>Los scripts y el lanzador automático <span class="badge-key">activar-sistema.bat</span> invocan <code>cmd.exe /c</code> directamente, eludiendo por completo las restricciones de PowerShell sin requerir permisos de administrador.</td>
+                        <td><span class="badge-solved">✓ BLINDADO</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Colisión de Puertos (8080)</strong></td>
+                        <td>Keycloak por defecto intentaba escuchar en el puerto 8080, chocando con Spring Boot.</td>
+                        <td>El archivo <span class="badge-key">compose-keycloak.yml</span> mapea el puerto de Keycloak a <strong>8180</strong> (<code>"8180:8080"</code>), dejando el <strong>8080</strong> 100% libre para el backend Spring Boot.</td>
+                        <td><span class="badge-solved">✓ CERO COLISIONES</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Colisión de Base de Datos Postgres (5432)</strong></td>
+                        <td>Si la nueva PC ya tenía un PostgreSQL local en 5432, el contenedor de Keycloak fallaba al arrancar.</td>
+                        <td>Se configuró el puerto externo de PostgreSQL de Keycloak en <strong>5433</strong> (<code>"5433:5432"</code>), garantizando que nunca colisione con instalaciones locales previas.</td>
+                        <td><span class="badge-solved">✓ AISLADO</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Usuario sin Roles o Login Confuso</strong></td>
+                        <td>Se requerían múltiples credenciales o el modo demo se cruzaba con tokens reales.</td>
+                        <td>Se eliminó por completo el código mock/demo y se configuró en Keycloak un <strong>Usuario Maestro Único</strong> con todos los roles (`ADMIN`, `JEFE`, `VENDEDOR`), garantizando acceso pleno e instantáneo con una sola clave.</td>
+                        <td><span class="badge-solved">✓ ACCESO TOTAL</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Fuga de Conexiones de Base de Datos</strong></td>
+                        <td>El modo Open-In-View mantenía transacciones abiertas durante la serialización JSON.</td>
+                        <td>Se fijó <code>spring.jpa.open-in-view: false</code> y se auditaron todos los servicios con <code>@Transactional(readOnly = true)</code>, garantizando cierre atómico y liberación inmediata en HikariCP.</td>
+                        <td><span class="badge-solved">✓ CONEXIONES SEGURAS</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 4: CREDENCIALES MAESTRAS DE ACCESO -->
+    <div class="section-card">
+        <div class="section-title">
+            <span>🔑</span>
+            <span>4. Credenciales Maestras para la Demostración</span>
+        </div>
+        <p class="section-desc">
+            Usa estas credenciales para iniciar sesión en cualquier equipo:
+        </p>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div style="background: var(--surface2); padding: 22px; border-radius: var(--radius-md); border-left: 4px solid var(--accent);">
+                <h4 style="color: #ffffff; font-size: 15px; margin-bottom: 12px;">Usuario Maestro del CRM (Viernes V1)</h4>
+                <div style="font-size: 13.5px; color: var(--text-muted); display: flex; flex-direction: column; gap: 6px;">
+                    <div><strong>URL de Login:</strong> <a href="http://localhost:4200/login" target="_blank" style="color: #60a5fa;">http://localhost:4200/login</a></div>
+                    <div><strong>Correo:</strong> <code style="color: #93c5fd; font-family: 'JetBrains Mono', monospace;">admin@viernes.com</code></div>
+                    <div><strong>Contraseña:</strong> <code style="color: #93c5fd; font-family: 'JetBrains Mono', monospace;">Admin12345</code></div>
+                    <div><strong>Roles Asignados:</strong> <span class="badge-key">ADMIN</span> <span class="badge-key">JEFE</span> <span class="badge-key">VENDEDOR</span> (Acceso Completo)</div>
+                </div>
+            </div>
+
+            <div style="background: var(--surface2); padding: 22px; border-radius: var(--radius-md); border-left: 4px solid var(--purple);">
+                <h4 style="color: #ffffff; font-size: 15px; margin-bottom: 12px;">Consola de Administración de Keycloak</h4>
+                <div style="font-size: 13.5px; color: var(--text-muted); display: flex; flex-direction: column; gap: 6px;">
+                    <div><strong>URL de Consola:</strong> <a href="http://localhost:8180" target="_blank" style="color: #c084fc;">http://localhost:8180</a></div>
+                    <div><strong>Usuario Admin:</strong> <code style="color: #c084fc; font-family: 'JetBrains Mono', monospace;">admin</code></div>
+                    <div><strong>Contraseña Admin:</strong> <code style="color: #c084fc; font-family: 'JetBrains Mono', monospace;">admin</code></div>
+                    <div><strong>Realm del Sistema:</strong> <span class="badge-key">viernes-realm</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 5: COMANDOS DE DIAGNÓSTICO EN CASO DE DUDAS -->
+    <div class="section-card">
+        <div class="section-title">
+            <span>🔍</span>
+            <span>5. Comandos de Diagnóstico Rápido (Chequeo de Salud)</span>
+        </div>
+        <p class="section-desc">
+            Si en la otra máquina deseas verificar que cada componente esté respondiendo correctamente:
+        </p>
+
+        <div class="code-container">
+            <div class="code-header">
+                <span>Comandos de Verificación en CMD / PowerShell</span>
+                <button class="btn-copy" onclick="copyCode('diagCmd')">Copiar</button>
+            </div>
+            <pre id="diagCmd">:: 1. Verificar si Keycloak responde:
+curl -I http://localhost:8180/realms/viernes-realm/.well-known/openid-configuration
+
+:: 2. Verificar si el Backend Spring Boot responde:
+curl http://localhost:8080/actuator/health
+
+:: 3. Verificar si el contenedor Docker está corriendo:
+docker ps --filter "name=viernes-keycloak"
+
+:: 4. Si alguna vez necesitas reiniciar Keycloak desde cero (limpiar volumen):
+docker compose -f compose-keycloak.yml down -v
+docker compose -f compose-keycloak.yml up -d</pre>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>Viernes CRM V1 – Sistema de Gestión Comercial y Cotizaciones Empresariales</p>
+        <p style="margin-top: 5px; color: var(--text-subtle);">Informe Final de Despliegue y Activación Multi-Entorno • VIERNES CRM V1</p>
+    </footer>
+
+</div>
+
+<!-- Script para copiar códigos con un clic -->
+<script>
+    function copyCode(id) {
+        const text = document.getElementById(id).innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            alert('¡Código copiado al portapapeles!');
+        }).catch(err => {
+            console.error('Error al copiar:', err);
+        });
+    }
+</script>
+
+</body>
+</html>

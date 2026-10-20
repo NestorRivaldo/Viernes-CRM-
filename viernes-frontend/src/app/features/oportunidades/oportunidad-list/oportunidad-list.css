@@ -368,3 +368,121 @@
   color: #94a3b8;
   font-size: 12px;
 }
+
+/* Kanban Card Actions (Menu & Edit) */
+.kanban-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.kanban-stage-chip {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-full);
+  padding: 2px 5px 2px 7px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.kanban-stage-chip:hover {
+  background: #e2e8f0;
+  border-color: #cbd5e1;
+}
+
+.stage-mini-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.stage-mini-dot.blue { background-color: #3b82f6; }
+.stage-mini-dot.purple { background-color: #8b5cf6; }
+.stage-mini-dot.orange { background-color: #f59e0b; }
+.stage-mini-dot.emerald { background-color: #10b981; }
+.stage-mini-dot.success { background-color: #06b6d4; }
+.stage-mini-dot.danger { background-color: #f43f5e; }
+
+.icon-expand {
+  font-size: 13px !important;
+  width: 13px !important;
+  height: 13px !important;
+  color: #64748b;
+}
+
+/* Kanban Stepper Controls */
+.kanban-stage-stepper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stepper-arrow-btn {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  padding: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #64748b;
+  transition: all var(--transition-fast);
+}
+
+.stepper-arrow-btn mat-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+}
+
+.stepper-arrow-btn:hover:not(:disabled) {
+  background: var(--primary-blue);
+  border-color: var(--primary-blue);
+  color: #ffffff;
+}
+
+.stepper-arrow-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* CDK Drag & Drop styles */
+.cdk-drag-preview {
+  box-sizing: border-box;
+  border-radius: var(--radius-md);
+  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.16);
+  background: #ffffff;
+  border: 1px solid var(--primary-blue);
+  padding: 12px;
+}
+
+.cdk-drag-placeholder {
+  opacity: 0.35;
+  background: #f1f5f9;
+  border: 2px dashed #94a3b8;
+  border-radius: var(--radius-md);
+  min-height: 80px;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.stage-cards-container.cdk-drop-list-dragging .kanban-op-card:not(.cdk-drag-placeholder) {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+/* Stage Menu styling */
+.menu-stage-header {
+  padding: 8px 16px 4px 16px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
