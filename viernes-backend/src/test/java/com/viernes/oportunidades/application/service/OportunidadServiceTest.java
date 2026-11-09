@@ -2,7 +2,7 @@ package com.viernes.oportunidades.application.service;
 
 import com.viernes.oportunidades.application.dto.OportunidadRequest;
 import com.viernes.oportunidades.application.dto.OportunidadResponse;
-import com.viernes.oportunidades.application.port.out.OportunidadPersistencePort;
+import com.viernes.oportunidades.application.port.out.*;
 import com.viernes.oportunidades.domain.EtapaOportunidad;
 import com.viernes.oportunidades.domain.Oportunidad;
 import com.viernes.shared.exception.ResourceNotFoundException;
@@ -27,6 +27,18 @@ class OportunidadServiceTest {
 
     @Mock
     private OportunidadPersistencePort persistencePort;
+    @Mock
+    private OportunidadContactoPersistencePort contactoPort;
+    @Mock
+    private OportunidadProductoPersistencePort productoPort;
+    @Mock
+    private OportunidadColaboradorPersistencePort colaboradorPort;
+    @Mock
+    private ContactoQueryPort contactoQueryPort;
+    @Mock
+    private ProductoQueryPort productoQueryPort;
+    @Mock
+    private UsuarioQueryPort usuarioQueryPort;
 
     @InjectMocks
     private OportunidadService servicio;
@@ -38,7 +50,7 @@ class OportunidadServiceTest {
     void setUp() {
         validRequest = new OportunidadRequest(
                 "Venta ERP", "Cliente XYZ", new BigDecimal("10000.00"), 50,
-                null, "Juan", LocalDate.now().plusDays(30)
+                null, "Juan", LocalDate.now().plusDays(30), null
         );
 
         entidadGuardada = Oportunidad.builder()
@@ -77,7 +89,7 @@ class OportunidadServiceTest {
     void actualizar_existente_actualizaCampos() {
         OportunidadRequest updateRequest = new OportunidadRequest(
                 "Venta ERP Actualizada", "Cliente ABC", new BigDecimal("20000.00"), 75,
-                EtapaOportunidad.NEGOCIACION, "Maria", LocalDate.now().plusDays(60)
+                EtapaOportunidad.NEGOCIACION, "Maria", LocalDate.now().plusDays(60), null
         );
         when(persistencePort.findById(1L)).thenReturn(Optional.of(entidadGuardada));
         when(persistencePort.save(any(Oportunidad.class))).thenAnswer(i -> i.getArgument(0));

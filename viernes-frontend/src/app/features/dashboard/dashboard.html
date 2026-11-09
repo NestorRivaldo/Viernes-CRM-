@@ -36,8 +36,9 @@
       </div>
       <div class="kpi-title">Clientes</div>
       <div class="kpi-number">{{ totalClientes() }}</div>
-      <div class="kpi-trend positive">
-        <span class="trend-arrow">↑</span> 12% <span class="trend-label">vs. mes ant.</span>
+      <div class="kpi-trend" [style.color]="tendenciaClientes().color">
+        <span class="trend-arrow">{{ tendenciaClientes().flecha }}</span> {{ tendenciaClientes().texto }}
+        <span class="trend-label">vs. mes ant.</span>
       </div>
     </div>
 
@@ -50,8 +51,9 @@
       </div>
       <div class="kpi-title">Leads</div>
       <div class="kpi-number">{{ totalLeads() }}</div>
-      <div class="kpi-trend positive">
-        <span class="trend-arrow">↑</span> 8% <span class="trend-label">vs. mes ant.</span>
+      <div class="kpi-trend" [style.color]="tendenciaLeads().color">
+        <span class="trend-arrow">{{ tendenciaLeads().flecha }}</span> {{ tendenciaLeads().texto }}
+        <span class="trend-label">vs. mes ant.</span>
       </div>
     </div>
 
@@ -64,8 +66,9 @@
       </div>
       <div class="kpi-title">Oportunidades</div>
       <div class="kpi-number">{{ totalOportunidades() }}</div>
-      <div class="kpi-trend positive">
-        <span class="trend-arrow">↑</span> 15% <span class="trend-label">vs. mes ant.</span>
+      <div class="kpi-trend" [style.color]="tendenciaOportunidades().color">
+        <span class="trend-arrow">{{ tendenciaOportunidades().flecha }}</span> {{ tendenciaOportunidades().texto }}
+        <span class="trend-label">vs. mes ant.</span>
       </div>
     </div>
 
@@ -78,8 +81,9 @@
       </div>
       <div class="kpi-title">Propuestas</div>
       <div class="kpi-number">{{ totalPropuestas() }}</div>
-      <div class="kpi-trend positive">
-        <span class="trend-arrow">↑</span> 4% <span class="trend-label">vs. mes ant.</span>
+      <div class="kpi-trend" [style.color]="tendenciaPropuestas().color">
+        <span class="trend-arrow">{{ tendenciaPropuestas().flecha }}</span> {{ tendenciaPropuestas().texto }}
+        <span class="trend-label">vs. mes ant.</span>
       </div>
     </div>
 
@@ -92,8 +96,8 @@
       </div>
       <div class="kpi-title">Conversión</div>
       <div class="kpi-number">{{ tasaConversion() }}</div>
-      <div class="kpi-trend positive">
-        <span class="trend-arrow">↑</span> 4.2% <span class="trend-label">vs. mes ant.</span>
+      <div class="kpi-trend" style="color: #64748b;">
+        <span class="trend-arrow">✓</span> {{ resumenConversion() }}
       </div>
     </div>
 
@@ -115,66 +119,68 @@
           </div>
         </div>
 
-        <!-- Pipeline Line Chart with SVG -->
-        <div class="pipeline-chart-container">
-          <div class="y-axis-labels">
-            <span>S/ 260k</span>
-            <span>S/ 195k</span>
-            <span>S/ 130k</span>
-            <span>S/ 65k</span>
-            <span>S/ 0k</span>
+        <!-- Pipeline Line Chart with SVG (datos reales de oportunidades) -->
+        @if (!oportunidadesListas()) {
+          <div class="chart-empty-state">
+            <mat-spinner diameter="28"></mat-spinner>
+            <p class="empty-subtitle">Cargando evolución del pipeline...</p>
           </div>
-
-          <div class="chart-canvas-area">
-            
-            <!-- Tooltip floating above peak point (Junio) -->
-            <div class="chart-tooltip-floating" style="right: 28px; top: 15px;">
-              <span class="tooltip-month">Junio</span>
-              <strong class="tooltip-val">{{ valorPipelineFormateado() }}</strong>
+        } @else if (hayDatosPipeline()) {
+          <div class="pipeline-chart-container">
+            <div class="y-axis-labels">
+              @for (etiqueta of etiquetasY(); track $index) {
+                <span>{{ etiqueta }}</span>
+              }
             </div>
 
-            <!-- SVG Smooth Spline Chart -->
-            <svg class="pipeline-svg" viewBox="0 0 540 180" preserveAspectRatio="none">
-              <defs>
-                <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#3B82F6" stop-opacity="0.25"/>
-                  <stop offset="100%" stop-color="#3B82F6" stop-opacity="0.0"/>
-                </linearGradient>
-              </defs>
+            <div class="chart-canvas-area">
 
-              <!-- Grid horizontal guide lines -->
-              <line x1="0" y1="20" x2="540" y2="20" stroke="#f1f5f9" stroke-width="1"/>
-              <line x1="0" y1="60" x2="540" y2="60" stroke="#f1f5f9" stroke-width="1"/>
-              <line x1="0" y1="100" x2="540" y2="100" stroke="#f1f5f9" stroke-width="1"/>
-              <line x1="0" y1="140" x2="540" y2="140" stroke="#f1f5f9" stroke-width="1"/>
-              <line x1="0" y1="178" x2="540" y2="178" stroke="#e2e8f0" stroke-width="1"/>
+              @if (ultimoPunto(); as punto) {
+                <div class="chart-tooltip-floating"
+                     [style.left.%]="(punto.x / 540) * 100"
+                     [style.top.px]="punto.y">
+                  <span class="tooltip-month">{{ punto.etiqueta }}</span>
+                  <strong class="tooltip-val">{{ formatearSoles(punto.valor) }}</strong>
+                </div>
+              }
 
-              <!-- Area Fill under curve -->
-              <path d="M 30 115 C 90 90, 150 95, 210 110 C 270 120, 330 85, 390 70 C 440 60, 480 35, 510 30 L 510 178 L 30 178 Z" fill="url(#chartGradient)"/>
+              <svg class="pipeline-svg" viewBox="0 0 540 180" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#3B82F6" stop-opacity="0.25"/>
+                    <stop offset="100%" stop-color="#3B82F6" stop-opacity="0.0"/>
+                  </linearGradient>
+                </defs>
 
-              <!-- Main Blue Curve Line -->
-              <path d="M 30 115 C 90 90, 150 95, 210 110 C 270 120, 330 85, 390 70 C 440 60, 480 35, 510 30" fill="none" stroke="#2563EB" stroke-width="3" stroke-linecap="round"/>
+                <line x1="0" y1="20" x2="540" y2="20" stroke="#f1f5f9" stroke-width="1"/>
+                <line x1="0" y1="60" x2="540" y2="60" stroke="#f1f5f9" stroke-width="1"/>
+                <line x1="0" y1="100" x2="540" y2="100" stroke="#f1f5f9" stroke-width="1"/>
+                <line x1="0" y1="140" x2="540" y2="140" stroke="#f1f5f9" stroke-width="1"/>
+                <line x1="0" y1="178" x2="540" y2="178" stroke="#e2e8f0" stroke-width="1"/>
 
-              <!-- Interactive Points -->
-              <circle cx="30" cy="115" r="4.5" fill="#2563EB" stroke="#ffffff" stroke-width="2"/>
-              <circle cx="126" cy="93" r="4.5" fill="#2563EB" stroke="#ffffff" stroke-width="2"/>
-              <circle cx="210" cy="110" r="4.5" fill="#2563EB" stroke="#ffffff" stroke-width="2"/>
-              <circle cx="330" cy="85" r="4.5" fill="#2563EB" stroke="#ffffff" stroke-width="2"/>
-              <circle cx="420" cy="65" r="4.5" fill="#2563EB" stroke="#ffffff" stroke-width="2"/>
-              <circle cx="510" cy="30" r="6" fill="#2563EB" stroke="#ffffff" stroke-width="2.5"/>
-            </svg>
+                <path [attr.d]="pathArea()" fill="url(#chartGradient)"/>
+                <path [attr.d]="pathLinea()" fill="none" stroke="#2563EB" stroke-width="3" stroke-linecap="round"/>
 
-            <!-- X-Axis Month Labels -->
-            <div class="x-axis-labels">
-              <span>Ene</span>
-              <span>Feb</span>
-              <span>Mar</span>
-              <span>Abr</span>
-              <span>May</span>
-              <span>Jun</span>
+                @for (punto of puntosPipeline(); track punto.clave) {
+                  <circle [attr.cx]="punto.x" [attr.cy]="punto.y" r="4.5" fill="#2563EB" stroke="#ffffff" stroke-width="2"/>
+                }
+              </svg>
+
+              <div class="x-axis-labels">
+                @for (mes of seriePipeline(); track mes.clave) {
+                  <span>{{ mes.etiqueta }}</span>
+                }
+              </div>
             </div>
           </div>
-        </div>
+        } @else {
+          <div class="chart-empty-state">
+            <mat-icon>insights</mat-icon>
+            <p class="empty-title">Aún no hay datos de pipeline</p>
+            <p class="empty-subtitle">Cuando registres oportunidades, aquí verás cómo evoluciona su valor mes a mes.</p>
+            <a routerLink="/oportunidades/nuevo" class="empty-action">Registrar oportunidad</a>
+          </div>
+        }
       </div>
 
       <!-- BOTTOM ROW OF 2 CARDS (Oportunidades por etapa & Próximas actividades) -->
@@ -214,7 +220,7 @@
           </div>
 
           <div class="upcoming-activities-list">
-            @for (act of proximasActividades; track act.titulo) {
+            @for (act of proximasActividades(); track act.id) {
               <div class="activity-timeline-row">
                 <div class="activity-calendar-pill">
                   <span class="calendar-day">{{ act.dia }}</span>
@@ -229,6 +235,12 @@
                   <span class="activity-headline">{{ act.titulo }}</span>
                   <span class="activity-subline">{{ act.cliente }} • {{ act.hora }}</span>
                 </div>
+              </div>
+            } @empty {
+              <div class="empty-state-card" style="padding: 24px; text-align: center; color: #64748b;">
+                <mat-icon style="font-size: 32px; height: 32px; width: 32px; margin-bottom: 6px; opacity: 0.7;">event_available</mat-icon>
+                <p style="margin: 0; font-size: 13px; font-weight: 500;">No hay actividades pendientes</p>
+                <span style="font-size: 11px; opacity: 0.8;">Todas las tareas están al día</span>
               </div>
             }
           </div>
@@ -249,7 +261,7 @@
         </div>
 
         <div class="recent-events-feed">
-          @for (item of actividadesRecientes; track item.titulo) {
+          @for (item of actividadesRecientes(); track item.id) {
             <div class="feed-event-item">
               <div class="feed-icon-circle {{ item.colorClass }}">
                 <mat-icon>{{ item.icon }}</mat-icon>
@@ -258,6 +270,12 @@
                 <strong class="feed-event-title">{{ item.titulo }}</strong>
                 <span class="feed-event-meta">{{ item.tiempo }} • {{ item.detalle }}</span>
               </div>
+            </div>
+          } @empty {
+            <div class="empty-state-card" style="padding: 24px; text-align: center; color: #64748b;">
+              <mat-icon style="font-size: 32px; height: 32px; width: 32px; margin-bottom: 6px; opacity: 0.7;">history</mat-icon>
+              <p style="margin: 0; font-size: 13px; font-weight: 500;">Sin actividad registrada</p>
+              <span style="font-size: 11px; opacity: 0.8;">Crea una actividad para verla aquí</span>
             </div>
           }
         </div>

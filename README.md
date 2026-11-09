@@ -82,3 +82,21 @@ docker compose -f compose-dev.yml down
 ```
 
 `Ctrl+C` detiene el backend y el frontend en sus propias terminales.
+
+## Consulta DNI/RUC (APIsPERU) — token del backend
+
+Aplica al backend `viernes-backend/` (`com.viernes`). El botón **Consultar** del
+alta de clientes llama a APIsPERU **desde el backend** para traer el nombre (DNI)
+o la razón social (RUC). Requiere un token personal:
+
+1. Consigue tu token gratuito en <https://apisperu.com/admin/dniruc> (plan free: 1.000 consultas/mes).
+2. Copia la plantilla: `viernes-backend/.env.local.example` → `viernes-backend/.env.local`.
+3. Edita `.env.local` y define `APISPERU_TOKEN=<tu token>`.
+4. Ejecuta `activar-sistema.bat`: carga `.env.local` automáticamente antes de arrancar el backend.
+
+Seguridad:
+
+- `.env.local` está **git-ignored**: nunca lo commitees ni lo compartas por chat o repositorio.
+- El token viaja como *query param* a APIsPERU y **no se registra en logs**.
+- Sin token, el resto del sistema funciona; solo el botón Consultar devuelve *"La consulta externa DNI/RUC no está configurada. Defina la variable APISPERU_TOKEN."*
+- **Cada quien usa su propio token** (su cuota). Si se comparte uno, todos consumen las mismas 1.000 consultas/mes.

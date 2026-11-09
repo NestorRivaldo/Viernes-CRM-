@@ -17,6 +17,11 @@ public interface ActividadSpringDataRepository extends JpaRepository<ActividadEn
     List<ActividadEntity> findByIdCliente(Long idCliente);
     List<ActividadEntity> findByIdLead(Long idLead);
     List<ActividadEntity> findByIdOportunidad(Long idOportunidad);
+
+    @Query("SELECT DISTINCT a FROM ActividadEntity a WHERE a.id IN " +
+            "(SELECT ae.idActividad FROM ActividadEtiquetaEntity ae WHERE ae.idEtiqueta = :idEtiqueta)")
+    List<ActividadEntity> findByEtiquetaId(@Param("idEtiqueta") Long idEtiqueta);
+
     List<ActividadEntity> findByIdUsuario(String idUsuario);
     List<ActividadEntity> findByTipo(TipoActividad tipo);
 

@@ -192,6 +192,11 @@
   background: #eff6ff;
 }
 
+.mac-action-btn.view:hover {
+  color: #6d28d9;
+  background: #f5f3ff;
+}
+
 .mac-action-btn.delete:hover {
   color: #ef4444;
   background: #fef2f2;

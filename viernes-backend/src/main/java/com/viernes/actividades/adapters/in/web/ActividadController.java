@@ -47,11 +47,14 @@ public class ActividadController {
             @RequestParam(required = false) Long idCliente,
             @RequestParam(required = false) Long idLead,
             @RequestParam(required = false) Long idOportunidad,
+            @RequestParam(required = false) Long etiquetaId,
             @RequestParam(required = false) String idUsuario,
             @RequestParam(required = false) Boolean vencidas
     ) {
         if (Boolean.TRUE.equals(vencidas)) {
             return ResponseEntity.ok(useCase.listarVencidas());
+        } else if (etiquetaId != null) {
+            return ResponseEntity.ok(useCase.filtrarPorEtiqueta(etiquetaId));
         } else if (estado != null) {
             return ResponseEntity.ok(useCase.filtrarPorEstado(estado));
         } else if (idCliente != null) {

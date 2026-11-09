@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -6,6 +6,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { AuthService, UsuarioSesion } from '../auth/auth.service';
+import { MensajeriaService } from '../../features/mensajeria/mensajeria.service';
+import { ChatPanel } from '../../features/mensajeria/chat-panel/chat-panel';
 
 @Component({
   selector: 'app-layout',
@@ -18,15 +20,25 @@ import { AuthService, UsuarioSesion } from '../auth/auth.service';
     MatIconModule,
     MatButtonModule,
     MatMenuModule,
-    MatDividerModule
+    MatDividerModule,
+    ChatPanel
   ],
   templateUrl: './layout.html',
   styleUrl: './layout.css',
 })
-export class Layout {
+export class Layout implements OnInit, OnDestroy {
+  readonly mensajeria = inject(MensajeriaService);
   sidebarOpen = true;
 
   constructor(private authService: AuthService, private router: Router) {}
+
+  ngOnInit() {
+    this.mensajeria.iniciar();
+  }
+
+  ngOnDestroy() {
+    this.mensajeria.detener();
+  }
 
   get usuario(): UsuarioSesion | null {
     return this.authService.getUsuario();
@@ -61,19 +73,23 @@ export class Layout {
     return this.authService.hasRole('ADMIN');
   }
 
+  get esJefe(): boolean {
+    return this.authService.hasRole('JEFE');
+  }
+
+  get puedeVerAdministracion(): boolean {
+    return this.esAdmin || this.esJefe;
+  }
+
   toggleSidebar() {
     this.sidebarOpen = !this.sidebarOpen;
   }
 
-  onSearch(event: any) {
-    const val = event.target?.value?.trim();
-    if (val) {
-      this.router.navigate(['/clientes'], { queryParams: { q: val } });
+  async logout() {
+    try {
+      await this.authService.logout();
+    } catch {
+      await this.router.navigate(['/login']);
     }
-  }
-
-  logout() {
-    this.authService.logout();
-    this.router.navigate(['/login']);
   }
 }

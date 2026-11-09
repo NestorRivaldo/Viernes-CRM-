@@ -133,3 +133,33 @@
   color: #ef4444;
   background: #fef2f2;
 }
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  padding: 3px 6px 3px 10px;
+  border-radius: var(--radius-full);
+  background: var(--primary-blue-light);
+  color: var(--primary-blue);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.filter-chip button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  display: inline-flex;
+  padding: 1px;
+  border-radius: 50%;
+}
+
+.filter-chip button mat-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+}
+

@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Sección 6 · Integración y Sistemas Empresariales: ACL, Domain Events, Circuit Breaker y Saga traducidos del caso docente (BomERP + SUNAT) a Viernes CRM V1, con verificación de qué existe y qué es brecha.">
+<title>Sección 6 · Integración y Sistemas Empresariales · Viernes CRM V1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#070b14; --surface:#0f1626; --surface2:#151f33; --surface3:#1b2842;
+  --border:#22304a; --border-strong:#33466a;
+  --text:#eef4ff; --text-muted:#a5b4cb; --text-subtle:#7385a1;
+  --green:#10b981; --blue:#3b82f6; --purple:#a855f7; --amber:#f59e0b;
+  --rose:#f43f5e; --cyan:#06b6d4;
+  --paper:#f4f6fb; --ink:#16213a; --line:#5a6b8c;
+  --mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  background:var(--bg); color:var(--text); line-height:1.6; padding:30px 20px 80px;
+  background-image:
+    radial-gradient(circle at 8% 0%,rgba(6,182,212,.13) 0%,transparent 40%),
+    radial-gradient(circle at 92% 12%,rgba(168,85,247,.10) 0%,transparent 35%),
+    radial-gradient(circle at 50% 100%,rgba(16,185,129,.08) 0%,transparent 40%);
+  background-attachment:fixed;
+}
+.container{max-width:1340px;margin:0 auto}
+.top-nav{display:flex;justify-content:space-between;gap:16px;padding-bottom:20px;border-bottom:1px solid var(--border);margin-bottom:28px;font-size:13px;flex-wrap:wrap}
+.top-nav a{color:var(--text-muted);text-decoration:none;font-weight:600}
+.top-nav a:hover{color:#fff}
+.hero{padding:8px 0 26px;border-bottom:1px solid var(--border);margin-bottom:26px}
+.eyebrow{display:inline-flex;color:var(--cyan);background:rgba(6,182,212,.12);border:1px solid rgba(6,182,212,.3);border-radius:999px;padding:5px 13px;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px}
+h1{font-size:clamp(30px,4.5vw,46px);font-weight:800;letter-spacing:-.03em;line-height:1.15;background:linear-gradient(135deg,#fff 40%,#93c5fd 72%,#c4b5fd 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:14px}
+.lead{color:var(--text-muted);font-size:15.5px;max-width:1080px}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(196px,1fr));gap:12px;margin-bottom:26px}
+.metric{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.metric .l{font-size:11px;color:var(--text-subtle);text-transform:uppercase;font-weight:700;letter-spacing:.04em}
+.metric .v{font-size:18px;font-weight:800;font-family:var(--mono);white-space:nowrap}
+.panel{background:linear-gradient(180deg,rgba(21,31,51,.9),rgba(15,22,38,.9));border:1px solid var(--border-strong);border-radius:14px;padding:24px;margin-bottom:26px;position:relative;overflow:hidden}
+.panel::before{content:'';position:absolute;top:0;left:0;width:5px;height:100%;background:linear-gradient(180deg,var(--cyan),var(--purple))}
+.panel h2{font-size:19px;font-weight:800;margin-bottom:6px}
+.panel .sub{color:var(--text-muted);font-size:13.5px;margin-bottom:16px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-subtle);padding:9px 10px;border-bottom:1px solid var(--border-strong)}
+td{padding:9px 10px;border-bottom:1px solid var(--border);color:var(--text-muted);vertical-align:top}
+td b{color:#fff}
+td.c{text-align:center;font-family:var(--mono);font-weight:700}
+.ok{color:#6ee7b7}.no{color:#fda4af}.mid{color:#fde68a}.dim{color:#94a3b8}
+.pattern{background:linear-gradient(180deg,rgba(21,31,51,.95),rgba(15,22,38,.95));border:1px solid var(--border);border-radius:16px;margin:0 0 26px;overflow:hidden}
+.pattern.acl{border-top:4px solid var(--green)}
+.pattern.evt{border-top:4px solid var(--blue)}
+.pattern.brk{border-top:4px solid var(--amber)}
+.pattern.sga{border-top:4px solid var(--purple)}
+.p-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;padding:20px 24px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.p-num{font-family:var(--mono);font-size:11px;color:var(--text-subtle);letter-spacing:.1em;font-weight:700}
+.p-title{font-size:24px;font-weight:800;letter-spacing:-.02em;color:#fff;margin-top:3px}
+.p-def{font-size:13px;color:#93c5fd;font-style:italic;margin-top:6px;max-width:760px}
+.badges{display:flex;gap:8px;flex-wrap:wrap}
+.tag{font-size:10.5px;font-weight:700;padding:4px 10px;border-radius:999px;font-family:var(--mono);letter-spacing:.04em;white-space:nowrap}
+.t-ex{background:rgba(16,185,129,.14);color:#6ee7b7;border:1px solid rgba(16,185,129,.4)}
+.t-gap{background:rgba(245,158,11,.14);color:#fde68a;border:1px solid rgba(245,158,11,.4)}
+.t-na{background:rgba(100,116,139,.14);color:#94a3b8;border:1px solid rgba(100,116,139,.35)}
+.analogy{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:20px 24px}
+@media(max-width:860px){.analogy{grid-template-columns:1fr}}
+.acol{border-radius:10px;padding:16px;font-size:13.5px}
+.acol.docente{background:rgba(244,63,94,.06);border:1px solid rgba(244,63,94,.25)}
+.acol.viernes{background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.25)}
+.acol h4{font-size:11px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:9px;font-weight:800}
+.acol.docente h4{color:#fda4af}
+.acol.viernes h4{color:#6ee7b7}
+.acol p{color:var(--text-muted);margin-bottom:8px}
+.acol p:last-child{margin-bottom:0}
+.acol strong{color:#fff}
+.diagram-wrap{padding:0 24px 20px}
+.diagram{background:var(--paper);border-radius:12px;padding:16px}
+.diagram svg{width:100%;height:auto;display:block}
+.dcap{font-size:10.5px;color:var(--text-subtle);font-family:var(--mono);text-transform:uppercase;letter-spacing:.07em;text-align:center;margin-top:8px}
+.p-body{padding:0 24px 22px}
+.p-body h3{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--text-subtle);margin:22px 0 8px;font-weight:700}
+.p-body h3:first-child{margin-top:4px}
+code{font-family:var(--mono);font-size:11.5px;background:rgba(59,130,246,.09);color:#bfdbfe;padding:1px 5px;border-radius:4px}
+.ev{font-family:var(--mono);font-size:11.5px;color:#a5b4cb;background:#050914;border:1px solid var(--border);border-left:2px solid var(--cyan);border-radius:0 8px 8px 0;padding:11px 14px;margin-top:8px;overflow-x:auto}
+.ev b{color:#67e8f9;font-weight:600}
+.say{background:rgba(168,85,247,.07);border:1px solid rgba(168,85,247,.25);border-radius:10px;padding:14px 16px;font-size:13.5px;color:#ddd6fe;margin-top:16px}
+.say b{color:#fff}
+.fix{background:rgba(244,63,94,.07);border:1px solid rgba(244,63,94,.28);border-radius:10px;padding:14px 16px;font-size:13.5px;margin-top:14px}
+.fix h4{font-size:12px;color:#fda4af;text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px}
+.fix p{color:var(--text-muted)}
+.p-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 24px;border-top:1px solid var(--border);background:rgba(7,11,20,.5);flex-wrap:wrap}
+.trace{font-family:var(--mono);font-size:11px;color:var(--text-subtle);display:flex;gap:6px;flex-wrap:wrap}
+.trace span{background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:2px 7px}
+.cbtn{background:transparent;border:1px solid var(--border);color:var(--text-muted);border-radius:6px;padding:5px 13px;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:.2s}
+.cbtn:hover{background:var(--surface2);color:#fff;border-color:var(--border-strong)}
+.sep{display:flex;align-items:center;gap:14px;margin:38px 0 20px}
+.sep h2{font-size:21px;font-weight:800;letter-spacing:-.02em}
+.sep .line{flex:1;height:1px;background:var(--border)}
+.toast{position:fixed;bottom:24px;right:24px;background:#10b981;color:#fff;padding:11px 20px;border-radius:8px;font-weight:600;font-size:13px;box-shadow:0 4px 14px rgba(0,0,0,.4);opacity:0;transform:translateY(20px);transition:.3s;pointer-events:none;z-index:1000}
+.toast.show{opacity:1;transform:translateY(0)}
+.footer{margin-top:52px;padding-top:22px;border-top:1px solid var(--border);color:var(--text-subtle);font-size:12px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+<div class="container">
+
+<nav class="top-nav">
+  <a href="informe_casos_uso_nucleo_v1.html">← Núcleo de casos de uso</a>
+  <a href="guia_visual_patrones_grasp_gof.html">Catálogo GRASP &amp; GoF (sección 5)</a>
+  <a href="index.html">Portal central de informes</a>
+</nav>
+
+<header class="hero">
+  <div class="eyebrow">Sección 6 · Integración y Sistemas Empresariales</div>
+  <h1>Del caso BomERP/SUNAT a Viernes CRM</h1>
+  <p class="lead">
+    Cuatro patrones de integración — <strong>ACL</strong>, <strong>Domain Events</strong>,
+    <strong>Circuit Breaker</strong> y <strong>Saga</strong> — explicados primero con el caso docente
+    y traducidos después al sistema real. Cada patrón lleva su estado verificado en el código:
+    qué existe, qué es brecha y qué condición lo haría necesario.
+  </p>
+</header>
+
+<div class="metrics">
+  <div class="metric"><span class="l">Patrones analizados</span><span class="v" style="color:#fff">4</span></div>
+  <div class="metric"><span class="l">Implementados</span><span class="v" style="color:#6ee7b7">1 / 4</span></div>
+  <div class="metric"><span class="l">Llamadas salientes</span><span class="v" style="color:#fda4af">0</span></div>
+  <div class="metric"><span class="l">Eventos publicados</span><span class="v" style="color:#fda4af">0</span></div>
+  <div class="metric"><span class="l">Modulith instalado</span><span class="v" style="color:#fde68a">2.0.7</span></div>
+</div>
+
+<div class="panel">
+  <h2>Cómo leer esta sección</h2>
+  <p class="sub">El caso docente (BomERP facturando a SUNAT) es un sistema con integración real. Viernes CRM V1
+  <strong>no se integra con ningún sistema externo</strong>: su única frontera es Keycloak, y en modo pasivo.
+  Por eso cada patrón se presenta en tres tiempos: el caso del docente, su equivalente exacto en Viernes, y el
+  estado verificado. Donde no existe, se dice por qué no existe y cuál sería la condición precisa que lo haría
+  necesario — que es un análisis más sólido que fingir una implementación.</p>
+  <table>
+    <thead><tr><th>Patrón</th><th>Caso del docente</th><th>Equivalente real en Viernes CRM</th><th style="text-align:center">Estado</th></tr></thead>
+    <tbody>
+      <tr><td><b>ACL</b></td><td>SUNAT exige UBL 2.1 XML; BomERP guarda la venta a su manera</td><td>Keycloak representa roles en <code>realm_access.roles</code>; Spring Security exige <code>ROLE_X</code></td><td class="c ok">● Existe</td></tr>
+      <tr><td><b>Domain Events</b></td><td><code>VentaRegistrada</code> → Inventario, Reportes, IA</td><td><code>PropuestaAprobada</code> → Mensajería, Dashboard, Mapa, Actividades</td><td class="c mid">◐ Brecha</td></tr>
+      <tr><td><b>Circuit Breaker</b></td><td>SUNAT no responde al validar el comprobante</td><td>Keycloak no responde al aprovisionar usuario / JWKS caducado</td><td class="c dim">○ No aplica hoy</td></tr>
+      <tr><td><b>Saga</b></td><td>Resumen de boletas → ticket → compensación</td><td>Convertir Lead en Oportunidad: 5 pasos, 4 compensaciones</td><td class="c dim">○ No aplica hoy</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="sep"><h2>Los cuatro patrones</h2><div class="line"></div></div>
+
+<!-- ============ ACL ============ -->
+<article class="pattern acl" id="acl">
+  <div class="p-head">
+    <div>
+      <div class="p-num">PATRÓN 01 · INTEGRACIÓN</div>
+      <div class="p-title">Anti-Corruption Layer (ACL)</div>
+      <div class="p-def">Aísla tu modelo de dominio del modelo de un sistema externo que no controlas, traduciendo entre ambos, para que los cambios del externo no corrompan lo interno.</div>
+    </div>
+    <div class="badges"><span class="tag t-ex">● IMPLEMENTADO</span><span class="tag t-na">Frontera: identidad</span></div>
+  </div>
+
+  <div class="analogy">
+    <div class="acol docente">
+      <h4>Caso del docente · BomERP + SUNAT</h4>
+      <p>BomERP tiene su propia manera de guardar una venta, pero <strong>SUNAT exige un formato específico llamado UBL 2.1 XML</strong>.</p>
+      <p>Si el modelo de SUNAT se filtra al dominio, cada cambio del esquema tributario obliga a retocar la lógica de ventas. El ACL se interpone: <strong>Isolate, Translate, Absorb Changes</strong>.</p>
+    </div>
+    <div class="acol viernes">
+      <h4>En Viernes CRM V1</h4>
+      <p>Keycloak tiene su propia manera de representar identidad y roles, pero <strong>Spring Security exige autoridades con prefijo <code>ROLE_</code> y un principal estable</strong>.</p>
+      <p>El ACL existe y cumple los tres verbos. Ningún servicio ni entidad del dominio lee claims crudos de Keycloak.</p>
+    </div>
+  </div>
+
+  <div class="diagram-wrap">
+    <div class="diagram">
+      <svg viewBox="0 0 760 372" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagrama del anti-corruption layer de identidad en Viernes CRM">
+        <defs><marker id="a1" markerWidth="9" markerHeight="9" refX="8" refY="3.2" orient="auto"><path d="M0,0 L8,3.2 L0,6.4 z" fill="#5a6b8c"/></marker>
+        <marker id="a1r" markerWidth="9" markerHeight="9" refX="8" refY="3.2" orient="auto"><path d="M0,0 L8,3.2 L0,6.4 z" fill="#f43f5e"/></marker></defs>
+        <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="700" fill="#16213a" font-family="Inter,sans-serif">ACL de identidad · Viernes CRM V1</text>
+
+        <!-- Tu dominio -->
+        <rect x="18" y="42" width="200" height="212" rx="10" fill="none" stroke="#16213a" stroke-width="2"/>
+        <text x="118" y="62" text-anchor="middle" font-size="10.5" font-weight="800" letter-spacing="1" fill="#16213a" font-family="Inter,sans-serif">TU DOMINIO</text>
+        <rect x="34" y="76" width="168" height="40" rx="6" fill="#fff" stroke="#16213a" stroke-width="1.4"/>
+        <text x="118" y="93" text-anchor="middle" font-size="11" font-weight="600" fill="#16213a" font-family="Inter,sans-serif">RolUsuario</text>
+        <text x="118" y="107" text-anchor="middle" font-size="9.5" fill="#5a6b8c" font-family="JetBrains Mono,monospace">ADMIN · JEFE · VENDEDOR</text>
+        <rect x="34" y="126" width="168" height="40" rx="6" fill="#fff" stroke="#16213a" stroke-width="1.4"/>
+        <text x="118" y="143" text-anchor="middle" font-size="11" font-weight="600" fill="#16213a" font-family="Inter,sans-serif">GrantedAuthority</text>
+        <text x="118" y="157" text-anchor="middle" font-size="9.5" fill="#5a6b8c" font-family="JetBrains Mono,monospace">"ROLE_ADMIN"</text>
+        <rect x="34" y="176" width="168" height="60" rx="6" fill="#fff" stroke="#16213a" stroke-width="1.4"/>
+        <text x="118" y="196" text-anchor="middle" font-size="11" font-weight="600" fill="#16213a" font-family="Inter,sans-serif">KeycloakSecurityConfig</text>
+        <text x="118" y="210" text-anchor="middle" font-size="9.5" fill="#5a6b8c" font-family="Inter,sans-serif">hasAnyRole("ADMIN","JEFE")</text>
+        <text x="118" y="224" text-anchor="middle" font-size="9.5" fill="#5a6b8c" font-family="Inter,sans-serif">no conoce claims</text>
+
+        <!-- ACL -->
+        <rect x="270" y="42" width="220" height="212" rx="10" fill="#ede9fe" stroke="#16213a" stroke-width="2"/>
+        <text x="380" y="62" text-anchor="middle" font-size="10.5" font-weight="800" letter-spacing=".8" fill="#16213a" font-family="Inter,sans-serif">ANTI-CORRUPTION LAYER</text>
+        <rect x="284" y="72" width="192" height="30" rx="5" fill="#fff" stroke="#16213a" stroke-width="1.2"/>
+        <text x="380" y="91" text-anchor="middle" font-size="10" font-weight="700" fill="#16213a" font-family="JetBrains Mono,monospace">KeycloakJwtAuthentication…</text>
+        <rect x="284" y="112" width="192" height="42" rx="5" fill="#fff" stroke="#5a6b8c" stroke-width="1.1"/>
+        <text x="380" y="129" text-anchor="middle" font-size="10" font-weight="700" fill="#16213a" font-family="Inter,sans-serif">ISOLATE</text>
+        <text x="380" y="143" text-anchor="middle" font-size="9" fill="#5a6b8c" font-family="Inter,sans-serif">el dominio no ve claims crudos</text>
+        <rect x="284" y="162" width="192" height="42" rx="5" fill="#fff" stroke="#5a6b8c" stroke-width="1.1"/>
+        <text x="380" y="179" text-anchor="middle" font-size="10" font-weight="700" fill="#16213a" font-family="Inter,sans-serif">TRANSLATE</text>
+        <text x="380" y="193" text-anchor="middle" font-size="9" fill="#5a6b8c" font-family="Inter,sans-serif">realm_access.roles → ROLE_X</text>
+        <rect x="284" y="212" width="192" height="34" rx="5" fill="#fff" stroke="#5a6b8c" stroke-width="1.1"/>
+        <text x="380" y="227" text-anchor="middle" font-size="10" font-weight="700" fill="#16213a" font-family="Inter,sans-serif">ABSORB CHANGES</text>
+        <text x="380" y="240" text-anchor="middle" font-size="9" fill="#5a6b8c" font-family="Inter,sans-serif">filtra · normaliza · fallback</text>
+
+        <!-- Sistema externo -->
+        <rect x="542" y="42" width="200" height="212" rx="10" fill="none" stroke="#16213a" stroke-width="2"/>
+        <text x="642" y="62" text-anchor="middle" font-size="10.5" font-weight="800" letter-spacing="1" fill="#16213a" font-family="Inter,sans-serif">SISTEMA EXTERNO</text>
+        <rect x="558" y="76" width="168" height="40" rx="6" fill="#fff" stroke="#16213a" stroke-width="1.4"/>
+        <text x="642" y="93" text-anchor="middle" font-size="11" font-weight="600" fill="#16213a" font-family="Inter,sans-serif">Keycloak (IdP OIDC)</text>
+        <text x="642" y="107" text-anchor="middle" font-size="9.5" fill="#5a6b8c" font-family="Inter,sans-serif">realm viernes</text>
+        <rect x="558" y="126" width="168" height="40" rx="6" fill="#fff" stroke="#5a6b8c" stroke-width="1.1" stroke-dasharray="4 3"/>
+        <text x="642" y="143" text-anchor="middle" font-size="9.5" fill="#16213a" font-family="JetBrains Mono,monospace">realm_access.roles[]</text>
+        <text x="642" y="157" text-anchor="middle" font-size="9.5" fill="#5a6b8c" font-family="JetBrains Mono,monospace">["ADMIN","JEFE",…]</text>
+        <rect x="558" y="176" width="168" height="60" rx="6" fill="#fff" stroke="#5a6b8c" stroke-width="1.1" stroke-dasharray="4 3"/>
+        <text x="642" y="196" text-anchor="middle" font-size="9.5" fill="#16213a" font-family="JetBrains Mono,monospace">preferred_username</text>
+        <text x="642" y="210" text-anchor="middle" font-size="9.5" fill="#16213a" font-family="JetBrains Mono,monospace">sub</text>
+        <text x="642" y="228" text-anchor="middle" font-size="9" fill="#5a6b8c" font-family="Inter,sans-serif">ruido: default-roles*, offline_access</text>
+
+        <!-- flujos -->
+        <line x1="542" y1="146" x2="490" y2="180" stroke="#5a6b8c" stroke-width="1.8" marker-end="url(#a1)"/>
+        <text x="516" y="140" text-anchor="middle" font-size="9" font-style="italic" fill="#5a6b8c" font-family="Inter,sans-serif">JWT entrante</text>
+        <line x1="270" y1="146" x2="222" y2="146" stroke="#5a6b8c" stroke-width="1.8" marker-end="url(#a1)"/>
+        <text x="246" y="138" text-anchor="middle" font-size="9" font-style="italic" fill="#5a6b8c" font-family="Inter,sans-serif">traducido</text>
+
+        <!-- brecha -->
+        <rect x="18" y="272" width="724" height="82" rx="8" fill="#fff1f2" stroke="#f43f5e" stroke-width="1.6" stroke-dasharray="6 4"/>
+        <text x="34" y="294" font-size="11" font-weight="800" fill="#be123c" font-family="Inter,sans-serif">⚠ EL ACL TRADUCE, PERO NO RECONCILIA</text>
+        <text x="34" y="314" font-size="10.5" fill="#16213a" font-family="Inter,sans-serif">Dos fuentes de verdad del rol conviven sin sincronizarse: el claim del token (autoriza) y la columna CRM_USUARIOS.ROL (solo se lee).</text>
+        <text x="34" y="332" font-size="10.5" fill="#16213a" font-family="Inter,sans-serif">Un usuario puede tener ROL='VENDEDOR' en BD y claim ADMIN en el token: el ACL aísla el formato, pero la identidad sigue partida.</text>
+        <text x="34" y="348" font-size="9.5" font-style="italic" fill="#5a6b8c" font-family="Inter,sans-serif">Además: si el perfil "keycloak" no está activo, no existe ninguna SecurityFilterChain — el ACL desaparece junto con todo el control de acceso.</text>
+      </svg>
+    </div>
+    <div class="dcap">Frontera de identidad · el único ACL real del sistema</div>
+  </div>
+
+  <div class="p-body">
+    <h3>Los tres verbos, con la línea de código que los cumple</h3>
+    <table>
+      <thead><tr><th>Verbo</th><th>Qué hace en Viernes</th><th>Evidencia</th></tr></thead>
+      <tbody>
+        <tr><td><b>Isolate</b></td><td>Ningún servicio ni entidad lee claims crudos de Keycloak. El dominio solo conoce <code>RolUsuario</code>.</td><td class="dim">grep <code>getClaim</code> = 1 archivo, el converter</td></tr>
+        <tr><td><b>Translate</b></td><td><code>realm_access.roles</code> (lista dentro de un map) → <code>SimpleGrantedAuthority("ROLE_ADMIN")</code>. <code>preferred_username</code> → principal de sesión.</td><td class="dim">converter:47-71 · :39-42</td></tr>
+        <tr><td><b>Absorb changes</b></td><td>Descarta <code>default-roles*</code>, <code>offline_access</code>, <code>uma_authorization</code>; normaliza a mayúsculas; si falta <code>preferred_username</code> cae a <code>sub</code>.</td><td class="dim">converter:62 · :64-67</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Distinción que hay que tener clara</h3>
+    <table>
+      <thead><tr><th></th><th>Adapter</th><th>Anti-Corruption Layer</th></tr></thead>
+      <tbody>
+        <tr><td><b>Frontera</b></td><td>Tecnología interna que ustedes controlan</td><td>Sistema externo que no controlan</td></tr>
+        <tr><td><b>Ejemplo real</b></td><td><code>PropuestaPersistenceAdapter.toEntity / toDomain</code></td><td><code>KeycloakJwtAuthenticationConverter</code></td></tr>
+        <tr><td><b>Riesgo si se confunden</b></td><td>Acoplamiento a JPA</td><td>Corrupción del modelo por cambios de un tercero</td></tr>
+      </tbody>
+    </table>
+
+    <div class="ev"><b>Estado verificado:</b> IMPLEMENTADO en la frontera de identidad. Límite honesto: la traducción es <b>unidireccional</b> hacia el modelo de Spring Security, no hacia un modelo de identidad propio del dominio.</div>
+
+    <div class="say"><b>Qué diría en la sustentación:</b> "Nuestro sistema no factura a SUNAT, pero sí tiene una frontera externa: Keycloak define la identidad y nosotros definimos los roles. El converter que une ambos lados es un anti-corruption layer, y cumple exactamente los tres verbos del caso docente. Lo detectable es que aísla el <em>formato</em> pero no reconcilia el <em>dato</em>: tenemos dos fuentes de verdad de rol." Eso demuestra que aplicaron el patrón al sistema real en lugar de recitar la definición.</div>
+  </div>
+
+  <div class="p-foot">
+    <div class="trace"><span>KeycloakJwtAuthenticationConverter.java:47-71</span><span>RolUsuario.java:3</span><span>KeycloakSecurityConfig.java:36</span></div>
+    <button class="cbtn" data-k="acl">Copiar para Miro</button>
+  </div>
+</article>
+
+<!-- ============ DOMAIN EVENTS ============ -->
+<article class="pattern evt" id="events">
+  <div class="p-head">
+    <div>
+      <div class="p-num">PATRÓN 02 · INTEGRACIÓN</div>
+      <div class="p-title">Domain Events</div>
+      <div class="p-def">Un aviso que comunica que ocurrió algo importante en el sistema, para que otros módulos reaccionen sin que el emisor conozca a los receptores.</div>
+    </div>
+    <div class="badges"><span class="tag t-gap">◐ BRECHA</span><span class="tag t-na">0 publishers</span></div>
+  </div>
+
+  <div class="analogy">
+    <div class="acol docente">
+      <h4>Caso del docente · BomERP</h4>
+      <p>BomERP registra una venta y el módulo de ventas necesita comunicar a otros que ocurrió algo importante. Genera <strong><code>VentaRegistrada</code></strong>.</p>
+      <p>Inventario actualiza existencias, Reportes registra la operación, IA analiza las ventas. <strong>El módulo de ventas no necesita saber quién recibe el aviso.</strong></p>
+    </div>
+    <div class="acol viernes">
+      <h4>En Viernes CRM V1</h4>
+      <p>Se aprueba una propuesta. El módulo de propuestas debería comunicar que algo importante ocurrió.</p>
+      <p><strong>Hoy no lo hace.</strong> <code>PropuestaService.aprobar()</code> cambia el estado y termina: no crea cliente, no genera la actividad de cierre, no avisa al vendedor, no refresca el dashboard.</p>
+    </div>
+  </div>
+
+  <div class="diagram-wrap">
+    <div class="diagram">
+      <svg viewBox="0 0 760 350" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagrama de eventos de dominio propuesto para Viernes CRM">
+        <defs><marker id="a2" markerWidth="9" markerHeight="9" refX="8" refY="3.2" orient="auto"><path d="M0,0 L8,3.2 L0,6.4 z" fill="#5a6b8c"/></marker>
+        <marker id="a2g" markerWidth="9" markerHeight="9" refX="8" refY="3.2" orient="auto"><path d="M0,0 L8,3.2 L0,6.4 z" fill="#94a3b8"/></marker></defs>
+        <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="700" fill="#16213a" font-family="Inter,sans-serif">Domain Events · HOY vs PROPUESTO</text>
+
+        <!-- HOY -->
+        <rect x="18" y="40" width="724" height="66" rx="8" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.4" stroke-dasharray="6 4"/>
+        <text x="34" y="60" font-size="10.5" font-weight="800" letter-spacing=".8" fill="#475569" font-family="Inter,sans-serif">HOY — SIN EVENTOS</text>
+        <text x="34" y="80" font-size="11" fill="#16213a" font-family="Inter,sans-serif">PropuestaService.aprobar()  →  UPDATE CRM_PROPUESTAS SET ESTADO='APROBADA'  →  <tspan font-weight="700">fin de la transacción. Nadie se entera.</tspan></text>
+        <text x="34" y="96" font-size="9.5" font-style="italic" fill="#64748b" font-family="JetBrains Mono,monospace">ApplicationEventPublisher = 0 · @EventListener = 0 · @TransactionalEventListener = 0</text>
+
+        <!-- PROPUESTO -->
+        <rect x="18" y="118" width="150" height="76" rx="8" fill="#fff" stroke="#16213a" stroke-width="1.8"/>
+        <text x="93" y="140" text-anchor="middle" font-size="10" font-weight="800" letter-spacing=".6" fill="#16213a" font-family="Inter,sans-serif">PUBLISHER</text>
+        <text x="93" y="160" text-anchor="middle" font-size="10.5" fill="#16213a" font-family="Inter,sans-serif">PropuestaService</text>
+        <text x="93" y="176" text-anchor="middle" font-size="10" fill="#5a6b8c" font-family="JetBrains Mono,monospace">.aprobar(id)</text>
+
+        <rect x="230" y="112" width="190" height="90" rx="8" fill="#dbeafe" stroke="#16213a" stroke-width="1.8"/>
+        <text x="325" y="132" text-anchor="middle" font-size="10" font-weight="800" letter-spacing=".6" fill="#16213a" font-family="Inter,sans-serif">EVENT BROKER</text>
+        <text x="325" y="152" text-anchor="middle" font-size="10.5" fill="#16213a" font-family="Inter,sans-serif">Spring Modulith</text>
+        <text x="325" y="168" text-anchor="middle" font-size="9.5" fill="#5a6b8c" font-family="JetBrains Mono,monospace">ApplicationEventPublisher</text>
+        <text x="325" y="184" text-anchor="middle" font-size="9.5" fill="#5a6b8c" font-family="JetBrains Mono,monospace">+ publication outbox</text>
+
+        <line x1="168" y1="156" x2="228" y2="156" stroke="#5a6b8c" stroke-width="1.8" marker-end="url(#a2)"/>
+        <text x="198" y="148" text-anchor="middle" font-size="9" font-style="italic" fill="#5a6b8c" font-family="Inter,sans-serif">publica</text>
+
+        <!-- suscriptores -->
+        <g>
+          <rect x="500" y="106" width="242" height="38" rx="6" fill="#fff" stroke="#16213a" stroke-width="1.3"/>
+          <text x="514" y="130" font-size="10.5" fill="#16213a" font-family="Inter,sans-serif">Mensajería · avisa al vendedor en la sala</text>
+          <rect x="500" y="150" width="242" height="38" rx="6" fill="#fff" stroke="#16213a" stroke-width="1.3"/>
+          <text x="514" y="174" font-size="10.5" fill="#16213a" font-family="Inter,sans-serif">Dashboard · refresca KPIs de conversión</text>
+          <rect x="500" y="194" width="242" height="38" rx="6" fill="#fff" stroke="#16213a" stroke-width="1.3"/>
+          <text x="514" y="218" font-size="10.5" fill="#16213a" font-family="Inter,sans-serif">RelationshipMap · re-busca el grafo</text>
+        </g>
+        <line x1="420" y1="140" x2="498" y2="125" stroke="#5a6b8c" stroke-width="1.5" marker-end="url(#a2)"/>
+        <line x1="420" y1="157" x2="498" y2="169" stroke="#5a6b8c" stroke-width="1.5" marker-end="url(#a2)"/>
+        <line x1="420" y1="174" x2="498" y2="212" stroke="#5a6b8c" stroke-width="1.5" marker-end="url(#a2)"/>
+        <text x="459" y="112" text-anchor="middle" font-size="9" font-style="italic" fill="#5a6b8c" font-family="Inter,sans-serif">suscribe</text>
+
+        <!-- catalogo eventos -->
+        <rect x="18" y="222" width="724" height="112" rx="8" fill="#fff" stroke="#16213a" stroke-width="1.4"/>
+        <text x="34" y="242" font-size="10.5" font-weight="800" letter-spacing=".7" fill="#16213a" font-family="Inter,sans-serif">CATÁLOGO DE EVENTOS PROPUESTOS — cada uno sustituye un acoplamiento real</text>
+        <text x="34" y="264" font-size="10.5" fill="#16213a" font-family="JetBrains Mono,monospace">PropuestaAprobadaEvent    <tspan fill="#5a6b8c">→ Mensajería · Dashboard · RelationshipMap · Actividades (tarea de cierre)</tspan></text>
+        <text x="34" y="282" font-size="10.5" fill="#16213a" font-family="JetBrains Mono,monospace">OportunidadGanadaEvent    <tspan fill="#5a6b8c">→ Clientes (cierra el hueco "no hay GANADA → cliente")</tspan></text>
+        <text x="34" y="300" font-size="10.5" fill="#16213a" font-family="JetBrains Mono,monospace">LeadCalificadoEvent       <tspan fill="#5a6b8c">→ Actividades (crea la tarea de seguimiento)</tspan></text>
+        <text x="34" y="318" font-size="10.5" fill="#16213a" font-family="JetBrains Mono,monospace">ClienteDesactivadoEvent   <tspan fill="#5a6b8c">→ Oportunidades (bloquea nuevas altas)</tspan></text>
+      </svg>
+    </div>
+    <div class="dcap">El broker ya está en el pom — falta el código</div>
+  </div>
+
+  <div class="p-body">
+    <h3>El hallazgo que sostiene este bloque</h3>
+    <div class="ev"><b>Spring Modulith 2.0.7 está instalado y sin usar.</b> pom.xml:32 define la propiedad de versión, y hay cuatro artefactos declarados: <b>starter-core</b> (líneas 56-59), <b>actuator</b> (73-77), <b>starter-test</b> (94-98) y <b>docs</b> (99-103). Esa librería aporta precisamente <code>@ApplicationModuleListener</code> y el <em>publication outbox</em> transaccional. En <code>src/main</code>: <b>0</b> coincidencias de <code>ApplicationEventPublisher</code>, <code>@EventListener</code> o <code>@TransactionalEventListener</code>.</div>
+
+    <h3>Conexión con la sección 5</h3>
+    <p style="color:var(--text-muted);font-size:13.5px;margin-bottom:6px">En el catálogo GRASP &amp; GoF ustedes mismos clasificaron <strong>Observer como <code>[C] Oportunidad</code></strong> con la nota "publicar eventos de dominio para que mensajería envíe emails y el dashboard refresque métricas sin acoplarse". La sección 6 es donde ese hallazgo recibe la solución concreta y la librería que ya tienen para implementarla.</p>
+
+    <table>
+      <thead><tr><th>Problema actual</th><th>Evidencia</th><th>Cómo lo resuelve el evento</th></tr></thead>
+      <tbody>
+        <tr><td>Aprobar no dispara ningún efecto colateral</td><td class="dim">PropuestaService.java:124-130</td><td>Suscriptores reaccionan sin que el emisor los conozca</td></tr>
+        <tr><td><code>RelationshipMapService</code> depende de 6 módulos por llamada directa</td><td class="dim">RelationshipMapService.java:40-44</td><td>Construye el grafo desde eventos cacheados, no desde 6 puertos</td></tr>
+        <tr><td>Los adaptadores de validación saltan los puertos y usan repositorios ajenos</td><td class="dim">RelacionValidationAdapter · PropuestaRelacionValidationAdapter</td><td>El evento reemplaza la consulta cruzada por notificación</td></tr>
+      </tbody>
+    </table>
+
+    <div class="say"><b>Qué diría en la sustentación:</b> "Identificamos que el patrón no está implementado, y no lo presentamos como defecto gratuito: presentamos que la infraestructura ya está pagada en el <code>pom.xml</code>, que el caso de uso UC11 es el punto exacto donde falta, y que esto cierra el Observer <code>[C]</code> que clasificamos en la sección 5." Saber dónde <em>no</em> está un patrón y por qué, vale más que saber dónde está.</div>
+  </div>
+
+  <div class="p-foot">
+    <div class="trace"><span>pom.xml:32,56-59,73-77</span><span>PropuestaService.java:124</span><span>0 publishers</span></div>
+    <button class="cbtn" data-k="events">Copiar para Miro</button>
+  </div>
+</article>
+
+<!-- ============ CIRCUIT BREAKER ============ -->
+<article class="pattern brk" id="breaker">
+  <div class="p-head">
+    <div>
+      <div class="p-num">PATRÓN 03 · RESILIENCIA</div>
+      <div class="p-title">Circuit Breaker</div>
+      <div class="p-def">Deja de insistir contra un servicio que está fallando: tras un umbral de fallos corta el circuito y responde rápido, para reabrir la prueba más tarde en vez de saturar al dependiente.</div>
+    </div>
+    <div class="badges"><span class="tag t-na">○ NO APLICA HOY</span><span class="tag t-gap">◐ 1 riesgo real</span></div>
+  </div>
+
+  <div class="analogy">
+    <div class="acol docente">
+      <h4>Caso del docente · BomERP + SUNAT</h4>
+      <p>SUNAT no responde al validar el comprobante. Sin protección, cada venta queda esperando, se agotan los hilos del servidor y <strong>el sistema entero se cae por culpa de un tercero lento</strong>.</p>
+    </div>
+    <div class="acol viernes">
+      <h4>En Viernes CRM V1</h4>
+      <p><strong>No existe ninguna llamada saliente que proteger</strong>: 0 <code>RestTemplate</code>, 0 <code>WebClient</code>, 0 <code>HttpClient</code>, 0 Feign, 0 Resilience4j.</p>
+      <p>Pero hay un riesgo presente y uno futuro, y ambos son concretos.</p>
+    </div>
+  </div>
+
+  <div class="diagram-wrap">
+    <div class="diagram">
+      <svg viewBox="0 0 760 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Máquina de estados del circuit breaker aplicada a Keycloak">
+        <defs><marker id="a3" markerWidth="9" markerHeight="9" refX="8" refY="3.2" orient="auto"><path d="M0,0 L8,3.2 L0,6.4 z" fill="#5a6b8c"/></marker></defs>
+        <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="700" fill="#16213a" font-family="Inter,sans-serif">Circuit Breaker · configuración propuesta para el aprovisionamiento a Keycloak</text>
+
+        <rect x="40" y="70" width="180" height="70" rx="35" fill="#10b981" stroke="#16213a" stroke-width="1.8"/>
+        <text x="130" y="100" text-anchor="middle" font-size="13" font-weight="800" fill="#fff" font-family="Inter,sans-serif">CLOSED</text>
+        <text x="130" y="120" text-anchor="middle" font-size="9.5" fill="#ecfdf5" font-family="Inter,sans-serif">todo funciona normalmente</text>
+
+        <rect x="540" y="70" width="180" height="70" rx="35" fill="#f43f5e" stroke="#16213a" stroke-width="1.8"/>
+        <text x="630" y="100" text-anchor="middle" font-size="13" font-weight="800" fill="#fff" font-family="Inter,sans-serif">OPEN</text>
+        <text x="630" y="120" text-anchor="middle" font-size="9.5" fill="#fff1f2" font-family="Inter,sans-serif">fallo rápido · short-circuit</text>
+
+        <rect x="290" y="200" width="180" height="70" rx="35" fill="#f59e0b" stroke="#16213a" stroke-width="1.8"/>
+        <text x="380" y="230" text-anchor="middle" font-size="13" font-weight="800" fill="#16213a" font-family="Inter,sans-serif">HALF_OPEN</text>
+        <text x="380" y="250" text-anchor="middle" font-size="9.5" fill="#451a03" font-family="Inter,sans-serif">llamadas de prueba limitadas</text>
+
+        <path d="M222,105 L538,105" fill="none" stroke="#5a6b8c" stroke-width="1.8" marker-end="url(#a3)"/>
+        <text x="380" y="96" text-anchor="middle" font-size="10" font-style="italic" fill="#5a6b8c" font-family="Inter,sans-serif">failureRate &gt; 50% en ventana de 20</text>
+
+        <path d="M600,142 C600,215 500,235 472,235" fill="none" stroke="#5a6b8c" stroke-width="1.8" marker-end="url(#a3)"/>
+        <text x="596" y="196" text-anchor="end" font-size="10" font-style="italic" fill="#5a6b8c" font-family="Inter,sans-serif">waitDuration 30 s</text>
+
+        <path d="M290,235 C200,235 130,200 130,142" fill="none" stroke="#5a6b8c" stroke-width="1.8" marker-end="url(#a3)"/>
+        <text x="150" y="212" font-size="10" font-style="italic" fill="#5a6b8c" font-family="Inter,sans-serif">3 pruebas OK</text>
+
+        <path d="M330,215 C280,160 300,130 330,118" fill="none" stroke="#5a6b8c" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#a3)"/>
+        <text x="262" y="176" text-anchor="middle" font-size="10" font-style="italic" fill="#5a6b8c" font-family="Inter,sans-serif">prueba falló</text>
+
+        <rect x="40" y="150" width="180" height="34" rx="5" fill="#fff" stroke="#5a6b8c" stroke-width="1.1"/>
+        <text x="130" y="171" text-anchor="middle" font-size="9.5" fill="#16213a" font-family="Inter,sans-serif">POST /usuarios + aprovisionar</text>
+      </svg>
+    </div>
+    <div class="dcap">Máquina de estados estándar — la configuración es la decisión de diseño</div>
+  </div>
+
+  <div class="p-body">
+    <h3>Candidato A — el riesgo que existe hoy, en el frontend</h3>
+    <div class="ev">mensajeria.service.ts:11 define <b>intervaloMs = 5000</b> y la línea 44 lo programa con <b>setInterval(() =&gt; this.poll(), ...)</b>. No hay backoff exponencial, no hay contador de fallos, no hay corte. Si el backend se cae, cada pestaña abierta sigue golpeando <code>GET /mensajeria</code> cada 5 segundos indefinidamente. Es un circuito abierto mal disimulado: solo reintentos ciegos.</div>
+
+    <h3>Candidato B — el que nacería al cerrar la brecha de UC02</h3>
+    <p style="color:var(--text-muted);font-size:13.5px;margin-bottom:8px">"Crear usuario" hoy escribe solo <code>CRM_USUARIOS</code> y <strong>nunca llama a la API de administración de Keycloak</strong> (<code>UsuarioService.crear</code>, líneas 50-61). El usuario creado no puede iniciar sesión hasta que alguien lo dé de alta aparte. Arreglarlo introduce la primera llamada saliente del sistema — y ahí el breaker pasa de opcional a obligatorio.</p>
+    <table>
+      <thead><tr><th>Estado</th><th>¿Qué significa?</th><th>Comportamiento concreto en Viernes</th></tr></thead>
+      <tbody>
+        <tr><td><b style="color:#6ee7b7">CLOSED</b></td><td>Todo funciona normalmente</td><td>El alta crea en BD <em>y</em> aprovisiona en el realm</td></tr>
+        <tr><td><b style="color:#fda4af">OPEN</b></td><td>Se detectan fallos y se dejan de enviar solicitudes temporalmente</td><td>La creación <strong>no se pierde</strong>: encola la tarea de aprovisionamiento y responde <code>202 Accepted</code></td></tr>
+        <tr><td><b style="color:#fde68a">HALF_OPEN</b></td><td>Se hacen pruebas para comprobar si el servicio ya funciona</td><td>Reintenta los pendientes; si 3 pasan, cierra el circuito</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Candidato C — la disponibilidad del propio ACL</h3>
+    <p style="color:var(--text-muted);font-size:13.5px">Keycloak se valida contra <code>jwk-set-uri</code>. Si cae y la caché de JWKS expira, <strong>todas</strong> las peticiones fallan: no es un problema de un caso de uso, es del sistema completo. No lleva breaker porque no es una llamada de negocio, pero es la dependencia externa real que tienen — y conviene nombrarla.</p>
+
+    <div class="say"><b>Qué diría en la sustentación:</b> "El patrón no aplica hoy porque no tenemos llamadas salientes, y esa es una conclusión medida, no una suposición. Lo que sí presentamos es la condición exacta que lo haría necesario: el día que cerremos el aprovisionamiento de usuarios a Keycloak, tendremos una dependencia externa lenta, y ese es el punto donde va el breaker. Mientras tanto ya tenemos un caso real de reintento sin control, que es el polling de mensajería."</div>
+  </div>
+
+  <div class="p-foot">
+    <div class="trace"><span>0 Resilience4j en pom</span><span>mensajeria.service.ts:11,44</span><span>application-keycloak.yml:6-9</span></div>
+    <button class="cbtn" data-k="breaker">Copiar para Miro</button>
+  </div>
+</article>
+
+<!-- ============ SAGA ============ -->
+<article class="pattern sga" id="saga">
+  <div class="p-head">
+    <div>
+      <div class="p-num">PATRÓN 04 · COORDINACIÓN</div>
+      <div class="p-title">Saga</div>
+      <div class="p-def">Secuencia de transacciones locales donde cada paso tiene una <strong>compensación</strong>: si un paso falla, se revierten en orden inverso los ya completados. Es la alternativa al ACID distribuido.</div>
+    </div>
+    <div class="badges"><span class="tag t-na">○ NO APLICA HOY</span><span class="tag t-gap">◐ caso candidato</span></div>
+  </div>
+
+  <div class="fix">
+    <h4>⚠ Corrección al material del docente</h4>
+    <p>La lámina describe: reunir boletas → enviar resumen → SUNAT devuelve ticket → consultar estado → <em>"si rechaza, BomERP debe revisar el problema, corregirlo y preparar un nuevo resumen"</em>. Eso es <strong>reintento de un envío idempotente, no una Saga</strong>. El rasgo definitorio de la Saga es la transacción compensatoria por paso, no repetir el intento. Conviene corregirlo antes de que lo señalen.</p>
+  </div>
+
+  <div class="analogy">
+    <div class="acol docente">
+      <h4>Caso del docente · versión corregida</h4>
+      <p>Enviar el resumen diario a SUNAT implica: <strong>reservar inventario → emitir comprobante → descontar stock</strong>.</p>
+      <p>Si SUNAT rechaza, no se "vuelve a intentar": se <strong>compensa</strong> — anular el comprobante emitido y liberar la reserva de inventario.</p>
+    </div>
+    <div class="acol viernes">
+      <h4>En Viernes CRM V1</h4>
+      <p>El único caso honesto de multi-paso con compensación es <strong>Convertir Lead en Oportunidad</strong> — que además es el eslabón roto que detectamos al reducir los 88 casos de uso a 12.</p>
+      <p>Hoy <strong>no existe</strong>: el literal <code>CONVERTIDO</code> no lo asigna ningún código.</p>
+    </div>
+  </div>
+
+  <div class="diagram-wrap">
+    <div class="diagram">
+      <svg viewBox="0 0 760 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Saga de conversión de lead con sus compensaciones">
+        <defs><marker id="a4" markerWidth="9" markerHeight="9" refX="8" refY="3.2" orient="auto"><path d="M0,0 L8,3.2 L0,6.4 z" fill="#5a6b8c"/></marker>
+        <marker id="a4c" markerWidth="9" markerHeight="9" refX="8" refY="3.2" orient="auto"><path d="M0,0 L8,3.2 L0,6.4 z" fill="#f43f5e"/></marker></defs>
+        <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="700" fill="#16213a" font-family="Inter,sans-serif">Saga: Convertir Lead en Oportunidad</text>
+        <text x="380" y="40" text-anchor="middle" font-size="10" font-style="italic" fill="#5a6b8c" font-family="Inter,sans-serif">5 pasos hacia adelante · 4 compensaciones hacia atrás</text>
+
+        <text x="34" y="66" font-size="9.5" font-weight="800" letter-spacing=".8" fill="#16213a" font-family="Inter,sans-serif">FLUJO NORMAL</text>
+
+        <!-- pasos -->
+        <g font-family="Inter,sans-serif">
+          <rect x="24"  y="76" width="130" height="56" rx="7" fill="#fff" stroke="#16213a" stroke-width="1.6"/>
+          <text x="89"  y="99" text-anchor="middle" font-size="10" font-weight="700" fill="#16213a">1 · Crear cliente</text>
+          <text x="89"  y="115" text-anchor="middle" font-size="9" fill="#5a6b8c">desde el lead</text>
+
+          <rect x="170" y="76" width="130" height="56" rx="7" fill="#fff" stroke="#16213a" stroke-width="1.6"/>
+          <text x="235" y="99" text-anchor="middle" font-size="10" font-weight="700" fill="#16213a">2 · Crear</text>
+          <text x="235" y="113" text-anchor="middle" font-size="10" font-weight="700" fill="#16213a">oportunidad</text>
+
+          <rect x="316" y="76" width="130" height="56" rx="7" fill="#fff" stroke="#16213a" stroke-width="1.6"/>
+          <text x="381" y="99" text-anchor="middle" font-size="10" font-weight="700" fill="#16213a">3 · Migrar</text>
+          <text x="381" y="113" text-anchor="middle" font-size="10" font-weight="700" fill="#16213a">contactos</text>
+
+          <rect x="462" y="76" width="130" height="56" rx="7" fill="#fff" stroke="#16213a" stroke-width="1.6"/>
+          <text x="527" y="99" text-anchor="middle" font-size="10" font-weight="700" fill="#16213a">4 · Marcar lead</text>
+          <text x="527" y="113" text-anchor="middle" font-size="10" font-weight="700" fill="#16213a">CONVERTIDO</text>
+
+          <rect x="608" y="76" width="130" height="56" rx="7" fill="#fff" stroke="#16213a" stroke-width="1.6"/>
+          <text x="673" y="99" text-anchor="middle" font-size="10" font-weight="700" fill="#16213a">5 · Desasociar</text>
+          <text x="673" y="113" text-anchor="middle" font-size="10" font-weight="700" fill="#16213a">de campañas</text>
+        </g>
+        <line x1="154" y1="104" x2="168" y2="104" stroke="#5a6b8c" stroke-width="1.7" marker-end="url(#a4)"/>
+        <line x1="300" y1="104" x2="314" y2="104" stroke="#5a6b8c" stroke-width="1.7" marker-end="url(#a4)"/>
+        <line x1="446" y1="104" x2="460" y2="104" stroke="#5a6b8c" stroke-width="1.7" marker-end="url(#a4)"/>
+        <line x1="592" y1="104" x2="606" y2="104" stroke="#5a6b8c" stroke-width="1.7" marker-end="url(#a4)"/>
+
+        <text x="34" y="176" font-size="9.5" font-weight="800" letter-spacing=".8" fill="#be123c" font-family="Inter,sans-serif">COMPENSACIONES — si el paso siguiente falla, se revierte en orden inverso</text>
+
+        <g font-family="Inter,sans-serif">
+          <rect x="24"  y="188" width="130" height="52" rx="7" fill="#fff1f2" stroke="#f43f5e" stroke-width="1.4"/>
+          <text x="89"  y="210" text-anchor="middle" font-size="9.5" font-weight="700" fill="#be123c">C1 · Eliminar cliente</text>
+          <text x="89"  y="226" text-anchor="middle" font-size="8.5" fill="#9f1239">solo si fue de alta nueva</text>
+
+          <rect x="170" y="188" width="130" height="52" rx="7" fill="#fff1f2" stroke="#f43f5e" stroke-width="1.4"/>
+          <text x="235" y="210" text-anchor="middle" font-size="9.5" font-weight="700" fill="#be123c">C2 · Eliminar</text>
+          <text x="235" y="226" text-anchor="middle" font-size="9.5" font-weight="700" fill="#be123c">oportunidad</text>
+
+          <rect x="316" y="188" width="130" height="52" rx="7" fill="#fff1f2" stroke="#f43f5e" stroke-width="1.4"/>
+          <text x="381" y="210" text-anchor="middle" font-size="9.5" font-weight="700" fill="#be123c">C3 · Desvincular</text>
+          <text x="381" y="226" text-anchor="middle" font-size="9.5" font-weight="700" fill="#be123c">contactos migrados</text>
+
+          <rect x="462" y="188" width="130" height="52" rx="7" fill="#fff1f2" stroke="#f43f5e" stroke-width="1.4"/>
+          <text x="527" y="210" text-anchor="middle" font-size="9.5" font-weight="700" fill="#be123c">C4 · Devolver lead</text>
+          <text x="527" y="226" text-anchor="middle" font-size="9.5" font-weight="700" fill="#be123c">a CALIFICADO</text>
+        </g>
+        <line x1="608" y1="132" x2="540" y2="186" stroke="#f43f5e" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#a4c)"/>
+        <line x1="462" y1="132" x2="390" y2="186" stroke="#f43f5e" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#a4c)"/>
+        <line x1="316" y1="132" x2="245" y2="186" stroke="#f43f5e" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#a4c)"/>
+        <line x1="170" y1="132" x2="100" y2="186" stroke="#f43f5e" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#a4c)"/>
+
+        <!-- variantes -->
+        <rect x="24" y="262" width="352" height="118" rx="8" fill="#dbeafe" stroke="#16213a" stroke-width="1.5"/>
+        <text x="40" y="284" font-size="10.5" font-weight="800" letter-spacing=".6" fill="#16213a" font-family="Inter,sans-serif">VARIANTE A · ORQUESTADA</text>
+        <text x="40" y="304" font-size="10" fill="#16213a" font-family="JetBrains Mono,monospace">LeadConversionSaga  (módulo leads)</text>
+        <text x="40" y="322" font-size="10" fill="#16213a" font-family="Inter,sans-serif">Un coordinador ejecuta paso a paso y conoce todas las</text>
+        <text x="40" y="338" font-size="10" fill="#16213a" font-family="Inter,sans-serif">compensaciones. ✓ Control total y estado visible.</text>
+        <text x="40" y="356" font-size="10" fill="#5a6b8c" font-family="Inter,sans-serif">✗ Punto único de fallo y de acoplamiento.</text>
+
+        <rect x="390" y="262" width="348" height="118" rx="8" fill="#dcfce7" stroke="#16213a" stroke-width="1.5"/>
+        <text x="406" y="284" font-size="10.5" font-weight="800" letter-spacing=".6" fill="#16213a" font-family="Inter,sans-serif">VARIANTE B · COREOGRAFIADA</text>
+        <text x="406" y="304" font-size="10" fill="#16213a" font-family="JetBrains Mono,monospace">LeadConvertidoEvent → MigrarContactosListener</text>
+        <text x="406" y="322" font-size="10" fill="#16213a" font-family="JetBrains Mono,monospace">                     → DesasociarCampaniaListener</text>
+        <text x="406" y="340" font-size="10" fill="#16213a" font-family="Inter,sans-serif">Sin coordinador. ✓ Bajo acoplamiento.</text>
+        <text x="406" y="358" font-size="10" fill="#5a6b8c" font-family="Inter,sans-serif">✗ Cada suscriptor necesita su compensación propia, y</text>
+        <text x="406" y="372" font-size="10" fill="#5a6b8c" font-family="Inter,sans-serif">  exige Domain Events — que hoy no existen.</text>
+      </svg>
+    </div>
+    <div class="dcap">La variante B depende del patrón anterior — los cuatro se encadenan</div>
+  </div>
+
+  <div class="p-body">
+    <h3>Por qué hoy no hace falta — y es un argumento, no una excusa</h3>
+    <div class="ev">Las <b>13 anotaciones <code>@Transactional</code></b> del backend viven dentro de <b>una sola base de datos Oracle</b>. Una transacción local ya garantiza atomicidad: o se aplican todos los pasos o ninguno. La Saga resuelve el ACID <em>distribuido</em>, y aquí no hay distribución. Introducir una ahora sería complejidad sin beneficio.</div>
+
+    <h3>La condición exacta que la haría necesaria</h3>
+    <table>
+      <thead><tr><th>Gatillo</th><th>Estado actual</th><th>Qué obligaría a una Saga</th></tr></thead>
+      <tbody>
+        <tr><td>Implementar la conversión de lead</td><td class="no">No existe</td><td>Coordinar 4 módulos con resultado parcial inaceptable</td></tr>
+        <tr><td>Separar módulos en servicios</td><td class="dim">Monolito modular (Modulith)</td><td>Cada servicio con su BD → sin transacción común</td></tr>
+        <tr><td>Añadir facturación o inventario</td><td class="no">No existe módulo</td><td>Reserva de stock + emisión de comprobante + descuento</td></tr>
+      </tbody>
+    </table>
+
+    <div class="say"><b>Qué diría en la sustentación:</b> primero la corrección al caso docente — "enviar y reenviar el resumen es reintento, no compensación; la Saga se define por revertir el paso ya confirmado". Después el caso propio: "nuestro equivalente sería la conversión de lead en oportunidad, cinco pasos y cuatro compensaciones, que además es el eslabón que falta en nuestro embudo. Y no la implementamos como Saga porque las 13 transacciones del sistema caben en una sola BD Oracle: la necesitaríamos el día que los módulos se separen o aparezca un servicio de inventario."</div>
+  </div>
+
+  <div class="p-foot">
+    <div class="trace"><span>EstadoLead.java:4 CONVERTIDO</span><span>13 @Transactional</span><span>grep Saga = 0</span></div>
+    <button class="cbtn" data-k="saga">Copiar para Miro</button>
+  </div>
+</article>
+
+<!-- ============ CADENA ============ -->
+<div class="sep"><h2>Cómo se encadenan los cuatro</h2><div class="line"></div></div>
+<div class="panel">
+  <h2>No son cuatro temas separados</h2>
+  <p class="sub">Presentarlos como una cadena de dependencias demuestra comprensión del conjunto, y explica por qué en Viernes solo el primer eslabón está resuelto.</p>
+  <div class="diagram">
+    <svg viewBox="0 0 760 190" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cadena de dependencia entre los cuatro patrones">
+      <defs><marker id="a5" markerWidth="9" markerHeight="9" refX="8" refY="3.2" orient="auto"><path d="M0,0 L8,3.2 L0,6.4 z" fill="#5a6b8c"/></marker></defs>
+      <rect x="20"  y="46" width="160" height="60" rx="9" fill="#d1fae5" stroke="#16213a" stroke-width="1.8"/>
+      <text x="100" y="72" text-anchor="middle" font-size="12" font-weight="800" fill="#16213a" font-family="Inter,sans-serif">ACL</text>
+      <text x="100" y="90" text-anchor="middle" font-size="9.5" fill="#166534" font-family="Inter,sans-serif">● existe · Keycloak</text>
+
+      <rect x="220" y="46" width="160" height="60" rx="9" fill="#dbeafe" stroke="#16213a" stroke-width="1.8"/>
+      <text x="300" y="72" text-anchor="middle" font-size="12" font-weight="800" fill="#16213a" font-family="Inter,sans-serif">Domain Events</text>
+      <text x="300" y="90" text-anchor="middle" font-size="9.5" fill="#1e40af" font-family="Inter,sans-serif">◐ Modulith listo · 0 código</text>
+
+      <rect x="420" y="46" width="160" height="60" rx="9" fill="#ede9fe" stroke="#16213a" stroke-width="1.8"/>
+      <text x="500" y="72" text-anchor="middle" font-size="12" font-weight="800" fill="#16213a" font-family="Inter,sans-serif">Saga</text>
+      <text x="500" y="90" text-anchor="middle" font-size="9.5" fill="#5b21b6" font-family="Inter,sans-serif">○ coreografía = eventos + C1..Cn</text>
+
+      <rect x="620" y="46" width="120" height="60" rx="9" fill="#fef3c7" stroke="#16213a" stroke-width="1.8"/>
+      <text x="680" y="66" text-anchor="middle" font-size="11" font-weight="800" fill="#16213a" font-family="Inter,sans-serif">Circuit</text>
+      <text x="680" y="80" text-anchor="middle" font-size="11" font-weight="800" fill="#16213a" font-family="Inter,sans-serif">Breaker</text>
+      <text x="680" y="96" text-anchor="middle" font-size="9" fill="#92400e" font-family="Inter,sans-serif">○ protege cada</text>
+
+      <line x1="180" y1="76" x2="218" y2="76" stroke="#5a6b8c" stroke-width="1.8" marker-end="url(#a5)"/>
+      <line x1="380" y1="76" x2="418" y2="76" stroke="#5a6b8c" stroke-width="1.8" marker-end="url(#a5)"/>
+      <line x1="580" y1="76" x2="618" y2="76" stroke="#5a6b8c" stroke-width="1.8" marker-end="url(#a5)"/>
+
+      <text x="200" y="126" text-anchor="middle" font-size="9" font-style="italic" fill="#5a6b8c" font-family="Inter,sans-serif">sin ACL no hay</text>
+      <text x="200" y="138" text-anchor="middle" font-size="9" font-style="italic" fill="#5a6b8c" font-family="Inter,sans-serif">modelo limpio</text>
+      <text x="400" y="126" text-anchor="middle" font-size="9" font-style="italic" fill="#5a6b8c" font-family="Inter,sans-serif">sin eventos la saga</text>
+      <text x="400" y="138" text-anchor="middle" font-size="9" font-style="italic" fill="#5a6b8c" font-family="Inter,sans-serif">solo puede ser orquestada</text>
+      <text x="600" y="126" text-anchor="middle" font-size="9" font-style="italic" fill="#5a6b8c" font-family="Inter,sans-serif">paso que salga</text>
+      <text x="600" y="138" text-anchor="middle" font-size="9" font-style="italic" fill="#5a6b8c" font-family="Inter,sans-serif">del sistema</text>
+
+      <text x="380" y="172" text-anchor="middle" font-size="10.5" font-weight="700" fill="#16213a" font-family="Inter,sans-serif">Viernes CRM tiene resuelto el eslabón 1. El 2 está comprado en el pom y sin código. El 3 y el 4 esperan un disparo concreto.</text>
+    </svg>
+  </div>
+</div>
+
+<!-- ============ VERIFICACION ============ -->
+<div class="sep"><h2>Evidencia de la verificación</h2><div class="line"></div></div>
+<div class="panel" style="padding:0;overflow:hidden">
+  <table>
+    <thead><tr><th>Búsqueda</th><th style="text-align:center">pom.xml</th><th style="text-align:center">src/main/java</th><th>Conclusión</th></tr></thead>
+    <tbody>
+      <tr><td><code>resilience4j · circuitbreaker · spring-cloud · feign</code></td><td class="c no">0</td><td class="c no">0</td><td>Sin librería de resiliencia</td></tr>
+      <tr><td><code>RestTemplate · WebClient · HttpClient</code></td><td class="c no">0</td><td class="c no">0</td><td><b>Ninguna llamada saliente</b></td></tr>
+      <tr><td><code>kafka · amqp · rabbit</code></td><td class="c no">0</td><td class="c no">0</td><td>Sin broker de mensajes</td></tr>
+      <tr><td><code>mail · retry · quartz · statemachine · saga</code></td><td class="c no">0</td><td class="c no">0</td><td>Sin correo, sin reintentos, sin scheduler</td></tr>
+      <tr><td><code>ApplicationEventPublisher · @EventListener · @TransactionalEventListener</code></td><td class="dim">n/a</td><td class="c no">0</td><td>Modulith instalado, eventos ausentes</td></tr>
+      <tr><td><code>SUNAT · UBL · factura · comprobante</code></td><td class="c no">0</td><td class="c no">0</td><td>No existe módulo tributario</td></tr>
+      <tr><td><code>spring-modulith</code></td><td class="c ok">4 artefactos</td><td class="dim">2 package-info</td><td>La infraestructura de eventos ya está declarada</td></tr>
+      <tr><td><code>@Transactional</code></td><td class="dim">n/a</td><td class="c mid">13 archivos</td><td>Transacción local única en una BD Oracle</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<footer class="footer">
+  <div>Viernes CRM V1 · Sección 6: Integración y Sistemas Empresariales · 4 patrones, 1 implementado, 3 brechas con condición de disparo identificada</div>
+  <div>Auditoría estática contrastada con el código fuente · 05/11/2026</div>
+</footer>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite">✓ Copiado al portapapeles</div>
+
+<script>
+const TXT = {
+acl:
+`PATRÓN 01 · ANTI-CORRUPTION LAYER (ACL)   [● IMPLEMENTADO]
+
+DEFINICIÓN
+Aísla el modelo de dominio del modelo de un sistema externo que no controlas, traduciendo entre ambos, para que los cambios del externo no corrompan lo interno.
+
+CASO DEL DOCENTE (BomERP + SUNAT)
+BomERP tiene su propia manera de guardar una venta, pero SUNAT exige un formato específico llamado UBL 2.1 XML.
+
+EN VIERNES CRM V1
+Keycloak tiene su propia manera de representar identidad y roles, pero Spring Security exige autoridades con prefijo ROLE_ y un principal estable.
+
+LOS TRES VERBOS, CON EVIDENCIA
+- ISOLATE  : ningún servicio ni entidad lee claims crudos de Keycloak; el dominio solo conoce RolUsuario.
+- TRANSLATE: realm_access.roles (lista en un map) -> SimpleGrantedAuthority("ROLE_ADMIN"); preferred_username -> principal de sesión. [converter:47-71, 39-42]
+- ABSORB   : descarta default-roles*, offline_access, uma_authorization; normaliza a mayúsculas; fallback a sub si falta preferred_username. [converter:62, 64-67]
+
+ADAPTADOR vs ACL  (no confundir)
+- Adapter  = frontera contra tecnología interna propia. Ej: PropuestaPersistenceAdapter.toEntity / toDomain
+- ACL      = frontera contra sistema externo que no controlas. Ej: KeycloakJwtAuthenticationConverter
+
+BRECHA DETECTADA
+El ACL traduce el formato pero no reconcilia el dato. Conviven dos fuentes de verdad del rol: el claim del token (que autoriza) y CRM_USUARIOS.ROL (que solo se lee). Pueden divergir sin que nada lo advierta.
+Además, si el perfil "keycloak" no está activo, no existe ninguna SecurityFilterChain y el control de acceso desaparece por completo.
+
+LÍMITE HONESTO
+La traducción es unidireccional hacia el modelo de Spring Security, no hacia un modelo de identidad propio del dominio.
+
+FUENTES: KeycloakJwtAuthenticationConverter.java:47-71 · RolUsuario.java:3 · KeycloakSecurityConfig.java:36`,
+
+events:
+`PATRÓN 02 · DOMAIN EVENTS   [◐ BRECHA — 0 publishers]
+
+DEFINICIÓN
+Un aviso que comunica que ocurrió algo importante en el sistema, para que otros módulos reaccionen sin que el emisor conozca a los receptores.
+
+CASO DEL DOCENTE (BomERP)
+Al registrar una venta se emite VentaRegistrada. Inventario actualiza existencias, Reportes registra la operación, IA analiza. El módulo de ventas no sabe quién recibe el aviso.
+
+EN VIERNES CRM V1 — HOY
+Se aprueba una propuesta y PropuestaService.aprobar() cambia el estado y termina. No crea cliente, no genera actividad de cierre, no avisa al vendedor, no refresca el dashboard.
+Medido: ApplicationEventPublisher = 0 · @EventListener = 0 · @TransactionalEventListener = 0
+
+EL HALLAZGO
+Spring Modulith 2.0.7 está INSTALADO Y SIN USAR. pom.xml:32 define la versión y hay cuatro artefactos: starter-core (56-59), actuator (73-77), starter-test (94-98), docs (99-103). Esa librería aporta @ApplicationModuleListener y el publication outbox transaccional.
+
+CATÁLOGO DE EVENTOS PROPUESTOS
+- PropuestaAprobadaEvent    -> Mensajería · Dashboard · RelationshipMap · Actividades (tarea de cierre)
+- OportunidadGanadaEvent    -> Clientes (cierra el hueco "no hay GANADA -> cliente")
+- LeadCalificadoEvent       -> Actividades (crea la tarea de seguimiento)
+- ClienteDesactivadoEvent   -> Oportunidades (bloquea nuevas altas)
+
+ACOPLAMIENTOS QUE SUSTITUYE
+- RelationshipMapService depende de 6 módulos por llamada directa [líneas 40-44]
+- RelacionValidationAdapter y PropuestaRelacionValidationAdapter usan repositorios Spring Data ajenos en vez de puertos
+
+CONEXIÓN CON LA SECCIÓN 5
+Observer fue clasificado [C] Oportunidad en el catálogo GRASP/GoF. Esta es su solución concreta y la librería que ya existe para implementarla.
+
+FUENTES: pom.xml:32,56-59,73-77 · PropuestaService.java:124-130`,
+
+breaker:
+`PATRÓN 03 · CIRCUIT BREAKER   [○ NO APLICA HOY · 1 riesgo real]
+
+DEFINICIÓN
+Deja de insistir contra un servicio que está fallando: tras un umbral de fallos corta el circuito y responde rápido, para reabrir la prueba más tarde en vez de saturar al dependiente.
+
+CASO DEL DOCENTE (BomERP + SUNAT)
+SUNAT no responde al validar el comprobante. Sin protección cada venta queda esperando, se agotan los hilos y el sistema entero cae por culpa de un tercero lento.
+
+EN VIERNES CRM V1
+No existe ninguna llamada saliente que proteger. Medido: RestTemplate = 0 · WebClient = 0 · HttpClient = 0 · Feign = 0 · Resilience4j = 0.
+
+CANDIDATO A — RIESGO PRESENTE (frontend)
+mensajeria.service.ts:11 define intervaloMs = 5000 y :44 lo programa con setInterval(() => this.poll(), ...). Sin backoff exponencial, sin contador de fallos, sin corte. Si el backend cae, cada pestaña abierta golpea GET /mensajeria cada 5 segundos indefinidamente.
+
+CANDIDATO B — NACE AL CERRAR LA BRECHA DE UC02
+"Crear usuario" escribe solo CRM_USUARIOS y nunca llama a la API de administración de Keycloak (UsuarioService.crear:50-61). El usuario creado no puede iniciar sesión. Arreglarlo introduce la primera llamada saliente del sistema, y ahí el breaker pasa de opcional a obligatorio.
+
+CONFIGURACIÓN PROPUESTA
+- CLOSED    : ventana de 20 llamadas, umbral 50% de fallo. El alta crea en BD y aprovisiona el realm.
+- OPEN      : 30 s. La creación NO se pierde: encola la tarea de aprovisionamiento y responde 202 Accepted.
+- HALF_OPEN : 3 llamadas de prueba sobre los pendientes; si pasan, cierra el circuito.
+
+CANDIDATO C — DISPONIBILIDAD DEL PROPIO ACL
+Keycloak se valida contra jwk-set-uri. Si cae y la caché de JWKS expira, TODAS las peticiones fallan. No es un caso de negocio: es la dependencia externa real del sistema.
+
+FUENTES: mensajeria.service.ts:11,44 · UsuarioService.java:50-61 · application-keycloak.yml:6-9`,
+
+saga:
+`PATRÓN 04 · SAGA   [○ NO APLICA HOY · caso candidato identificado]
+
+DEFINICIÓN
+Secuencia de transacciones locales donde cada paso tiene una COMPENSACIÓN: si un paso falla, se revierten en orden inverso los ya completados. Es la alternativa al ACID distribuido.
+
+CORRECCIÓN AL MATERIAL DEL DOCENTE
+La lámina dice: reunir boletas -> enviar resumen -> SUNAT devuelve ticket -> consultar estado -> "si rechaza, revisar, corregir y preparar un nuevo resumen". Eso es REINTENTO de un envío idempotente, no una Saga. La Saga se define por revertir el paso ya confirmado, no por repetir el intento.
+Versión corregida del mismo caso: reservar inventario -> emitir comprobante -> descontar stock; si SUNAT rechaza se compensa anulando el comprobante y liberando la reserva.
+
+CASO EQUIVALENTE EN VIERNES CRM
+Convertir Lead en Oportunidad — 5 pasos, 4 compensaciones. Es además el eslabón roto del embudo: el literal CONVERTIDO de EstadoLead no lo asigna ningún código (grep convertir|conversion = 0).
+
+PASOS                          COMPENSACIONES
+1 Crear cliente desde el lead   C1 Eliminar cliente (solo si fue de alta nueva)
+2 Crear oportunidad             C2 Eliminar la oportunidad creada
+3 Migrar contactos del lead     C3 Desvincular contactos migrados
+4 Marcar lead CONVERTIDO        C4 Devolver el lead a CALIFICADO
+5 Desasociar de campañas            
+
+VARIANTE A — ORQUESTADA
+LeadConversionSaga en el módulo leads. Un coordinador ejecuta paso a paso y conoce todas las compensaciones.
++ Control total y estado visible.   - Punto único de fallo y de acoplamiento.
+
+VARIANTE B — COREOGRAFIADA
+LeadConvertidoEvent -> MigrarContactosListener -> DesasociarCampaniaListener. Sin coordinador.
++ Bajo acoplamiento.   - Cada suscriptor necesita su compensación propia, y EXIGE Domain Events, que hoy no existen.
+
+POR QUÉ HOY NO HACE FALTA
+Las 13 anotaciones @Transactional del backend viven dentro de una sola base de datos Oracle. Una transacción local ya garantiza atomicidad. La Saga resuelve el ACID distribuido y aquí no hay distribución: introducirla sería complejidad sin beneficio.
+
+CONDICIÓN QUE LA VUELVE NECESARIA
+- Implementar la conversión de lead (hoy no existe)
+- Separar los módulos en servicios con BD propia (hoy es monolito modular)
+- Añadir facturación o inventario (hoy no existe ese módulo)
+
+FUENTES: EstadoLead.java:4 · 13 archivos con @Transactional · grep Saga = 0`
+};
+
+const CHAIN =
+`CADERA DE DEPENDENCIA ENTRE LOS CUATRO PATRONES
+
+ACL  ->  Domain Events  ->  Saga  ->  Circuit Breaker
+
+- Sin ACL no hay modelo de dominio limpio que publicar.
+- Sin Domain Events la Saga solo puede ser orquestada.
+- El Circuit Breaker protege cada paso que salga del sistema.
+
+Estado en Viernes CRM V1:
+  ACL ............ ● existe (Keycloak -> Spring Security)
+  Domain Events .. ◐ Modulith 2.0.7 comprado en el pom, 0 líneas de código
+  Saga ........... ○ no aplica: 13 transacciones locales en una sola BD Oracle
+  Breaker ........ ○ no aplica: 0 llamadas salientes (1 riesgo real en el polling)
+
+Presentarlos como cadena demuestra comprensión del conjunto, y explica por qué
+solo el primer eslabón está resuelto.`;
+
+function copyText(t,msg){
+  const done=()=>showToast(msg);
+  if(navigator.clipboard&&window.isSecureContext) navigator.clipboard.writeText(t).then(done).catch(()=>fallback(t,done));
+  else fallback(t,done);
+}
+function fallback(t,done){
+  const ta=document.createElement('textarea');
+  ta.value=t; ta.setAttribute('readonly',''); ta.style.cssText='position:absolute;left:-9999px';
+  document.body.appendChild(ta); ta.select();
+  try{document.execCommand('copy');done();}
+  catch(e){showToast('✗ No se pudo copiar — selecciona el texto manualmente');}
+  ta.remove();
+}
+let toastTimer;
+function showToast(m){
+  const el=document.getElementById('toast');
+  el.textContent=m; el.classList.add('show');
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove('show'),2400);
+}
+document.querySelectorAll('.cbtn').forEach(b=>{
+  b.onclick=()=>copyText(TXT[b.dataset.k],`✓ ${b.dataset.k} copiado para Miro`);
+});
+</script>
+</body>
+</html>

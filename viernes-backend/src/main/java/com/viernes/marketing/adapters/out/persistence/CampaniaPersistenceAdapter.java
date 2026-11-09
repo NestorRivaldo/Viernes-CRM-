@@ -5,6 +5,7 @@ import com.viernes.marketing.adapters.out.persistence.repository.CampaniaSpringD
 import com.viernes.marketing.application.port.out.CampaniaPersistencePort;
 import com.viernes.marketing.domain.Campania;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +18,7 @@ public class CampaniaPersistenceAdapter implements CampaniaPersistencePort {
 
     @Override
     public List<Campania> findAll() {
-        return repository.findAll().stream().map(this::toDomain).toList();
+        return repository.findAll(Sort.by(Sort.Direction.ASC, "id")).stream().map(this::toDomain).toList();
     }
 
     @Override

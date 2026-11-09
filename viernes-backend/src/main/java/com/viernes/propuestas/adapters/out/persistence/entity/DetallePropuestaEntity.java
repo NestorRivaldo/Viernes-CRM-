@@ -14,6 +14,9 @@ public class DetallePropuestaEntity {
     @Column(name = "ID")
     private Long id;
 
+    @Column(name = "ID_PRODUCTO")
+    private Long idProducto;
+
     @Column(name = "DESCRIPCION", nullable = false, length = 500)
     private String descripcion;
 

@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mapa Interactivo de Módulos V1 — Viernes CRM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#090d16; --surface:#111726; --surface2:#172033; --border:#232f48;
+  --text:#f1f5f9; --muted:#94a3b8; --subtle:#64748b;
+  --accent:#3b82f6; --accent-soft:rgba(59,130,246,.12);
+  --green:#10b981; --green-soft:rgba(16,185,129,.12);
+  --purple:#a855f7; --purple-soft:rgba(168,85,247,.12);
+  --amber:#f59e0b; --amber-soft:rgba(245,158,11,.12);
+  --cyan:#06b6d4; --cyan-soft:rgba(6,182,212,.12);
+  --rose:#f43f5e; --rose-soft:rgba(244,63,94,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;padding:40px 20px 80px;
+  background-image:radial-gradient(circle at 10% 10%,rgba(59,130,246,.08) 0%,transparent 45%),radial-gradient(circle at 90% 90%,rgba(168,85,247,.06) 0%,transparent 45%);background-attachment:fixed}
+.container{max-width:1200px;margin:0 auto}
+.top-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+.back-link{display:inline-flex;align-items:center;gap:8px;color:#60a5fa;text-decoration:none;font-size:13.5px;font-weight:600}
+header{text-align:center;margin-bottom:44px}
+.brand-badge{display:inline-flex;align-items:center;gap:8px;background:var(--accent-soft);color:#60a5fa;border:1px solid rgba(59,130,246,.3);padding:6px 16px;border-radius:30px;font-size:13px;font-weight:700;margin-bottom:18px;letter-spacing:.04em}
+h1{font-size:38px;font-weight:800;letter-spacing:-.025em;background:linear-gradient(135deg,#fff 30%,#93c5fd 80%,#38bdf8 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:14px;line-height:1.2}
+.subtitle{font-size:16.5px;color:var(--muted);max-width:860px;margin:0 auto 26px}
+.pills{display:flex;justify-content:center;flex-wrap:wrap;gap:10px}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;font-size:12.5px;font-weight:600}
+.p-green{background:var(--green-soft);color:#34d399;border:1px solid rgba(16,185,129,.3)}
+.p-blue{background:var(--accent-soft);color:#93c5fd;border:1px solid rgba(59,130,246,.3)}
+.p-purple{background:var(--purple-soft);color:#c084fc;border:1px solid rgba(168,85,247,.3)}
+.p-amber{background:var(--amber-soft);color:#fbbf24;border:1px solid rgba(245,158,11,.3)}
+.banner{display:flex;gap:14px;align-items:flex-start;background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:12px;padding:16px 18px;margin:0 0 30px;font-size:14px}
+.banner .bi{font-size:20px;line-height:1}
+.banner b{color:#93c5fd}
+h2{font-size:23px;font-weight:700;color:#fff;margin:48px 0 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);padding-bottom:12px}
+h2 .num{display:flex;align-items:center;justify-content:center;min-width:34px;height:34px;border-radius:8px;background:var(--accent-soft);color:#60a5fa;font-size:15px;font-family:'JetBrains Mono',monospace}
+h3{font-size:16.5px;font-weight:600;color:#e2e8f0;margin:24px 0 10px}
+p{margin:10px 0;color:#cbd5e1;font-size:14.5px}
+.sec-intro{color:var(--muted);font-size:14.5px;margin-bottom:16px}
+code{font-family:'JetBrains Mono',Consolas,monospace;font-size:12.5px;background:var(--surface2);border:1px solid var(--border);padding:1px 6px;border-radius:5px;color:#a5f3fc}
+.anchor{font-family:'JetBrains Mono',Consolas,monospace;font-size:12px;background:rgba(59,130,246,.1);color:#93c5fd;border:1px solid rgba(59,130,246,.2);padding:1px 7px;border-radius:6px;white-space:nowrap;display:inline-block;margin:1px 0}
+.note{border-radius:10px;padding:13px 16px;margin:16px 0;font-size:13.5px;border:1px solid}
+.note.info{background:var(--accent-soft);border-color:rgba(59,130,246,.3);color:#bfdbfe}
+.note.warn{background:var(--amber-soft);border-color:rgba(245,158,11,.3);color:#fde68a}
+.note.ok{background:var(--green-soft);border-color:rgba(16,185,129,.3);color:#a7f3d0}
+.badge{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.05em;padding:2px 8px;border-radius:5px;vertical-align:middle}
+.b-gap{background:var(--rose-soft);color:#fda4af;border:1px solid rgba(244,63,94,.35)}
+.b-ok{background:var(--green-soft);color:#6ee7b7;border:1px solid rgba(16,185,129,.35)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:16px 0}
+.mini{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+.mini .k{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--subtle)}
+.mini .v{font-size:15px;font-weight:600;color:#e2e8f0;margin:4px 0}
+.mini p{font-size:13px;margin:6px 0 0}
+.svgwrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin:0;overflow-x:auto}
+.svgwrap svg{display:block;margin:0 auto;max-width:100%}
+.legend{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:12px;font-size:12px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.dot{width:10px;height:10px;border-radius:3px;display:inline-block}
+.btn{background:var(--accent);color:#fff;border:none;border-radius:9px;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn.sec{background:var(--surface2);color:#e2e8f0;border:1px solid var(--border)}
+.btn.ok{background:var(--green)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.copy-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:14px 0}
+.copy-hint{color:var(--muted);font-size:13px}
+footer{margin-top:50px;padding-top:20px;border-top:1px solid var(--border);color:var(--subtle);font-size:12.5px;text-align:center}
+/* ---- mapa interactivo ---- */
+.mm-controls{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:18px 0}
+.mm-field{display:inline-flex;gap:8px;align-items:center;color:var(--muted);font-size:13px;font-weight:500}
+.mm-controls select{background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-family:inherit;font-size:13.5px;cursor:pointer}
+.mm-controls input[type=range]{accent-color:var(--accent);width:150px;cursor:pointer}
+.mm-status{color:var(--muted);font-size:13.5px;margin:6px 0 16px;min-height:22px}
+.mm-status b{color:#93c5fd}
+.mm-stage{display:grid;grid-template-columns:minmax(280px,400px) 1fr;gap:22px;align-items:start;margin:16px 0}
+@media(max-width:820px){.mm-stage{grid-template-columns:1fr}}
+#mm-svg{width:100%;height:auto}
+.mm-seg{stroke:var(--border);stroke-width:2;fill:none}
+.mm-seg-done{stroke:var(--accent)}
+.mm-seg-ret{stroke:var(--purple);stroke-dasharray:5 5}
+.mm-seg-on{stroke:var(--purple)}
+.mm-conn{stroke:var(--border);stroke-width:1}
+.mm-box{fill:var(--surface);stroke:var(--border);stroke-width:1}
+.mm-box-done{stroke:#334155}
+.mm-box-active{fill:var(--surface2);stroke:var(--accent);stroke-width:2}
+.mm-box-ret.mm-box-active{stroke:var(--purple)}
+.mm-title{fill:var(--text);font-family:'Inter',sans-serif;font-size:13px;font-weight:600}
+.mm-sub{fill:var(--muted);font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:400}
+.mm-dot{fill:var(--surface2);stroke:var(--border);stroke-width:1}
+.mm-dot-done{fill:var(--accent);stroke:var(--accent)}
+.mm-dot-ret{fill:var(--purple);stroke:var(--purple)}
+#mm-token{transition:transform .6s ease,opacity .3s ease}
+.mm-token-core{fill:#60a5fa}
+.mm-token-ring{fill:none;stroke:#60a5fa;stroke-width:2;opacity:.35}
+.mm-arr-mut{fill:var(--subtle)}
+.mm-arr-acc{fill:#60a5fa}
+.mm-arr-ret{fill:#c084fc}
+.mm-log{list-style:none;display:flex;flex-direction:column;gap:10px}
+.mm-log-item{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--border);border-radius:10px;padding:11px 14px}
+.mm-log-active{background:var(--surface2);border-left-color:var(--accent)}
+.mm-log-num{flex:0 0 28px;height:28px;border-radius:50%;background:var(--accent-soft);border:1px solid rgba(59,130,246,.4);color:#60a5fa;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:600}
+.mm-log-active .mm-log-num{background:var(--accent);color:#fff;border-color:var(--accent)}
+.mm-log-body{display:flex;flex-direction:column;gap:3px;min-width:0}
+.mm-log-title{font-size:14px;font-weight:600;color:#e2e8f0;overflow-wrap:anywhere}
+.mm-anchor{font-family:'JetBrains Mono',Consolas,monospace;font-size:11.5px;background:rgba(59,130,246,.1);color:#93c5fd;border:1px solid rgba(59,130,246,.2);padding:1px 7px;border-radius:6px;word-break:break-all;display:inline-block;margin:1px 0}
+.mm-log-detail{color:var(--muted);font-size:13px}
+@media (prefers-reduced-motion: reduce){#mm-token{transition:opacity .2s ease}}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="top-nav">
+    <a class="back-link" href="index.html">&#8592; Portal de informes</a>
+    <span style="color:var(--subtle);font-size:12.5px;font-family:'JetBrains Mono',monospace">VIERNES CRM V1 · backend</span>
+  </div>
+
+  <header>
+    <div class="brand-badge">&#9670; VIERNES CRM V1</div>
+    <h1>Mapa Interactivo de Módulos</h1>
+    <p class="subtitle">Un mapa estilo Scratch: eliges un escenario, <b>envías una señal</b> y ves el dato recorrer las capas del hexágono paso a paso &mdash; controller, puertos, servicio, adapters y destino &mdash; con la respuesta de vuelta. Cada salto cita su <code>archivo:línea</code> real.</p>
+    <div class="pills">
+      <span class="pill p-blue">3 escenarios</span>
+      <span class="pill p-purple">Arquitectura hexagonal</span>
+      <span class="pill p-green">Señal &#8594; recorrido del dato</span>
+      <span class="pill p-amber">archivo:línea verificado</span>
+    </div>
+  </header>
+
+  <div class="banner">
+    <span class="bi">&#127891;</span>
+    <div><b>Docente &#8596; Viernes.</b> La idea de clase de &laquo;enviar una señal y observar cómo viaja el dato&raquo; (como en Scratch) se traduce aquí en una petición HTTP real atravesando <code>adapters/in/web &#8594; application/port/in &#8594; service &#8594; application/port/out &#8594; adapters/out &#8594; Oracle/APIsPERU/otro módulo</code>. El mapa no es decoración: cada nodo es una clase del código y cada paso lleva su anclaje para que lo defiendas mostrando el archivo.</div>
+  </div>
+
+  <div class="note info"><b>Cómo leer las rutas.</b> Todos los anclajes son relativos a <code>viernes-backend/src/main/java/com/viernes/</code>. Ejemplo: <span class="anchor">actividades/application/service/ActividadService.java:63</span> = ese archivo, línea 63. Árbol canónico: <code>E:\Viernes\Viernes</code>.</div>
+
+  <!-- ============ 01 ============ -->
+  <h2 id="s01"><span class="num">01</span> Mapa interactivo</h2>
+  <p class="sec-intro">Elige un escenario y pulsa <b>Enviar señal</b> (recorrido automático), <b>Paso</b> (avance manual) o arrastra el deslizador <b>Señal</b> para situarte en cualquier salto. El pulso azul es la ida (petición); el púrpura discontinuo, la vuelta (respuesta). La lista de la derecha se ilumina en el paso activo y muestra qué ocurre y dónde.</p>
+
+  <div class="mm-controls">
+    <label class="mm-field" for="mm-scenario">Escenario
+      <select id="mm-scenario">
+        <option value="0">Crear actividad</option>
+        <option value="1">Consultar DNI (APIsPERU)</option>
+        <option value="2">Agregar participante</option>
+      </select>
+    </label>
+    <button class="btn" id="mm-send" type="button">Enviar señal</button>
+    <button class="btn sec" id="mm-step" type="button">Paso</button>
+    <button class="btn sec" id="mm-reset" type="button">Reiniciar</button>
+    <label class="mm-field" for="mm-scrub">Señal
+      <input id="mm-scrub" type="range" min="0" max="9" step="1" value="0">
+    </label>
+  </div>
+  <p class="mm-status" id="mm-status" aria-live="polite">Pulsa «Enviar señal».</p>
+
+  <div class="mm-stage">
+    <div>
+      <div class="svgwrap">
+        <svg id="mm-svg" viewBox="0 0 340 632" role="img" aria-label="Mapa del recorrido de la señal por capas">
+          <title>Recorrido de la señal por las capas del módulo</title>
+          <defs>
+            <marker id="mm-arr-mut" markerWidth="8" markerHeight="8" refX="5.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M1 1 L6 3 L1 5" class="mm-arr-mut"></path></marker>
+            <marker id="mm-arr-acc" markerWidth="8" markerHeight="8" refX="5.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M1 1 L6 3 L1 5" class="mm-arr-acc"></path></marker>
+            <marker id="mm-arr-ret" markerWidth="8" markerHeight="8" refX="5.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M1 1 L6 3 L1 5" class="mm-arr-ret"></path></marker>
+          </defs>
+          <g id="mm-scene"></g>
+          <g id="mm-token" style="transform:translate(24px,37px);opacity:0">
+            <circle class="mm-token-ring" cx="0" cy="0" r="12"></circle>
+            <circle class="mm-token-core" cx="0" cy="0" r="7"></circle>
+          </g>
+        </svg>
+      </div>
+      <div class="legend">
+        <span><i class="dot" style="background:#3b82f6"></i> Petición (ida)</span>
+        <span><i class="dot" style="background:#a855f7"></i> Respuesta (vuelta)</span>
+        <span><i class="dot" style="background:#232f48"></i> Aún no recorrido</span>
+      </div>
+    </div>
+    <ol class="mm-log" id="mm-log"></ol>
+  </div>
+
+  <!-- ============ 02 ============ -->
+  <h2 id="s02"><span class="num">02</span> Lo que demuestra cada recorrido</h2>
+  <p class="sec-intro">Los tres escenarios no son arbitrarios: cada uno prueba una pieza distinta de la arquitectura que la sustentación exige defender.</p>
+  <div class="grid">
+    <div class="mini">
+      <div class="k">Escenario A · Crear actividad</div>
+      <div class="v">El hexágono completo</div>
+      <p>La petición entra por <code>in/web</code>, cruza <code>port/in &#8594; service &#8594; port/out</code> y sale por adapters a Oracle y al módulo etiquetas; vuelve como DTO (<code>toResponse</code>), nunca como entidad. <span class="badge b-ok">HEXAGONAL</span></p>
+      <p><span class="badge b-gap">BRECHA</span> Mapeo manual: MapStruct declarado en el pom pero sin uso; <code>RelacionValidationAdapter</code> acoplado a repos de módulos OPEN.</p>
+    </div>
+    <div class="mini">
+      <div class="k">Escenario B · Consultar DNI</div>
+      <div class="v">Integración externa segura</div>
+      <p>Token solo en backend (variable de entorno), enviado como query param; <code>@Cacheable</code> (Caffeine) evita consultar por cada tecla; rate-limit por usuario en el controller. <span class="badge b-ok">SEGURO</span></p>
+      <p><span class="badge b-gap">BRECHA</span> Falta un cap diario global de consultas al plan free (1.000/mes); hoy el límite es por usuario/ventana.</p>
+    </div>
+    <div class="mini">
+      <div class="k">Escenario C · Agregar participante</div>
+      <div class="v">Cruce entre módulos</div>
+      <p><code>ContactoQueryAdapter</code> consulta contactos usando solo el API público de clientes (<code>ManageClienteUseCase</code>), sin tocar sus repositorios: respeta Spring Modulith. <span class="badge b-ok">MODULITH</span></p>
+      <p><span class="badge b-gap">BRECHA</span> Ese camino hace <code>listar().flatMap(...)</code> (recorre todos los clientes): correcto pero ineficiente; falta un obtenerContacto(id) en el puerto público.</p>
+    </div>
+  </div>
+  <div class="note ok"><b>Regla de dependencia que verás en los tres:</b> <code>adapters &#8594; application &#8594; domain</code>. El puerto <code>in</code> lo implementa el service y lo llama el controller; el puerto <code>out</code> lo implementan los adapters y lo llama el service. Esa inversión es lo que hace el núcleo testeable con mocks.</div>
+
+  <!-- ============ MIRO ============ -->
+  <h2 id="miro"><span class="num">&#9635;</span> Copiar outline para Miro</h2>
+  <p class="sec-intro">Genera un outline de texto (los 3 recorridos, la regla hexagonal y las brechas) para pegarlo como nota o índice en un board de Miro.</p>
+  <div class="copy-row">
+    <button class="btn" id="copyMiroBtn" type="button">Copiar para Miro</button>
+    <span class="copy-hint" id="copyMiroHint">Copia el outline del mapa interactivo de módulos.</span>
+  </div>
+
+  <footer>VIERNES CRM V1 · Mapa interactivo de módulos · generado sobre el código real de E:\Viernes\Viernes · anclajes archivo:línea verificados.</footer>
+</div>
+
+<script>
+(function(){
+  var NS='http://www.w3.org/2000/svg';
+  var TOP=14,ROW=62,BOXH=46,RAILX=24,BOXX=44,BOXW=276;
+  var SCENARIOS=[
+    {label:'Crear actividad (POST /api/v1/actividades)',hops:[
+      {title:'Cliente HTTP',sub:'mundo exterior',anchor:'POST /api/v1/actividades',detail:'Angular o Postman envía ActividadRequest (título, fecha, tipo, relaciones, etiquetaIds).',phase:'forward'},
+      {title:'ActividadController.crear()',sub:'in/web · L27',anchor:'actividades/adapters/in/web/ActividadController.java:27',detail:'@PostMapping :26; @Valid @RequestBody y delega useCase.crear(request) :28. Sin lógica de negocio.',phase:'forward'},
+      {title:'ManageActividadUseCase',sub:'port/in · L10',anchor:'actividades/application/port/in/ManageActividadUseCase.java:10',detail:'Puerto de entrada (interfaz). El controller depende de la abstracción, no del servicio concreto.',phase:'forward'},
+      {title:'ActividadService.crear()',sub:'service · L63',anchor:'actividades/application/service/ActividadService.java:63',detail:'@Service @Transactional. Orquesta validarRelaciones :64, etiquetas (máx 8 :39), save :80, sincronizarEtiquetas :81 y toResponse :382.',phase:'forward'},
+      {title:'RelacionValidationAdapter',sub:'out/persistence · L37',anchor:'actividades/adapters/out/persistence/RelacionValidationAdapter.java:37',detail:'Tras RelacionValidationPort. Cliente/Lead/Oportunidad vía repos de módulos OPEN :20; usuario vía UsuariosApi (CLOSED) :52. Si falta → 404.',phase:'forward',gap:true},
+      {title:'ActividadPersistenceAdapter.save()',sub:'out/persistence · L26',anchor:'actividades/adapters/out/persistence/ActividadPersistenceAdapter.java:26',detail:'Tras ActividadPersistencePort. toEntity :27 → repository.save :28 → toDomain :29. Mapeo manual (MapStruct declarado sin uso).',phase:'forward',gap:true},
+      {title:'Oracle · CRM_ACTIVIDADES',sub:'base de datos',anchor:'actividades/adapters/out/persistence/entity/ActividadEntity.java:9',detail:'@Table(name="CRM_ACTIVIDADES"). Hibernate persiste la fila; esquema BOM_VENTAS, ddl-auto update.',phase:'forward'},
+      {title:'ActividadEtiquetaPersistenceAdapter',sub:'out/persistence · L43',anchor:'actividades/adapters/out/persistence/ActividadEtiquetaPersistenceAdapter.java:43',detail:'reemplazarEtiquetas(idActividad, ids) :43 vincula la actividad con el módulo etiquetas (sincronizarEtiquetas :81).',phase:'forward'},
+      {title:'Service.toResponse()',sub:'service · L382',anchor:'actividades/application/service/ActividadService.java:382',detail:'Arma ActividadResponse y calcula esVencida (PENDIENTE + fecha pasada). Devuelve un DTO, nunca la entidad.',phase:'return'},
+      {title:'Controller → HTTP 201',sub:'in/web · L29',anchor:'actividades/adapters/in/web/ActividadController.java:29',detail:'new ResponseEntity<>(response, HttpStatus.CREATED) :29. El JSON vuelve al cliente. Fin de ida y vuelta.',phase:'return'}
+    ]},
+    {label:'Consultar DNI (clientes → APIsPERU)',hops:[
+      {title:'Cliente HTTP',sub:'mundo exterior',anchor:'GET /api/v1/clientes/documento/DNI/{numero}',detail:'El frontend consulta un DNI/RUC. El token de APIsPERU nunca viaja en Angular.',phase:'forward'},
+      {title:'ClienteController.consultarDocumento()',sub:'in/web · L45',anchor:'clientes/adapters/in/web/ClienteController.java:45',detail:'@GetMapping /documento/{tipo}/{numero} :44. rateLimiter.verificar(usuario) :49 (máx 20/60s).',phase:'forward'},
+      {title:'ManageClienteUseCase',sub:'port/in · L22',anchor:'clientes/application/port/in/ManageClienteUseCase.java:22',detail:'consultarDocumento(tipo, numero) :22. Puerto de entrada del módulo clientes.',phase:'forward'},
+      {title:'ClienteService.consultarDocumento()',sub:'service · L67',anchor:'clientes/application/service/ClienteService.java:67',detail:'validarDocumento :68 (DNI 8 dígitos :216 / RUC 11 :219); si es inválido no llama a la API. documentoLookupPort.consultar :73.',phase:'forward'},
+      {title:'ApisPeruDocumentoAdapter',sub:'out/external · L28',anchor:'clientes/adapters/out/external/ApisPeruDocumentoAdapter.java:28',detail:'Implementa DocumentoLookupPort. @Cacheable :51 (Caffeine, caché positiva y negativa): no consulta en cada tecla. RestClient :42. Falta cap diario global (backlog).',phase:'forward',gap:true},
+      {title:'APIsPERU (externo)',sub:'HTTPS · externo',anchor:'dniruc.apisperu.com/api/v1/dni/{numero}',detail:'Token como query param :89 (DNI) / :128 (RUC), en variable de entorno y solo backend. Cada consulta real = 1/1000 del plan free.',phase:'forward'},
+      {title:'Adapter → DocumentoConsultado',sub:'out/external · L172',anchor:'clientes/adapters/out/external/ApisPeruDocumentoAdapter.java:172',detail:'Traduce errores (401 token :175) a excepciones del dominio; la respuesta queda cacheada para la próxima.',phase:'return'},
+      {title:'Service.toDocumentoResponse()',sub:'service · L237',anchor:'clientes/application/service/ClienteService.java:237',detail:'Arma DocumentoConsultaResponse :74/:237 con los datos consultados.',phase:'return'},
+      {title:'Controller → HTTP 200',sub:'in/web · L45',anchor:'clientes/adapters/in/web/ClienteController.java:45',detail:'ResponseEntity.ok(respuesta). El frontend muestra nombres / razón social.',phase:'return'}
+    ]},
+    {label:'Agregar participante (actividades → clientes)',hops:[
+      {title:'Cliente HTTP',sub:'mundo exterior',anchor:'POST /api/v1/actividades/{id}/participantes',detail:'Se envía { contactoId } para vincular un contacto de un cliente a la actividad.',phase:'forward'},
+      {title:'ActividadController.agregarParticipante()',sub:'in/web · L95',anchor:'actividades/adapters/in/web/ActividadController.java:95',detail:'@PostMapping /{id}/participantes :94. useCase.agregarParticipante(id, contactoId) :98.',phase:'forward'},
+      {title:'ManageActividadUseCase',sub:'port/in · L10',anchor:'actividades/application/port/in/ManageActividadUseCase.java:10',detail:'Puerto de entrada: agregarParticipante(actividadId, contactoId).',phase:'forward'},
+      {title:'ActividadService.agregarParticipante()',sub:'service · L196',anchor:'actividades/application/service/ActividadService.java:196',detail:'Verifica la actividad; contactoQueryPort.buscarPorId :200. Contacto inexistente → 404; duplicado → IllegalArgumentException.',phase:'forward'},
+      {title:'ContactoQueryAdapter',sub:'out/persistence · L31',anchor:'actividades/adapters/out/persistence/ContactoQueryAdapter.java:31',detail:'Tras ContactoQueryPort. No toca repos de clientes: ManageClienteUseCase.listar().flatMap(contactos).filter :31 (API pública, pero recorre todos los clientes).',phase:'forward',gap:true},
+      {title:'Módulo clientes (API pública)',sub:'otro módulo',anchor:'clientes/application/port/in/ManageClienteUseCase.java:13',detail:'listar() :13 expone ClienteResponse con sus contactos. actividades consume solo el puerto público (Spring Modulith).',phase:'forward'},
+      {title:'ActividadParticipantePersistenceAdapter.save()',sub:'out/persistence · L23',anchor:'actividades/adapters/out/persistence/ActividadParticipantePersistenceAdapter.java:23',detail:'De vuelta en actividades: guarda el vínculo (idActividad, idContacto, creadoEn) vía JPA → Oracle.',phase:'forward'},
+      {title:'Service.toParticipanteResponse()',sub:'service · L352',anchor:'actividades/application/service/ActividadService.java:352',detail:'Arma ParticipanteResponse con nombre y correo del contacto (llamado en :212).',phase:'return'},
+      {title:'Controller → HTTP 201',sub:'in/web · L99',anchor:'actividades/adapters/in/web/ActividadController.java:99',detail:'new ResponseEntity<>(response, HttpStatus.CREATED) :99. El contacto queda vinculado a la actividad.',phase:'return'}
+    ]}
+  ];
+  var sel=document.getElementById('mm-scenario');
+  var sendBtn=document.getElementById('mm-send');
+  var stepBtn=document.getElementById('mm-step');
+  var resetBtn=document.getElementById('mm-reset');
+  var scrub=document.getElementById('mm-scrub');
+  var statusEl=document.getElementById('mm-status');
+  var svg=document.getElementById('mm-svg');
+  var scene=document.getElementById('mm-scene');
+  var token=document.getElementById('mm-token');
+  var log=document.getElementById('mm-log');
+  var si=0,step=-1,playing=false,timer=null;
+  function hs(){return SCENARIOS[si].hops;}
+  function last(){return hs().length-1;}
+  function cy(i){return TOP+i*ROW+BOXH/2;}
+  function el(tag,attrs,cls){var e=document.createElementNS(NS,tag);if(cls){e.setAttribute('class',cls);}for(var k in attrs){if(Object.prototype.hasOwnProperty.call(attrs,k)){e.setAttribute(k,attrs[k]);}}return e;}
+  function stop(){playing=false;if(timer){clearInterval(timer);timer=null;}sendBtn.disabled=false;}
+  function build(){
+    while(scene.firstChild){scene.removeChild(scene.firstChild);}
+    var h=hs(),n=h.length,H=TOP+(n-1)*ROW+BOXH+14;
+    svg.setAttribute('viewBox','0 0 340 '+H);
+    for(var i=0;i<n-1;i++){
+      var ret=h[i+1].phase==='return';
+      var seg=el('line',{x1:RAILX,y1:cy(i)+7,x2:RAILX,y2:cy(i+1)-7,'marker-end':'url(#mm-arr-mut)'},'mm-seg'+(ret?' mm-seg-ret':''));
+      seg.setAttribute('data-seg',String(i));scene.appendChild(seg);
+    }
+    for(var j=0;j<n;j++){
+      var y=TOP+j*ROW,c=cy(j);
+      scene.appendChild(el('line',{x1:RAILX,y1:c,x2:BOXX,y2:c},'mm-conn'));
+      var box=el('rect',{x:BOXX,y:y,width:BOXW,height:BOXH,rx:8},'mm-box');box.setAttribute('data-box',String(j));scene.appendChild(box);
+      var lbl=h[j].title;if(lbl.length>34){lbl=lbl.slice(0,33)+'…';}
+      var t=el('text',{x:56,y:y+21},'mm-title');t.textContent=lbl;scene.appendChild(t);
+      var s=el('text',{x:56,y:y+37},'mm-sub');s.textContent=h[j].sub;scene.appendChild(s);
+      var dot=el('circle',{cx:RAILX,cy:c,r:5},'mm-dot');dot.setAttribute('data-dot',String(j));scene.appendChild(dot);
+    }
+  }
+  function buildLog(){
+    while(log.firstChild){log.removeChild(log.firstChild);}
+    var h=hs();
+    for(var i=0;i<h.length;i++){
+      var li=document.createElement('li');li.className='mm-log-item';
+      var num=document.createElement('span');num.className='mm-log-num';num.textContent=String(i+1);
+      var body=document.createElement('span');body.className='mm-log-body';
+      var ti=document.createElement('span');ti.className='mm-log-title';ti.textContent=h[i].title;
+      if(h[i].gap){ti.appendChild(document.createTextNode(' '));var bg=document.createElement('span');bg.className='badge b-gap';bg.textContent='BRECHA';ti.appendChild(bg);}
+      var an=document.createElement('span');an.className='mm-anchor';an.textContent=h[i].anchor;
+      var de=document.createElement('span');de.className='mm-log-detail';de.textContent=h[i].detail;
+      body.appendChild(ti);body.appendChild(an);body.appendChild(de);
+      li.appendChild(num);li.appendChild(body);log.appendChild(li);
+    }
+  }
+  function update(){
+    var h=hs(),n=h.length,i,j;
+    for(i=0;i<n-1;i++){
+      var seg=scene.querySelector('[data-seg="'+i+'"]');
+      var ret=h[i+1].phase==='return',traveled=step>=i+1;
+      seg.setAttribute('class','mm-seg'+(ret?' mm-seg-ret':'')+(traveled?(ret?' mm-seg-on':' mm-seg-done'):''));
+      seg.setAttribute('marker-end','url(#'+(ret?'mm-arr-ret':(traveled?'mm-arr-acc':'mm-arr-mut'))+')');
+      if(ret){seg.setAttribute('opacity',traveled?'1':'0.35');}else{seg.removeAttribute('opacity');}
+    }
+    for(j=0;j<n;j++){
+      var box=scene.querySelector('[data-box="'+j+'"]');
+      var dot=scene.querySelector('[data-dot="'+j+'"]');
+      var ret2=h[j].phase==='return',state=j===step?'active':(j<step?'done':'pending');
+      box.setAttribute('class','mm-box mm-box-'+state+(ret2&&state==='active'?' mm-box-ret':''));
+      dot.setAttribute('class','mm-dot'+(j<=step?(ret2?' mm-dot-ret':' mm-dot-done'):''));
+      if(j>step){box.setAttribute('opacity','0.5');}else{box.removeAttribute('opacity');}
+    }
+    var idx=step<0?0:step;
+    token.style.transform='translate('+RAILX+'px,'+cy(idx)+'px)';
+    token.style.opacity=step<0?'0':'1';
+    if(step<0){statusEl.textContent='Escenario: '+SCENARIOS[si].label+'. Pulsa «Enviar señal» o «Paso».';}
+    else{statusEl.textContent='Paso '+(step+1)+' de '+n+' — '+h[step].title;}
+    scrub.max=String(last());scrub.value=String(step<0?0:step);
+    stepBtn.disabled=step>=last();
+    var items=log.children;
+    for(var k=0;k<items.length;k++){
+      if(k===step){items[k].setAttribute('class','mm-log-item mm-log-active');items[k].setAttribute('aria-current','step');}
+      else{items[k].setAttribute('class','mm-log-item');items[k].removeAttribute('aria-current');}
+    }
+  }
+  function render(){stop();build();buildLog();step=-1;update();}
+  function advance(){if(step<last()){step++;update();}else{stop();}}
+  function send(){stop();step=0;update();playing=true;sendBtn.disabled=true;timer=setInterval(advance,950);}
+  function stepOnce(){stop();if(step<last()){step++;update();}}
+  function reset(){stop();step=-1;update();}
+  function jump(i){stop();step=i;update();}
+  sel.addEventListener('change',function(){si=parseInt(sel.value,10)||0;render();});
+  sendBtn.addEventListener('click',send);
+  stepBtn.addEventListener('click',stepOnce);
+  resetBtn.addEventListener('click',reset);
+  scrub.addEventListener('input',function(){jump(parseInt(scrub.value,10)||0);});
+  render();
+
+  /* ---- Miro ---- */
+  var miroMapa={
+    titulo:"VIERNES CRM V1 — Mapa Interactivo de Módulos",
+    secciones:[
+      "Mapa interactivo estilo Scratch: eliges escenario, envias la senal y un pulso recorre las capas; cada paso cita archivo:linea real. Ida = peticion (azul); vuelta = respuesta (purpura).",
+      "Escenario A - Crear actividad (POST /api/v1/actividades): Cliente HTTP -> ActividadController.crear:27 -> ManageActividadUseCase:10 -> ActividadService.crear:63 -> RelacionValidationAdapter:37 -> ActividadPersistenceAdapter.save:26 -> Oracle CRM_ACTIVIDADES -> ActividadEtiquetaPersistenceAdapter:43 -> toResponse:382 -> 201 CREATED.",
+      "Escenario B - Consultar DNI (clientes -> APIsPERU): GET /documento/{tipo}/{numero} -> ClienteController:45 (rateLimiter.verificar:49, 20/60s) -> ManageClienteUseCase:22 -> ClienteService:67 (validarDocumento:68, DNI 8 / RUC 11) -> ApisPeruDocumentoAdapter:28 (@Cacheable:51, token query param:89 solo backend) -> APIsPERU -> toDocumentoResponse:237 -> 200.",
+      "Escenario C - Agregar participante (actividades -> clientes): POST /{id}/participantes -> ActividadController:95 -> ManageActividadUseCase -> ActividadService.agregarParticipante:196 -> ContactoQueryAdapter:31 (ManageClienteUseCase.listar().flatMap, API publica) -> modulo clientes:13 -> ActividadParticipantePersistenceAdapter.save:23 -> Oracle -> toParticipanteResponse:352 -> 201.",
+      "Regla hexagonal: adapters -> application -> domain. port/in lo llama el controller y lo implementa el service; port/out lo implementan los adapters out y lo llama el service. Inversion de dependencia => testeable con mocks. El nucleo nunca devuelve entidades: siempre DTO.",
+      "Seguridad APIsPERU: token en variable de entorno, solo backend, como query param; nunca en Angular; cache positiva y negativa para no consultar por tecla; rate-limit por usuario.",
+      "Brechas visibles: MapStruct declarado sin uso (mapeo manual); RelacionValidationAdapter acoplado a repos de modulos OPEN; ContactoQueryAdapter listar+flatMap ineficiente; falta cap diario global de APIsPERU (backlog)."
+    ]
+  };
+  function textoPlano(){
+    return miroMapa.titulo+"\n"+"=".repeat(miroMapa.titulo.length)+"\n\n"+
+      miroMapa.secciones.map(function(s,i){return (i+1)+". "+s;}).join("\n\n");
+  }
+  var btn=document.getElementById('copyMiroBtn');
+  var hint=document.getElementById('copyMiroHint');
+  if(btn){
+    btn.addEventListener('click',async function(){
+      var texto=textoPlano();
+      try{
+        if(navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(texto);}
+        else{var ta=document.createElement('textarea');ta.value=texto;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}
+        btn.textContent='✓ Copiado';btn.classList.add('ok');
+        hint.textContent='Pégalo en Miro como nota de texto o índice del board.';
+        setTimeout(function(){btn.textContent='Copiar para Miro';btn.classList.remove('ok');hint.textContent='Copia el outline del mapa interactivo de módulos.';},2600);
+      }catch(e){hint.textContent='No se pudo copiar automáticamente. Selecciona el texto manualmente.';}
+    });
+  }
+  window.__miroMapaInteractivo=miroMapa;
+  window.__miroTextoPlano=textoPlano;
+})();
+</script>
+</body>
+</html>

@@ -16,6 +16,7 @@ public class Oportunidad {
     private EtapaOportunidad etapa;
     private String responsable;
     private LocalDate fechaCierre;
+    private String descripcion;
     private LocalDateTime creadoEn;
 
     public BigDecimal getValorPonderado() {

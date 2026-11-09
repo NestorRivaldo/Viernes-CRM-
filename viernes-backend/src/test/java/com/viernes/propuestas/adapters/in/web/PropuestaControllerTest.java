@@ -54,13 +54,13 @@ class PropuestaControllerTest {
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
 
-        DetallePropuestaRequest detalleReq = new DetallePropuestaRequest("Servicio", 2, new BigDecimal("100.00"));
+        DetallePropuestaRequest detalleReq = new DetallePropuestaRequest("Servicio", 2, new BigDecimal("100.00"), 5L);
         validRequest = new PropuestaRequest(
                 1L, 1L, "Cliente XYZ", "Juan", LocalDate.now(), LocalDate.now().plusDays(15),
                 new BigDecimal("10.00"), "Obs", List.of(detalleReq)
         );
 
-        DetallePropuestaResponse detalleResp = new DetallePropuestaResponse(1L, "Servicio", 2, new BigDecimal("100.00"), new BigDecimal("200.00"));
+        DetallePropuestaResponse detalleResp = new DetallePropuestaResponse(1L, 5L, "Servicio", 2, new BigDecimal("100.00"), new BigDecimal("200.00"));
         validResponse = new PropuestaResponse(
                 1L, "PROP-2026-0001", 1L, 1L, "Cliente XYZ", EstadoPropuesta.BORRADOR,
                 1, new BigDecimal("200.00"), new BigDecimal("10.00"), new BigDecimal("190.00"),
@@ -77,7 +77,8 @@ class PropuestaControllerTest {
                 .content(objectMapper.writeValueAsString(validRequest)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1L))
-                .andExpect(jsonPath("$.numeroPropuesta").value("PROP-2026-0001"));
+                .andExpect(jsonPath("$.numeroPropuesta").value("PROP-2026-0001"))
+                .andExpect(jsonPath("$.detalles[0].productoId").value(5L));
     }
 
     @Test

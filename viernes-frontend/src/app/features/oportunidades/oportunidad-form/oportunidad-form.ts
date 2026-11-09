@@ -37,7 +37,8 @@ export class OportunidadForm implements OnInit {
       probabilidad: [0, [Validators.min(0), Validators.max(100)]],
       etapa: [EtapaOportunidad.PROSPECCION],
       responsable: ['', Validators.maxLength(100)],
-      fechaCierre: ['']
+      fechaCierre: [''],
+      descripcion: ['', Validators.maxLength(500)]
     });
   }
 

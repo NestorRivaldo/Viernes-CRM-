@@ -8,6 +8,9 @@ import java.util.Optional;
 public interface ClientePersistencePort {
     List<Cliente> findAll();
     List<Cliente> findByNombreOrEmpresa(String q);
+    List<Cliente> findByNumeroDocumento(String numeroDocumento);
+    boolean existsByNumeroDocumento(String numeroDocumento);
+    boolean existsByNumeroDocumentoAndIdNot(String numeroDocumento, Long id);
     List<Cliente> findByEstado(EstadoCliente estado);
     long countByEstado(EstadoCliente estado);
     Optional<Cliente> findById(Long id);

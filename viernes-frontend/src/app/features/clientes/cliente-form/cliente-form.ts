@@ -12,7 +12,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ClientesService } from '../clientes.service';
-import { ContactoResponse, EstadoCliente } from '../clientes.model';
+import { ContactoResponse, DocumentoConsultaResponse, EstadoCliente, TipoDocumento } from '../clientes.model';
 
 @Component({
   selector: 'app-cliente-form',
@@ -27,6 +27,10 @@ export class ClienteForm implements OnInit {
   id!: number;
   loading = false;
   estados = Object.values(EstadoCliente);
+  tiposDocumento = Object.values(TipoDocumento);
+  consultandoDocumento = false;
+  errorDocumento = '';
+  documentoConsultado: DocumentoConsultaResponse | null = null;
 
   contactos: ContactoResponse[] = [];
   contactoForm: FormGroup;
@@ -44,6 +48,8 @@ export class ClienteForm implements OnInit {
     this.form = this.fb.group({
       nombre: ['', [Validators.required, Validators.maxLength(150)]],
       empresa: ['', Validators.maxLength(150)],
+      tipoDocumento: [null as TipoDocumento | null],
+      numeroDocumento: ['', [Validators.maxLength(20), Validators.pattern(/^(\d{8}|\d{11})$/)]],
       correo: ['', [Validators.required, Validators.email, Validators.maxLength(150)]],
       telefono: ['', Validators.maxLength(30)],
       estado: [EstadoCliente.ACTIVO, Validators.required],
@@ -106,6 +112,60 @@ export class ClienteForm implements OnInit {
       error: (err) => {
         alert(err?.friendlyMessage || 'Error al guardar el cliente');
         this.loading = false;
+      }
+    });
+  }
+
+  consultarDocumento() {
+    if (this.consultandoDocumento) return;
+
+    const tipo = this.form.get('tipoDocumento')?.value as TipoDocumento | null;
+    const numero = String(this.form.get('numeroDocumento')?.value || '').trim();
+    this.errorDocumento = '';
+
+    if (!tipo) {
+      this.errorDocumento = 'Selecciona el tipo de documento antes de consultar.';
+      return;
+    }
+
+    const patron = tipo === TipoDocumento.DNI ? /^\d{8}$/ : /^\d{11}$/;
+    if (!patron.test(numero)) {
+      this.errorDocumento = tipo === TipoDocumento.DNI
+        ? 'El DNI debe tener exactamente 8 dígitos.'
+        : 'El RUC debe tener exactamente 11 dígitos.';
+      return;
+    }
+
+    this.consultandoDocumento = true;
+    this.clientesService.consultarDocumento(tipo, numero).subscribe({
+      next: (documento) => {
+        this.documentoConsultado = documento;
+
+        if (documento.tipoDocumento === TipoDocumento.DNI) {
+          const nombreActual = String(this.form.get('nombre')?.value || '').trim();
+          this.form.patchValue({ nombre: documento.nombreCompleto || nombreActual });
+        } else {
+          const razonSocial = documento.razonSocial || documento.nombreComercial || '';
+          const nombreActual = String(this.form.get('nombre')?.value || '').trim();
+          this.form.patchValue({
+            empresa: razonSocial || this.form.get('empresa')?.value || '',
+            nombre: nombreActual || razonSocial
+          });
+
+          const telefono = documento.telefonos?.find((valor) => !!valor?.trim());
+          if (telefono && !String(this.form.get('telefono')?.value || '').trim()) {
+            this.form.patchValue({ telefono });
+          }
+        }
+
+        this.form.markAsDirty();
+        this.consultandoDocumento = false;
+      },
+      error: (err) => {
+        this.consultandoDocumento = false;
+        this.errorDocumento = err?.friendlyMessage
+          || err?.error?.message
+          || 'No se pudo consultar el documento.';
       }
     });
   }

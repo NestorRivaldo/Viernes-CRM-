@@ -308,15 +308,62 @@
 .x-axis-labels {
   display: flex;
   justify-content: space-between;
-  padding: 8px 16px 0 16px;
+  padding: 8px 0 0 0;
   font-size: 11.5px;
   color: #94a3b8;
   font-weight: 500;
 }
 
+.x-axis-labels span {
+  flex: 1;
+  text-align: center;
+}
+
+/* Empty state when there is no pipeline data yet */
+.chart-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 210px;
+  padding: 24px;
+  text-align: center;
+  color: #94a3b8;
+}
+
+.chart-empty-state mat-icon {
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
+  color: #cbd5e1;
+}
+
+.chart-empty-state .empty-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.chart-empty-state .empty-subtitle {
+  margin: 0;
+  font-size: 12.5px;
+  max-width: 320px;
+}
+
+.chart-empty-state .empty-action {
+  margin-top: 10px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #2563eb;
+  text-decoration: none;
+}
+
 /* Floating Tooltip */
 .chart-tooltip-floating {
   position: absolute;
+  transform: translate(-50%, -115%);
   background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: var(--radius-md);

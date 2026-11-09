@@ -49,7 +49,7 @@ class OportunidadControllerTest {
         validResponse = new OportunidadResponse(
                 1L, "Venta ERP", "Cliente XYZ", new BigDecimal("10000.00"), 50,
                 new BigDecimal("5000.00"), EtapaOportunidad.PROSPECCION, "Juan",
-                LocalDate.now().plusDays(30), LocalDateTime.now()
+                LocalDate.now().plusDays(30), null, LocalDateTime.now()
         );
     }
 
@@ -138,7 +138,7 @@ class OportunidadControllerTest {
         OportunidadResponse etapaResponse = new OportunidadResponse(
                 1L, "Venta ERP", "Cliente XYZ", new BigDecimal("10000.00"), 50,
                 new BigDecimal("5000.00"), EtapaOportunidad.NEGOCIACION, "Juan",
-                LocalDate.now().plusDays(30), LocalDateTime.now()
+                LocalDate.now().plusDays(30), null, LocalDateTime.now()
         );
         when(useCase.cambiarEtapa(eq(1L), eq(EtapaOportunidad.NEGOCIACION))).thenReturn(etapaResponse);
 

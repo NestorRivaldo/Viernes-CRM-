@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Informe técnico de Viernes CRM V1: mapa de carpetas, arquitectura, módulos backend y frontend, seguridad, modelo de datos, API, configuración, pruebas y deuda técnica.">
+    <title>Informe Técnico del Sistema · VIERNES CRM V1</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #090d16;
+            --surface: #111726;
+            --surface2: #172033;
+            --surface3: #1c2740;
+            --border: #232f48;
+            --border-strong: #31415f;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --text-subtle: #64748b;
+            --accent: #3b82f6;
+            --accent-soft: rgba(59, 130, 246, 0.12);
+            --cyan: #06b6d4;
+            --cyan-soft: rgba(6, 182, 212, 0.12);
+            --green: #10b981;
+            --green-soft: rgba(16, 185, 129, 0.12);
+            --purple: #a855f7;
+            --purple-soft: rgba(168, 85, 247, 0.12);
+            --amber: #f59e0b;
+            --amber-soft: rgba(245, 158, 11, 0.12);
+            --rose: #f43f5e;
+            --rose-soft: rgba(244, 63, 94, 0.12);
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            padding: 34px 20px 70px;
+            background-image:
+                radial-gradient(circle at 10% 2%, rgba(59, 130, 246, 0.10) 0%, transparent 38%),
+                radial-gradient(circle at 88% 18%, rgba(168, 85, 247, 0.07) 0%, transparent 34%),
+                radial-gradient(circle at 45% 100%, rgba(16, 185, 129, 0.05) 0%, transparent 38%);
+            background-attachment: fixed;
+        }
+
+        a { color: #93c5fd; text-decoration: none; }
+        a:hover { color: #dbeafe; }
+        .container { max-width: 1220px; margin: 0 auto; }
+
+        .skip-link {
+            position: absolute;
+            left: -9999px;
+            top: 10px;
+            background: #fff;
+            color: #0f172a;
+            padding: 8px 14px;
+            border-radius: 6px;
+            z-index: 999;
+        }
+        .skip-link:focus { left: 20px; }
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+            padding-bottom: 18px;
+            margin-bottom: 34px;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+        }
+        .topbar .back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+        .topbar .back:hover { color: #fff; }
+        .topbar-meta {
+            color: var(--text-subtle);
+            font-family: var(--mono);
+            font-size: 11.5px;
+            text-align: right;
+        }
+
+        .hero { padding: 8px 0 34px; border-bottom: 1px solid var(--border); margin-bottom: 28px; }
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #6ee7b7;
+            background: var(--green-soft);
+            border: 1px solid rgba(16, 185, 129, 0.30);
+            border-radius: 30px;
+            padding: 6px 13px;
+            font-size: 11.5px;
+            font-weight: 700;
+            letter-spacing: 0.10em;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+        .hero h1 {
+            font-size: clamp(34px, 5vw, 54px);
+            line-height: 1.08;
+            letter-spacing: -0.035em;
+            font-weight: 800;
+            max-width: 1040px;
+            background: linear-gradient(135deg, #ffffff 32%, #93c5fd 62%, #6ee7b7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 18px;
+        }
+        .hero .lead { color: var(--text-muted); font-size: 17px; max-width: 980px; line-height: 1.75; }
+        .hero-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            border: 1px solid var(--border-strong);
+            background: rgba(23, 32, 51, 0.78);
+            color: #cbd5e1;
+            border-radius: 999px;
+            padding: 5px 11px;
+            font-size: 11.5px;
+            font-weight: 600;
+        }
+        .pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px rgba(16,185,129,.8); }
+        .pill.blue .dot { background: var(--accent); box-shadow: 0 0 8px rgba(59,130,246,.8); }
+        .pill.purple .dot { background: var(--purple); box-shadow: 0 0 8px rgba(168,85,247,.8); }
+        .pill.amber .dot { background: var(--amber); box-shadow: 0 0 8px rgba(245,158,11,.8); }
+
+        .doc-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 26px;
+            margin-top: 18px;
+            color: var(--text-subtle);
+            font-size: 12.5px;
+        }
+        .doc-meta strong { color: #cbd5e1; font-weight: 600; }
+
+        .toc {
+            background: linear-gradient(180deg, rgba(17, 23, 38, 0.92), rgba(17, 23, 38, 0.70));
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 18px;
+            margin-bottom: 34px;
+        }
+        .toc-title {
+            font-size: 11px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--text-subtle);
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        .toc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 8px; }
+        .toc a {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 7px 9px;
+            border-radius: 7px;
+            color: var(--text-muted);
+            font-size: 12.5px;
+            border: 1px solid transparent;
+        }
+        .toc a:hover { background: var(--surface2); border-color: var(--border); color: #fff; }
+        .toc .n { font-family: var(--mono); font-size: 10.5px; color: #6ee7b7; }
+
+        .section { margin: 0 0 54px; }
+        .section-head {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+        .section-num {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: #6ee7b7;
+            background: var(--green-soft);
+            border: 1px solid rgba(16, 185, 129, 0.26);
+            border-radius: 7px;
+            padding: 3px 8px;
+            flex: 0 0 auto;
+        }
+        h2 { font-size: clamp(22px, 3vw, 30px); letter-spacing: -0.02em; line-height: 1.25; font-weight: 750; }
+        h3 { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; margin: 24px 0 10px; color: #e2e8f0; }
+        h4 { font-size: 13.5px; font-weight: 700; color: #dbeafe; margin-bottom: 5px; }
+        p { color: var(--text-muted); margin: 0 0 12px; }
+        p strong, li strong { color: #e2e8f0; font-weight: 650; }
+        ul, ol { color: var(--text-muted); padding-left: 22px; margin: 0 0 14px; }
+        li { margin: 5px 0; }
+
+        code {
+            font-family: var(--mono);
+            font-size: 0.86em;
+            color: #bae6fd;
+            background: rgba(6, 182, 212, 0.09);
+            border: 1px solid rgba(6, 182, 212, 0.16);
+            border-radius: 5px;
+            padding: 1px 5px;
+            overflow-wrap: anywhere;
+        }
+        pre {
+            font-family: var(--mono);
+            font-size: 12.5px;
+            line-height: 1.65;
+            color: #cbd5e1;
+            background: #0b1220;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px 18px;
+            overflow-x: auto;
+            margin: 12px 0 18px;
+            tab-size: 2;
+        }
+        pre code { background: none; border: 0; padding: 0; color: inherit; font-size: inherit; }
+        .muted { color: var(--text-subtle); }
+        .small { font-size: 12.5px; }
+
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(148px, 1fr)); gap: 12px; margin: 18px 0 24px; }
+        .kpi {
+            background: linear-gradient(180deg, rgba(23, 32, 51, 0.88), rgba(17, 23, 38, 0.92));
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 15px 16px;
+            position: relative;
+            overflow: hidden;
+        }
+        .kpi::before {
+            content: "";
+            position: absolute;
+            inset: 0 auto auto 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #10b981, #3b82f6, transparent);
+            opacity: 0.85;
+        }
+        .kpi .label { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.09em; color: var(--text-subtle); font-weight: 700; margin-bottom: 4px; }
+        .kpi .value { font-family: var(--mono); font-size: 25px; line-height: 1.15; color: #fff; font-weight: 600; letter-spacing: -0.03em; }
+        .kpi .note { font-size: 11.5px; color: var(--text-subtle); margin-top: 3px; }
+
+        .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+        .card {
+            background: rgba(17, 23, 38, 0.88);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 18px 19px;
+        }
+        .card h3 { margin-top: 0; }
+        .card p:last-child, .card ul:last-child { margin-bottom: 0; }
+        .card.blue { border-color: rgba(59, 130, 246, 0.34); background: linear-gradient(180deg, rgba(59,130,246,.07), rgba(17,23,38,.92)); }
+        .card.green { border-color: rgba(16, 185, 129, 0.30); background: linear-gradient(180deg, rgba(16,185,129,.06), rgba(17,23,38,.92)); }
+        .card.purple { border-color: rgba(168, 85, 247, 0.30); background: linear-gradient(180deg, rgba(168,85,247,.06), rgba(17,23,38,.92)); }
+        .card.amber { border-color: rgba(245, 158, 11, 0.30); background: linear-gradient(180deg, rgba(245,158,11,.06), rgba(17,23,38,.92)); }
+        .card.rose { border-color: rgba(244, 63, 94, 0.30); background: linear-gradient(180deg, rgba(244,63,94,.06), rgba(17,23,38,.92)); }
+
+        .callout {
+            border-left: 3px solid var(--accent);
+            background: linear-gradient(90deg, rgba(59, 130, 246, 0.10), rgba(59, 130, 246, 0.025));
+            border-radius: 0 10px 10px 0;
+            padding: 14px 17px;
+            margin: 16px 0;
+            color: #cbd5e1;
+            font-size: 13.5px;
+        }
+        .callout strong { color: #dbeafe; }
+        .callout.green { border-left-color: var(--green); background: linear-gradient(90deg, rgba(16,185,129,.10), rgba(16,185,129,.02)); }
+        .callout.amber { border-left-color: var(--amber); background: linear-gradient(90deg, rgba(245,158,11,.10), rgba(245,158,11,.02)); }
+        .callout.rose { border-left-color: var(--rose); background: linear-gradient(90deg, rgba(244,63,94,.10), rgba(244,63,94,.02)); }
+
+        .flow {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 0;
+            align-items: stretch;
+            margin: 18px 0 22px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            background: rgba(11, 18, 32, 0.72);
+        }
+        .flow-step { padding: 15px 14px; position: relative; border-right: 1px solid var(--border); }
+        .flow-step:last-child { border-right: 0; }
+        .flow-step .step-num { font-family: var(--mono); font-size: 10px; color: #6ee7b7; margin-bottom: 5px; }
+        .flow-step h4 { font-size: 12.5px; color: #f1f5f9; }
+        .flow-step p { font-size: 11.5px; line-height: 1.55; color: var(--text-subtle); margin: 3px 0 0; }
+        .flow-step::after {
+            content: "›";
+            position: absolute;
+            right: -9px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--surface2);
+            border: 1px solid var(--border-strong);
+            color: #93c5fd;
+            font-size: 14px;
+            line-height: 16px;
+            text-align: center;
+            z-index: 2;
+        }
+        .flow-step:last-child::after { display: none; }
+
+        .seq { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin: 16px 0 20px; }
+        .seq-row {
+            display: grid;
+            grid-template-columns: 38px minmax(0, 1.0fr) minmax(0, 2.0fr);
+            gap: 14px;
+            align-items: start;
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(17, 23, 38, 0.58);
+        }
+        .seq-row:last-child { border-bottom: 0; }
+        .seq-row:nth-child(even) { background: rgba(23, 32, 51, 0.48); }
+        .seq-num {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: #6ee7b7;
+            background: var(--green-soft);
+            border: 1px solid rgba(16,185,129,.25);
+            border-radius: 6px;
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .seq-actor { font-size: 12.5px; font-weight: 700; color: #dbeafe; }
+        .seq-desc { font-size: 12.5px; color: var(--text-muted); }
+
+        .table-wrap {
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin: 14px 0 20px;
+            background: rgba(17, 23, 38, 0.70);
+        }
+        table { width: 100%; border-collapse: collapse; font-size: 12.5px; min-width: 760px; }
+        thead { background: rgba(28, 39, 64, 0.78); }
+        th {
+            text-align: left;
+            padding: 11px 13px;
+            color: #cbd5e1;
+            font-weight: 700;
+            font-size: 11px;
+            letter-spacing: 0.055em;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border-strong);
+            white-space: nowrap;
+        }
+        td { padding: 10px 13px; color: var(--text-muted); border-bottom: 1px solid rgba(35, 47, 72, 0.7); vertical-align: top; }
+        tbody tr:last-child td { border-bottom: 0; }
+        tbody tr:hover { background: rgba(59, 130, 246, 0.045); }
+        td strong { color: #e2e8f0; }
+        td code { font-size: 11.5px; }
+
+        .method {
+            display: inline-block;
+            min-width: 46px;
+            text-align: center;
+            border-radius: 5px;
+            padding: 2px 6px;
+            font-family: var(--mono);
+            font-size: 10.5px;
+            font-weight: 600;
+            border: 1px solid;
+            white-space: nowrap;
+        }
+        .get { color: #6ee7b7; background: rgba(16,185,129,.12); border-color: rgba(16,185,129,.30); }
+        .post { color: #93c5fd; background: rgba(59,130,246,.12); border-color: rgba(59,130,246,.30); }
+        .put { color: #fcd34d; background: rgba(245,158,11,.12); border-color: rgba(245,158,11,.30); }
+        .patch { color: #c4b5fd; background: rgba(168,85,247,.12); border-color: rgba(168,85,247,.30); }
+        .delete { color: #fda4af; background: rgba(244,63,94,.12); border-color: rgba(244,63,94,.30); }
+
+        .tag {
+            font-size: 10.5px;
+            color: #cbd5e1;
+            background: rgba(28, 39, 64, 0.72);
+            border: 1px solid rgba(49, 65, 95, 0.7);
+            padding: 2px 7px;
+            border-radius: 5px;
+            white-space: nowrap;
+        }
+        .pill-list { display: flex; flex-wrap: wrap; gap: 6px; }
+
+        .tree {
+            font-family: var(--mono);
+            font-size: 12px;
+            line-height: 1.7;
+            color: #cbd5e1;
+            background: #0b1220;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 17px 19px;
+            overflow-x: auto;
+            margin: 14px 0 18px;
+            white-space: pre;
+        }
+        .tree .dir { color: #93c5fd; }
+        .tree .file { color: #cbd5e1; }
+        .tree .note { color: #8494ad; }
+        .tree .hl { color: #6ee7b7; }
+
+        .checklist { list-style: none; padding-left: 0; }
+        .checklist li { position: relative; padding-left: 23px; margin: 6px 0; }
+        .checklist li::before { content: "✓"; position: absolute; left: 0; top: 0; color: var(--green); font-weight: 800; font-size: 12px; }
+        .crosslist { list-style: none; padding-left: 0; }
+        .crosslist li { position: relative; padding-left: 23px; margin: 6px 0; }
+        .crosslist li::before { content: "×"; position: absolute; left: 0; top: -1px; color: var(--rose); font-weight: 800; font-size: 15px; }
+
+        .badge-inline {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 10.5px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 5px;
+            border: 1px solid;
+            white-space: nowrap;
+        }
+        .b-green { color: #6ee7b7; background: rgba(16,185,129,.10); border-color: rgba(16,185,129,.28); }
+        .b-amber { color: #fcd34d; background: rgba(245,158,11,.10); border-color: rgba(245,158,11,.28); }
+        .b-rose { color: #fda4af; background: rgba(244,63,94,.10); border-color: rgba(244,63,94,.28); }
+        .b-blue { color: #93c5fd; background: rgba(59,130,246,.10); border-color: rgba(59,130,246,.28); }
+        .b-purple { color: #c4b5fd; background: rgba(168,85,247,.10); border-color: rgba(168,85,247,.28); }
+
+        .footer {
+            margin-top: 56px;
+            padding-top: 22px;
+            border-top: 1px solid var(--border);
+            color: var(--text-subtle);
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
+        .footer strong { color: #cbd5e1; }
+
+        @media (max-width: 940px) {
+            .flow { grid-template-columns: 1fr 1fr; }
+            .flow-step:nth-child(2)::after { display: none; }
+            .grid-3 { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 680px) {
+            body { padding: 22px 14px 56px; }
+            .topbar { align-items: flex-start; }
+            .topbar-meta { display: none; }
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+            .flow { grid-template-columns: 1fr; }
+            .flow-step { border-right: 0; border-bottom: 1px solid var(--border); }
+            .flow-step::after { display: none; }
+            .flow-step:last-child { border-bottom: 0; }
+            .seq-row { grid-template-columns: 30px 1fr; gap: 8px; }
+            .seq-desc { grid-column: 2; }
+            .kpi-grid { grid-template-columns: 1fr 1fr; }
+            .section { margin-bottom: 42px; }
+        }
+        @media (max-width: 430px) { .kpi-grid { grid-template-columns: 1fr; } .hero h1 { font-size: 32px; } }
+        @media print {
+            body { background: #fff; color: #111; padding: 0; }
+            .topbar, .toc { display: none; }
+            .container { max-width: none; }
+            .section { break-inside: avoid; }
+            .card, .table-wrap, pre, .flow, .seq { border-color: #ccc; background: #fff; }
+            p, li, td { color: #222; }
+            h1, h2, h3, h4, .kpi .value { color: #111; -webkit-text-fill-color: #111; background: none; }
+            a { color: #1d4ed8; }
+        }
+    </style>
+</head>
+<body>
+<a class="skip-link" href="#contenido">Ir al contenido</a>
+<div class="container">
+
+    <nav class="topbar" aria-label="Navegación del informe">
+        <a class="back" href="../index.html">← Volver al portal de informes</a>
+        <span class="topbar-meta">VIERNES CRM V1 · Informe técnico · v1.0</span>
+    </nav>
+
+    <header class="hero">
+        <div class="eyebrow">Arquitectura · carpetas · módulos · operación</div>
+        <h1>Informe técnico del sistema y sus módulos</h1>
+        <p class="lead">
+            Radiografía del código y del funcionamiento actual de Viernes CRM V1: dónde vive cada pieza, cómo se
+            comunican el frontend Angular, el backend Spring Boot, Keycloak y Oracle, qué responsabilidad tiene cada
+            módulo y cuáles son las brechas que deben cerrarse antes de producción.
+        </p>
+        <div class="hero-pills">
+            <span class="pill"><span class="dot"></span> 12 módulos funcionales + shared</span>
+            <span class="pill blue"><span class="dot"></span> 13 controladores REST</span>
+            <span class="pill purple"><span class="dot"></span> 19 tablas Oracle</span>
+            <span class="pill amber"><span class="dot"></span> 257 pruebas en verde</span>
+        </div>
+        <div class="doc-meta">
+            <span><strong>Versión:</strong> 1.0</span>
+            <span><strong>Fecha:</strong> 21 de octubre de 2026</span>
+            <span><strong>Fuente:</strong> código actual de <code>E:\LPII\Viernes</code></span>
+            <span><strong>Alcance:</strong> backend, frontend, datos, seguridad y despliegue</span>
+        </div>
+    </header>
+
+    <nav class="toc" aria-label="Contenido del informe">
+        <div class="toc-title">Contenido</div>
+        <div class="toc-grid">
+            <a href="#resumen"><span class="n">01</span> Resumen ejecutivo</a>
+            <a href="#carpetas"><span class="n">02</span> Mapa de carpetas</a>
+            <a href="#topologia"><span class="n">03</span> Topología y arranque</a>
+            <a href="#backend"><span class="n">04</span> Arquitectura backend</a>
+            <a href="#modulos"><span class="n">05</span> Catálogo de módulos</a>
+            <a href="#frontend"><span class="n">06</span> Frontend Angular</a>
+            <a href="#seguridad"><span class="n">07</span> Seguridad e identidad</a>
+            <a href="#datos"><span class="n">08</span> Modelo de datos</a>
+            <a href="#flujos"><span class="n">09</span> Flujos de negocio</a>
+            <a href="#api"><span class="n">10</span> Mapa de API</a>
+            <a href="#config"><span class="n">11</span> Configuración y despliegue</a>
+            <a href="#calidad"><span class="n">12</span> Calidad y pruebas</a>
+            <a href="#riesgos"><span class="n">13</span> Riesgos y deuda</a>
+            <a href="#referencia"><span class="n">14</span> Referencia rápida</a>
+        </div>
+    </nav>
+
+    <main id="contenido">
+
+        <section class="section" id="resumen">
+            <div class="section-head"><span class="section-num">01</span><h2>Resumen ejecutivo</h2></div>
+            <p>
+                Viernes CRM V1 es un monorepo full-stack con un backend único Spring Boot organizado por módulos de
+                negocio y un frontend Angular con rutas lazy-loaded. El backend aplica <strong>Spring Modulith</strong>
+                para delimitar módulos y <strong>arquitectura hexagonal</strong> dentro de cada módulo. La persistencia
+                principal está en Oracle 23c; la identidad se externaliza en Keycloak 25 con PostgreSQL.
+            </p>
+            <div class="kpi-grid">
+                <div class="kpi"><div class="label">Paquetes backend</div><div class="value">13</div><div class="note">12 módulos + shared</div></div>
+                <div class="kpi"><div class="label">Controladores</div><div class="value">13</div><div class="note">API REST v1</div></div>
+                <div class="kpi"><div class="label">Tablas Oracle</div><div class="value">19</div><div class="note">esquema BOM_VENTAS</div></div>
+                <div class="kpi"><div class="label">Repositorios JPA</div><div class="value">17</div><div class="note">Spring Data</div></div>
+                <div class="kpi"><div class="label">Componentes Angular</div><div class="value">25</div><div class="note">standalone</div></div>
+                <div class="kpi"><div class="label">Pruebas backend</div><div class="value">257</div><div class="note">0 fallos · 0 errores</div></div>
+                <div class="kpi"><div class="label">Bundle inicial</div><div class="value">342,38 kB</div><div class="note">94,11 kB transferidos</div></div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Capa</th><th>Tecnología</th><th>Función actual</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Backend</strong></td><td>Spring Boot 4.0.7 · Java 21 · Spring Modulith 2.0.7</td><td>API REST, reglas de negocio, transacciones y persistencia JPA.</td></tr>
+                        <tr><td><strong>Frontend</strong></td><td>Angular 22.1 · TypeScript · Angular Material · signals · zoneless</td><td>SPA autenticada, layout, formularios, tablas, dashboard y chat.</td></tr>
+                        <tr><td><strong>Identidad</strong></td><td>Keycloak 25.0.6 · OIDC · JWT</td><td>Emisión y validación de tokens; roles ADMIN, JEFE y VENDEDOR.</td></tr>
+                        <tr><td><strong>Base principal</strong></td><td>Oracle AI Database 23c Free</td><td>Esquema <code>BOM_VENTAS</code> con 19 tablas de negocio.</td></tr>
+                        <tr><td><strong>Base de identidad</strong></td><td>PostgreSQL 16 Alpine</td><td>Persistencia interna de Keycloak, aislada de Oracle.</td></tr>
+                        <tr><td><strong>Infra local</strong></td><td>Docker para Oracle y Keycloak; procesos locales para backend y frontend</td><td>Arranque reproducible en Windows con <code>activar-sistema.bat</code>.</td></tr>
+                        <tr><td><strong>Calidad</strong></td><td>JUnit 5 · Mockito · MockMvc · Modulith Test</td><td>257 pruebas de servicio, controlador, modularidad y contexto.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="callout green">
+                <strong>Estado verificado:</strong> la suite completa terminó con <strong>257 pruebas, 0 fallos y 0
+                errores</strong>; el build de Angular terminó correctamente con un bundle inicial de
+                <strong>342,38 kB</strong> (<strong>94,11 kB</strong> transferidos). El sistema está operativo en el
+                entorno local con los perfiles <code>dev,keycloak</code>.
+            </div>
+            <div class="callout amber">
+                <strong>Advertencia de alcance:</strong> este informe describe el código actual. Los documentos
+                <code>README.md</code>, <code>CLAUDE.md</code> y algunos informes antiguos todavía hablan de
+                <code>bomerp-backend</code>, 7 módulos o 132 pruebas; esas cifras ya no representan el sistema.
+            </div>
+        </section>
+
+        <section class="section" id="carpetas">
+            <div class="section-head"><span class="section-num">02</span><h2>Mapa de carpetas importantes</h2></div>
+            <p>
+                El repositorio separa backend, frontend, infraestructura de identidad, documentación y observabilidad.
+                Esta es la estructura relevante para entender el sistema sin recorrer archivos generados o dependencias.
+            </p>
+            <div class="tree"><span class="dir">E:\LPII\Viernes\</span>
+├── <span class="dir">viernes-backend\</span>                         <span class="note">API REST Spring Boot</span>
+│   ├── <span class="dir">src/main/java/com/viernes/</span>
+│   │   ├── <span class="dir">auth/</span>          <span class="note">login local, JWT, configuración de seguridad</span>
+│   │   ├── <span class="dir">usuarios/</span>      <span class="note">CRUD de usuarios, roles y API pública UsuariosApi</span>
+│   │   ├── <span class="dir">clientes/</span>      <span class="note">clientes y contactos</span>
+│   │   ├── <span class="dir">leads/</span>         <span class="note">leads y fuentes</span>
+│   │   ├── <span class="dir">marketing/</span>     <span class="note">campañas y asociación con leads</span>
+│   │   ├── <span class="dir">oportunidades/</span> <span class="note">pipeline, contactos, productos y colaboradores</span>
+│   │   ├── <span class="dir">productos/</span>     <span class="note">catálogo comercial</span>
+│   │   ├── <span class="dir">propuestas/</span>    <span class="note">cotizaciones, detalles y estados</span>
+│   │   ├── <span class="dir">actividades/</span>   <span class="note">llamadas, reuniones, tareas y seguimiento</span>
+│   │   ├── <span class="dir">equipos/</span>       <span class="note">equipos y miembros</span>
+│   │   ├── <span class="dir">dashboard/</span>     <span class="note">agregaciones de solo lectura</span>
+│   │   ├── <span class="dir">mensajeria/</span>    <span class="note">sala general de mensajes</span>
+│   │   └── <span class="dir">shared/</span>        <span class="note">excepciones, filtros y configuración común</span>
+│   ├── <span class="dir">src/main/resources/</span>
+│   │   ├── <span class="file">application.yml</span>
+│   │   ├── <span class="file">application-dev.yml</span>
+│   │   └── <span class="file">application-keycloak.yml</span>
+│   ├── <span class="dir">src/test/java/com/viernes/</span>       <span class="note">29 archivos de prueba</span>
+│   ├── <span class="file">compose-dev.yml</span>                 <span class="note">Oracle 23c en Docker</span>
+│   └── <span class="file">pom.xml</span>
+├── <span class="dir">viernes-frontend\</span>                        <span class="note">SPA Angular</span>
+│   ├── <span class="dir">src/app/core/</span>
+│   │   ├── <span class="dir">auth/</span>          <span class="note">AuthService, guards y adaptador Keycloak</span>
+│   │   ├── <span class="dir">interceptors/</span>  <span class="note">JWT, timeout, manejo de 401/403 y X-Trace-ID</span>
+│   │   ├── <span class="dir">layout/</span>        <span class="note">shell, sidebar, cabecera y panel de mensajería</span>
+│   │   └── <span class="dir">services/</span>      <span class="note">ApiService y utilidades compartidas</span>
+│   ├── <span class="dir">src/app/features/</span>                 <span class="note">12 carpetas funcionales</span>
+│   ├── <span class="file">src/app/app.routes.ts</span>             <span class="note">rutas y lazy loading</span>
+│   ├── <span class="file">src/app/app.config.ts</span>             <span class="note">providers, zoneless e interceptores</span>
+│   ├── <span class="file">src/environments/environment.ts</span>   <span class="note">URL base de la API</span>
+│   ├── <span class="file">angular.json</span>
+│   └── <span class="file">package.json</span>
+├── <span class="dir">docker/keycloak/</span>
+│   └── <span class="file">viernes-realm.json</span>               <span class="note">realm, clientes, roles y usuario demo</span>
+├── <span class="file">compose-keycloak.yml</span>                   <span class="note">Keycloak + PostgreSQL</span>
+├── <span class="file">activar-sistema.bat</span>                    <span class="note">arranque de los 5 servicios</span>
+├── <span class="dir">informe/</span>                               <span class="note">portal y documentos técnicos HTML/MD</span>
+├── <span class="dir">docs/</span>                                  <span class="note">guías de Keycloak</span>
+├── <span class="dir">obs/</span>                                   <span class="note">Prometheus, Grafana y Promtail</span>
+└── <span class="file">README.md</span>                              <span class="note">desactualizado: describe bomerp</span></div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Carpeta / archivo</th><th>Qué contiene</th><th>Por qué importa</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>viernes-backend/src/main/java/com/viernes/</code></td><td>13 paquetes: 12 módulos funcionales y <code>shared</code>.</td><td>Es el corazón del dominio y de la API.</td></tr>
+                        <tr><td><code>.../application/service/</code></td><td>Servicios de caso de uso de cada módulo.</td><td>Aquí viven las reglas de negocio y las transacciones.</td></tr>
+                        <tr><td><code>.../adapters/in/web/</code></td><td>Controladores REST.</td><td>Definen el contrato HTTP y los códigos de respuesta.</td></tr>
+                        <tr><td><code>.../adapters/out/persistence/</code></td><td>Adaptadores JPA, entidades y repositorios.</td><td>Única frontera con Oracle.</td></tr>
+                        <tr><td><code>.../domain/</code></td><td>Modelos, enums y cálculos de dominio.</td><td>Contiene reglas como el valor ponderado de una oportunidad.</td></tr>
+                        <tr><td><code>.../package-info.java</code></td><td>Declaración de módulo y dependencias permitidas.</td><td>Spring Modulith la usa para verificar los límites.</td></tr>
+                        <tr><td><code>src/main/resources/application-dev.yml</code></td><td>Oracle, JPA, perfiles, CORS, JWT local y actuator.</td><td>Define el entorno de desarrollo real.</td></tr>
+                        <tr><td><code>src/main/resources/application-keycloak.yml</code></td><td>Issuer, JWK Set y proveedor Keycloak.</td><td>Activa la validación OAuth2 del backend.</td></tr>
+                        <tr><td><code>viernes-frontend/src/app/core/</code></td><td>Autenticación, guards, interceptores, layout y servicios base.</td><td>Controla la sesión y el shell de toda la SPA.</td></tr>
+                        <tr><td><code>viernes-frontend/src/app/features/</code></td><td>Pantallas y servicios por dominio.</td><td>Implementa la experiencia funcional del CRM.</td></tr>
+                        <tr><td><code>docker/keycloak/viernes-realm.json</code></td><td>Realm, clientes, roles y usuario demo.</td><td>Permite reproducir la identidad desde cero.</td></tr>
+                        <tr><td><code>obs/</code></td><td>Configuraciones de Prometheus, Grafana y Promtail.</td><td>Base de observabilidad aún no integrada al arranque principal.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Ruta de lectura recomendada</h3>
+            <div class="grid-3">
+                <div class="card blue"><h4>1. Entrar por el contrato</h4><p class="small"><code>app.routes.ts</code> y los controladores REST muestran qué puede hacer el sistema y qué rutas existen.</p></div>
+                <div class="card green"><h4>2. Seguir un flujo</h4><p class="small">Frontend service → controlador → caso de uso → servicio → puerto → adaptador → entidad.</p></div>
+                <div class="card purple"><h4>3. Revisar los límites</h4><p class="small">Leer los <code>package-info.java</code> y <code>ModularityTests</code> para entender el acoplamiento real.</p></div>
+            </div>
+        </section>
+
+        <section class="section" id="topologia">
+            <div class="section-head"><span class="section-num">03</span><h2>Topología y arranque actual</h2></div>
+            <p>
+                El sistema se ejecuta con cinco piezas: Oracle, PostgreSQL para Keycloak, Keycloak, backend y frontend.
+                Las dependencias externas corren en Docker; las aplicaciones corren como procesos locales para facilitar
+                el desarrollo y la recarga.
+            </p>
+<h3 class="sr-only">Topología de ejecución</h3>
+            <div class="flow" aria-label="Topología de ejecución">
+                <div class="flow-step"><div class="step-num">01 · DATOS</div><h4>Oracle 23c</h4><p><code>bomerp-oracle</code><br>Puerto 1521<br>Esquema BOM_VENTAS</p></div>
+                <div class="flow-step"><div class="step-num">02 · IDENTIDAD</div><h4>Keycloak 25</h4><p>Puerto 8180<br>PostgreSQL 16 en 5433<br>Realm viernes-realm</p></div>
+                <div class="flow-step"><div class="step-num">03 · API</div><h4>Spring Boot</h4><p>Puerto 8080<br>Perfiles dev,keycloak<br>Tomcat + JPA</p></div>
+                <div class="flow-step"><div class="step-num">04 · SPA</div><h4>Angular</h4><p>Puerto 4200<br>Vite dev server<br>Material + signals</p></div>
+                <div class="flow-step"><div class="step-num">05 · OBS</div><h4>Actuator / obs</h4><p>Health, metrics, prometheus<br>Configs Prometheus/Grafana<br>Opcional</p></div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Componente</th><th>Puerto</th><th>URL / credencial</th><th>Estado actual</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Oracle AI Database 23c Free</strong></td><td>1521</td><td><code>localhost:1521/FREEPDB1</code> · usuario <code>BOM_VENTAS</code></td><td><span class="badge-inline b-green">Operativo</span></td></tr>
+                        <tr><td><strong>PostgreSQL Keycloak</strong></td><td>5433</td><td>Base <code>keycloak</code></td><td><span class="badge-inline b-green">Operativo</span> en Docker</td></tr>
+                        <tr><td><strong>Keycloak</strong></td><td>8180</td><td><code>http://localhost:8180</code> · realm <code>viernes-realm</code></td><td><span class="badge-inline b-green">Operativo</span></td></tr>
+                        <tr><td><strong>Backend</strong></td><td>8080</td><td><code>http://localhost:8080</code></td><td><span class="badge-inline b-green">Operativo</span></td></tr>
+                        <tr><td><strong>Frontend</strong></td><td>4200</td><td><code>http://localhost:4200</code></td><td><span class="badge-inline b-green">Operativo</span></td></tr>
+                        <tr><td><strong>Swagger UI</strong></td><td>8080</td><td><code>http://localhost:8080/swagger-ui.html</code></td><td><span class="badge-inline b-green">Disponible</span></td></tr>
+                        <tr><td><strong>Actuator</strong></td><td>8080</td><td><code>http://localhost:8080/actuator/health</code></td><td><span class="badge-inline b-green">Disponible</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Orden de arranque</h3>
+            <div class="seq">
+                <div class="seq-row"><div class="seq-num">1</div><div class="seq-actor">Docker</div><div class="seq-desc">Verificar que Docker Desktop esté activo.</div></div>
+                <div class="seq-row"><div class="seq-num">2</div><div class="seq-actor">Oracle</div><div class="seq-desc"><code>docker compose -f viernes-backend\compose-dev.yml up -d</code>. Esperar el estado <code>healthy</code>.</div></div>
+                <div class="seq-row"><div class="seq-num">3</div><div class="seq-actor">Keycloak</div><div class="seq-desc"><code>docker compose -f compose-keycloak.yml up -d</code>. Esperar a que el realm esté importado en el puerto 8180.</div></div>
+                <div class="seq-row"><div class="seq-num">4</div><div class="seq-actor">Backend</div><div class="seq-desc"><code>.\mvnw.cmd spring-boot:run</code> con perfiles <code>dev,keycloak</code>. Verificar Swagger o <code>/actuator/health</code>.</div></div>
+                <div class="seq-row"><div class="seq-num">5</div><div class="seq-actor">Frontend</div><div class="seq-desc"><code>npm.cmd start</code> y abrir <code>http://localhost:4200</code>.</div></div>
+            </div>
+            <div class="callout">
+                <strong>Automatización:</strong> <code>activar-sistema.bat</code> ejecuta los cinco pasos, instala
+                <code>node_modules</code> si falta y abre el navegador. No debe usarse en producción: está pensado para
+                una laptop de desarrollo Windows.
+            </div>
+            <div class="callout amber">
+                <strong>Credenciales demo:</strong> el realm versionado define el usuario <code>admin@viernes.com</code>
+                con contraseña <code>Admin12345</code> y roles ADMIN, JEFE y VENDEDOR. La consola de Keycloak usa
+                <code>admin/admin</code>. Son credenciales de demostración y están en el repositorio; deben rotarse o
+                externalizarse antes de cualquier despliegue real.
+            </div>
+        </section>
+
+        <section class="section" id="backend">
+            <div class="section-head"><span class="section-num">04</span><h2>Arquitectura del backend</h2></div>
+            <p>
+                El backend es un único proceso Spring Boot, pero internamente está dividido por módulos. Cada módulo
+                funcional replica cuatro zonas: entrada web, aplicación, dominio y persistencia. Spring Modulith
+                comprueba que las dependencias declaradas se respeten.
+            </p>
+<h3 class="sr-only">Flujo de una petición backend</h3>
+            <div class="flow" aria-label="Flujo de una petición backend">
+                <div class="flow-step"><div class="step-num">01</div><h4>Controller</h4><p>Recibe HTTP, valida DTOs y traduce a caso de uso.</p></div>
+                <div class="flow-step"><div class="step-num">02</div><h4>Use Case</h4><p>Puerto de entrada del módulo; desacopla la web de la aplicación.</p></div>
+                <div class="flow-step"><div class="step-num">03</div><h4>Service</h4><p>Reglas de negocio, transacciones y validaciones cruzadas.</p></div>
+                <div class="flow-step"><div class="step-num">04</div><h4>Out Port</h4><p>Contrato de persistencia o de consulta a otro módulo.</p></div>
+                <div class="flow-step"><div class="step-num">05</div><h4>Adapter</h4><p>JPA, entidades y repositorios Spring Data hacia Oracle.</p></div>
+            </div>
+
+            <h3>Estructura interna de un módulo</h3>
+            <div class="tree"><span class="dir">com.viernes.&lt;modulo&gt;/</span>
+├── <span class="dir">adapters/</span>
+│   ├── <span class="dir">in/web/</span>                 <span class="note">Controlador REST y mapeo HTTP</span>
+│   └── <span class="dir">out/persistence/</span>       <span class="note">Adaptador, entidad y repositorio JPA</span>
+├── <span class="dir">application/</span>
+│   ├── <span class="dir">dto/</span>                    <span class="note">Requests y responses (records)</span>
+│   ├── <span class="dir">port/in/</span>                <span class="note">Casos de uso expuestos</span>
+│   ├── <span class="dir">port/out/</span>               <span class="note">Puertos de persistencia o consulta</span>
+│   └── <span class="dir">service/</span>                <span class="note">Implementación de casos de uso</span>
+├── <span class="dir">domain/</span>                     <span class="note">Modelo y enums del negocio</span>
+└── <span class="file">package-info.java</span>           <span class="note">Límites y dependencias del módulo</span></div>
+
+            <h3>Límites declarados con Spring Modulith</h3>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Módulo</th><th>Tipo</th><th>Dependencias permitidas / observación</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>auth</code></td><td><span class="badge-inline b-green">Cerrado</span></td><td><code>usuarios</code></td></tr>
+                        <tr><td><code>usuarios</code></td><td><span class="badge-inline b-green">Cerrado</span></td><td><code>shared</code>, <code>shared.exception</code></td></tr>
+                        <tr><td><code>equipos</code></td><td><span class="badge-inline b-green">Cerrado</span></td><td><code>usuarios</code>, <code>shared</code>, <code>shared.exception</code></td></tr>
+                        <tr><td><code>mensajeria</code></td><td><span class="badge-inline b-green">Cerrado</span></td><td><code>usuarios</code>, <code>shared</code>, <code>shared.exception</code></td></tr>
+                        <tr><td><code>propuestas</code></td><td><span class="badge-inline b-green">Cerrado</span></td><td><code>productos</code>, <code>clientes</code>, <code>oportunidades</code>, <code>shared</code>, <code>shared.exception</code></td></tr>
+                        <tr><td><code>clientes</code>, <code>leads</code>, <code>marketing</code>, <code>oportunidades</code>, <code>productos</code>, <code>dashboard</code></td><td><span class="badge-inline b-amber">OPEN</span></td><td>No imponen límites estrictos; permiten acceso transversal entre módulos.</td></tr>
+                        <tr><td><code>actividades</code></td><td><span class="badge-inline b-rose">Sin package-info</span></td><td>No declara dependencias y su adaptador importa repositorios de clientes, leads y oportunidades, además de <code>UsuariosApi</code>.</td></tr>
+                        <tr><td><code>shared</code></td><td><span class="badge-inline b-blue">Transversal</span></td><td>Excepciones, filtro de correlación y configuración OpenAPI.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="callout amber">
+                <strong>Lectura de los límites:</strong> los módulos OPEN y la ausencia de <code>package-info</code> en
+                <code>actividades</code> hacen que la verificación de Modulith sea más permisiva de lo que sugiere la
+                arquitectura objetivo. Esto no rompe el sistema, pero sí permite acoplamientos que deberían revisarse.
+            </div>
+
+            <h3>Convenciones y piezas transversales</h3>
+            <div class="grid-3">
+                <div class="card"><h4>DTOs</h4><p class="small">Requests y responses son <code>record</code> en la mayoría de módulos; las validaciones usan Jakarta Validation.</p></div>
+                <div class="card"><h4>Transacciones</h4><p class="small">Los servicios usan <code>@Transactional</code> para escritura y <code>readOnly = true</code> para consultas.</p></div>
+                <div class="card"><h4>Errores</h4><p class="small"><code>GlobalExceptionHandler</code> centraliza 404, 400, 401, 403, 409 y errores de validación.</p></div>
+                <div class="card"><h4>Correlación</h4><p class="small"><code>X-Trace-ID</code> se genera en Angular y se propaga al backend mediante un filtro compartido.</p></div>
+                <div class="card"><h4>Documentación</h4><p class="small">Springdoc 3.0.2 expone Swagger UI y anotaciones <code>@Tag</code>/<code>@Operation</code>.</p></div>
+                <div class="card"><h4>Auditoría técnica</h4><p class="small"><code>ModularityTests</code> verifica la estructura y genera documentación de módulos.</p></div>
+            </div>
+        </section>
+
+        <section class="section" id="modulos">
+            <div class="section-head"><span class="section-num">05</span><h2>Catálogo de módulos backend</h2></div>
+            <p>
+                Los 12 módulos funcionales cubren el ciclo comercial, la gestión de usuarios, el dashboard y la
+                mensajería. La tabla siguiente resume su responsabilidad, sus tablas y su superficie REST.
+            </p>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Módulo</th><th>Responsabilidad</th><th>Tablas</th><th>API base</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>auth</strong></td><td>Login local con JWT, configuración de seguridad y adaptación de Keycloak.</td><td><code>CRM_USUARIOS</code> (lectura)</td><td><code>/api/v1/auth</code></td></tr>
+                        <tr><td><strong>usuarios</strong></td><td>CRUD de usuarios, roles ADMIN/JEFE/VENDEDOR, activación y desactivación; expone <code>UsuariosApi</code>.</td><td><code>CRM_USUARIOS</code></td><td><code>/api/v1/usuarios</code></td></tr>
+                        <tr><td><strong>clientes</strong></td><td>Clientes y contactos, búsqueda, estado y desactivación lógica.</td><td><code>CRM_CLIENTES</code>, <code>CRM_CONTACTOS</code></td><td><code>/api/v1/clientes</code></td></tr>
+                        <tr><td><strong>leads</strong></td><td>Leads, fuentes de origen, estados y conversión comercial.</td><td><code>CRM_LEADS</code>, <code>CRM_FUENTES</code></td><td><code>/api/v1/leads</code>, <code>/api/v1/fuentes</code></td></tr>
+                        <tr><td><strong>marketing</strong></td><td>Campañas, estados y asociación N:M con leads.</td><td><code>CRM_CAMPANIAS</code>, <code>CRM_CAMPANIA_LEADS</code></td><td><code>/api/v1/campanias</code></td></tr>
+                        <tr><td><strong>oportunidades</strong></td><td>Pipeline, valor ponderado, contactos, productos y colaboradores.</td><td><code>CRM_OPORTUNIDADES</code> + 3 tablas puente</td><td><code>/api/v1/oportunidades</code></td></tr>
+                        <tr><td><strong>productos</strong></td><td>Catálogo, precio base, código y estado del producto.</td><td><code>CRM_PRODUCTOS</code></td><td><code>/api/v1/productos</code></td></tr>
+                        <tr><td><strong>propuestas</strong></td><td>Cotizaciones con detalle, snapshots de producto, totales y máquina de estados.</td><td><code>CRM_PROPUESTAS</code>, <code>CRM_PROPUESTA_DETALLES</code></td><td><code>/api/v1/propuestas</code></td></tr>
+                        <tr><td><strong>actividades</strong></td><td>Llamadas, reuniones, tareas y seguimientos; vínculo polimórfico y participantes.</td><td><code>CRM_ACTIVIDADES</code>, <code>CRM_ACTIVIDAD_PARTICIPANTES</code></td><td><code>/api/v1/actividades</code></td></tr>
+                        <tr><td><strong>equipos</strong></td><td>Equipos, estado y miembros N:M con usuarios.</td><td><code>CRM_EQUIPOS</code>, <code>CRM_EQUIPO_MIEMBROS</code></td><td><code>/api/v1/equipos</code></td></tr>
+                        <tr><td><strong>dashboard</strong></td><td>Agregaciones de solo lectura para KPIs, pipeline, leads, actividades y propuestas.</td><td>Consulta las tablas de otros módulos</td><td><code>/api/v1/dashboard</code></td></tr>
+                        <tr><td><strong>mensajeria</strong></td><td>Sala general, historial incremental, resumen y envío.</td><td><code>CRM_MENSAJES</code></td><td><code>/api/v1/mensajeria</code></td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Reglas de negocio destacadas</h3>
+            <div class="grid-2">
+                <div class="card green">
+                    <h4>Oportunidades y pipeline</h4>
+                    <p class="small">Etapas: <code>PROSPECCION → CONTACTO → CALIFICACION → PROPUESTA → NEGOCIACION → GANADA / PERDIDA</code>. El valor ponderado se calcula como <code>valor × probabilidad / 100</code>, con redondeo HALF_UP a dos decimales.</p>
+                </div>
+                <div class="card purple">
+                    <h4>Propuestas</h4>
+                    <p class="small">Nacen en <code>BORRADOR</code>; solo se editan o eliminan en ese estado. Pasan a <code>ENVIADA</code>, luego a <code>APROBADA</code> o <code>RECHAZADA</code>; pueden cancelarse si no están en estado terminal. El número es <code>PROP-AAAA-####</code>.</p>
+                </div>
+                <div class="card blue">
+                    <h4>Actividades</h4>
+                    <p class="small">Tipos <code>LLAMADA</code>, <code>REUNION</code>, <code>TAREA</code> y <code>SEGUIMIENTO</code>; estados <code>PENDIENTE</code>, <code>EN_PROCESO</code>, <code>COMPLETADA</code> y <code>CANCELADA</code>. Una actividad se considera vencida si sigue pendiente después de su fecha.</p>
+                </div>
+                <div class="card amber">
+                    <h4>Leads y marketing</h4>
+                    <p class="small">Estados de lead: <code>NUEVO</code>, <code>CONTACTADO</code>, <code>CALIFICADO</code>, <code>CONVERTIDO</code> y <code>DESCARTADO</code>. Campañas: <code>BORRADOR</code>, <code>ACTIVA</code>, <code>FINALIZADA</code> y <code>CANCELADA</code>.</p>
+                </div>
+                <div class="card">
+                    <h4>Clientes y contactos</h4>
+                    <p class="small">Cliente con estado <code>ACTIVO/INACTIVO</code>; el contacto pertenece a un cliente y se gestiona como subrecurso. La desactivación es lógica, no borrado físico.</p>
+                </div>
+                <div class="card">
+                    <h4>Equipos</h4>
+                    <p class="small">Estado <code>ACTIVO/INACTIVO</code>, nombre único y miembros asociados a usuarios. La membresía se agrega y elimina mediante subrecurso.</p>
+                </div>
+                <div class="card">
+                    <h4>Mensajería</h4>
+                    <p class="small">Sala única para todos los usuarios autenticados. Historial persistente en Oracle, polling cada 5 s y contador de no leídos por navegador. Ver <a href="informe_mensajeria_v1.html">informe específico</a>.</p>
+                </div>
+                <div class="card">
+                    <h4>Dashboard</h4>
+                    <p class="small">Seis consultas de solo lectura: resumen, KPIs, pipeline, leads, actividades y propuestas. No tiene tabla propia; consume el estado actual de los demás módulos.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="frontend">
+            <div class="section-head"><span class="section-num">06</span><h2>Frontend Angular</h2></div>
+            <p>
+                La SPA usa Angular 22.1 con componentes standalone, change detection zoneless y rutas lazy-loaded. No hay
+                NgRx: el estado local se apoya en signals y en servicios con <code>HttpClient</code>. El layout autenticado
+                es el contenedor común de todas las pantallas.
+            </p>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Ruta</th><th>Pantalla / componente</th><th>Protección</th><th>Observación</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>/login</code></td><td>Login</td><td>Pública</td><td>Formulario contra Keycloak Direct Grant.</td></tr>
+                        <tr><td><code>/dashboard</code></td><td>Dashboard</td><td><code>authGuard</code></td><td>KPIs, pipeline y resúmenes.</td></tr>
+                        <tr><td><code>/clientes</code>, <code>/clientes/nuevo</code>, <code>/clientes/:id/editar</code></td><td>ClienteList, ClienteForm</td><td><code>authGuard</code></td><td>CRUD y contactos.</td></tr>
+                        <tr><td><code>/leads</code>, <code>/leads/nuevo</code>, <code>/leads/:id/editar</code></td><td>LeadList, LeadForm</td><td><code>authGuard</code></td><td>CRUD y cambio de estado.</td></tr>
+                        <tr><td><code>/oportunidades</code>, <code>/nuevo</code>, <code>/:id/editar</code>, <code>/:id</code></td><td>OportunidadList, Form, Detail</td><td><code>authGuard</code></td><td>Pipeline, contactos, productos y colaboradores.</td></tr>
+                        <tr><td><code>/productos</code>, <code>/nuevo</code>, <code>/:id/editar</code></td><td>ProductoList, ProductoForm</td><td><code>authGuard</code></td><td>Catálogo comercial.</td></tr>
+                        <tr><td><code>/actividades</code>, <code>/nuevo</code>, <code>/:id/editar</code></td><td>ActividadList, ActividadForm</td><td><code>authGuard</code></td><td>Seguimiento y participantes.</td></tr>
+                        <tr><td><code>/propuestas</code>, <code>/nuevo</code>, <code>/:id/editar</code></td><td>PropuestaList, PropuestaForm</td><td><code>authGuard</code></td><td>Detalle, totales y estados.</td></tr>
+                        <tr><td><code>/usuarios</code>, <code>/nuevo</code>, <code>/:id/editar</code></td><td>UsuarioList, UsuarioForm</td><td><code>roleGuard</code> ADMIN</td><td>Solo ADMIN.</td></tr>
+                        <tr><td><code>/equipos</code>, <code>/nuevo</code>, <code>/:id/editar</code></td><td>EquipoList, EquipoForm</td><td><code>authGuard</code></td><td>Miembros y estado.</td></tr>
+                        <tr><td><code>/configuracion</code></td><td>Configuracion</td><td><code>authGuard</code></td><td>Vista vacía / placeholder.</td></tr>
+                        <tr><td><code>/contactos</code>, <code>/pipeline</code>, <code>/indicadores</code>, <code>/campanas</code></td><td>Redirecciones</td><td><code>authGuard</code></td><td>Redirigen a clientes, oportunidades, dashboard y dashboard respectivamente.</td></tr>
+                        <tr><td><code>**</code></td><td>Redirección</td><td>—</td><td>Vuelve a la raíz.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Núcleo del frontend</h3>
+            <div class="grid-2">
+                <div class="card blue">
+                    <h4><code>core/auth</code></h4>
+                    <p class="small"><code>AuthService</code> gestiona login, token, usuario y roles. <code>authGuard</code> protege el layout; <code>roleGuard</code> restringe usuarios a ADMIN. Existe un adaptador Keycloak adicional, pero el proveedor registrado en <code>app.config.ts</code> es el servicio principal.</p>
+                </div>
+                <div class="card green">
+                    <h4><code>core/interceptors</code></h4>
+                    <p class="small"><code>traceIdInterceptor</code> agrega <code>X-Trace-ID</code>; <code>jwtInterceptor</code> agrega el Bearer, aplica timeout de 15 s y maneja 401 (logout) y 403 (aviso).</p>
+                </div>
+                <div class="card purple">
+                    <h4><code>core/layout</code></h4>
+                    <p class="small">Shell con sidebar, cabecera, menú de usuario, notificaciones estáticas y botón de mensajes con badge. Renderiza el <code>router-outlet</code> y el panel de chat.</p>
+                </div>
+                <div class="card">
+                    <h4><code>core/services</code></h4>
+                    <p class="small"><code>ApiService</code> centraliza la URL base desde <code>environment.ts</code>. Los servicios de feature construyen sus rutas relativas.</p>
+                </div>
+            </div>
+
+            <h3>Features y componentes</h3>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Feature</th><th>Contenido principal</th><th>Estado</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>dashboard</strong></td><td>Vista de KPIs y gráficos/resúmenes.</td><td><span class="badge-inline b-green">Operativo</span></td></tr>
+                        <tr><td><strong>clientes</strong></td><td>Listado, formulario y diálogo de contactos.</td><td><span class="badge-inline b-green">Operativo</span></td></tr>
+                        <tr><td><strong>leads</strong></td><td>Listado, formulario y cambio de estado.</td><td><span class="badge-inline b-green">Operativo</span></td></tr>
+                        <tr><td><strong>oportunidades</strong></td><td>Listado, formulario, detalle y diálogos de asociación.</td><td><span class="badge-inline b-green">Operativo</span></td></tr>
+                        <tr><td><strong>productos</strong></td><td>Listado y formulario de catálogo.</td><td><span class="badge-inline b-green">Operativo</span></td></tr>
+                        <tr><td><strong>actividades</strong></td><td>Listado y formulario de seguimiento.</td><td><span class="badge-inline b-green">Operativo</span></td></tr>
+                        <tr><td><strong>propuestas</strong></td><td>Listado y formulario con detalles.</td><td><span class="badge-inline b-green">Operativo</span></td></tr>
+                        <tr><td><strong>usuarios</strong></td><td>Listado y formulario, solo ADMIN.</td><td><span class="badge-inline b-green">Operativo</span></td></tr>
+                        <tr><td><strong>equipos</strong></td><td>Listado, formulario y miembros.</td><td><span class="badge-inline b-green">Operativo</span></td></tr>
+                        <tr><td><strong>mensajeria</strong></td><td>Servicio de polling y panel de chat.</td><td><span class="badge-inline b-green">Operativo</span></td></tr>
+                        <tr><td><strong>configuracion</strong></td><td>Componente vacío.</td><td><span class="badge-inline b-amber">Placeholder</span></td></tr>
+                        <tr><td><strong>marketing</strong></td><td>No existe carpeta de feature; la ruta <code>/campanas</code> redirige a dashboard.</td><td><span class="badge-inline b-rose">Solo backend</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="callout amber">
+                <strong>Brecha funcional visible:</strong> el backend de marketing está implementado, pero la SPA no
+                ofrece una pantalla de campañas. Del mismo modo, <code>/configuracion</code> es un placeholder y el menú
+                de notificaciones es estático.
+            </div>
+        </section>
+
+        <section class="section" id="seguridad">
+            <div class="section-head"><span class="section-num">07</span><h2>Seguridad e identidad</h2></div>
+            <p>
+                La seguridad se apoya en Keycloak como proveedor OIDC y en Spring Security como resource server. El
+                frontend obtiene un access token, lo guarda y lo adjunta a cada llamada al backend. Los roles viajan en
+                <code>realm_access.roles</code> y se convierten en autoridades <code>ROLE_*</code>.
+            </p>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Elemento</th><th>Configuración actual</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Realm</strong></td><td><code>viernes-realm</code> en <code>http://localhost:8180</code>.</td></tr>
+                        <tr><td><strong>Cliente frontend</strong></td><td><code>viernes-frontend</code>, público, Standard Flow y Direct Grant habilitados; redirects a <code>localhost:4200</code>.</td></tr>
+                        <tr><td><strong>Cliente backend</strong></td><td><code>viernes-backend</code>, bearer-only.</td></tr>
+                        <tr><td><strong>Usuario demo</strong></td><td><code>admin@viernes.com</code> con roles ADMIN, JEFE y VENDEDOR.</td></tr>
+                        <tr><td><strong>Issuer / JWK</strong></td><td><code>http://localhost:8180/realms/viernes-realm</code> y endpoint <code>/protocol/openid-connect/certs</code>.</td></tr>
+                        <tr><td><strong>Backend público</strong></td><td><code>/api/v1/auth/**</code>, Swagger, actuator y recursos estáticos.</td></tr>
+                        <tr><td><strong>Backend protegido</strong></td><td>Todo lo demás exige JWT válido; las mutaciones de usuarios exigen <code>ROLE_ADMIN</code>.</td></tr>
+                        <tr><td><strong>Frontend</strong></td><td><code>authGuard</code> en el layout; <code>roleGuard</code> ADMIN en usuarios; <code>jwtInterceptor</code> para Bearer y 401/403.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <h3>Flujo de autenticación actual</h3>
+            <div class="seq">
+                <div class="seq-row"><div class="seq-num">1</div><div class="seq-actor">Login</div><div class="seq-desc">El usuario ingresa correo y contraseña. El formulario está precargado con las credenciales demo.</div></div>
+                <div class="seq-row"><div class="seq-num">2</div><div class="seq-actor">AuthService</div><div class="seq-desc">Envía <code>grant_type=password</code> al endpoint <code>/protocol/openid-connect/token</code> del cliente público.</div></div>
+                <div class="seq-row"><div class="seq-num">3</div><div class="seq-actor">Keycloak</div><div class="seq-desc">Valida credenciales y devuelve <code>access_token</code> y <code>refresh_token</code>.</div></div>
+                <div class="seq-row"><div class="seq-num">4</div><div class="seq-actor">Navegador</div><div class="seq-desc">Guarda tokens y usuario en <code>localStorage</code>; decodifica claims para nombre, correo y roles.</div></div>
+                <div class="seq-row"><div class="seq-num">5</div><div class="seq-actor">Interceptor</div><div class="seq-desc">Adjunta <code>Authorization: Bearer …</code> a las llamadas al backend; no lo hace en llamadas a Keycloak ni en <code>/auth/</code>.</div></div>
+                <div class="seq-row"><div class="seq-num">6</div><div class="seq-actor">Resource Server</div><div class="seq-desc">Valida firma, emisor y expiración; convierte roles y establece el principal con <code>preferred_username</code>.</div></div>
+            </div>
+            <div class="grid-2">
+                <div class="card green">
+                    <h3>Fortalezas</h3>
+                    <ul class="checklist">
+                        <li>Identidad centralizada y estándar OIDC.</li>
+                        <li>Roles de realm mapeados a autoridades Spring.</li>
+                        <li>API stateless, sin sesión de servidor.</li>
+                        <li>Guard de rol para la administración de usuarios.</li>
+                        <li>Timeout de 15 s y mensajes de error amigables.</li>
+                    </ul>
+                </div>
+                <div class="card rose">
+                    <h3>Brechas</h3>
+                    <ul class="crosslist">
+                        <li>Access token en <code>localStorage</code>; expuesto ante XSS.</li>
+                        <li>No hay refresh automático efectivo en <code>AuthService</code>; al expirar se fuerza logout.</li>
+                        <li>Direct Grant es un flujo heredado, no el recomendado para SPA.</li>
+                        <li>El login local del backend no es aceptado por el resource server en perfil Keycloak.</li>
+                        <li>Actuator y Swagger están abiertos sin autenticación.</li>
+                        <li>Credenciales demo y secretos en archivos del repositorio.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="callout rose">
+                <strong>Dualidad de autenticación:</strong> conviven un login JWT local (<code>/api/v1/auth/login</code>)
+                y el login Keycloak. En el perfil activo <code>keycloak</code>, el backend valida tokens de Keycloak; el
+                token local no sirve para autenticarse. Antes de producción debe elegirse un único camino y retirar el
+                otro o aislarlo por perfil.
+            </div>
+        </section>
+
+        <section class="section" id="datos">
+            <div class="section-head"><span class="section-num">08</span><h2>Modelo de datos Oracle</h2></div>
+            <p>
+                El esquema <code>BOM_VENTAS</code> contiene 19 tablas. La mayoría de asociaciones se modelan como
+                agregados por ID, no como relaciones JPA bidireccionales. Solo Cliente↔Contacto y Propuesta↔Detalle usan
+                mapeo JPA directo; el resto se resuelve en adaptadores y puertos de consulta.
+            </p>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Grupo</th><th>Tabla</th><th>Propósito</th><th>Relación clave</th></tr></thead>
+                    <tbody>
+                        <tr><td rowspan="1"><strong>Seguridad</strong></td><td><code>CRM_USUARIOS</code></td><td>Usuarios, credenciales, rol y estado.</td><td>Referenciada por correo/ID desde otros módulos.</td></tr>
+                        <tr><td rowspan="2"><strong>Clientes</strong></td><td><code>CRM_CLIENTES</code></td><td>Empresas o personas atendidas.</td><td>1:N con contactos.</td></tr>
+                        <tr><td><code>CRM_CONTACTOS</code></td><td>Personas de contacto de un cliente.</td><td>FK lógica/JPA a cliente.</td></tr>
+                        <tr><td rowspan="2"><strong>Leads</strong></td><td><code>CRM_LEADS</code></td><td>Prospectos y su estado.</td><td>N:1 con fuente.</td></tr>
+                        <tr><td><code>CRM_FUENTES</code></td><td>Catálogo de origen del lead.</td><td>1:N con leads.</td></tr>
+                        <tr><td rowspan="2"><strong>Marketing</strong></td><td><code>CRM_CAMPANIAS</code></td><td>Campañas y su estado.</td><td>N:M con leads.</td></tr>
+                        <tr><td><code>CRM_CAMPANIA_LEADS</code></td><td>Tabla puente campaña–lead.</td><td>PK compuesta / unicidad por par.</td></tr>
+                        <tr><td rowspan="4"><strong>Pipeline</strong></td><td><code>CRM_OPORTUNIDADES</code></td><td>Oportunidades, valor, probabilidad y etapa.</td><td>N:M con contactos, productos y usuarios.</td></tr>
+                        <tr><td><code>CRM_OPORTUNIDAD_CONTACTOS</code></td><td>Contactos asociados y rol/decisor.</td><td>Tabla puente.</td></tr>
+                        <tr><td><code>CRM_OPORTUNIDAD_PRODUCTOS</code></td><td>Productos asociados y cantidad.</td><td>Tabla puente.</td></tr>
+                        <tr><td><code>CRM_OPORTUNIDAD_COLABORADORES</code></td><td>Usuarios colaboradores.</td><td>Tabla puente.</td></tr>
+                        <tr><td><strong>Catálogo</strong></td><td><code>CRM_PRODUCTOS</code></td><td>Productos, código, precio base y estado.</td><td>Referenciada por propuestas y oportunidades.</td></tr>
+                        <tr><td rowspan="2"><strong>Propuestas</strong></td><td><code>CRM_PROPUESTAS</code></td><td>Cabecera, estado, totales y fechas.</td><td>1:N con detalles.</td></tr>
+                        <tr><td><code>CRM_PROPUESTA_DETALLES</code></td><td>Líneas con snapshot de producto, cantidad y precio.</td><td>FK a propuesta; producto lógico.</td></tr>
+                        <tr><td rowspan="2"><strong>Actividades</strong></td><td><code>CRM_ACTIVIDADES</code></td><td>Llamadas, reuniones, tareas y seguimientos.</td><td>Vínculo polimórfico a cliente, lead u oportunidad.</td></tr>
+                        <tr><td><code>CRM_ACTIVIDAD_PARTICIPANTES</code></td><td>Contactos participantes.</td><td>Tabla puente con unicidad actividad–contacto.</td></tr>
+                        <tr><td rowspan="2"><strong>Equipos</strong></td><td><code>CRM_EQUIPOS</code></td><td>Equipos comerciales y estado.</td><td>N:M con usuarios.</td></tr>
+                        <tr><td><code>CRM_EQUIPO_MIEMBROS</code></td><td>Miembros del equipo.</td><td>Tabla puente.</td></tr>
+                        <tr><td><strong>Mensajería</strong></td><td><code>CRM_MENSAJES</code></td><td>Mensajes de la sala general.</td><td>Autor lógico por correo; sin FK a usuarios.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="grid-2">
+                <div class="card blue">
+                    <h3>Decisiones de modelado</h3>
+                    <ul>
+                        <li><strong>Agregados por ID:</strong> los módulos no dependen de entidades JPA ajenas.</li>
+                        <li><strong>Snapshots:</strong> la propuesta guarda descripción y precio del producto al momento de cotizar.</li>
+                        <li><strong>Integridad en aplicación:</strong> los adaptadores validan existencia de referencias antes de guardar.</li>
+                        <li><strong>Desactivación lógica:</strong> usuarios, clientes, productos y equipos manejan estado en lugar de borrado indiscriminado.</li>
+                    </ul>
+                </div>
+                <div class="card amber">
+                    <h3>Cuidados</h3>
+                    <ul>
+                        <li>No hay migraciones versionadas; el esquema depende de <code>ddl-auto=update</code>.</li>
+                        <li>Las referencias lógicas no tienen FK física: la integridad depende del código.</li>
+                        <li>Los borrados en cascada se resuelven manualmente en algunos servicios.</li>
+                        <li>No hay campos de auditoría uniformes (<code>creado_por</code>, <code>actualizado_en</code>) en todas las tablas.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="flujos">
+            <div class="section-head"><span class="section-num">09</span><h2>Flujos de negocio actuales</h2></div>
+            <p>
+                El sistema cubre el ciclo comercial desde el lead hasta la propuesta, con actividades de seguimiento y un
+                dashboard agregado. Estos son los recorridos principales tal como están implementados.
+            </p>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Flujo</th><th>Pasos</th><th>Reglas / efecto</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Autenticación</strong></td>
+                            <td>Login → Keycloak → token → localStorage → interceptor → backend.</td>
+                            <td>El backend valida el JWT; el frontend guarda usuario y roles. Al expirar, logout y redirección.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Cliente y contacto</strong></td>
+                            <td>Crear cliente → agregar contactos → consultar/editar → desactivar.</td>
+                            <td>El contacto pertenece al cliente; la desactivación evita borrar historial.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Lead</strong></td>
+                            <td>Registrar lead → asignar fuente → cambiar estado → convertir/descartar.</td>
+                            <td>Estados NUEVO → CONTACTADO → CALIFICADO → CONVERTIDO / DESCARTADO.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Oportunidad</strong></td>
+                            <td>Crear oportunidad → asociar contactos, productos y colaboradores → avanzar etapa.</td>
+                            <td>El valor ponderado se recalcula en la respuesta; las asociaciones evitan duplicados.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Propuesta</strong></td>
+                            <td>Seleccionar oportunidad y cliente → agregar detalles → calcular totales → enviar → aprobar/rechazar/cancelar.</td>
+                            <td>Solo BORRADOR es editable; las transiciones son explícitas; el detalle conserva snapshot del producto.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Actividad</strong></td>
+                            <td>Crear actividad → vincular cliente/lead/oportunidad → agregar participantes → cambiar estado.</td>
+                            <td>Puede estar vencida si sigue pendiente después de la fecha; los participantes son contactos.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Campaña</strong></td>
+                            <td>Crear campaña → activar → asociar leads → finalizar/cancelar.</td>
+                            <td>Backend operativo; la SPA no expone pantalla y redirige <code>/campanas</code> a dashboard.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Dashboard</strong></td>
+                            <td>Consultar resumen, KPIs, pipeline, leads, actividades y propuestas.</td>
+                            <td>Consultas de solo lectura sobre el estado actual; no almacena agregados.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Mensajería</strong></td>
+                            <td>Abrir panel → cargar últimos 100 → enviar → polling incremental → marcar leído.</td>
+                            <td>Sala única, polling 5 s, badge local y persistencia Oracle. Ver informe específico.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="callout">
+                <strong>Flujo comercial principal:</strong> Lead → Oportunidad → Propuesta → Actividad de seguimiento →
+                Dashboard. Los módulos se comunican por IDs y puertos de consulta, no por navegación de entidades JPA.
+            </div>
+        </section>
+
+        <section class="section" id="api">
+            <div class="section-head"><span class="section-num">10</span><h2>Mapa de API REST</h2></div>
+            <p>
+                La API se agrupa por módulo y usa el prefijo <code>/api/v1</code>. Todas las rutas requieren JWT salvo
+                <code>/api/v1/auth/**</code>, Swagger y actuator. Las operaciones de usuarios requieren ADMIN en las
+                mutaciones.
+            </p>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Módulo</th><th>Base</th><th>Operaciones principales</th><th>Notas</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Auth</strong></td><td><code>/api/v1/auth</code></td><td><span class="method post">POST</span> <code>/login</code></td><td>JWT local; en perfil Keycloak no es el flujo operativo.</td></tr>
+                        <tr><td><strong>Usuarios</strong></td><td><code>/api/v1/usuarios</code></td><td><span class="method get">GET</span> /, /{id} · <span class="method post">POST</span> / · <span class="method put">PUT</span> /{id} · <span class="method patch">PATCH</span> /{id}/activar, /{id}/desactivar</td><td>Mutaciones solo ADMIN.</td></tr>
+                        <tr><td><strong>Clientes</strong></td><td><code>/api/v1/clientes</code></td><td><span class="method get">GET</span> /, /{id} · <span class="method post">POST</span> / · <span class="method put">PUT</span> /{id} · <span class="method patch">PATCH</span> /{id}/desactivar · <span class="method delete">DELETE</span> /{id} · contactos bajo <code>/{clienteId}/contactos</code></td><td>Búsqueda y filtro por estado.</td></tr>
+                        <tr><td><strong>Fuentes</strong></td><td><code>/api/v1/fuentes</code></td><td><span class="method get">GET</span> /, /{id} · <span class="method post">POST</span> / · <span class="method put">PUT</span> /{id} · <span class="method delete">DELETE</span> /{id}</td><td>Catálogo de origen de leads.</td></tr>
+                        <tr><td><strong>Leads</strong></td><td><code>/api/v1/leads</code></td><td><span class="method get">GET</span> /, /{id} · <span class="method post">POST</span> / · <span class="method put">PUT</span> /{id} · <span class="method patch">PATCH</span> /{id}/estado · <span class="method delete">DELETE</span> /{id}</td><td>Filtros por estado y búsqueda.</td></tr>
+                        <tr><td><strong>Campañas</strong></td><td><code>/api/v1/campanias</code></td><td><span class="method get">GET</span> /, /{id}, /{id}/leads · <span class="method post">POST</span> /, /{id}/leads · <span class="method put">PUT</span> /{id} · <span class="method patch">PATCH</span> /{id}/estado · <span class="method delete">DELETE</span> /{id}, /{id}/leads/{leadId}</td><td>Sin pantalla frontend actual.</td></tr>
+                        <tr><td><strong>Oportunidades</strong></td><td><code>/api/v1/oportunidades</code></td><td><span class="method get">GET</span> /, /{id}, subrecursos · <span class="method post">POST</span> /, /{id}/contactos, /{id}/productos, /{id}/colaboradores · <span class="method put">PUT</span> /{id}, /{id}/contactos/{contactoId} · <span class="method patch">PATCH</span> /{id}/etapa · <span class="method delete">DELETE</span> /{id} y asociaciones</td><td>Pipeline y valor ponderado.</td></tr>
+                        <tr><td><strong>Productos</strong></td><td><code>/api/v1/productos</code></td><td><span class="method get">GET</span> /, /{id} · <span class="method post">POST</span> / · <span class="method put">PUT</span> /{id} · <span class="method delete">DELETE</span> /{id}</td><td>El estado se envía en el request de actualización.</td></tr>
+                        <tr><td><strong>Propuestas</strong></td><td><code>/api/v1/propuestas</code></td><td><span class="method get">GET</span> /, /{id} · <span class="method post">POST</span> / · <span class="method put">PUT</span> /{id} · <span class="method patch">PATCH</span> /{id}/enviar, /aprobar, /rechazar, /cancelar · <span class="method delete">DELETE</span> /{id}</td><td>Máquina de estados y totales.</td></tr>
+                        <tr><td><strong>Actividades</strong></td><td><code>/api/v1/actividades</code></td><td><span class="method get">GET</span> /, /{id}, /{id}/participantes · <span class="method post">POST</span> /, /{id}/participantes · <span class="method put">PUT</span> /{id} · <span class="method patch">PATCH</span> /{id}/estado · <span class="method delete">DELETE</span> /{id}, /{id}/participantes/{contactoId}</td><td>Filtros por estado, cliente, lead, oportunidad, usuario y vencidas.</td></tr>
+                        <tr><td><strong>Equipos</strong></td><td><code>/api/v1/equipos</code></td><td><span class="method get">GET</span> /, /{id}, /{id}/miembros · <span class="method post">POST</span> /, /{id}/miembros · <span class="method put">PUT</span> /{id} · <span class="method patch">PATCH</span> /{id}/activar, /{id}/desactivar · <span class="method delete">DELETE</span> /{id}, /{id}/miembros/{usuarioId}</td><td>Miembros y estado.</td></tr>
+                        <tr><td><strong>Dashboard</strong></td><td><code>/api/v1/dashboard</code></td><td><span class="method get">GET</span> /resumen, /kpis, /pipeline, /leads, /actividades, /propuestas</td><td>Solo lectura.</td></tr>
+                        <tr><td><strong>Mensajería</strong></td><td><code>/api/v1/mensajeria</code></td><td><span class="method get">GET</span> /, /resumen · <span class="method post">POST</span> /</td><td>Polling y sala general.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="callout">
+                <strong>Documentación viva:</strong> Swagger UI se genera desde las anotaciones de los controladores y está
+                disponible en <code>/swagger-ui.html</code>. Es la referencia más actualizada del contrato HTTP.
+            </div>
+        </section>
+
+        <section class="section" id="config">
+            <div class="section-head"><span class="section-num">11</span><h2>Configuración y despliegue</h2></div>
+            <h3>Configuración del backend</h3>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Archivo / propiedad</th><th>Valor actual</th><th>Efecto</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>application.yml</code> · <code>spring.profiles.active</code></td><td><code>dev,keycloak</code></td><td>Activa Oracle de desarrollo y resource server Keycloak.</td></tr>
+                        <tr><td><code>application-dev.yml</code> · datasource</td><td><code>jdbc:oracle:thin:@localhost:1521/FREEPDB1</code>, usuario <code>BOM_VENTAS</code></td><td>Conexión a Oracle local.</td></tr>
+                        <tr><td><code>spring.jpa.hibernate.ddl-auto</code></td><td><code>update</code></td><td>Hibernate crea/actualiza tablas automáticamente.</td></tr>
+                        <tr><td><code>spring.jpa.open-in-view</code></td><td><code>false</code></td><td>Evita lazy loading fuera de transacción; buena práctica.</td></tr>
+                        <tr><td><code>spring.jpa.show-sql</code></td><td><code>true</code></td><td>Registro SQL detallado en desarrollo; ruidoso en producción.</td></tr>
+                        <tr><td><code>springdoc.swagger-ui.path</code></td><td><code>/swagger-ui.html</code></td><td>Documentación interactiva.</td></tr>
+                        <tr><td><code>management.endpoints.web.exposure.include</code></td><td><code>health,info,metrics,prometheus</code></td><td>Observabilidad vía Actuator.</td></tr>
+                        <tr><td><code>viernes.cors.allowed-origins</code></td><td><code>localhost:4200</code>, <code>8080</code>, <code>3000</code></td><td>CORS de desarrollo.</td></tr>
+                        <tr><td><code>jwt.secret</code> / <code>jwt.expiration</code></td><td>Clave HS256 en texto plano / 8 horas</td><td>Solo para el login local; no aplica al resource server Keycloak.</td></tr>
+                        <tr><td><code>application-keycloak.yml</code></td><td>Issuer y JWK Set de <code>localhost:8180</code></td><td>Validación de tokens OIDC.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <h3>Configuración del frontend</h3>
+            <div class="grid-2">
+                <div class="card blue">
+                    <h4><code>environment.ts</code></h4>
+                    <pre style="margin-bottom:0"><code>export const environment = {
+  apiBaseUrl: 'http://localhost:8080/api/v1'
+};</code></pre>
+                    <p class="small muted" style="margin-top:10px">La URL está hardcodeada; no hay archivo de producción separado.</p>
+                </div>
+                <div class="card purple">
+                    <h4><code>app.config.ts</code></h4>
+                    <p class="small">Provee router, HTTP con interceptores, change detection zoneless y manejo global de errores. No registra el adaptador Keycloak alternativo.</p>
+                </div>
+            </div>
+            <h3>Infraestructura</h3>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Archivo</th><th>Servicio</th><th>Detalle</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>viernes-backend/compose-dev.yml</code></td><td>Oracle</td><td>Imagen <code>gvenzl/oracle-free:23-slim</code>, contenedor <code>bomerp-oracle</code>, puerto 1521, usuario <code>BOM_VENTAS</code>.</td></tr>
+                        <tr><td><code>compose-keycloak.yml</code></td><td>Keycloak + PostgreSQL</td><td>Keycloak 25.0.6 en 8180; PostgreSQL 16 Alpine en 5433; importa <code>viernes-realm.json</code>.</td></tr>
+                        <tr><td><code>obs/</code></td><td>Prometheus, Grafana, Promtail</td><td>Configuraciones base; no forman parte del arranque principal.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <h3>Comandos de verificación</h3>
+            <pre><code># Backend
+cd viernes-backend
+.\mvnw.cmd test
+.\mvnw.cmd spring-boot:run
+
+# Frontend
+cd viernes-frontend
+npm.cmd install
+npm.cmd run build
+npm.cmd start
+
+# Infraestructura
+docker compose -f viernes-backend\compose-dev.yml up -d
+docker compose -f compose-keycloak.yml up -d</code></pre>
+            <div class="callout rose">
+                <strong>No hay perfil de producción.</strong> No existe <code>application-prod.yml</code>, las URLs y
+                credenciales están orientadas a localhost y el frontend no tiene <code>environment.prod.ts</code>. Antes
+                de desplegar se requiere una configuración por variables de entorno, HTTPS, CORS restringido y
+                migraciones de base de datos.
+            </div>
+        </section>
+
+        <section class="section" id="calidad">
+            <div class="section-head"><span class="section-num">12</span><h2>Calidad y pruebas</h2></div>
+            <p>
+                La suite del backend es amplia y está distribuida por módulo. Incluye pruebas de servicio, controlador,
+                modularidad y contexto Spring. El frontend tiene únicamente dos pruebas base y no cubre los flujos de
+                negocio.
+            </p>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Ámbito</th><th>Pruebas</th><th>Detalle</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>actividades</strong></td><td>28</td><td>Servicio y controlador.</td></tr>
+                        <tr><td><strong>auth</strong></td><td>8</td><td>AuthService y JwtService.</td></tr>
+                        <tr><td><strong>clientes</strong></td><td>30</td><td>Servicio y controlador.</td></tr>
+                        <tr><td><strong>dashboard</strong></td><td>8</td><td>Servicio y controlador.</td></tr>
+                        <tr><td><strong>equipos</strong></td><td>26</td><td>Servicio y controlador.</td></tr>
+                        <tr><td><strong>leads</strong></td><td>36</td><td>Lead, fuente, servicio y controlador.</td></tr>
+                        <tr><td><strong>marketing</strong></td><td>26</td><td>Campaña, servicio y controlador.</td></tr>
+                        <tr><td><strong>mensajeria</strong></td><td>11</td><td>Servicio y controlador.</td></tr>
+                        <tr><td><strong>oportunidades</strong></td><td>20</td><td>Servicio y controlador.</td></tr>
+                        <tr><td><strong>productos</strong></td><td>20</td><td>Servicio y controlador.</td></tr>
+                        <tr><td><strong>propuestas</strong></td><td>22</td><td>Servicio y controlador.</td></tr>
+                        <tr><td><strong>usuarios</strong></td><td>19</td><td>Servicio y controlador.</td></tr>
+                        <tr><td><strong>raíz</strong></td><td>3</td><td><code>ModularityTests</code> (2) y <code>ViernesApplicationTests</code> (1).</td></tr>
+                        <tr><td><strong>Total</strong></td><td><strong>257</strong></td><td><strong>0 fallos · 0 errores · BUILD SUCCESS</strong></td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="grid-2">
+                <div class="card green">
+                    <h3>Fortalezas de la suite</h3>
+                    <ul class="checklist">
+                        <li>Cobertura de servicios y controladores en todos los módulos.</li>
+                        <li>Verificación automática de la estructura Modulith.</li>
+                        <li>Prueba de carga del contexto Spring.</li>
+                        <li>Build de producción Angular validado.</li>
+                        <li>Documentación de módulos generada por prueba.</li>
+                    </ul>
+                </div>
+                <div class="card amber">
+                    <h3>Brechas de calidad</h3>
+                    <ul class="crosslist">
+                        <li>No hay pruebas <code>@DataJpaTest</code> ni de integración real con Oracle.</li>
+                        <li>Solo una prueba <code>@SpringBootTest</code> de contexto.</li>
+                        <li>El frontend tiene 2 specs base; no hay pruebas de features.</li>
+                        <li>No hay E2E de login, ventas, propuestas o mensajería.</li>
+                        <li>No hay pruebas de contrato ni de carga.</li>
+                        <li>No hay análisis estático obligatorio (Sonar, SpotBugs, ESLint estricto).</li>
+                    </ul>
+                </div>
+            </div>
+            <h3>Build Angular</h3>
+            <pre><code>Initial chunk files   Raw size      Transfer size
+chunk-bLOCJ4ZW.js     207.34 kB     60.18 kB
+main-MW7LQ7KR.js      119.80 kB     30.88 kB
+styles-DUGPAA6K.css    15.23 kB      3.05 kB
+Initial total         342.38 kB     94.11 kB
+Lazy chunks           35+            —</code></pre>
+            <p class="small muted">El bundle inicial queda por debajo del presupuesto de advertencia de 500 kB configurado en <code>angular.json</code>.</p>
+        </section>
+
+        <section class="section" id="riesgos">
+            <div class="section-head"><span class="section-num">13</span><h2>Riesgos y deuda técnica</h2></div>
+            <p>
+                El sistema es funcional para desarrollo, pero hay decisiones que deben resolverse antes de un despliegue
+                real. La tabla prioriza por impacto y evidencia en el código actual.
+            </p>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Severidad</th><th>Riesgo / deuda</th><th>Evidencia</th><th>Recomendación</th></tr></thead>
+                    <tbody>
+                        <tr><td><span class="badge-inline b-rose">Alta</span></td><td>Secretos y credenciales demo en el repositorio.</td><td>Datasource, JWT local, Keycloak admin, usuario demo y contraseñas en YAML/JSON/compose.</td><td>Externalizar a variables de entorno o vault; rotar credenciales.</td></tr>
+                        <tr><td><span class="badge-inline b-rose">Alta</span></td><td>Esquema sin migraciones versionadas.</td><td><code>ddl-auto: update</code>; no hay Flyway/Liquibase.</td><td>Adoptar migraciones y desactivar <code>ddl-auto</code> en producción.</td></tr>
+                        <tr><td><span class="badge-inline b-rose">Alta</span></td><td>No hay configuración de producción.</td><td>Sin <code>application-prod.yml</code>, URLs localhost y CORS fijo.</td><td>Perfil prod, HTTPS, CORS explícito y variables de entorno.</td></tr>
+                        <tr><td><span class="badge-inline b-rose">Alta</span></td><td>Dualidad de autenticación.</td><td>Login local y Keycloak conviven; el token local no sirve con resource server Keycloak.</td><td>Consolidar en Keycloak/OIDC y retirar el login local o aislarlo por perfil.</td></tr>
+                        <tr><td><span class="badge-inline b-rose">Alta</span></td><td>Token en <code>localStorage</code>.</td><td><code>AuthService</code> guarda access y refresh token en el navegador.</td><td>Evaluar cookies httpOnly o almacenamiento en memoria con refresh controlado.</td></tr>
+                        <tr><td><span class="badge-inline b-amber">Media</span></td><td>Límites de módulos permisivos.</td><td>Módulos OPEN y <code>actividades</code> sin <code>package-info</code>; importa repositorios ajenos.</td><td>Declarar dependencias, exponer APIs públicas y evitar repositorios cruzados.</td></tr>
+                        <tr><td><span class="badge-inline b-amber">Media</span></td><td>Actuator y Swagger abiertos.</td><td><code>/actuator/**</code> y Swagger con <code>permitAll</code>.</td><td>Restringir en producción o exponer solo health.</td></tr>
+                        <tr><td><span class="badge-inline b-amber">Media</span></td><td>Funcionalidades frontend incompletas.</td><td><code>configuracion</code> vacío, <code>/campanas</code> redirige, notificaciones estáticas.</td><td>Completar o retirar del menú para no generar expectativas.</td></tr>
+                        <tr><td><span class="badge-inline b-amber">Media</span></td><td>Cobertura frontend insuficiente.</td><td>Solo 2 archivos <code>.spec.ts</code> base.</td><td>Pruebas de servicios, guards y componentes críticos; añadir E2E.</td></tr>
+                        <tr><td><span class="badge-inline b-amber">Media</span></td><td>Sin paginación general.</td><td>La mayoría de listados devuelve todos los registros.</td><td>Paginar y filtrar en servidor; cuidar dashboard y mensajería.</td></tr>
+                        <tr><td><span class="badge-inline b-amber">Media</span></td><td>Sin rate limiting ni auditoría de mensajería.</td><td>No hay límite por usuario ni tabla de auditoría.</td><td>Añadir throttling, moderación y retención.</td></tr>
+                        <tr><td><span class="badge-inline b-blue">Baja</span></td><td>Documentación desactualizada.</td><td>README/CLAUDE describen bomerp; informes antiguos hablan de 7 módulos y 132 pruebas.</td><td>Actualizar o marcar como históricos.</td></tr>
+                        <tr><td><span class="badge-inline b-blue">Baja</span></td><td>Ruido de desarrollo.</td><td><code>show-sql: true</code> y logging DEBUG en <code>com.viernes</code>.</td><td>Desactivar en prod y usar logs estructurados.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Hoja de ruta recomendada</h3>
+            <div class="grid-3">
+                <div class="card rose">
+                    <h4>P1 · Antes de producción</h4>
+                    <ul class="small">
+                        <li>Configuración por entorno y secretos fuera del repo.</li>
+                        <li>Migraciones Flyway/Liquibase.</li>
+                        <li>Un solo flujo de autenticación.</li>
+                        <li>Restringir actuator/Swagger.</li>
+                        <li>Pruebas E2E de login y flujo comercial.</li>
+                    </ul>
+                </div>
+                <div class="card amber">
+                    <h4>P2 · Estabilidad</h4>
+                    <ul class="small">
+                        <li>Cerrar límites de módulos y reducir acoplamiento.</li>
+                        <li>Paginación y filtros en servidor.</li>
+                        <li>Pruebas de integración con Oracle.</li>
+                        <li>Completar configuración y campañas en la SPA.</li>
+                        <li>Observabilidad integrada al arranque.</li>
+                    </ul>
+                </div>
+                <div class="card blue">
+                    <h4>P3 · Evolución</h4>
+                    <ul class="small">
+                        <li>Mensajería en tiempo real con SSE/WebSocket.</li>
+                        <li>Canales y adjuntos.</li>
+                        <li>Auditoría y analítica de uso.</li>
+                        <li>Internacionalización y accesibilidad avanzada.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="referencia">
+            <div class="section-head"><span class="section-num">14</span><h2>Referencia rápida y conclusión</h2></div>
+            <div class="grid-2">
+                <div class="card blue">
+                    <h3>URLs</h3>
+                    <ul>
+                        <li>Frontend: <code>http://localhost:4200</code></li>
+                        <li>API: <code>http://localhost:8080</code></li>
+                        <li>Swagger: <code>http://localhost:8080/swagger-ui.html</code></li>
+                        <li>Health: <code>http://localhost:8080/actuator/health</code></li>
+                        <li>Keycloak: <code>http://localhost:8180</code></li>
+                        <li>Realm: <code>viernes-realm</code></li>
+                    </ul>
+                </div>
+                <div class="card green">
+                    <h3>Credenciales demo</h3>
+                    <ul>
+                        <li>Usuario: <code>admin@viernes.com</code></li>
+                        <li>Contraseña: <code>Admin12345</code></li>
+                        <li>Roles: ADMIN, JEFE, VENDEDOR</li>
+                        <li>Consola Keycloak: <code>admin/admin</code></li>
+                    </ul>
+                    <p class="small muted">Solo para entorno local. No reutilizar en producción.</p>
+                </div>
+            </div>
+            <h3>Documentos relacionados</h3>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Documento</th><th>Uso</th></tr></thead>
+                    <tbody>
+                        <tr><td><a href="informe_mensajeria_v1.html">Informe de Mensajería Interna</a></td><td>Detalle de la sala general, endpoints, polling, UI y limitaciones.</td></tr>
+                        <tr><td><a href="informe_estructura_sistema.html">Estructura Global del Sistema</a></td><td>Visión histórica de arquitectura, topología y capas.</td></tr>
+                        <tr><td><a href="informe_relaciones_transaccionalidad.html">Relaciones y Transaccionalidad</a></td><td>Análisis de relaciones, agregados y <code>@Transactional</code>.</td></tr>
+                        <tr><td><a href="informe_keycloak_v1.html">Informe Keycloak</a></td><td>Configuración de OIDC, realm, clientes y flujo de identidad.</td></tr>
+                        <tr><td><a href="arquitectura_codigo.html">Arquitectura de Código</a></td><td>Recorrido por paquetes y decisiones de implementación.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <h3>Conclusión</h3>
+            <p>
+                Viernes CRM V1 tiene una base sólida para un proyecto académico y un prototipo funcional: módulos bien
+                separados en la intención, una API REST consistente, persistencia Oracle, identidad centralizada y una
+                suite de 257 pruebas en verde. La arquitectura hexagonal por módulo facilita cambiar adaptadores y
+                aislar reglas de negocio.
+            </p>
+            <p>
+                El principal salto pendiente no es funcional sino operativo: convertir una configuración de desarrollo
+                cómoda en un despliegue seguro y repetible. Eso implica migraciones, secretos externos, un único flujo
+                de autenticación, pruebas de integración/E2E, límites de módulos más estrictos y cierre de las pantallas
+                incompletas.
+            </p>
+            <div class="callout green">
+                <strong>En una frase:</strong> el sistema ya funciona de punta a punta en local; el siguiente hito es
+                endurecerlo para producción sin perder la modularidad que hoy lo hace mantenible.
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="footer">
+        <span><strong>VIERNES CRM V1</strong> · Informe Técnico del Sistema y sus Módulos · v1.0</span>
+        <span>Generado desde el código actual · 21/10/2026 · <a href="../index.html">Portal de informes</a></span>
+    </footer>
+
+</div>
+</body>
+</html>

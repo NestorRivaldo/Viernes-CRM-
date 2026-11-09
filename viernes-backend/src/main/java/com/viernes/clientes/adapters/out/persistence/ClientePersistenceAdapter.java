@@ -8,6 +8,7 @@ import com.viernes.clientes.domain.Cliente;
 import com.viernes.clientes.domain.Contacto;
 import com.viernes.clientes.domain.EstadoCliente;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -23,13 +24,29 @@ public class ClientePersistenceAdapter implements ClientePersistencePort {
 
     @Override
     public List<Cliente> findAll() {
-        return repository.findAll().stream().map(this::toDomain).toList();
+        return repository.findAll(Sort.by(Sort.Direction.ASC, "id")).stream().map(this::toDomain).toList();
     }
 
     @Override
     public List<Cliente> findByNombreOrEmpresa(String q) {
-        return repository.findByNombreContainingIgnoreCaseOrEmpresaContainingIgnoreCase(q, q)
+        return repository.findByNombreContainingIgnoreCaseOrEmpresaContainingIgnoreCaseOrNumeroDocumentoContainingIgnoreCase(q, q, q)
                 .stream().map(this::toDomain).toList();
+    }
+
+    @Override
+    public List<Cliente> findByNumeroDocumento(String numeroDocumento) {
+        return repository.findByNumeroDocumento(numeroDocumento)
+                .stream().map(this::toDomain).toList();
+    }
+
+    @Override
+    public boolean existsByNumeroDocumento(String numeroDocumento) {
+        return repository.existsByNumeroDocumento(numeroDocumento);
+    }
+
+    @Override
+    public boolean existsByNumeroDocumentoAndIdNot(String numeroDocumento, Long id) {
+        return repository.existsByNumeroDocumentoAndIdNot(numeroDocumento, id);
     }
 
     @Override
@@ -67,6 +84,8 @@ public class ClientePersistenceAdapter implements ClientePersistencePort {
                 .id(entity.getId())
                 .nombre(entity.getNombre())
                 .empresa(entity.getEmpresa())
+                .tipoDocumento(entity.getTipoDocumento())
+                .numeroDocumento(entity.getNumeroDocumento())
                 .correo(entity.getCorreo())
                 .telefono(entity.getTelefono())
                 .estado(entity.getEstado())
@@ -81,6 +100,8 @@ public class ClientePersistenceAdapter implements ClientePersistencePort {
                 .id(domain.getId())
                 .nombre(domain.getNombre())
                 .empresa(domain.getEmpresa())
+                .tipoDocumento(domain.getTipoDocumento())
+                .numeroDocumento(domain.getNumeroDocumento())
                 .correo(domain.getCorreo())
                 .telefono(domain.getTelefono())
                 .estado(domain.getEstado())

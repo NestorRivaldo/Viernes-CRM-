@@ -1,127 +1,426 @@
-<div class="form-container">
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>
-        {{ isEdit ? 'Editar Propuesta' : 'Nueva Propuesta' }}
-        <span *ngIf="isEdit" class="estado-chip">{{ estadoActual }}</span>
-      </mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <div *ngIf="loading" class="loading-state">Cargando...</div>
-
-      <form [formGroup]="form" (ngSubmit)="guardar()">
-
-        <div class="form-row">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>ID Oportunidad</mat-label>
-            <input matInput type="number" formControlName="idOportunidad" required>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>ID Cliente</mat-label>
-            <input matInput type="number" formControlName="idCliente" required>
-          </mat-form-field>
+<div class="entity-page" [class.is-dialog]="esDialogo">
+  <div class="entity-dialog propuesta-dialog">
+    <header class="entity-header">
+      <div class="entity-icon">
+        <mat-icon>request_quote</mat-icon>
+      </div>
+      <div class="entity-heading">
+        <span class="entity-eyebrow">Ventas · Propuestas</span>
+        <div class="propuesta-title-row">
+          <h2>{{ titulo }}</h2>
+          @if (isEdit) {
+            <span class="entity-status-chip {{ estadoClass }}">{{ estadoActual }}</span>
+          }
         </div>
+        <p>{{ subtitulo }}</p>
+      </div>
+      <button type="button" class="entity-close" (click)="cerrar()" [disabled]="loading" title="Cerrar">
+        <mat-icon>close</mat-icon>
+      </button>
+    </header>
 
-        <div class="form-row">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Nombre del Cliente</mat-label>
-            <input matInput formControlName="clienteNombre">
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Responsable</mat-label>
-            <input matInput formControlName="responsable">
-          </mat-form-field>
+    <form id="propuestaForm" [formGroup]="form" (ngSubmit)="guardar()" class="entity-body">
+      @if (cargandoPropuesta) {
+        <div class="entity-loading">
+          <mat-spinner diameter="34"></mat-spinner>
+          <span>Cargando propuesta...</span>
         </div>
-
-        <div class="form-row">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Fecha de Emisión</mat-label>
-            <input matInput type="date" formControlName="fechaEmision" required>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Fecha de Vencimiento</mat-label>
-            <input matInput type="date" formControlName="fechaVencimiento">
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Descuento</mat-label>
-            <input matInput type="number" formControlName="descuento" min="0">
-          </mat-form-field>
-        </div>
-
-        <div class="form-row">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Observaciones</mat-label>
-            <textarea matInput formControlName="observaciones" rows="2"></textarea>
-          </mat-form-field>
-        </div>
-
-        <h3>Detalles</h3>
-        <div formArrayName="detalles">
-          <div class="detalle-row" *ngFor="let detalle of detalles.controls; let i = index" [formGroupName]="i">
-            <mat-form-field appearance="outline" class="detalle-descripcion">
-              <mat-label>Descripción</mat-label>
-              <input matInput formControlName="descripcion" required>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" class="detalle-num">
-              <mat-label>Cantidad</mat-label>
-              <input matInput type="number" formControlName="cantidad" required min="1">
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" class="detalle-num">
-              <mat-label>Precio Unitario</mat-label>
-              <input matInput type="number" formControlName="precioUnitario" required min="0">
-            </mat-form-field>
-
-            <button mat-icon-button color="warn" type="button" (click)="eliminarDetalle(i)"
-                    *ngIf="estadoActual === 'BORRADOR'">
-              <mat-icon>delete</mat-icon>
-            </button>
+      } @else {
+        @if (validationError) {
+          <div class="entity-alert error">
+            <mat-icon>error_outline</mat-icon>
+            <span>{{ validationError }}</span>
           </div>
-        </div>
+        }
 
-        <div class="detalle-actions" *ngIf="estadoActual === 'BORRADOR'">
-          <button mat-stroked-button type="button" (click)="agregarDetalle()">
-            <mat-icon>add</mat-icon> Agregar Detalle
+        @if (serverError) {
+          <div class="entity-alert error">
+            <mat-icon>cloud_off</mat-icon>
+            <span>{{ serverError }}</span>
+          </div>
+        }
+
+        @if (!esBorrador) {
+          <div class="entity-alert info">
+            <mat-icon>lock</mat-icon>
+            <span>
+              Esta propuesta ya no se puede editar porque está en estado
+              <strong>{{ estadoActual }}</strong>. Puedes gestionar su aprobación desde el flujo inferior.
+            </span>
+          </div>
+        }
+
+        <section class="entity-section">
+          <div class="entity-section-heading">
+            <span class="entity-index">01</span>
+            <div class="entity-section-copy">
+              <h3>Datos de la propuesta</h3>
+              <p>Vinculación comercial, fechas y condiciones generales.</p>
+            </div>
+          </div>
+
+          <div class="entity-grid two">
+            <div class="entity-field">
+              <label class="entity-label" for="propuestaOportunidad">
+                Oportunidad asociada <span class="entity-req">*</span>
+              </label>
+              <div class="entity-input-wrap">
+                <mat-icon class="entity-input-icon">track_changes</mat-icon>
+                <select
+                  id="propuestaOportunidad"
+                  class="entity-select"
+                  [class.invalid]="mostrarError('idOportunidad')"
+                  formControlName="idOportunidad"
+                  (change)="onOportunidadChange()"
+                >
+                  <option [ngValue]="null">-- Seleccionar oportunidad --</option>
+                  @for (op of oportunidades; track op.id) {
+                    <option [ngValue]="op.id">
+                      #{{ op.id }} - {{ op.nombre }} ({{ op.clienteNombre || 'Sin cliente' }}) - S/ {{ op.valor }}
+                    </option>
+                  }
+                </select>
+              </div>
+              @if (mostrarError('idOportunidad')) {
+                <span class="entity-error">{{ mensajeError('idOportunidad') }}</span>
+              } @else {
+                <span class="entity-hint">Oportunidad del pipeline comercial a cotizar.</span>
+              }
+            </div>
+
+            <div class="entity-field">
+              <label class="entity-label" for="propuestaCliente">
+                Cliente destinatario <span class="entity-req">*</span>
+              </label>
+              <div class="entity-input-wrap">
+                <mat-icon class="entity-input-icon">person</mat-icon>
+                <select
+                  id="propuestaCliente"
+                  class="entity-select"
+                  [class.invalid]="mostrarError('idCliente')"
+                  formControlName="idCliente"
+                  (change)="onClienteChange()"
+                >
+                  <option [ngValue]="null">-- Seleccionar cliente --</option>
+                  @for (c of clientes; track c.id) {
+                    <option [ngValue]="c.id">
+                      #{{ c.id }} - {{ c.empresa ? c.empresa + ' (' + c.nombre + ')' : c.nombre }}
+                    </option>
+                  }
+                </select>
+              </div>
+              @if (mostrarError('idCliente')) {
+                <span class="entity-error">{{ mensajeError('idCliente') }}</span>
+              } @else {
+                <span class="entity-hint">Cliente comercial al que se emite la propuesta.</span>
+              }
+            </div>
+
+            <div class="entity-field">
+              <label class="entity-label" for="propuestaClienteNombre">Nombre del cliente</label>
+              <div class="entity-input-wrap">
+                <mat-icon class="entity-input-icon">business</mat-icon>
+                <input
+                  id="propuestaClienteNombre"
+                  class="entity-input"
+                  formControlName="clienteNombre"
+                  placeholder="Se completa desde el cliente"
+                />
+              </div>
+            </div>
+
+            <div class="entity-field">
+              <label class="entity-label" for="propuestaResponsable">Responsable</label>
+              <div class="entity-input-wrap">
+                <mat-icon class="entity-input-icon">assignment_ind</mat-icon>
+                <input
+                  id="propuestaResponsable"
+                  class="entity-input"
+                  formControlName="responsable"
+                  placeholder="Ej. Ejecutivo comercial"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="entity-grid three propuesta-dates">
+            <div class="entity-field">
+              <label class="entity-label" for="propuestaEmision">
+                Fecha de emisión <span class="entity-req">*</span>
+              </label>
+              <div class="entity-input-wrap">
+                <mat-icon class="entity-input-icon">event</mat-icon>
+                <input
+                  id="propuestaEmision"
+                  type="date"
+                  class="entity-input"
+                  [class.invalid]="mostrarError('fechaEmision')"
+                  formControlName="fechaEmision"
+                />
+              </div>
+              @if (mostrarError('fechaEmision')) {
+                <span class="entity-error">{{ mensajeError('fechaEmision') }}</span>
+              }
+            </div>
+
+            <div class="entity-field">
+              <label class="entity-label" for="propuestaVencimiento">Fecha de vencimiento</label>
+              <div class="entity-input-wrap">
+                <mat-icon class="entity-input-icon">event_busy</mat-icon>
+                <input
+                  id="propuestaVencimiento"
+                  type="date"
+                  class="entity-input"
+                  formControlName="fechaVencimiento"
+                />
+              </div>
+            </div>
+
+            <div class="entity-field">
+              <label class="entity-label" for="propuestaDescuento">Descuento</label>
+              <div class="entity-input-wrap">
+                <mat-icon class="entity-input-icon">percent</mat-icon>
+                <input
+                  id="propuestaDescuento"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  class="entity-input"
+                  [class.invalid]="mostrarError('descuento')"
+                  formControlName="descuento"
+                  placeholder="0.00"
+                />
+              </div>
+              @if (mostrarError('descuento')) {
+                <span class="entity-error">{{ mensajeError('descuento') }}</span>
+              } @else {
+                <span class="entity-hint">Monto descontado del subtotal.</span>
+              }
+            </div>
+          </div>
+
+          <div class="entity-field propuesta-observaciones">
+            <label class="entity-label" for="propuestaObservaciones">Observaciones</label>
+            <textarea
+              id="propuestaObservaciones"
+              class="entity-textarea"
+              formControlName="observaciones"
+              placeholder="Condiciones, alcance o notas para el cliente..."
+            ></textarea>
+          </div>
+        </section>
+
+        <section class="entity-section">
+          <div class="entity-section-heading">
+            <span class="entity-index">02</span>
+            <div class="entity-section-copy">
+              <h3>Detalles de la propuesta</h3>
+              <p>Productos, servicios y condiciones económicas ofrecidas.</p>
+            </div>
+            <div class="entity-section-aside">
+              <span class="entity-count-chip">
+                <mat-icon>inventory_2</mat-icon>
+                {{ detalles.length }} {{ detalles.length === 1 ? 'ítem' : 'ítems' }}
+              </span>
+            </div>
+          </div>
+
+          <div class="propuesta-detalles" formArrayName="detalles">
+            @for (detalle of detalles.controls; track $index; let i = $index) {
+              <div class="detalle-row" [formGroupName]="i">
+                <div class="entity-field detalle-producto">
+                  <label class="entity-label" [for]="'detalleProducto' + i">Producto</label>
+                  <div class="entity-select-wrap">
+                    <select
+                      [id]="'detalleProducto' + i"
+                      class="entity-select"
+                      formControlName="productoId"
+                      (change)="onProductoChange(i)"
+                    >
+                      <option value="">Ítem libre</option>
+                      @for (producto of productos; track producto.id) {
+                        <option [value]="producto.id">{{ producto.codigo }} — {{ producto.nombre }}</option>
+                      }
+                    </select>
+                    <mat-icon class="entity-select-chevron">expand_more</mat-icon>
+                  </div>
+                </div>
+
+                <div class="entity-field detalle-descripcion">
+                  <label class="entity-label" [for]="'detalleDescripcion' + i">
+                    Descripción <span class="entity-req">*</span>
+                  </label>
+                  <input
+                    [id]="'detalleDescripcion' + i"
+                    class="entity-input"
+                    [class.invalid]="mostrarErrorDetalle(i, 'descripcion')"
+                    formControlName="descripcion"
+                    placeholder="Detalle del producto o servicio"
+                  />
+                  @if (mostrarErrorDetalle(i, 'descripcion')) {
+                    <span class="entity-error">{{ mensajeErrorDetalle(i, 'descripcion') }}</span>
+                  }
+                </div>
+
+                <div class="entity-field detalle-num">
+                  <label class="entity-label" [for]="'detalleCantidad' + i">
+                    Cant. <span class="entity-req">*</span>
+                  </label>
+                  <input
+                    [id]="'detalleCantidad' + i"
+                    type="number"
+                    min="1"
+                    step="1"
+                    class="entity-input"
+                    [class.invalid]="mostrarErrorDetalle(i, 'cantidad')"
+                    formControlName="cantidad"
+                  />
+                  @if (mostrarErrorDetalle(i, 'cantidad')) {
+                    <span class="entity-error">{{ mensajeErrorDetalle(i, 'cantidad') }}</span>
+                  }
+                </div>
+
+                <div class="entity-field detalle-num">
+                  <label class="entity-label" [for]="'detallePrecio' + i">
+                    Precio unit. <span class="entity-req">*</span>
+                  </label>
+                  <input
+                    [id]="'detallePrecio' + i"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    class="entity-input"
+                    [class.invalid]="mostrarErrorDetalle(i, 'precioUnitario')"
+                    formControlName="precioUnitario"
+                  />
+                  @if (mostrarErrorDetalle(i, 'precioUnitario')) {
+                    <span class="entity-error">{{ mensajeErrorDetalle(i, 'precioUnitario') }}</span>
+                  }
+                </div>
+
+                <button
+                  type="button"
+                  class="detalle-remove"
+                  [disabled]="detalles.length === 1 || !esBorrador"
+                  (click)="eliminarDetalle(i)"
+                  title="Eliminar detalle"
+                >
+                  <mat-icon>delete_outline</mat-icon>
+                </button>
+              </div>
+            }
+          </div>
+
+          @if (esBorrador) {
+            <button type="button" class="detalle-add" (click)="agregarDetalle()">
+              <mat-icon>add</mat-icon>
+              Agregar detalle
+            </button>
+          }
+
+          <div class="propuesta-total-box">
+            <div class="total-line">
+              <span>Subtotal</span>
+              <strong>{{ formatearMonto(subtotalEstimado) }}</strong>
+            </div>
+            @if (descuentoActual > 0) {
+              <div class="total-line discount">
+                <span>Descuento</span>
+                <strong>- {{ formatearMonto(descuentoActual) }}</strong>
+              </div>
+            }
+            <div class="total-line total">
+              <span>Total estimado</span>
+              <strong>{{ formatearMonto(totalEstimado) }}</strong>
+            </div>
+          </div>
+        </section>
+
+        @if (isEdit) {
+          <section class="entity-section">
+            <div class="entity-section-heading">
+              <span class="entity-index">03</span>
+              <div class="entity-section-copy">
+                <h3>Flujo de aprobación</h3>
+                <p>Acciones disponibles según el estado actual de la propuesta.</p>
+              </div>
+              <div class="entity-section-aside">
+                <span class="entity-status-chip {{ estadoClass }}">{{ estadoActual }}</span>
+              </div>
+            </div>
+
+            <div class="workflow-bar">
+              <div class="workflow-copy">
+                <mat-icon>{{ esBorrador ? 'edit_note' : 'lock' }}</mat-icon>
+                <span>
+                  {{ esBorrador
+                    ? 'La propuesta puede editarse y enviarse al cliente cuando esté lista.'
+                    : 'La propuesta está en solo lectura; solo puedes gestionar su estado.' }}
+                </span>
+              </div>
+
+              <div class="workflow-actions">
+                @if (estadoActual === 'BORRADOR') {
+                  <button type="button" class="entity-btn-ghost" [disabled]="loading" (click)="cambiarEstado('enviar')">
+                    <mat-icon>send</mat-icon>
+                    Enviar
+                  </button>
+                }
+
+                @if (estadoActual === 'ENVIADA') {
+                  <button type="button" class="entity-btn-ghost danger" [disabled]="loading" (click)="cambiarEstado('rechazar')">
+                    <mat-icon>close</mat-icon>
+                    Rechazar
+                  </button>
+                  <button type="button" class="entity-btn-ghost" [disabled]="loading" (click)="cambiarEstado('aprobar')">
+                    <mat-icon>check_circle</mat-icon>
+                    Aprobar
+                  </button>
+                }
+
+                @if (estadoActual === 'BORRADOR' || estadoActual === 'ENVIADA') {
+                  <button type="button" class="entity-btn-ghost danger" [disabled]="loading" (click)="cambiarEstado('cancelar')">
+                    <mat-icon>cancel</mat-icon>
+                    Cancelar propuesta
+                  </button>
+                }
+              </div>
+            </div>
+          </section>
+        }
+      }
+    </form>
+
+    <footer class="entity-footer">
+      <span class="entity-footer-hint">
+        <mat-icon>info</mat-icon>
+        @if (esBorrador) {
+          Los campos con <strong>*</strong> son obligatorios
+        } @else {
+          Propuesta en solo lectura
+        }
+      </span>
+      <div class="entity-actions">
+        <button type="button" class="entity-btn-ghost" (click)="cerrar()" [disabled]="loading">
+          {{ esBorrador ? 'Cancelar' : 'Cerrar' }}
+        </button>
+        @if (esBorrador) {
+          <button
+            type="submit"
+            form="propuestaForm"
+            class="entity-btn-primary"
+            [disabled]="loading || cargandoPropuesta"
+          >
+            @if (loading) {
+              <span class="entity-spinner"></span>
+              Guardando...
+            } @else {
+              <mat-icon>save</mat-icon>
+              {{ isEdit ? 'Guardar cambios' : 'Crear propuesta' }}
+            }
           </button>
-        </div>
-
-        <div class="total-row">
-          <strong>Total estimado: {{ totalEstimado | currency }}</strong>
-        </div>
-
-        <div class="form-actions">
-          <button mat-button type="button" routerLink="/propuestas">Volver</button>
-
-          <ng-container *ngIf="isEdit">
-            <button mat-raised-button color="accent" type="button" (click)="cambiarEstado('enviar')"
-                    *ngIf="estadoActual === 'BORRADOR'" [disabled]="loading">
-              Enviar
-            </button>
-            <button mat-raised-button color="primary" type="button" (click)="cambiarEstado('aprobar')"
-                    *ngIf="estadoActual === 'ENVIADA'" [disabled]="loading">
-              Aprobar
-            </button>
-            <button mat-raised-button color="warn" type="button" (click)="cambiarEstado('rechazar')"
-                    *ngIf="estadoActual === 'ENVIADA'" [disabled]="loading">
-              Rechazar
-            </button>
-            <button mat-button color="warn" type="button" (click)="cambiarEstado('cancelar')"
-                    *ngIf="estadoActual === 'BORRADOR' || estadoActual === 'ENVIADA'" [disabled]="loading">
-              Cancelar Propuesta
-            </button>
-          </ng-container>
-
-          <button mat-raised-button color="primary" type="submit"
-                  *ngIf="estadoActual === 'BORRADOR'" [disabled]="form.invalid || loading">
-            {{ loading ? 'Guardando...' : 'Guardar' }}
-          </button>
-        </div>
-      </form>
-    </mat-card-content>
-  </mat-card>
+        }
+      </div>
+    </footer>
+  </div>
 </div>

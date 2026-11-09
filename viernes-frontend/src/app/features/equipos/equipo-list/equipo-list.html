@@ -1,0 +1,142 @@
+<div class="module-view-container">
+
+  <!-- VIEW TOOLBAR -->
+  <div class="view-toolbar">
+    <div class="view-title-group">
+      <h2>Equipos</h2>
+      <p>Equipos de trabajo y asignación de usuarios del CRM</p>
+    </div>
+
+    <div class="toolbar-actions-group">
+      <!-- Search Pill -->
+      <div class="toolbar-search-pill">
+        <mat-icon>search</mat-icon>
+        <input
+          type="text"
+          placeholder="Buscar por nombre o descripción..."
+          [ngModel]="filtroTexto()"
+          (ngModelChange)="filtroTexto.set($event)"
+        />
+        @if (filtroTexto()) {
+          <button class="clear-search-btn" (click)="filtroTexto.set('')">
+            <mat-icon>close</mat-icon>
+          </button>
+        }
+      </div>
+
+      <!-- Estado Filter Pill -->
+      <div class="toolbar-filter-pill">
+        <mat-icon>filter_list</mat-icon>
+        <select [ngModel]="filtroActivo()" (ngModelChange)="filtroActivo.set($event); cargarEquipos()">
+          <option value="TODOS">Todos</option>
+          <option value="ACTIVOS">Activos</option>
+          <option value="INACTIVOS">Inactivos</option>
+        </select>
+      </div>
+
+      <!-- New Team Button -->
+      <button class="btn-primary-mac" (click)="nuevoEquipo()">
+        <mat-icon>add</mat-icon> Nuevo Equipo
+      </button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Cargando equipos...</p>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="error-message">
+      {{ error() }}
+    </div>
+  }
+
+  @if (isEmpty()) {
+    <div class="empty-state">
+      <mat-icon>groups</mat-icon>
+      <h3>No hay equipos registrados</h3>
+      <p>Comienza creando un equipo para organizar a los usuarios del CRM.</p>
+      <button class="btn-primary-mac" (click)="nuevoEquipo()" style="margin-top: 16px;">
+        <mat-icon>add</mat-icon> Registrar primer Equipo
+      </button>
+    </div>
+  }
+
+  @if (hasEquipos()) {
+    <div class="mac-table-card">
+      <table mat-table [dataSource]="equiposOrdenados()" matSort matSortDisableClear
+             [matSortActive]="sortState().active" [matSortDirection]="sortState().direction"
+             (matSortChange)="onSortChange($event)">
+
+        <!-- ID Column -->
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="id"> ID </th>
+          <td mat-cell *matCellDef="let equipo" class="id-cell"> #{{ equipo.id }} </td>
+        </ng-container>
+
+        <!-- Nombre Column -->
+        <ng-container matColumnDef="nombre">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="nombre"> Equipo </th>
+          <td mat-cell *matCellDef="let equipo">
+            <div class="equipo-avatar-name">
+              <div class="equipo-mini-avatar">{{ (equipo.nombre || 'E').charAt(0).toUpperCase() }}</div>
+              <div class="equipo-info-text">
+                <strong class="equipo-name-label">{{ equipo.nombre }}</strong>
+                <small class="equipo-descripcion-sub">{{ equipo.descripcion || 'Sin descripción' }}</small>
+              </div>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Miembros Column -->
+        <ng-container matColumnDef="miembros">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="miembros"> Miembros </th>
+          <td mat-cell *matCellDef="let equipo">
+            <span class="miembros-count">
+              <mat-icon>person</mat-icon> {{ equipo.totalMiembros }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Estado Column -->
+        <ng-container matColumnDef="estado">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="activo"> Estado </th>
+          <td mat-cell *matCellDef="let equipo">
+            <span class="status-pill {{ equipo.activo ? 'success' : 'neutral' }}">
+              {{ equipo.activo ? 'ACTIVO' : 'INACTIVO' }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Acciones Column -->
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef class="actions-header"> Acciones </th>
+          <td mat-cell *matCellDef="let equipo" class="actions-cell">
+            <button class="mac-action-btn members" title="Gestionar miembros" (click)="editar(equipo.id)">
+              <mat-icon>group</mat-icon>
+            </button>
+            <button class="mac-action-btn edit" title="Editar" (click)="editar(equipo.id)">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button
+              class="mac-action-btn toggle"
+              [title]="equipo.activo ? 'Desactivar equipo' : 'Activar equipo'"
+              (click)="cambiarEstado(equipo)">
+              <mat-icon>{{ equipo.activo ? 'block' : 'check_circle' }}</mat-icon>
+            </button>
+            <button class="mac-action-btn delete" title="Eliminar" (click)="eliminar(equipo)">
+              <mat-icon>delete_outline</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </div>
+  }
+
+</div>

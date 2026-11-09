@@ -7,6 +7,8 @@ import com.viernes.leads.application.port.out.FuentePersistencePort;
 import com.viernes.leads.domain.Fuente;
 import com.viernes.shared.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
@@ -19,18 +21,21 @@ public class FuenteService implements ManageFuenteUseCase {
     private final FuentePersistencePort persistencePort;
 
     @Override
+    @Cacheable(cacheNames = "fuentes", key = "#activa == null ? 'all' : #activa.toString()")
     public List<FuenteResponse> listar(Boolean activa) {
         List<Fuente> fuentes = activa != null ? persistencePort.findByActiva(activa) : persistencePort.findAll();
         return fuentes.stream().map(this::toResponse).toList();
     }
 
     @Override
+    @Cacheable(cacheNames = "fuentes", key = "#id")
     public FuenteResponse obtener(Long id) {
         return toResponse(findOrThrow(id));
     }
 
     @Override
     @Transactional
+    @CacheEvict(cacheNames = "fuentes", allEntries = true)
     public FuenteResponse crear(FuenteRequest request) {
         if (persistencePort.existsByCodigo(request.codigo())) {
             throw new IllegalArgumentException("Ya existe una fuente con el código: " + request.codigo());
@@ -45,6 +50,7 @@ public class FuenteService implements ManageFuenteUseCase {
 
     @Override
     @Transactional
+    @CacheEvict(cacheNames = "fuentes", allEntries = true)
     public FuenteResponse actualizar(Long id, FuenteRequest request) {
         Fuente f = findOrThrow(id);
         apply(f, request);
@@ -53,6 +59,7 @@ public class FuenteService implements ManageFuenteUseCase {
 
     @Override
     @Transactional
+    @CacheEvict(cacheNames = "fuentes", allEntries = true)
     public void eliminar(Long id) {
         findOrThrow(id);
         persistencePort.deleteById(id);

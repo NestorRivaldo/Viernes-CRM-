@@ -1,0 +1,233 @@
+<div class="entity-page" [class.is-dialog]="esDialogo">
+  <div class="entity-dialog equipo-dialog">
+    <header class="entity-header">
+      <div class="entity-icon">
+        <mat-icon>groups</mat-icon>
+      </div>
+      <div class="entity-heading">
+        <span class="entity-eyebrow">Administración · Equipos</span>
+        <h2>{{ titulo }}</h2>
+        <p>{{ subtitulo }}</p>
+      </div>
+      <button type="button" class="entity-close" (click)="cerrar()" [disabled]="loading" title="Cerrar">
+        <mat-icon>close</mat-icon>
+      </button>
+    </header>
+
+    <form id="equipoForm" [formGroup]="form" (ngSubmit)="guardar()" class="entity-body">
+      @if (cargandoEquipo) {
+        <div class="entity-loading">
+          <mat-spinner diameter="34"></mat-spinner>
+          <span>Cargando equipo...</span>
+        </div>
+      } @else {
+        @if (serverError) {
+          <div class="entity-alert error">
+            <mat-icon>error_outline</mat-icon>
+            <span>{{ serverError }}</span>
+          </div>
+        }
+
+        @if (recienCreado) {
+          <div class="entity-alert success">
+            <mat-icon>check_circle</mat-icon>
+            <span>Equipo creado correctamente. Ya puedes agregar sus miembros.</span>
+          </div>
+        }
+
+        <section class="entity-section">
+          <div class="entity-section-heading">
+            <span class="entity-index">01</span>
+            <div class="entity-section-copy">
+              <h3>Información del equipo</h3>
+              <p>Define el nombre y el propósito del equipo.</p>
+            </div>
+          </div>
+
+          <div class="entity-grid">
+            <div class="entity-field">
+              <label class="entity-label" for="equipoNombre">
+                Nombre <span class="entity-req">*</span>
+              </label>
+              <div class="entity-input-wrap">
+                <mat-icon class="entity-input-icon">groups</mat-icon>
+                <input
+                  id="equipoNombre"
+                  class="entity-input"
+                  [class.invalid]="mostrarError('nombre')"
+                  formControlName="nombre"
+                  maxlength="120"
+                  placeholder="Ej. Equipo comercial Lima"
+                />
+              </div>
+              @if (mostrarError('nombre')) {
+                <span class="entity-error">{{ mensajeError('nombre') }}</span>
+              }
+            </div>
+
+            <div class="entity-field">
+              <label class="entity-label" for="equipoDescripcion">Descripción</label>
+              <div class="entity-textarea-wrap">
+                <textarea
+                  id="equipoDescripcion"
+                  class="entity-textarea"
+                  [class.invalid]="mostrarError('descripcion')"
+                  formControlName="descripcion"
+                  maxlength="500"
+                  rows="3"
+                  placeholder="Describe el objetivo o alcance de este equipo..."
+                ></textarea>
+                <span class="entity-counter">{{ form.get('descripcion')?.value?.length || 0 }}/500</span>
+              </div>
+              @if (mostrarError('descripcion')) {
+                <span class="entity-error">{{ mensajeError('descripcion') }}</span>
+              }
+            </div>
+          </div>
+        </section>
+
+        @if (isEdit) {
+          <section class="entity-section">
+            <div class="entity-section-heading">
+              <span class="entity-index">02</span>
+              <div class="entity-section-copy">
+                <h3>Miembros del equipo</h3>
+                <p>Asigna usuarios para organizar el trabajo del equipo.</p>
+              </div>
+              <div class="entity-section-aside">
+                <span class="entity-count-chip">
+                  <mat-icon>group</mat-icon>
+                  {{ miembrosLoading ? '...' : miembros.length }} miembros
+                </span>
+              </div>
+            </div>
+
+            <div class="members-panel">
+              <div class="member-add-row">
+                <div class="entity-field member-select-field">
+                  <label class="entity-label" for="equipoUsuario">Agregar usuario</label>
+                  <div class="entity-select-wrap">
+                    <select
+                      id="equipoUsuario"
+                      class="entity-select"
+                      [(ngModel)]="usuarioSeleccionadoId"
+                      [ngModelOptions]="{ standalone: true }"
+                      [disabled]="miembrosLoading || usuariosLoading || usuarios.length === 0"
+                    >
+                      <option [ngValue]="null">
+                        {{ usuariosLoading ? 'Cargando usuarios...' : 'Selecciona un usuario' }}
+                      </option>
+                      @for (u of usuarios; track u.id) {
+                        <option [ngValue]="u.id" [disabled]="esMiembro(u.id)">
+                          {{ u.nombre }} {{ u.apellido }} ({{ u.correo }})
+                          {{ esMiembro(u.id) ? ' · Ya es miembro' : '' }}
+                        </option>
+                      }
+                    </select>
+                    <mat-icon class="entity-select-chevron">expand_more</mat-icon>
+                  </div>
+                  @if (usuariosError) {
+                    <span class="entity-error">{{ usuariosError }}</span>
+                  } @else if (!usuariosLoading && usuarios.length === 0) {
+                    <span class="entity-hint">No hay usuarios disponibles.</span>
+                  }
+                </div>
+
+                <button
+                  type="button"
+                  class="entity-btn-primary member-add-btn"
+                  [disabled]="!usuarioSeleccionadoId || miembrosLoading || usuariosLoading"
+                  (click)="agregarMiembro()"
+                >
+                  <mat-icon>person_add</mat-icon>
+                  Agregar
+                </button>
+              </div>
+
+              @if (miembrosLoading) {
+                <div class="members-loading">
+                  <mat-spinner diameter="30"></mat-spinner>
+                  <span>Cargando miembros...</span>
+                </div>
+              }
+
+              @if (miembrosError) {
+                <div class="entity-alert error members-alert">
+                  <mat-icon>error_outline</mat-icon>
+                  <span>{{ miembrosError }}</span>
+                </div>
+              }
+
+              @if (!miembrosLoading && !miembrosError && miembros.length === 0) {
+                <div class="members-empty">
+                  <mat-icon>group_off</mat-icon>
+                  <div>
+                    <strong>Sin miembros todavía</strong>
+                    <span>Agrega usuarios para organizar el trabajo del equipo.</span>
+                  </div>
+                </div>
+              }
+
+              @if (!miembrosLoading && miembros.length > 0) {
+                <div class="member-list">
+                  @for (m of miembros; track m.usuarioId) {
+                    <div class="member-row">
+                      <div class="member-avatar">{{ inicial(m.nombreCompleto) }}</div>
+                      <div class="member-info">
+                        <strong>{{ m.nombreCompleto }}</strong>
+                        <small>{{ m.correo || 'Sin correo' }}</small>
+                      </div>
+                      <span class="member-date">
+                        <mat-icon>calendar_today</mat-icon>
+                        {{ m.agregadoEn | date:'shortDate' }}
+                      </span>
+                      <button
+                        type="button"
+                        class="member-remove"
+                        (click)="quitarMiembro(m)"
+                        title="Quitar del equipo"
+                      >
+                        <mat-icon>person_remove</mat-icon>
+                      </button>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </section>
+        } @else {
+          <div class="entity-callout equipo-callout">
+            <mat-icon>info</mat-icon>
+            <span>Después de crear el equipo podrás agregar a sus miembros.</span>
+          </div>
+        }
+      }
+    </form>
+
+    <footer class="entity-footer">
+      <span class="entity-footer-hint">
+        <mat-icon>info</mat-icon>
+        Los campos con <strong>*</strong> son obligatorios
+      </span>
+      <div class="entity-actions">
+        <button type="button" class="entity-btn-ghost" (click)="cerrar()" [disabled]="loading">
+          {{ recienCreado ? 'Cerrar' : 'Cancelar' }}
+        </button>
+        <button
+          type="submit"
+          form="equipoForm"
+          class="entity-btn-primary"
+          [disabled]="loading || cargandoEquipo || miembrosLoading"
+        >
+          @if (loading) {
+            <span class="entity-spinner"></span>
+            Guardando...
+          } @else {
+            <mat-icon>save</mat-icon>
+            {{ isEdit ? 'Guardar cambios' : 'Crear equipo' }}
+          }
+        </button>
+      </div>
+    </footer>
+  </div>
+</div>

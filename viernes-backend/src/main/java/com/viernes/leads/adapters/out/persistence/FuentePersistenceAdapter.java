@@ -5,6 +5,7 @@ import com.viernes.leads.adapters.out.persistence.repository.FuenteSpringDataRep
 import com.viernes.leads.application.port.out.FuentePersistencePort;
 import com.viernes.leads.domain.Fuente;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +18,7 @@ public class FuentePersistenceAdapter implements FuentePersistencePort {
 
     @Override
     public List<Fuente> findAll() {
-        return repository.findAll().stream().map(this::toDomain).toList();
+        return repository.findAll(Sort.by(Sort.Direction.ASC, "id")).stream().map(this::toDomain).toList();
     }
 
     @Override

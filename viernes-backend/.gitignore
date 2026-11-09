@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Secretos locales (APISPERU_TOKEN, etc.) ###
+.env
+.env.local

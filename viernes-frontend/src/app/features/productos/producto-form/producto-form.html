@@ -1,58 +1,214 @@
-<div class="form-container">
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>{{ isEdit ? 'Editar Producto' : 'Nuevo Producto' }}</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <form [formGroup]="form" (ngSubmit)="guardar()">
+<div class="entity-page" [class.is-dialog]="esDialogo">
+  <div class="entity-dialog producto-dialog">
+    <header class="entity-header">
+      <div class="entity-icon">
+        <mat-icon>{{ isEdit ? 'edit_note' : 'add_box' }}</mat-icon>
+      </div>
+      <div class="entity-heading">
+        <span class="entity-eyebrow">Catálogo · Productos</span>
+        <h2>{{ isEdit ? 'Editar producto' : 'Nuevo producto' }}</h2>
+        <p>
+          {{ isEdit
+            ? 'Actualiza los datos del producto dentro del catálogo comercial.'
+            : 'Agrega un nuevo producto o servicio al catálogo comercial.' }}
+        </p>
+      </div>
+      <button type="button" class="entity-close" (click)="cerrar()" [disabled]="loading" title="Cerrar">
+        <mat-icon>close</mat-icon>
+      </button>
+    </header>
 
-        <div class="form-row">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Código</mat-label>
-            <input matInput formControlName="codigo" required>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Nombre</mat-label>
-            <input matInput formControlName="nombre" required>
-          </mat-form-field>
+    <form id="productoForm" [formGroup]="form" (ngSubmit)="guardar()" class="entity-body">
+      @if (cargandoProducto) {
+        <div class="entity-loading">
+          <mat-spinner diameter="34"></mat-spinner>
+          <span>Cargando producto...</span>
         </div>
+      } @else {
+        @if (serverError) {
+          <div class="entity-alert error">
+            <mat-icon>error_outline</mat-icon>
+            <span>{{ serverError }}</span>
+          </div>
+        }
 
-        <div class="form-row">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Categoría</mat-label>
-            <input matInput formControlName="categoria">
-          </mat-form-field>
+        <section class="entity-section">
+          <div class="entity-section-heading">
+            <span class="entity-index">01</span>
+            <div class="entity-section-copy">
+              <h3>Información del producto</h3>
+              <p>Identificación, categoría, precio y disponibilidad.</p>
+            </div>
+          </div>
 
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Precio Base</mat-label>
-            <input matInput formControlName="precioBase" type="number" min="0" step="0.01" required>
-          </mat-form-field>
-        </div>
+          <div class="entity-grid two">
+            <div class="entity-field">
+              <label class="entity-label" for="productoCodigo">
+                Código <span class="entity-req">*</span>
+              </label>
+              <div class="entity-input-wrap">
+                <mat-icon class="entity-input-icon">qr_code_2</mat-icon>
+                <input
+                  id="productoCodigo"
+                  class="entity-input"
+                  [class.invalid]="mostrarError('codigo')"
+                  formControlName="codigo"
+                  maxlength="50"
+                  autocomplete="off"
+                  placeholder="Ej. SRV-001"
+                />
+              </div>
+              @if (mostrarError('codigo')) {
+                <span class="entity-error">{{ mensajeError('codigo') }}</span>
+              } @else {
+                <span class="entity-hint">Identificador único dentro del catálogo.</span>
+              }
+            </div>
 
-        <div class="form-row">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Estado</mat-label>
-            <mat-select formControlName="estado" required>
-              <mat-option *ngFor="let est of estados" [value]="est">{{ est }}</mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div>
+            <div class="entity-field">
+              <label class="entity-label" for="productoNombre">
+                Nombre <span class="entity-req">*</span>
+              </label>
+              <div class="entity-input-wrap">
+                <mat-icon class="entity-input-icon">sell</mat-icon>
+                <input
+                  id="productoNombre"
+                  class="entity-input"
+                  [class.invalid]="mostrarError('nombre')"
+                  formControlName="nombre"
+                  maxlength="200"
+                  autocomplete="off"
+                  placeholder="Ej. Licencia anual"
+                />
+              </div>
+              @if (mostrarError('nombre')) {
+                <span class="entity-error">{{ mensajeError('nombre') }}</span>
+              }
+            </div>
 
-        <div class="form-row">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Descripción</mat-label>
-            <textarea matInput formControlName="descripcion" rows="3"></textarea>
-          </mat-form-field>
-        </div>
+            <div class="entity-field">
+              <label class="entity-label" for="productoCategoria">Categoría</label>
+              <div class="entity-input-wrap">
+                <mat-icon class="entity-input-icon">category</mat-icon>
+                <input
+                  id="productoCategoria"
+                  class="entity-input"
+                  [class.invalid]="mostrarError('categoria')"
+                  formControlName="categoria"
+                  maxlength="100"
+                  autocomplete="off"
+                  placeholder="Ej. Software, servicios"
+                />
+              </div>
+              @if (mostrarError('categoria')) {
+                <span class="entity-error">{{ mensajeError('categoria') }}</span>
+              }
+            </div>
 
-        <div class="form-actions">
-          <button mat-button type="button" routerLink="/productos">Cancelar</button>
-          <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || loading">
-            {{ loading ? 'Guardando...' : 'Guardar' }}
-          </button>
-        </div>
-      </form>
-    </mat-card-content>
-  </mat-card>
+            <div class="entity-field">
+              <label class="entity-label" for="productoPrecio">
+                Precio base <span class="entity-req">*</span>
+              </label>
+              <div class="entity-input-wrap">
+                <mat-icon class="entity-input-icon">payments</mat-icon>
+                <input
+                  id="productoPrecio"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  class="entity-input"
+                  [class.invalid]="mostrarError('precioBase')"
+                  formControlName="precioBase"
+                  placeholder="0.00"
+                />
+              </div>
+              @if (mostrarError('precioBase')) {
+                <span class="entity-error">{{ mensajeError('precioBase') }}</span>
+              } @else {
+                <span class="entity-hint">Precio de lista antes de impuestos.</span>
+              }
+            </div>
+
+            <div class="entity-field full">
+              <label class="entity-label" for="productoEstado">
+                Estado <span class="entity-req">*</span>
+              </label>
+              <div class="entity-select-wrap">
+                <select
+                  id="productoEstado"
+                  class="entity-select"
+                  [class.invalid]="mostrarError('estado')"
+                  formControlName="estado"
+                >
+                  @for (estado of estados; track estado) {
+                    <option [value]="estado">{{ estado }}</option>
+                  }
+                </select>
+                <mat-icon class="entity-select-chevron">expand_more</mat-icon>
+              </div>
+              @if (mostrarError('estado')) {
+                <span class="entity-error">{{ mensajeError('estado') }}</span>
+              } @else {
+                <span class="entity-hint">Solo los productos activos se ofrecen en propuestas nuevas.</span>
+              }
+            </div>
+          </div>
+        </section>
+
+        <section class="entity-section">
+          <div class="entity-section-heading">
+            <span class="entity-index">02</span>
+            <div class="entity-section-copy">
+              <h3>Descripción</h3>
+              <p>Detalle comercial que verá el equipo de ventas.</p>
+            </div>
+          </div>
+
+          <div class="entity-field">
+            <label class="entity-label" for="productoDescripcion">Descripción del producto</label>
+            <div class="entity-textarea-wrap">
+              <textarea
+                id="productoDescripcion"
+                class="entity-textarea"
+                [class.invalid]="mostrarError('descripcion')"
+                formControlName="descripcion"
+                maxlength="1000"
+                placeholder="Características, alcance o condiciones del producto..."
+              ></textarea>
+              <span class="entity-counter">{{ form.get('descripcion')?.value?.length || 0 }}/1000</span>
+            </div>
+            @if (mostrarError('descripcion')) {
+              <span class="entity-error">{{ mensajeError('descripcion') }}</span>
+            }
+          </div>
+        </section>
+      }
+    </form>
+
+    <footer class="entity-footer">
+      <span class="entity-footer-hint">
+        <mat-icon>info</mat-icon>
+        Los campos con <strong>*</strong> son obligatorios
+      </span>
+      <div class="entity-actions">
+        <button type="button" class="entity-btn-ghost" (click)="cerrar()" [disabled]="loading">
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          form="productoForm"
+          class="entity-btn-primary"
+          [disabled]="loading || cargandoProducto"
+        >
+          @if (loading) {
+            <span class="entity-spinner"></span>
+            Guardando...
+          } @else {
+            <mat-icon>save</mat-icon>
+            {{ isEdit ? 'Guardar cambios' : 'Crear producto' }}
+          }
+        </button>
+      </div>
+    </footer>
+  </div>
 </div>

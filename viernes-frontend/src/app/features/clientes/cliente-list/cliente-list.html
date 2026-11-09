@@ -13,7 +13,7 @@
         <mat-icon>search</mat-icon>
         <input 
           type="text" 
-          placeholder="Buscar por cliente, empresa o correo..." 
+          placeholder="Buscar por cliente, empresa, correo, DNI o RUC..." 
           [ngModel]="filtroTexto()" 
           (ngModelChange)="filtroTexto.set($event)"
         />
@@ -25,7 +25,7 @@
       </div>
 
       <!-- New Client Button -->
-      <button class="btn-primary-mac" routerLink="/clientes/nuevo">
+      <button class="btn-primary-mac" (click)="nuevoCliente()">
         <mat-icon>add</mat-icon> Nuevo Cliente
       </button>
     </div>
@@ -49,7 +49,7 @@
       <mat-icon>business</mat-icon>
       <h3>No hay clientes registrados</h3>
       <p>Comienza registrando a tu primera cuenta de cliente en el sistema.</p>
-      <button class="btn-primary-mac" routerLink="/clientes/nuevo" style="margin-top: 16px;">
+      <button class="btn-primary-mac" (click)="nuevoCliente()" style="margin-top: 16px;">
         <mat-icon>add</mat-icon> Registrar primer Cliente
       </button>
     </div>
@@ -57,17 +57,19 @@
 
   @if (hasClientes()) {
     <div class="mac-table-card">
-      <table mat-table [dataSource]="clientesFiltrados()">
+      <table mat-table [dataSource]="clientesOrdenados()" matSort matSortDisableClear
+             [matSortActive]="sortState().active" [matSortDirection]="sortState().direction"
+             (matSortChange)="onSortChange($event)">
         
         <!-- ID Column -->
         <ng-container matColumnDef="id">
-          <th mat-header-cell *matHeaderCellDef> ID </th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="id"> ID </th>
           <td mat-cell *matCellDef="let cliente" class="id-cell"> #{{ cliente.id }} </td>
         </ng-container>
 
         <!-- Nombre Column -->
         <ng-container matColumnDef="nombre">
-          <th mat-header-cell *matHeaderCellDef> Cliente </th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="nombre"> Cliente </th>
           <td mat-cell *matCellDef="let cliente">
             <div class="client-avatar-row">
               <div class="client-mini-avatar">{{ (cliente.nombre || 'C').charAt(0).toUpperCase() }}</div>
@@ -81,15 +83,23 @@
 
         <!-- Empresa Column -->
         <ng-container matColumnDef="empresa">
-          <th mat-header-cell *matHeaderCellDef> Empresa </th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="empresa"> Empresa </th>
           <td mat-cell *matCellDef="let cliente">
             <span class="empresa-label">{{ cliente.empresa || '-' }}</span>
           </td>
         </ng-container>
 
+        <!-- Documento Column -->
+        <ng-container matColumnDef="documento">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="numeroDocumento"> Documento </th>
+          <td mat-cell *matCellDef="let cliente">
+            <span class="documento-label">{{ documentoCliente(cliente) }}</span>
+          </td>
+        </ng-container>
+
         <!-- Correo Column -->
         <ng-container matColumnDef="correo">
-          <th mat-header-cell *matHeaderCellDef> Correo </th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="correo"> Correo </th>
           <td mat-cell *matCellDef="let cliente">
             <span class="correo-text">{{ cliente.correo }}</span>
           </td>
@@ -97,7 +107,7 @@
 
         <!-- Estado Column -->
         <ng-container matColumnDef="estado">
-          <th mat-header-cell *matHeaderCellDef> Estado </th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="estado"> Estado </th>
           <td mat-cell *matCellDef="let cliente">
             <span class="status-pill {{ cliente.estado === 'ACTIVO' ? 'success' : 'danger' }}">
               {{ cliente.estado }}
@@ -109,7 +119,10 @@
         <ng-container matColumnDef="acciones">
           <th mat-header-cell *matHeaderCellDef class="actions-header"> Acciones </th>
           <td mat-cell *matCellDef="let cliente" class="actions-cell">
-            <button class="mac-action-btn edit" title="Editar y gestionar contactos" (click)="editar(cliente.id)">
+            <button class="mac-action-btn map" title="Mapa de relaciones" (click)="verMapa(cliente.id)">
+              <mat-icon>hub</mat-icon>
+            </button>
+            <button class="mac-action-btn edit" title="Editar cliente" (click)="editar(cliente.id)">
               <mat-icon>edit</mat-icon>
             </button>
             @if (cliente.estado === 'ACTIVO') {

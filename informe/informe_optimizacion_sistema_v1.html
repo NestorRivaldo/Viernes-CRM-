@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Métodos de Optimización V1 — Viernes CRM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#090d16; --surface:#111726; --surface2:#172033; --border:#232f48;
+  --text:#f1f5f9; --muted:#94a3b8; --subtle:#64748b;
+  --accent:#3b82f6; --accent-soft:rgba(59,130,246,.12);
+  --green:#10b981; --green-soft:rgba(16,185,129,.12);
+  --purple:#a855f7; --purple-soft:rgba(168,85,247,.12);
+  --amber:#f59e0b; --amber-soft:rgba(245,158,11,.12);
+  --cyan:#06b6d4; --cyan-soft:rgba(6,182,212,.12);
+  --rose:#f43f5e; --rose-soft:rgba(244,63,94,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;padding:40px 20px 80px;
+  background-image:radial-gradient(circle at 10% 10%,rgba(59,130,246,.08) 0%,transparent 45%),radial-gradient(circle at 90% 90%,rgba(168,85,247,.06) 0%,transparent 45%);background-attachment:fixed}
+.container{max-width:1200px;margin:0 auto}
+.top-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+.back-link{display:inline-flex;align-items:center;gap:8px;color:#60a5fa;text-decoration:none;font-size:13.5px;font-weight:600}
+header{text-align:center;margin-bottom:44px}
+.brand-badge{display:inline-flex;align-items:center;gap:8px;background:var(--accent-soft);color:#60a5fa;border:1px solid rgba(59,130,246,.3);padding:6px 16px;border-radius:30px;font-size:13px;font-weight:700;margin-bottom:18px;letter-spacing:.04em}
+h1{font-size:38px;font-weight:800;letter-spacing:-.025em;background:linear-gradient(135deg,#fff 30%,#93c5fd 80%,#38bdf8 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:14px;line-height:1.2}
+.subtitle{font-size:16.5px;color:var(--muted);max-width:860px;margin:0 auto 26px}
+.pills{display:flex;justify-content:center;flex-wrap:wrap;gap:10px}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;font-size:12.5px;font-weight:600}
+.p-green{background:var(--green-soft);color:#34d399;border:1px solid rgba(16,185,129,.3)}
+.p-blue{background:var(--accent-soft);color:#93c5fd;border:1px solid rgba(59,130,246,.3)}
+.p-purple{background:var(--purple-soft);color:#c084fc;border:1px solid rgba(168,85,247,.3)}
+.p-amber{background:var(--amber-soft);color:#fbbf24;border:1px solid rgba(245,158,11,.3)}
+.banner{display:flex;gap:14px;align-items:flex-start;background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:12px;padding:16px 18px;margin:0 0 30px;font-size:14px}
+.banner .bi{font-size:20px;line-height:1}
+.banner b{color:#93c5fd}
+h2{font-size:23px;font-weight:700;color:#fff;margin:48px 0 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);padding-bottom:12px}
+h2 .num{display:flex;align-items:center;justify-content:center;min-width:34px;height:34px;border-radius:8px;background:var(--accent-soft);color:#60a5fa;font-size:15px;font-family:'JetBrains Mono',monospace}
+h3{font-size:16.5px;font-weight:600;color:#e2e8f0;margin:24px 0 10px}
+p{margin:10px 0;color:#cbd5e1;font-size:14.5px}
+.sec-intro{color:var(--muted);font-size:14.5px;margin-bottom:16px}
+.lead{font-size:15px;color:#e2e8f0}
+code{font-family:'JetBrains Mono',Consolas,monospace;font-size:12.5px;background:var(--surface2);border:1px solid var(--border);padding:1px 6px;border-radius:5px;color:#a5f3fc}
+.anchor{font-family:'JetBrains Mono',Consolas,monospace;font-size:12px;background:rgba(59,130,246,.1);color:#93c5fd;border:1px solid rgba(59,130,246,.2);padding:1px 7px;border-radius:6px;white-space:nowrap;display:inline-block;margin:1px 0}
+.note{border-radius:10px;padding:13px 16px;margin:16px 0;font-size:13.5px;border:1px solid}
+.note.info{background:var(--accent-soft);border-color:rgba(59,130,246,.3);color:#bfdbfe}
+.note.warn{background:var(--amber-soft);border-color:rgba(245,158,11,.3);color:#fde68a}
+.note.danger{background:var(--rose-soft);border-color:rgba(244,63,94,.3);color:#fecdd3}
+.note.ok{background:var(--green-soft);border-color:rgba(16,185,129,.3);color:#a7f3d0}
+.badge{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.05em;padding:2px 8px;border-radius:5px;vertical-align:middle}
+.b-gap{background:var(--rose-soft);color:#fda4af;border:1px solid rgba(244,63,94,.35)}
+.b-ok{background:var(--green-soft);color:#6ee7b7;border:1px solid rgba(16,185,129,.35)}
+.tree{font-family:'JetBrains Mono',Consolas,monospace;font-size:12.5px;line-height:1.75;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;overflow-x:auto;white-space:pre;color:#cbd5e1}
+.tree .dir{color:#60a5fa;font-weight:600}
+.tree .cm{color:var(--subtle)}
+.tree .f{color:#a5f3fc}
+.code{font-family:'JetBrains Mono',Consolas,monospace;font-size:12.5px;line-height:1.7;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--cyan);border-radius:10px;padding:14px 18px;overflow-x:auto;white-space:pre;color:#d7e3f4;margin:12px 0}
+.code .cm{color:var(--subtle)}
+.code .kw{color:#c084fc}
+.code .an{color:#6ee7b7}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13.5px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+th{background:var(--surface2);color:#e2e8f0;text-align:left;padding:10px 14px;font-weight:600;font-size:12.5px;letter-spacing:.03em;text-transform:uppercase;border-bottom:1px solid var(--border)}
+td{padding:10px 14px;border-bottom:1px solid var(--border);color:#cbd5e1;vertical-align:top}
+tr:last-child td{border-bottom:none}
+td .anchor{font-size:11px}
+.flow{margin:18px 0;position:relative;padding-left:8px}
+.flow-step{display:flex;gap:14px;margin:0 0 14px;position:relative}
+.flow-step .sn{flex:0 0 30px;height:30px;border-radius:50%;background:var(--accent-soft);border:1px solid rgba(59,130,246,.4);color:#60a5fa;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;counter-increment:step}
+.flow-step .sn::before{content:counter(step)}
+.flow{counter-reset:step}
+.flow-step .sb{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;flex:1}
+.flow-step .st{font-weight:600;color:#e2e8f0;font-size:14px;margin-bottom:4px}
+.flow-step .sd{color:var(--muted);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:16px 0}
+.mini{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+.mini .k{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--subtle)}
+.mini .v{font-size:15px;font-weight:600;color:#e2e8f0;margin:4px 0}
+.mini p{font-size:13px;margin:6px 0 0}
+.toc{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin:0 0 10px;display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:6px 22px}
+.toc a{color:#93c5fd;text-decoration:none;font-size:13.5px;display:flex;gap:8px;align-items:baseline}
+.toc a:hover{color:#bfdbfe}
+.toc a .n{font-family:'JetBrains Mono',monospace;color:var(--subtle);font-size:12px}
+.btn{background:var(--accent);color:#fff;border:none;border-radius:9px;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn.ok{background:var(--green)}
+.copy-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:14px 0}
+.copy-hint{color:var(--muted);font-size:13px}
+footer{margin-top:50px;padding-top:20px;border-top:1px solid var(--border);color:var(--subtle);font-size:12.5px;text-align:center}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="top-nav">
+    <a class="back-link" href="index.html">&#8592; Portal de informes</a>
+    <span style="color:var(--subtle);font-size:12.5px;font-family:'JetBrains Mono',monospace">VIERNES CRM V1 · S13 optimización</span>
+  </div>
+
+  <header>
+    <div class="brand-badge">&#9670; VIERNES CRM V1</div>
+    <h1>Métodos de Optimización del Sistema</h1>
+    <p class="subtitle">Qué técnicas de optimización usa Viernes CRM, cómo funciona cada una por dentro y dónde vive en el código. Caché Caffeine, reducción de llamadas, acceso a datos eficiente, frontend ligero y observabilidad &mdash; todo citado con anclaje <code>archivo:línea</code> y con su estructura.</p>
+    <div class="pills">
+      <span class="pill p-blue">Caché Caffeine (6 caches)</span>
+      <span class="pill p-green">Menos llamadas / tráfico</span>
+      <span class="pill p-purple">Oracle eficiente</span>
+      <span class="pill p-amber">Brechas señaladas</span>
+    </div>
+  </header>
+
+  <div class="banner">
+    <span class="bi">&#127891;</span>
+    <div><b>Docente &#8596; Viernes.</b> La rúbrica de <i>S13 Optimización y Preparación para Producción</i> pide demostrar técnicas reales, no enunciados. Este informe muestra cada técnica con su código y su anclaje: caché con TTL diferenciado, invalidación en escritura, rate-limit, timeouts, debounce, polling incremental y consultas eficientes. Puedes defender cada una abriendo el archivo citado, no de memoria.</div>
+  </div>
+
+  <div class="note info"><b>Cómo leer las rutas.</b> Anclajes de backend relativos a <code>viernes-backend/src/main/java/com/viernes/</code>; los de frontend a <code>viernes-frontend/src/</code>; <code>pom.xml</code> y <code>*.yml</code> a la raíz del backend. Ejemplo: <span class="anchor">shared/cache/CacheConfig.java:38</span>. Árbol canónico: <code>E:\Viernes\Viernes</code>.</div>
+
+  <div class="toc">
+    <a href="#resumen"><span class="n">01</span> Mapa de técnicas (resumen)</a>
+    <a href="#cache"><span class="n">02</span> Caché en memoria (Caffeine)</a>
+    <a href="#trafico"><span class="n">03</span> Reducción de llamadas y tráfico</a>
+    <a href="#datos"><span class="n">04</span> Acceso a datos (Oracle)</a>
+    <a href="#frontend"><span class="n">05</span> Frontend Angular ligero</a>
+    <a href="#obs"><span class="n">06</span> Observabilidad / producción</a>
+    <a href="#estructura"><span class="n">07</span> Estructura del código de optimización</a>
+    <a href="#brechas"><span class="n">08</span> Brechas (lo que NO está)</a>
+    <a href="#miro"><span class="n">&#9635;</span> Copiar outline para Miro</a>
+  </div>
+
+  <!-- ============ 01 RESUMEN ============ -->
+  <h2 id="resumen"><span class="num">01</span> Mapa de técnicas (resumen)</h2>
+  <p class="sec-intro">Cada fila: técnica, categoría, dónde vive y qué costo reduce. El detalle con código está en las secciones siguientes.</p>
+  <table>
+    <tr><th>Técnica</th><th>Categoría</th><th>Anclaje</th><th>Qué reduce</th></tr>
+    <tr><td>Caché Caffeine con TTL por caché</td><td>Caché</td><td><span class="anchor">shared/cache/CacheConfig.java:38-67</span></td><td>Consultas repetidas a Oracle / APIsPERU</td></tr>
+    <tr><td><code>@Cacheable</code> en lectura</td><td>Caché</td><td><span class="anchor">dashboard/.../DashboardService.java:17</span></td><td>Cómputo de KPIs en cada carga</td></tr>
+    <tr><td><code>@CacheEvict</code> en escritura</td><td>Caché</td><td><span class="anchor">etiquetas/.../EtiquetaService.java:59</span></td><td>Datos viejos tras escribir (consistencia)</td></tr>
+    <tr><td>Caché negativa (documentos-negativos)</td><td>Caché</td><td><span class="anchor">clientes/.../ApisPeruDocumentoAdapter.java:59-77</span></td><td>Cuota gastada en reintentos de "no existe"</td></tr>
+    <tr><td>Refresco programado <code>@Scheduled</code></td><td>Caché</td><td><span class="anchor">shared/cache/CacheRefreshJob.java:31</span></td><td>Entradas rancias (invalidación explícita)</td></tr>
+    <tr><td>Rate-limit por usuario (20/60 s)</td><td>Tráfico</td><td><span class="anchor">shared/ratelimit/ConsultaDocumentoRateLimiter.java:38</span></td><td>Abuso de la cuota externa</td></tr>
+    <tr><td>Timeout fail-fast (5 s / 15 s)</td><td>Tráfico</td><td><span class="anchor">clientes/.../ApisPeruDocumentoAdapter.java:39-40</span></td><td>Hilos colgados / esperas infinitas</td></tr>
+    <tr><td>Debounce 600 ms</td><td>Tráfico</td><td><span class="anchor">app/features/actividades/actividad-form/actividad-form.ts:137</span></td><td>Escrituras/llamadas por ráfaga de teclas</td></tr>
+    <tr><td>Polling incremental + límite</td><td>Tráfico</td><td><span class="anchor">app/features/mensajeria/mensajeria.service.ts:144-150</span></td><td>Re-traer toda la tabla en cada poll</td></tr>
+    <tr><td><code>forkJoin</code> (paralelo)</td><td>Tráfico</td><td><span class="anchor">app/features/actividades/actividad-form/actividad-form.ts:169</span></td><td>Latencia total de N peticiones en serie</td></tr>
+    <tr><td><code>@Transactional(readOnly=true)</code></td><td>Datos</td><td><span class="anchor">etiquetas/.../EtiquetaService.java:31</span></td><td>Dirty-checking / flush en consultas</td></tr>
+    <tr><td>Batch <code>findAllById</code>/<code>saveAll</code></td><td>Datos</td><td><span class="anchor">actividades/.../ActividadService.java:302</span></td><td>N+1 (una consulta por fila)</td></tr>
+    <tr><td>Filtrado/agregación en BD (<code>@Query</code>)</td><td>Datos</td><td><span class="anchor">oportunidades/.../OportunidadSpringDataRepository.java:18</span></td><td>Traer filas para calcular en Java</td></tr>
+    <tr><td>Paginación acotada (<code>PageRequest</code>)</td><td>Datos</td><td><span class="anchor">mensajeria/.../MensajePersistenceAdapter.java:22</span></td><td>Leer tablas completas</td></tr>
+    <tr><td>Lazy loading (32 <code>loadComponent</code>)</td><td>Frontend</td><td><span class="anchor">app/app.routes.ts</span></td><td>Bundle inicial / tiempo de carga</td></tr>
+    <tr><td>Signals + <code>computed</code></td><td>Frontend</td><td><span class="anchor">app/features/dashboard/dashboard.ts</span></td><td>Change detection global</td></tr>
+    <tr><td>Métricas (Actuator/Prometheus + <code>recordStats</code>)</td><td>Obs.</td><td><span class="anchor">pom.xml:37,119</span> · <span class="anchor">CacheConfig.java:41</span></td><td>Optimizar a ciegas (permite medir)</td></tr>
+  </table>
+
+  <!-- ============ 02 CACHE ============ -->
+  <h2 id="cache"><span class="num">02</span> Caché en memoria (Caffeine) &mdash; la técnica principal</h2>
+  <p class="lead">Idea: guardar en memoria el resultado de lecturas caras para no repetirlas. Spring intercepta los métodos anotados con un <b>proxy AOP</b>: si la clave ya está en caché y vigente, devuelve el valor <b>sin ejecutar el método</b>; si no, lo ejecuta y guarda el resultado.</p>
+
+  <h3>2.1 Estructura: dónde vive</h3>
+  <div class="tree"><span class="dir">shared/cache/</span>
+  ├─ <span class="f">CacheConfig.java</span>      <span class="cm">@EnableCaching + CaffeineCacheManager (6 cachés, TTL/size/stats)</span>
+  └─ <span class="f">CacheRefreshJob.java</span>  <span class="cm">@Scheduled: invalida catálogos cada 10 min</span>
+<span class="dir">&lt;módulo&gt;/application/service/</span>
+  └─ <span class="f">*Service.java</span>           <span class="cm">@Cacheable (lee) / @CacheEvict (invalida al escribir)</span>
+<span class="dir">clientes/adapters/out/external/</span>
+  └─ <span class="f">ApisPeruDocumentoAdapter.java</span> <span class="cm">@Cacheable positiva + caché negativa manual</span></div>
+
+  <h3>2.2 Infraestructura: 6 cachés con TTL diferenciado</h3>
+  <p>El TTL se ajusta al equilibrio <b>frescura vs. costo</b> de cada dato: lo volátil (KPIs) vive poco; lo estable y caro (consulta externa) vive mucho.</p>
+  <table>
+    <tr><th>Caché</th><th>TTL / tamaño</th><th>Por qué</th><th>Anclaje</th></tr>
+    <tr><td>productos / etiquetas / fuentes</td><td>5 min / 1.000</td><td>catálogos estables</td><td><span class="anchor">CacheConfig.java:38-41</span></td></tr>
+    <tr><td>dashboard</td><td>30 s / 20</td><td>KPIs volátiles</td><td><span class="anchor">CacheConfig.java:44-49</span></td></tr>
+    <tr><td>documentos</td><td>24 h / 5.000</td><td>cuota externa limitada</td><td><span class="anchor">CacheConfig.java:52-57</span></td></tr>
+    <tr><td>documentos-negativos</td><td>10 min / 5.000</td><td>no re-gastar cuota en "no existe"</td><td><span class="anchor">CacheConfig.java:62-67</span></td></tr>
+  </table>
+  <div class="code"><span class="an">@Bean</span>
+CacheManager cacheManager() {
+    CaffeineCacheManager manager = new CaffeineCacheManager();
+    manager.setCacheNames(List.of(CACHE_PRODUCTOS, CACHE_ETIQUETAS, CACHE_FUENTES));
+    manager.setCaffeine(Caffeine.newBuilder()
+            .maximumSize(1_000)
+            .expireAfterWrite(Duration.ofMinutes(5))   <span class="cm">// catálogos</span>
+            .recordStats());                            <span class="cm">// métricas hit/miss</span>
+    manager.registerCustomCache(CACHE_DASHBOARD,
+            Caffeine.newBuilder().maximumSize(20)
+                    .expireAfterWrite(Duration.ofSeconds(30)).recordStats().build());
+    manager.registerCustomCache(CACHE_DOCUMENTOS,
+            Caffeine.newBuilder().maximumSize(5_000)
+                    .expireAfterWrite(Duration.ofHours(24)).recordStats().build());
+    manager.registerCustomCache(CACHE_DOCUMENTOS_NEGATIVOS,
+            Caffeine.newBuilder().maximumSize(5_000)
+                    .expireAfterWrite(Duration.ofMinutes(10)).recordStats().build());
+    return manager;
+}</div>
+  <p><code>maximumSize</code> acota memoria (expulsa al llenarse); <code>expireAfterWrite</code> es el TTL desde la escritura; <code>recordStats()</code> expone hit-ratio para medir. <span class="anchor">CacheConfig.java:38-67</span></p>
+
+  <h3>2.3 Cómo funciona el proxy (mecanismo)</h3>
+  <div class="flow">
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">Llamada al método anotado</div><div class="sd">El proxy de Spring (creado por <code>@EnableCaching</code>, <span class="anchor">CacheConfig.java:23</span>) intercepta antes de ejecutar el cuerpo.</div></div></div>
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">Evalúa clave y condición</div><div class="sd">Calcula la clave SpEL (p. ej. <code>#id</code>, <code>'resumen'</code>) y la <code>condition</code>; busca en la caché.</div></div></div>
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">Hit &rarr; devuelve sin ejecutar</div><div class="sd">Si existe y el TTL no venció, retorna el valor guardado: <b>cero consultas a Oracle/APIsPERU</b>.</div></div></div>
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">Miss &rarr; ejecuta y guarda</div><div class="sd">Si no existe, ejecuta el método (va a la BD/API), guarda el resultado con la clave y lo devuelve.</div></div></div>
+  </div>
+
+  <h3>2.4 Lectura: <code>@Cacheable</code> (dashboard)</h3>
+  <div class="code"><span class="an">@Override</span>
+<span class="an">@Cacheable</span>(cacheNames = "dashboard", key = "'resumen'")
+public DashboardResumenResponse getResumen() { ... }  <span class="cm">// 6 métodos, cada uno con su clave</span></div>
+  <p>Convierte N consultas <code>COUNT</code>/<code>SUM</code> en un DTO servido desde memoria 30 s. <span class="anchor">dashboard/application/service/DashboardService.java:17-74</span></p>
+
+  <h3>2.5 Lectura + invalidación: <code>@Cacheable</code> / <code>@CacheEvict</code> (etiquetas)</h3>
+  <div class="code"><span class="an">@Transactional</span>(readOnly = true)
+<span class="an">@Cacheable</span>(cacheNames = "etiquetas",
+        key = "#activa == null ? 'all' : #activa.toString()",
+        condition = "#q == null || #q.isBlank()")  <span class="cm">// no cachea búsquedas con texto</span>
+public List&lt;EtiquetaResponse&gt; listar(Boolean activa, String q) { ... }
+
+<span class="an">@CacheEvict</span>(cacheNames = "etiquetas", allEntries = true)  <span class="cm">// invalida al escribir</span>
+public EtiquetaResponse crear(EtiquetaRequest request) { ... }</div>
+  <p>Las lecturas se comparten desde memoria; crear/actualizar/archivar <b>vacían</b> la caché (<code>allEntries=true</code>) para que la siguiente lectura recalcule fresco (patrón <i>cache-aside</i> con evaporación en escritura). La <code>condition</code> evita contaminar la caché con búsquedas libres. <span class="anchor">etiquetas/application/service/EtiquetaService.java:31-59</span> (igual en fuentes y productos).</p>
+
+  <h3>2.6 Caché positiva + negativa (integración externa)</h3>
+  <div class="code"><span class="an">@Cacheable</span>(cacheNames = CACHE_DOCUMENTOS,
+        key = "#tipoDocumento.name() + ':' + #numeroDocumento")
+public DocumentoConsultado consultar(...) {
+    String mensajeNegativo = cacheNegativos.get(clave, String.class);
+    if (mensajeNegativo != null)                      <span class="cm">// ya sabemos que no existe</span>
+        throw new ResourceNotFoundException(mensajeNegativo);  <span class="cm">// no gasta cuota</span>
+    try { ... }
+    catch (ResourceNotFoundException ex) {
+        cacheNegativos.put(clave, ex.getMessage());   <span class="cm">// guarda el "no existe"</span>
+        throw ex;
+    }
+    catch (RestClientResponseException ex) {
+        if (ex.getStatusCode().value() == 404)        <span class="cm">// solo 404 es negativo real</span>
+            cacheNegativos.put(clave, mensajeError(ex));
+        throw new IllegalStateException(mensajeError(ex), ex);
+    }
+}</div>
+  <p><code>@Cacheable</code> no cachea excepciones; por eso la caché negativa se maneja <b>manualmente</b> (<code>get</code>/<code>put</code>) para que un reintento de un documento inexistente no vuelva a gastar cuota. Solo el 404 se considera negativo (401/429/5xx son transitorios). <span class="anchor">clientes/adapters/out/external/ApisPeruDocumentoAdapter.java:50-83</span></p>
+
+  <h3>2.7 Refresco programado</h3>
+  <div class="code"><span class="an">@Scheduled</span>(fixedRateString = "${viernes.cache.refresh-ms:600000}")  <span class="cm">// 10 min</span>
+public void refrescarCatalogos() {
+    List.of(CACHE_PRODUCTOS, CACHE_ETIQUETAS, CACHE_FUENTES)
+        .forEach(name -&gt; { Cache c = cacheManager.getCache(name); if (c != null) c.clear(); });
+    log.info("Cache de catalogos refrescada: {}", caches);
+}</div>
+  <p>El TTL ya invalida por tiempo, pero el job deja un refresco <b>explícito y verificable en logs</b>. <span class="anchor">shared/cache/CacheRefreshJob.java:31-46</span></p>
+
+  <!-- ============ 03 TRAFICO ============ -->
+  <h2 id="trafico"><span class="num">03</span> Reducción de llamadas y tráfico</h2>
+  <p class="sec-intro">Técnicas que evitan hacer llamadas innecesarias, acotan su costo o traen menos datos por viaje.</p>
+
+  <h3>3.1 Rate-limit por usuario (protege la cuota externa)</h3>
+  <div class="code">this.contadores = Caffeine.newBuilder()
+        .maximumSize(10_000)
+        .expireAfterWrite(Duration.ofSeconds(ventanaSegundos))  <span class="cm">// ventana 60 s</span>
+        .build();
+public void verificar(String usuario) {
+    AtomicInteger contador = contadores.get(usuario, clave -&gt; new AtomicInteger());
+    if (contador.incrementAndGet() &gt; maxConsultas)              <span class="cm">// máx 20</span>
+        throw new RateLimitExceededException("Demasiadas consultas...", ventanaSegundos);
+}</div>
+  <p>Contador atómico por usuario en una caché Caffeine con ventana deslizante; al superar 20 consultas/60 s lanza 429 con <code>Retry-After</code>. Es por <b>usuario</b> (no por rol) porque cualquier rol registra clientes y usa la consulta. <span class="anchor">shared/ratelimit/ConsultaDocumentoRateLimiter.java:28-46</span></p>
+
+  <h3>3.2 Timeout fail-fast (backend 5 s, frontend 15 s)</h3>
+  <div class="code">SimpleClientHttpRequestFactory f = new SimpleClientHttpRequestFactory();
+int timeoutMs = (int) properties.getTimeout().toMillis();  <span class="cm">// 5 s</span>
+f.setConnectTimeout(timeoutMs);  <span class="cm">// máx para establecer conexión</span>
+f.setReadTimeout(timeoutMs);     <span class="cm">// máx esperando respuesta</span>
+this.restClient = RestClient.builder().baseUrl(...).requestFactory(f).build();</div>
+  <p>Acota la latencia peor-caso de la llamada externa; al vencer lanza <code>ResourceAccessException</code> &rarr; error amigable y el hilo se libera (no se secuestran hilos de Tomcat). En el frontend, <code>timeout(15000)</code> corta la petición si el backend no responde. <span class="anchor">ApisPeruDocumentoAdapter.java:37-45</span> · <span class="anchor">app/core/interceptors/jwt.interceptor.ts:22,36</span></p>
+
+  <h3>3.3 Debounce 600 ms (agrupa ráfagas de teclas)</h3>
+  <div class="code">this.form.valueChanges
+  .pipe(debounceTime(600), takeUntilDestroyed(this.destroyRef))
+  .subscribe((v) =&gt; { if (this.form.dirty) this.draft.save(this.draftKey, {...}); });</div>
+  <p>Espera 600 ms de silencio antes de actuar, evitando una escritura/llamada por cada tecla. <b>Nota honesta:</b> en estos forms alimenta el guardado de borrador (localStorage); la reducción de llamadas a APIsPERU la logran caché + rate-limit + botón. <span class="anchor">app/features/actividades/actividad-form/actividad-form.ts:136-142</span> (patrón repetido en ~10 forms).</p>
+
+  <h3>3.4 Polling incremental + paginación acotada (mensajería)</h3>
+  <div class="code"><span class="cm">// frontend: cada 5 s pide solo lo nuevo desde el último id, máx 100</span>
+private poll() {
+  const params = new HttpParams().set('despuesDeId', String(this.ultimoId))
+                                 .set('limite', String(this.maxMensajes));
+  this.http.get&lt;MensajeResponse[]&gt;(this.url(), { params }).subscribe(...);
+}
+<span class="cm">// backend: consulta delta + PageRequest (no trae toda la tabla)</span>
+public List&lt;Mensaje&gt; findDespuesDeId(Long despuesDeId, int limite) {
+  return repository.findByIdGreaterThanOrderByIdAsc(despuesDeId, PageRequest.of(0, limite))...;
+}</div>
+  <p>En vez de recargar todo el chat cada 5 s, trae <b>solo mensajes nuevos</b> acotados a un límite. Reduce payload y trabajo de BD por poll. <span class="anchor">app/features/mensajeria/mensajeria.service.ts:11,44,144-150</span> · <span class="anchor">mensajeria/adapters/out/persistence/MensajePersistenceAdapter.java:29-33</span></p>
+
+  <h3>3.5 Peticiones en paralelo (<code>forkJoin</code>)</h3>
+  <div class="code">forkJoin({
+  clientes: this.clientesService.listar().pipe(catchError(() =&gt; of([]))),
+  leads: this.leadsService.listar().pipe(catchError(() =&gt; of([]))),
+  oportunidades: this.oportunidadesService.listar().pipe(catchError(() =&gt; of([]))),
+  etiquetas: this.etiquetasService.listar(true).pipe(catchError(() =&gt; of([]))),
+})  <span class="cm">// las 4 viajan a la vez, no en serie</span></div>
+  <p>La latencia total pasa de <i>suma</i> de las 4 a la <i>máxima</i> de ellas. <span class="anchor">app/features/actividades/actividad-form/actividad-form.ts:169-179</span></p>
+
+  <!-- ============ 04 DATOS ============ -->
+  <h2 id="datos"><span class="num">04</span> Acceso a datos eficiente (Oracle)</h2>
+  <p class="sec-intro">Menos viajes a la BD, menos filas traídas y menos trabajo de Hibernate por consulta.</p>
+  <table>
+    <tr><th>Técnica</th><th>Cómo funciona</th><th>Anclaje</th></tr>
+    <tr><td><code>@Transactional(readOnly=true)</code></td><td>Hibernate omite dirty-checking y flush en consultas &rarr; más rápido y menos memoria</td><td><span class="anchor">EtiquetaService.java:31</span> (8 services)</td></tr>
+    <tr><td>Batch / anti-N+1</td><td><code>findAllById</code> trae etiquetas en una consulta; <code>saveAll</code> inserta en lote (no una por fila)</td><td><span class="anchor">ActividadService.java:302,335</span> · <span class="anchor">ActividadEtiquetaPersistenceAdapter.java:62</span></td></tr>
+    <tr><td>Filtrado/agregación en el motor</td><td><code>@Query</code> con <code>estado+fecha</code> (vencidas), subquery <code>IN</code>, y <code>COALESCE(SUM(valor*probabilidad/100))</code> para el pipeline: el cálculo ocurre en Oracle, no en Java</td><td><span class="anchor">ActividadSpringDataRepository.java:21,32</span> · <span class="anchor">OportunidadSpringDataRepository.java:18</span></td></tr>
+    <tr><td>Paginación acotada</td><td><code>PageRequest.of(0, limite)</code> evita leer tablas completas</td><td><span class="anchor">MensajePersistenceAdapter.java:22,30</span></td></tr>
+    <tr><td>Índices únicos</td><td><code>uniqueConstraints</code> en tablas puente &rarr; integridad y mejores planes de acceso</td><td><span class="anchor">ActividadEtiquetaEntity.java:8</span></td></tr>
+    <tr><td>Pool de conexiones</td><td>HikariCP (por defecto de Spring Data JPA) reutiliza conexiones JDBC</td><td><span class="anchor">pom.xml:49</span></td></tr>
+  </table>
+  <div class="note warn"><b>Anti-ejemplo real (N+1 residual).</b> <code>listarParticipantes</code> aún resuelve contactos uno-a-uno (<span class="anchor">ActividadService.java:230-231</span>), y <code>ContactoQueryAdapter</code> hace <code>listar().stream().flatMap(...).filter(...).findFirst()</code> (<span class="anchor">actividades/adapters/out/persistence/ContactoQueryAdapter.java:30-34</span>): trae todos los clientes para resolver un id. Señalado como brecha en §08.</div>
+
+  <!-- ============ 05 FRONTEND ============ -->
+  <h2 id="frontend"><span class="num">05</span> Frontend Angular ligero</h2>
+  <div class="grid">
+    <div class="mini"><div class="k">Lazy loading</div><div class="v">32 <code>loadComponent</code></div><p>Code-splitting por ruta: el bundle inicial solo trae el shell; cada feature se descarga al navegar. <span class="anchor">app/app.routes.ts</span></p></div>
+    <div class="mini"><div class="k">Signals + computed</div><div class="v">Change detection granular</div><p>Actualiza solo lo que cambia, sin re-render global. <span class="anchor">app/features/dashboard/dashboard.ts</span></p></div>
+    <div class="mini"><div class="k">takeUntilDestroyed</div><div class="v">Sin fugas de memoria</div><p>Cierra subscriptions al destruir el componente (menos listeners colgados). <span class="anchor">actividad-form.ts:137</span></p></div>
+    <div class="mini"><div class="k">Borradores localStorage</div><div class="v">draft.service</div><p>No re-pierde trabajo ni re-consulta al reabrir un form. <span class="anchor">app/core/services/draft.service.ts:8</span></p></div>
+  </div>
+  <div class="note warn"><b>Tradeoff, no optimización pura.</b> El filtrado de listas es <b>client-side</b> (<span class="anchor">app/features/actividades/actividad-list/actividad-list.ts:55</span>): reduce viajes al servidor pero carga todo en el cliente y no escala con volumen. Brecha en §08.</div>
+
+  <!-- ============ 06 OBS ============ -->
+  <h2 id="obs"><span class="num">06</span> Observabilidad y preparación para producción</h2>
+  <p class="sec-intro">No optimizan directamente, pero permiten <b>medir</b> y operar el sistema en producción (optimizar a ciegas es imposible).</p>
+  <table>
+    <tr><th>Pieza</th><th>Para qué</th><th>Anclaje</th></tr>
+    <tr><td>Actuator + Micrometer/Prometheus</td><td>Métricas de salud, JVM y caché para detectar cuellos de botella</td><td><span class="anchor">pom.xml:37,119</span> · <span class="anchor">pom.xml:83</span></td></tr>
+    <tr><td><code>recordStats()</code> en caché</td><td>Hit-ratio por caché: mide si la caché realmente ahorra consultas</td><td><span class="anchor">CacheConfig.java:41,48,56,66</span></td></tr>
+    <tr><td><code>X-Trace-ID</code> (MDC)</td><td>Correlaciona una petición frontend con sus logs backend</td><td><span class="anchor">shared/filter/CorrelationIdFilter.java:29</span></td></tr>
+    <tr><td>JWT stateless</td><td>Sin sesión en servidor &rarr; escala horizontal sin sticky sessions</td><td><span class="anchor">auth/keycloak/KeycloakSecurityConfig.java:88</span></td></tr>
+    <tr><td><code>GlobalExceptionHandler</code></td><td>Errores controlados y uniformes (429 con Retry-After, 404, 409...)</td><td><span class="anchor">shared/exception/GlobalExceptionHandler.java:24,86</span></td></tr>
+  </table>
+
+  <!-- ============ 07 ESTRUCTURA ============ -->
+  <h2 id="estructura"><span class="num">07</span> Estructura del código de optimización</h2>
+  <p class="sec-intro">La optimización está <b>transversal</b>: la infraestructura vive en <code>shared</code>, y las anotaciones se reparten en los services de cada módulo. Así ningún módulo reinventa la caché ni el rate-limit.</p>
+  <div class="tree"><span class="dir">viernes-backend/src/main/java/com/viernes/</span>
+├─ <span class="dir">shared/</span>
+│  ├─ <span class="dir">cache/</span> <span class="f">CacheConfig.java</span> + <span class="f">CacheRefreshJob.java</span>   <span class="cm">infra caché</span>
+│  ├─ <span class="dir">ratelimit/</span> <span class="f">ConsultaDocumentoRateLimiter.java</span>        <span class="cm">infra rate-limit</span>
+│  ├─ <span class="dir">filter/</span> <span class="f">CorrelationIdFilter.java</span>                  <span class="cm">trazabilidad</span>
+│  └─ <span class="dir">exception/</span> <span class="f">GlobalExceptionHandler.java</span>             <span class="cm">429/404/409 uniformes</span>
+├─ <span class="dir">dashboard/application/service/</span> <span class="f">DashboardService.java</span>  <span class="cm">@Cacheable KPIs</span>
+├─ <span class="dir">etiquetas|leads|productos/application/service/</span>            <span class="cm">@Cacheable + @CacheEvict</span>
+├─ <span class="dir">clientes/adapters/out/external/</span> <span class="f">ApisPeruDocumentoAdapter.java</span> <span class="cm">caché +/−, timeout</span>
+└─ <span class="dir">mensajeria/adapters/out/persistence/</span> <span class="f">MensajePersistenceAdapter.java</span> <span class="cm">delta + paginación</span>
+<span class="dir">viernes-frontend/src/app/</span>
+├─ <span class="dir">core/interceptors/</span> <span class="f">jwt.interceptor.ts</span>                <span class="cm">timeout 15 s</span>
+├─ <span class="dir">core/services/</span> <span class="f">draft.service.ts</span>                      <span class="cm">borradores</span>
+└─ <span class="dir">features/*/</span> <span class="f">*-form.ts</span> / <span class="f">mensajeria.service.ts</span>      <span class="cm">debounce, forkJoin, polling</span></div>
+
+  <!-- ============ 08 BRECHAS ============ -->
+  <h2 id="brechas"><span class="num">08</span> Brechas: lo que NO está optimizado <span class="badge b-gap">GAP</span></h2>
+  <p class="sec-intro">Ser honesto con lo que falta demuestra comprensión crítica. Cada brecha tiene anclaje o evidencia de ausencia.</p>
+  <table>
+    <tr><th>#</th><th>Brecha</th><th>Evidencia</th><th>Impacto</th></tr>
+    <tr><td>G1</td><td>Sin paginación en la mayoría de listados (solo mensajería)</td><td><code>Pageable</code> solo en mensajería; resto <code>findAll</code></td><td>No escala con volumen</td></tr>
+    <tr><td>G2</td><td>Filtrado client-side en listas</td><td><span class="anchor">actividad-list.ts:55</span></td><td>Carga todo en el cliente</td></tr>
+    <tr><td>G3</td><td>N+1 residual en participantes / ContactoQueryAdapter</td><td><span class="anchor">ActividadService.java:230-231</span> · <span class="anchor">ContactoQueryAdapter.java:30-34</span></td><td>Consultas de más</td></tr>
+    <tr><td>G4</td><td>Sin <code>OnPush</code> / <code>trackBy</code></td><td>grep sin resultados en features</td><td>Change detection y re-render de listas</td></tr>
+    <tr><td>G5</td><td>Sin compresión HTTP ni <code>@Async</code></td><td>sin <code>server.compression</code> / <code>@Async</code></td><td>Payload y trabajo síncrono</td></tr>
+    <tr><td>G6</td><td>MapStruct declarado pero sin uso (mapeo manual)</td><td><span class="anchor">pom.xml:114-115</span> · 0 <code>@Mapper</code></td><td>Boilerplate, no rendimiento</td></tr>
+  </table>
+  <div class="note ok"><b>Lectura para la sustentación.</b> El sistema ya aplica un conjunto coherente de optimizaciones (caché multinivel con TTL, invalidación, rate-limit, timeouts, delta-polling, batch y agregación en BD). Las brechas son de <i>escala</i> (paginación, OnPush) y están identificadas, no ocultas.</div>
+
+  <!-- ============ MIRO ============ -->
+  <h2 id="miro"><span class="num">&#9635;</span> Copiar outline para Miro</h2>
+  <p class="sec-intro">Genera un outline de texto (técnicas, cómo funcionan, estructura y brechas) para pegarlo como nota o índice en un board de Miro.</p>
+  <div class="copy-row">
+    <button class="btn" id="copyMiroBtn" type="button">Copiar para Miro</button>
+    <span class="copy-hint" id="copyMiroHint">Copia el outline de métodos de optimización.</span>
+  </div>
+
+  <footer>VIERNES CRM V1 · Informe de métodos de optimización (S13) · generado sobre el código real de E:\Viernes\Viernes · anclajes archivo:línea verificados · validación estructural (DOM), no por imagen.</footer>
+</div>
+
+<script>
+(function(){
+  var miroOptimizacion = {
+    titulo: "VIERNES CRM V1 — Métodos de Optimización (S13)",
+    secciones: [
+      "Cache Caffeine: CacheConfig.java:23 @EnableCaching; 6 caches con TTL por volatilidad/costo: catalogos 5min, dashboard 30s, documentos 24h, documentos-negativos 10min; maximumSize acota memoria; recordStats mide hit-ratio.",
+      "Mecanismo: proxy AOP intercepta @Cacheable; evalua clave SpEL+condition; hit devuelve sin ejecutar (0 consultas); miss ejecuta y guarda. @CacheEvict(allEntries) invalida al escribir (cache-aside).",
+      "Cache negativa manual: @Cacheable no cachea excepciones; ApisPeruDocumentoAdapter:59-77 get/put de 'no existe' para no re-gastar cuota; solo 404 es negativo real.",
+      "Refresco: CacheRefreshJob:31 @Scheduled 10min limpia catalogos y deja log verificable.",
+      "Reduccion de llamadas: rate-limit 20/60s por usuario (ConsultaDocumentoRateLimiter:38, contador atomico+Caffeine); timeout fail-fast 5s backend /15s frontend; debounce 600ms; polling incremental mensajeria (despuesDeId+limite, PageRequest); forkJoin paralelo.",
+      "Acceso a datos: @Transactional(readOnly=true) sin dirty-check; batch findAllById/saveAll anti-N+1; @Query filtrado y COALESCE SUM en Oracle; PageRequest acotado; uniqueConstraints; pool HikariCP.",
+      "Frontend: lazy loading 32 loadComponent; signals+computed; takeUntilDestroyed sin fugas; borradores localStorage; filtrado client-side = tradeoff.",
+      "Observabilidad: Actuator+Prometheus (pom:37,119); recordStats; X-Trace-ID MDC; JWT stateless escala horizontal; GlobalExceptionHandler 429/404/409.",
+      "Estructura: infra en shared/cache + shared/ratelimit + shared/filter + shared/exception; anotaciones repartidas en services de cada modulo; adapter externo con cache+timeout.",
+      "Brechas: sin paginacion en la mayoria de listados; filtrado client-side; N+1 residual listarParticipantes/ContactoQueryAdapter; sin OnPush/trackBy; sin compresion/@Async; MapStruct sin uso.",
+      "Defensa: cada tecnica con anclaje archivo:linea; abrir el archivo para demostrar, no de memoria."
+    ]
+  };
+  function textoPlano(){
+    return miroOptimizacion.titulo + "\n" + "=".repeat(miroOptimizacion.titulo.length) + "\n\n" +
+      miroOptimizacion.secciones.map(function(s,i){ return (i+1) + ". " + s; }).join("\n\n");
+  }
+  var btn = document.getElementById('copyMiroBtn');
+  var hint = document.getElementById('copyMiroHint');
+  if(btn){
+    btn.addEventListener('click', async function(){
+      var texto = textoPlano();
+      try{
+        if(navigator.clipboard && navigator.clipboard.writeText){ await navigator.clipboard.writeText(texto); }
+        else { var ta=document.createElement('textarea'); ta.value=texto; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); }
+        btn.textContent='✓ Copiado'; btn.classList.add('ok');
+        hint.textContent='Pégalo en Miro como nota de texto o índice del board.';
+        setTimeout(function(){ btn.textContent='Copiar para Miro'; btn.classList.remove('ok'); hint.textContent='Copia el outline de métodos de optimización.'; },2600);
+      }catch(e){ hint.textContent='No se pudo copiar automáticamente. Selecciona el texto manualmente.'; }
+    });
+  }
+  window.__miroOptimizacion = miroOptimizacion;
+  window.__miroTextoPlano = textoPlano;
+})();
+</script>
+</body>
+</html>

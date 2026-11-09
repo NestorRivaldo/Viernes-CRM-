@@ -109,6 +109,13 @@
   color: var(--text-secondary);
 }
 
+.documento-label {
+  font-family: monospace;
+  font-size: 12px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
 .correo-text {
   color: var(--text-secondary);
   font-size: 13px;
@@ -138,6 +145,11 @@
   font-size: 18px;
   width: 18px;
   height: 18px;
+}
+
+.mac-action-btn.map:hover {
+  color: #7c3aed;
+  background: #f5f3ff;
 }
 
 .mac-action-btn.edit:hover {

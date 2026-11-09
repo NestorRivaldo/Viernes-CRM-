@@ -1,0 +1,325 @@
+<div class="relationship-map-container">
+  
+  <!-- BARRA SUPERIOR CONTEXTUAL (macOS Monterey Toolbar) -->
+  <header class="map-header-toolbar">
+    <div class="header-left">
+      <div class="brand-pill">
+        <mat-icon class="brand-icon">hub</mat-icon>
+        <span class="brand-title">Mapa de Relaciones</span>
+      </div>
+
+      <!-- Botón Volver al Principal (Header) -->
+      <button class="mac-tool-btn back-to-root-btn" (click)="volverAlPrincipal()" matTooltip="Volver y recentrar en el registro raíz">
+        <mat-icon>home</mat-icon>
+        <span class="btn-text-label">Principal</span>
+      </button>
+
+      <!-- Selector Rápido de Contexto de Cliente -->
+      <div class="client-context-picker">
+        <button class="picker-trigger-btn" (click)="menuSelectorClienteAbierto.set(!menuSelectorClienteAbierto())">
+          <mat-icon class="picker-icon">business</mat-icon>
+          <span class="picker-label">
+            {{ selectedNode()?.type === 'CLIENTE' ? selectedNode()?.label : 'Cambiar Cliente...' }}
+          </span>
+          <mat-icon class="arrow-icon">arrow_drop_down</mat-icon>
+        </button>
+
+        @if (menuSelectorClienteAbierto()) {
+          <div class="picker-dropdown-menu">
+            <div class="dropdown-header">Seleccionar Cuenta Principal</div>
+            <div class="dropdown-list">
+              @for (c of listaClientes(); track c.id) {
+                <div class="dropdown-item" (click)="cambiarContextoCliente(c)">
+                  <div class="item-avatar">{{ c.nombre.charAt(0).toUpperCase() }}</div>
+                  <div class="item-info">
+                    <span class="item-name">{{ c.nombre }}</span>
+                    <small class="item-sub">{{ c.empresa || c.correo }}</small>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Indicadores de Nodos y Estado -->
+    <div class="header-center">
+      <div class="status-chip-group">
+        <span class="chip-metric">
+          <mat-icon class="metric-icon">grain</mat-icon>
+          <strong>{{ totalNodesCount() }}</strong> Nodos
+        </span>
+        <span class="chip-metric">
+          <mat-icon class="metric-icon">alt_route</mat-icon>
+          <strong>{{ totalEdgesCount() }}</strong> Conexiones
+        </span>
+      </div>
+    </div>
+
+    <!-- Acciones Globales de Lienzo -->
+    <div class="header-right">
+      <button class="mac-tool-btn" (click)="reorganizarLayout()" matTooltip="Reorganizar Grafo">
+        <mat-icon>auto_fix_high</mat-icon>
+      </button>
+      <button class="mac-tool-btn" (click)="centrarLienzo()" matTooltip="Centrar Lienzo Completo">
+        <mat-icon>filter_center_focus</mat-icon>
+      </button>
+      <button class="mac-tool-btn" (click)="zoomOut()" matTooltip="Alejar (-)">
+        <mat-icon>zoom_out</mat-icon>
+      </button>
+      <button class="mac-tool-btn" (click)="zoomIn()" matTooltip="Acercar (+)">
+        <mat-icon>zoom_in</mat-icon>
+      </button>
+    </div>
+  </header>
+
+  <!-- CUERPO PRINCIPAL DEL MAPA (TRES PANELES) -->
+  <div class="map-body-grid">
+    
+    <!-- 1. PANEL IZQUIERDO: Búsqueda en Vivo, Filtros de Entidad e Historial -->
+    <aside class="sidebar-left-panel">
+
+      <!-- Sección: Búsqueda en Tiempo Real sobre el Lienzo -->
+      <div class="panel-section search-section">
+        <div class="section-title-row">
+          <mat-icon class="sec-icon">search</mat-icon>
+          <span>Búsqueda en Lienzo</span>
+        </div>
+
+        <div class="canvas-search-box">
+          <mat-icon class="search-input-icon">search</mat-icon>
+          <input
+            type="text"
+            placeholder="Buscar por nombre, cargo, código..."
+            [ngModel]="filtroTexto()"
+            (ngModelChange)="aplicarFiltroTexto($event)"
+            class="mac-search-input"
+          />
+          @if (filtroTexto()) {
+            <button class="clear-search-btn" (click)="aplicarFiltroTexto('')" title="Limpiar búsqueda">
+              <mat-icon>close</mat-icon>
+            </button>
+          }
+        </div>
+        @if (filtroTexto()) {
+          <div class="search-results-pill">
+            <mat-icon class="search-match-icon">check_circle</mat-icon>
+            <span>{{ nodosCoincidentesCount() }} coincidencias</span>
+          </div>
+        }
+      </div>
+      
+      <!-- Sección: Filtros Rápidos por Entidad -->
+      <div class="panel-section">
+        <div class="section-title-row">
+          <mat-icon class="sec-icon">category</mat-icon>
+          <span>Filtro por Entidad</span>
+        </div>
+
+        <div class="entity-filter-list">
+          <button class="filter-pill-btn" [class.active]="filtroTipo() === 'TODOS'" (click)="aplicarFiltroTipo('TODOS')">
+            <span class="pill-dot todos"></span> Todos
+          </button>
+          <button class="filter-pill-btn" [class.active]="filtroTipo() === 'CLIENTE'" (click)="aplicarFiltroTipo('CLIENTE')">
+            <span class="pill-dot cliente"></span> Clientes
+          </button>
+          <button class="filter-pill-btn" [class.active]="filtroTipo() === 'CONTACTO'" (click)="aplicarFiltroTipo('CONTACTO')">
+            <span class="pill-dot contacto"></span> Contactos
+          </button>
+          <button class="filter-pill-btn" [class.active]="filtroTipo() === 'OPORTUNIDAD'" (click)="aplicarFiltroTipo('OPORTUNIDAD')">
+            <span class="pill-dot oportunidad"></span> Oportunidades
+          </button>
+          <button class="filter-pill-btn" [class.active]="filtroTipo() === 'ACTIVIDAD'" (click)="aplicarFiltroTipo('ACTIVIDAD')">
+            <span class="pill-dot actividad"></span> Actividades
+          </button>
+          <button class="filter-pill-btn" [class.active]="filtroTipo() === 'PROPUESTA'" (click)="aplicarFiltroTipo('PROPUESTA')">
+            <span class="pill-dot propuesta"></span> Propuestas
+          </button>
+        </div>
+      </div>
+
+      <!-- Sección: Historial de Exploración / Ruta de Navegación -->
+      <div class="panel-section history-section">
+        <div class="section-title-row">
+          <mat-icon class="sec-icon">history</mat-icon>
+          <span>Ruta de Exploración</span>
+        </div>
+
+        <div class="history-trail-list">
+          @for (step of history(); track step.id; let idx = $index) {
+            <div class="trail-item" [class.selected]="selectedNode()?.id === step.id" (click)="seleccionarDesdeHistorial(step)">
+              <div class="trail-index">{{ idx + 1 }}</div>
+              <div class="trail-meta">
+                <span class="trail-name">{{ step.label }}</span>
+                <span class="trail-type-badge {{ step.type.toLowerCase() }}">{{ step.type }}</span>
+              </div>
+              <mat-icon class="trail-jump-icon">chevron_right</mat-icon>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Sección: Guía de Interacción Estilo Blender Nodes -->
+      <div class="panel-section legend-section">
+        <div class="section-title-row">
+          <mat-icon class="sec-icon">help_outline</mat-icon>
+          <span>Guía de Interacción</span>
+        </div>
+        <ul class="legend-tips-list">
+          <li><strong>Clic simple:</strong> Inspeccionar detalles del nodo.</li>
+          <li><strong>Doble clic:</strong> Expandir / contraer conexiones.</li>
+          <li><strong>Arrastrar:</strong> Reposicionar libremente.</li>
+          <li><strong>Rueda / Scroll:</strong> Zoom progresivo in/out.</li>
+        </ul>
+      </div>
+
+    </aside>
+
+    <!-- 2. LIENZO CENTRAL: Canvas de Cytoscape.js con Estética Minimalista -->
+    <main class="canvas-center-viewport">
+      
+      @if (loading()) {
+        <div class="canvas-overlay-state">
+          <mat-spinner diameter="44"></mat-spinner>
+          <p>Trazando grafo de relaciones comerciales...</p>
+        </div>
+      }
+
+      @if (error()) {
+        <div class="canvas-overlay-state error">
+          <mat-icon class="state-icon">error_outline</mat-icon>
+          <h3>Ocurrió un error al cargar el mapa</h3>
+          <p>{{ error() }}</p>
+          <button class="btn-retry" (click)="cargarPrimerCliente()">Reintentar</button>
+        </div>
+      }
+
+      <!-- Contenedor Interactivo Cytoscape -->
+      <div #cyContainer class="cytoscape-graph-canvas"></div>
+
+      <!-- Toast Flotante Dinámico -->
+      @if (toastMensaje()) {
+        <div class="mac-floating-toast">
+          <mat-icon class="toast-icon">info</mat-icon>
+          <span class="toast-text">{{ toastMensaje() }}</span>
+        </div>
+      }
+
+      <!-- Floating Controls Badge -->
+      <div class="floating-canvas-controls">
+        <button class="fab-circle" (click)="centrarLienzo()" title="Centrar foco">
+          <mat-icon>center_focus_strong</mat-icon>
+        </button>
+        <button class="fab-circle" (click)="zoomIn()" title="Acercar">
+          <mat-icon>add</mat-icon>
+        </button>
+        <button class="fab-circle" (click)="zoomOut()" title="Alejar">
+          <mat-icon>remove</mat-icon>
+        </button>
+      </div>
+    </main>
+
+    <!-- 3. PANEL DERECHO: Inspector de Registro y Acciones -->
+    <aside class="sidebar-right-inspector">
+      
+      @if (selectedNode(); as node) {
+        <div class="inspector-card">
+          
+          <!-- Inspector Header -->
+          <div class="inspector-header">
+            <div class="badge-row">
+              <span class="entity-type-tag {{ node.type.toLowerCase() }}">
+                <mat-icon>{{ getNodeVisualTheme(node).icon }}</mat-icon>
+                {{ getNodeVisualTheme(node).label }}
+              </span>
+              @if (node.status) {
+                <span class="node-status-pill {{ node.status.toLowerCase() }}">
+                  {{ node.status }}
+                </span>
+              }
+            </div>
+            <h3 class="node-title">{{ node.label }}</h3>
+            @if (node.sublabel) {
+              <p class="node-subtitle">{{ node.sublabel }}</p>
+            }
+          </div>
+
+          <!-- Indicador de Nodo Completamente Expandido -->
+          @if (isNodoCompletamenteExpandido(node.id)) {
+            <div class="fully-expanded-badge">
+              <mat-icon class="badge-ic">verified</mat-icon>
+              <span>Todas las conexiones visibles</span>
+            </div>
+          }
+
+          <!-- Inspector Primary Properties -->
+          <div class="inspector-props-section">
+            <div class="props-title">Propiedades del Registro</div>
+            
+            <div class="prop-item">
+              <span class="prop-key">Identificador:</span>
+              <code class="prop-val-code">{{ node.id }}</code>
+            </div>
+
+            @for (entry of node.data | keyvalue; track entry.key) {
+              @if (entry.value !== null && entry.value !== undefined && entry.value !== '') {
+                <div class="prop-item">
+                  <span class="prop-key">{{ entry.key }}:</span>
+                  <span class="prop-val">{{ entry.value }}</span>
+                </div>
+              }
+            }
+          </div>
+
+          <!-- Inspector Action Buttons -->
+          <div class="inspector-actions-section">
+            
+            <!-- Acción Dinámica: Expandir o Contraer Rama -->
+            @if (isNodoExpandido(node.id) && node.id !== rootNodeId()) {
+              <button class="btn-inspector-action collapse" (click)="contraerNodo(node)">
+                <mat-icon>unfold_less</mat-icon> Contraer Conexiones
+              </button>
+            } @else {
+              <button class="btn-inspector-action primary" 
+                      [disabled]="expandingNodeId() === node.id"
+                      (click)="expandirNodo(node)">
+                @if (expandingNodeId() === node.id) {
+                  <mat-spinner diameter="18" style="display: inline-block; margin-right: 8px;"></mat-spinner>
+                  Expandiendo conexiones...
+                } @else {
+                  <mat-icon>account_tree</mat-icon> Expandir Conexiones
+                }
+              </button>
+            }
+
+            <button class="btn-inspector-action secondary" (click)="centrarEnNodo(node.id)">
+              <mat-icon>gps_fixed</mat-icon> Centrar en Lienzo
+            </button>
+
+            <!-- Botón Volver al Principal (solo visible si no estamos ya en la raíz) -->
+            @if (node.id !== rootNodeId()) {
+              <button class="btn-inspector-action outline" (click)="volverAlPrincipal()">
+                <mat-icon>home</mat-icon> Volver al Principal
+              </button>
+            }
+
+            <button class="btn-inspector-action outline" (click)="navegarARegistroOriginal(node)">
+              <mat-icon>open_in_new</mat-icon> Abrir Registro Original
+            </button>
+          </div>
+
+        </div>
+      } @else {
+        <div class="inspector-empty-state">
+          <mat-icon class="empty-icon">touch_app</mat-icon>
+          <h4>Sin Selección</h4>
+          <p>Haz clic en cualquier nodo del lienzo para inspeccionar sus datos y expandir o contraer su red comercial.</p>
+        </div>
+      }
+
+    </aside>
+
+  </div>
+
+</div>

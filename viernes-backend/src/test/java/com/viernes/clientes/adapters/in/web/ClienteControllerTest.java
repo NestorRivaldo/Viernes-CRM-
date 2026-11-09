@@ -4,9 +4,13 @@ import com.viernes.clientes.application.dto.ClienteRequest;
 import com.viernes.clientes.application.dto.ClienteResponse;
 import com.viernes.clientes.application.dto.ContactoRequest;
 import com.viernes.clientes.application.dto.ContactoResponse;
+import com.viernes.clientes.application.dto.DocumentoConsultaResponse;
 import com.viernes.clientes.application.port.in.ManageClienteUseCase;
 import com.viernes.clientes.domain.EstadoCliente;
+import com.viernes.clientes.domain.TipoDocumento;
+import com.viernes.shared.exception.RateLimitExceededException;
 import com.viernes.shared.exception.ResourceNotFoundException;
+import com.viernes.shared.ratelimit.ConsultaDocumentoRateLimiter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -23,6 +28,9 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -35,8 +43,13 @@ class ClienteControllerTest {
     @Mock
     private ManageClienteUseCase useCase;
 
+    @Mock
+    private ConsultaDocumentoRateLimiter rateLimiter;
+
     @InjectMocks
     private ClienteController controller;
+
+    private final TestingAuthenticationToken usuario = new TestingAuthenticationToken("vendedor", null);
 
     private ClienteResponse validResponse;
     private ContactoResponse validContactoResponse;
@@ -48,7 +61,8 @@ class ClienteControllerTest {
                 .build();
 
         validResponse = new ClienteResponse(
-                1L, "Juan Perez", "Empresa SA", "juan@mail.com", "555-1234",
+                1L, "Juan Perez", "Empresa SA", TipoDocumento.DNI, "12345678",
+                "juan@mail.com", "555-1234",
                 EstadoCliente.ACTIVO, "Maria", LocalDateTime.now(), List.of()
         );
 
@@ -64,6 +78,68 @@ class ClienteControllerTest {
         mockMvc.perform(get("/api/v1/clientes"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray());
+    }
+
+    @Test
+    void listar_porDocumento_retornaOk() throws Exception {
+        when(useCase.buscarPorDocumento("12345678")).thenReturn(List.of(validResponse));
+
+        mockMvc.perform(get("/api/v1/clientes").param("documento", "12345678"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].tipoDocumento").value("DNI"))
+                .andExpect(jsonPath("$[0].numeroDocumento").value("12345678"));
+    }
+
+    @Test
+    void consultarDocumento_dni_retornaDatosOficiales() throws Exception {
+        DocumentoConsultaResponse response = new DocumentoConsultaResponse(
+                TipoDocumento.DNI, "12345678", "Juan Perez Lopez",
+                null, null, null, null, null, List.of()
+        );
+        when(useCase.consultarDocumento(TipoDocumento.DNI, "12345678")).thenReturn(response);
+
+        mockMvc.perform(get("/api/v1/clientes/documento/DNI/12345678").principal(usuario))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.tipoDocumento").value("DNI"))
+                .andExpect(jsonPath("$.numeroDocumento").value("12345678"))
+                .andExpect(jsonPath("$.nombreCompleto").value("Juan Perez Lopez"));
+    }
+
+    @Test
+    void consultarDocumento_noEncontrado_retornaNotFound() throws Exception {
+        when(useCase.consultarDocumento(TipoDocumento.DNI, "99999999"))
+                .thenThrow(new ResourceNotFoundException("No se encontró el DNI"));
+
+        mockMvc.perform(get("/api/v1/clientes/documento/DNI/99999999").principal(usuario))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void consultarDocumento_aplicaLimitePorUsuarioAutenticado() throws Exception {
+        DocumentoConsultaResponse response = new DocumentoConsultaResponse(
+                TipoDocumento.DNI, "12345678", "Juan Perez Lopez",
+                null, null, null, null, null, List.of()
+        );
+        when(useCase.consultarDocumento(TipoDocumento.DNI, "12345678")).thenReturn(response);
+
+        mockMvc.perform(get("/api/v1/clientes/documento/DNI/12345678").principal(usuario))
+                .andExpect(status().isOk());
+
+        verify(rateLimiter).verificar("vendedor");
+    }
+
+    @Test
+    void consultarDocumento_limiteSuperado_retorna429ConRetryAfter() throws Exception {
+        doThrow(new RateLimitExceededException("Demasiadas consultas de documento.", 60))
+                .when(rateLimiter).verificar("vendedor");
+
+        mockMvc.perform(get("/api/v1/clientes/documento/DNI/12345678").principal(usuario))
+                .andExpect(status().isTooManyRequests())
+                .andExpect(header().string("Retry-After", "60"))
+                .andExpect(jsonPath("$.status").value(429))
+                .andExpect(jsonPath("$.message").value("Demasiadas consultas de documento."));
+
+        verifyNoInteractions(useCase);
     }
 
     @Test
@@ -90,9 +166,11 @@ class ClienteControllerTest {
 
         mockMvc.perform(post("/api/v1/clientes")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"nombre\":\"Juan Perez\",\"empresa\":\"Empresa SA\",\"correo\":\"juan@mail.com\",\"telefono\":\"555-1234\",\"responsable\":\"Maria\"}"))
+                .content("{\"nombre\":\"Juan Perez\",\"empresa\":\"Empresa SA\",\"tipoDocumento\":\"DNI\",\"numeroDocumento\":\"12345678\",\"correo\":\"juan@mail.com\",\"telefono\":\"555-1234\",\"responsable\":\"Maria\"}"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.tipoDocumento").value("DNI"))
+                .andExpect(jsonPath("$.numeroDocumento").value("12345678"))
                 .andExpect(jsonPath("$.estado").value("ACTIVO"));
     }
 

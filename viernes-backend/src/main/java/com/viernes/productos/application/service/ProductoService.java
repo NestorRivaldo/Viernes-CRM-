@@ -8,6 +8,8 @@ import com.viernes.productos.domain.EstadoProducto;
 import com.viernes.productos.domain.Producto;
 import com.viernes.shared.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
@@ -20,6 +22,7 @@ public class ProductoService implements ManageProductoUseCase {
     private final ProductoPersistencePort persistencePort;
 
     @Override
+    @Cacheable(cacheNames = "productos", key = "'all'")
     public List<ProductoResponse> listar() {
         return persistencePort.findAll().stream().map(this::toResponse).toList();
     }
@@ -30,17 +33,20 @@ public class ProductoService implements ManageProductoUseCase {
     }
 
     @Override
+    @Cacheable(cacheNames = "productos", key = "'estado:' + #estado.name()", condition = "#estado != null")
     public List<ProductoResponse> listarPorEstado(EstadoProducto estado) {
         return persistencePort.findByEstado(estado).stream().map(this::toResponse).toList();
     }
 
     @Override
+    @Cacheable(cacheNames = "productos", key = "#id")
     public ProductoResponse obtener(Long id) {
         return toResponse(findOrThrow(id));
     }
 
     @Override
     @Transactional
+    @CacheEvict(cacheNames = "productos", allEntries = true)
     public ProductoResponse crear(ProductoRequest request) {
         if (persistencePort.existsByCodigo(request.codigo())) {
             throw new IllegalArgumentException("Ya existe un producto con el código: " + request.codigo());
@@ -55,6 +61,7 @@ public class ProductoService implements ManageProductoUseCase {
 
     @Override
     @Transactional
+    @CacheEvict(cacheNames = "productos", allEntries = true)
     public ProductoResponse actualizar(Long id, ProductoRequest request) {
         Producto p = findOrThrow(id);
         if (!p.getCodigo().equals(request.codigo()) && persistencePort.existsByCodigo(request.codigo())) {
@@ -66,6 +73,7 @@ public class ProductoService implements ManageProductoUseCase {
 
     @Override
     @Transactional
+    @CacheEvict(cacheNames = "productos", allEntries = true)
     public void eliminar(Long id) {
         findOrThrow(id);
         persistencePort.deleteById(id);

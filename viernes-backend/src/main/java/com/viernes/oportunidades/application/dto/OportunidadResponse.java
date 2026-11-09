@@ -15,5 +15,6 @@ public record OportunidadResponse(
     EtapaOportunidad etapa,
     String responsable,
     LocalDate fechaCierre,
+    String descripcion,
     LocalDateTime creadoEn
 ) {}

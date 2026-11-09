@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Especificación de los 12 casos de uso del núcleo de Viernes CRM V1, con diagrama UML, flujos, excepciones y reglas de negocio verificados en el código fuente.">
+<title>Núcleo de Casos de Uso (12) · Viernes CRM V1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#070b14; --surface:#0f1626; --surface2:#151f33; --surface3:#1b2842;
+  --border:#22304a; --border-strong:#33466a;
+  --text:#eef4ff; --text-muted:#a5b4cb; --text-subtle:#7385a1;
+  --green:#10b981; --blue:#3b82f6; --purple:#a855f7; --amber:#f59e0b;
+  --rose:#f43f5e; --cyan:#06b6d4;
+  --paper:#f4f6fb; --paper-ink:#16213a; --paper-line:#5a6b8c;
+  --mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  background:var(--bg); color:var(--text); line-height:1.6;
+  padding:30px 20px 80px;
+  background-image:
+    radial-gradient(circle at 8% 0%,rgba(59,130,246,.13) 0%,transparent 40%),
+    radial-gradient(circle at 92% 12%,rgba(16,185,129,.09) 0%,transparent 35%),
+    radial-gradient(circle at 50% 100%,rgba(168,85,247,.08) 0%,transparent 40%);
+  background-attachment:fixed;
+}
+.container{max-width:1340px;margin:0 auto}
+.top-nav{display:flex;justify-content:space-between;gap:16px;padding-bottom:20px;border-bottom:1px solid var(--border);margin-bottom:28px;font-size:13px;flex-wrap:wrap}
+.top-nav a{color:var(--text-muted);text-decoration:none;font-weight:600}
+.top-nav a:hover{color:#fff}
+.hero{padding:8px 0 26px;border-bottom:1px solid var(--border);margin-bottom:26px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;color:var(--cyan);background:rgba(6,182,212,.12);border:1px solid rgba(6,182,212,.3);border-radius:999px;padding:5px 13px;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px}
+h1{font-size:clamp(30px,4.5vw,46px);font-weight:800;letter-spacing:-.03em;line-height:1.15;background:linear-gradient(135deg,#fff 40%,#93c5fd 75%,#6ee7b7 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:14px}
+.lead{color:var(--text-muted);font-size:15.5px;max-width:1060px}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:26px}
+.metric{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.metric .l{font-size:11.5px;color:var(--text-subtle);text-transform:uppercase;font-weight:700;letter-spacing:.04em}
+.metric .v{font-size:19px;font-weight:800;font-family:var(--mono);color:#fff;white-space:nowrap}
+.panel{background:linear-gradient(180deg,rgba(21,31,51,.9),rgba(15,22,38,.9));border:1px solid var(--border-strong);border-radius:14px;padding:24px;margin-bottom:26px;position:relative;overflow:hidden}
+.panel::before{content:'';position:absolute;top:0;left:0;width:5px;height:100%;background:linear-gradient(180deg,var(--cyan),var(--blue))}
+.panel h2{font-size:19px;font-weight:800;margin-bottom:6px}
+.panel .sub{color:var(--text-muted);font-size:13.5px;margin-bottom:18px}
+.fanin{width:100%;border-collapse:collapse;font-size:13px}
+.fanin th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-subtle);padding:8px 10px;border-bottom:1px solid var(--border-strong)}
+.fanin td{padding:9px 10px;border-bottom:1px solid var(--border);color:var(--text-muted);vertical-align:top}
+.fanin td b{color:#fff}
+.fanin .score{font-family:var(--mono);font-weight:700;font-size:15px;text-align:center;width:64px}
+.hi{color:#6ee7b7!important}.mid{color:#fde68a!important}.lo{color:#94a3b8!important}
+.controls{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;margin-bottom:24px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px 18px;position:sticky;top:14px;z-index:100}
+.fgroup{display:flex;flex-wrap:wrap;gap:6px}
+.fbtn{background:transparent;border:1px solid var(--border);color:var(--text-muted);border-radius:999px;padding:6px 13px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:.2s}
+.fbtn:hover{background:var(--surface2);color:#fff;border-color:var(--border-strong)}
+.fbtn.active{background:var(--blue);color:#fff;border-color:var(--blue);box-shadow:0 0 12px rgba(59,130,246,.4)}
+.copyall{background:var(--surface2);border:1px solid var(--border-strong);color:#cbd5e1;border-radius:8px;padding:7px 13px;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;gap:6px;align-items:center;transition:.2s}
+.copyall:hover{background:var(--surface3);color:#fff}
+.uc{background:linear-gradient(180deg,rgba(21,31,51,.95),rgba(15,22,38,.95));border:1px solid var(--border);border-left:4px solid var(--blue);border-radius:14px;margin-bottom:22px;overflow:hidden}
+.uc-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:18px 22px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.uc-id{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--text-subtle);letter-spacing:.08em}
+.uc-title{font-size:22px;font-weight:800;color:#fff;letter-spacing:-.02em;margin-top:2px}
+.uc-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.tag{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:999px;font-family:var(--mono);letter-spacing:.04em;white-space:nowrap}
+.t-mod{background:rgba(59,130,246,.13);color:#93c5fd;border:1px solid rgba(59,130,246,.32)}
+.t-actor{background:rgba(16,185,129,.13);color:#6ee7b7;border:1px solid rgba(16,185,129,.32)}
+.t-pri{background:rgba(244,63,94,.13);color:#fda4af;border:1px solid rgba(244,63,94,.32)}
+.uc-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0}
+@media(max-width:1020px){.uc-body{grid-template-columns:1fr}}
+.diagram{background:var(--paper);padding:14px;border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;gap:8px}
+.diagram svg{width:100%;height:auto;max-width:760px;display:block}
+.diagram figcaption{font-size:10.5px;color:#7c88a3;font-family:var(--mono);text-transform:uppercase;letter-spacing:.07em}
+.spec{padding:20px 22px;font-size:13.5px}
+.spec h4{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-subtle);margin:16px 0 6px;font-weight:700}
+.spec h4:first-child{margin-top:0}
+.spec p{color:var(--text-muted);margin-bottom:4px}
+.spec strong{color:#fff;font-weight:600}
+ol.flow{list-style:none;counter-reset:f}
+ol.flow li{counter-increment:f;position:relative;padding-left:28px;margin-bottom:6px;color:var(--text-muted)}
+ol.flow li::before{content:counter(f);position:absolute;left:0;top:1px;width:19px;height:19px;border-radius:5px;background:var(--surface3);color:#93c5fd;font-family:var(--mono);font-size:10.5px;font-weight:700;display:flex;align-items:center;justify-content:center}
+ul.pl{list-style:none}
+ul.pl li{padding-left:16px;position:relative;margin-bottom:6px;color:var(--text-muted)}
+ul.pl li::before{content:'';position:absolute;left:2px;top:8px;width:6px;height:6px;border-radius:50%;background:var(--border-strong)}
+ul.ex li::before{background:var(--amber);border-radius:1px}
+ul.wa{margin-top:4px}
+ul.wa li{padding-left:22px;position:relative;margin-bottom:8px;color:#fde68a;font-size:13px}
+ul.wa li::before{content:'!';position:absolute;left:0;top:0;width:15px;height:15px;border-radius:4px;background:rgba(244,63,94,.18);border:1px solid rgba(244,63,94,.45);color:#fda4af;font-size:10px;font-weight:800;font-family:var(--mono);display:flex;align-items:center;justify-content:center}
+code{font-family:var(--mono);font-size:11.5px;background:rgba(59,130,246,.09);color:#bfdbfe;padding:1px 5px;border-radius:4px}
+.uc-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 22px;border-top:1px solid var(--border);background:rgba(7,11,20,.5);flex-wrap:wrap}
+.trace{font-family:var(--mono);font-size:11px;color:var(--text-subtle);display:flex;gap:6px;flex-wrap:wrap}
+.trace span{background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:2px 7px}
+.cbtn{background:transparent;border:1px solid var(--border);color:var(--text-muted);border-radius:6px;padding:5px 12px;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:.2s}
+.cbtn:hover{background:var(--surface2);color:#fff;border-color:var(--border-strong)}
+.gapcard{background:linear-gradient(180deg,rgba(40,18,28,.85),rgba(20,12,18,.85));border:1px solid rgba(244,63,94,.3);border-radius:14px;padding:20px;margin-bottom:16px}
+.gapcard h3{font-size:16px;color:#fda4af;margin-bottom:6px;display:flex;gap:9px;align-items:center}
+.gapcard p{font-size:13.5px;color:var(--text-muted)}
+.gapcard .evid{margin-top:10px;font-family:var(--mono);font-size:11px;color:#f9a8d4;background:rgba(244,63,94,.07);border-left:2px solid rgba(244,63,94,.4);padding:7px 11px;border-radius:0 5px 5px 0}
+.summary{width:100%;border-collapse:collapse;font-size:12.5px}
+.summary th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-subtle);padding:9px 10px;border-bottom:1px solid var(--border-strong);position:sticky;top:0;background:var(--surface)}
+.summary td{padding:9px 10px;border-bottom:1px solid var(--border);color:var(--text-muted)}
+.summary td b{color:#fff}
+.summary .mono{font-family:var(--mono);font-size:11px;color:#93c5fd}
+.summary tr:hover td{background:rgba(59,130,246,.05)}
+.toast{position:fixed;bottom:24px;right:24px;background:#10b981;color:#fff;padding:11px 20px;border-radius:8px;font-weight:600;font-size:13px;box-shadow:0 4px 14px rgba(0,0,0,.4);opacity:0;transform:translateY(20px);transition:.3s;pointer-events:none;z-index:1000}
+.toast.show{opacity:1;transform:translateY(0)}
+.footer{margin-top:50px;padding-top:22px;border-top:1px solid var(--border);color:var(--text-subtle);font-size:12px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.sep{display:flex;align-items:center;gap:14px;margin:36px 0 18px}
+.sep h2{font-size:20px;font-weight:800;letter-spacing:-.02em}
+.sep .line{flex:1;height:1px;background:var(--border)}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="container">
+
+<nav class="top-nav">
+  <a href="guia_visual_patrones_grasp_gof.html">← Catálogo GRASP &amp; GoF</a>
+  <a href="informe_seccion5_patrones_grasp_gof.html">Informe técnico detallado</a>
+  <a href="index.html">Portal central de informes</a>
+</nav>
+
+<header class="hero">
+  <div class="eyebrow">Núcleo funcional · 12 casos de uso · Verificado en código</div>
+  <h1>Casos de Uso de Viernes CRM V1</h1>
+  <p class="lead">
+    De los <strong>88 casos de uso</strong> identificados en el sistema (103 endpoints HTTP, 123 operaciones
+    de puerto), estos <strong>12 son la base</strong>: los que otros módulos referencian, los que llevan
+    lógica de negocio real y los que sostienen la espina <code>Lead → Oportunidad → Propuesta → Actividad</code>.
+    Cada uno con su diagrama UML, flujo principal, alternativos, excepciones, reglas de negocio y hallazgos.
+  </p>
+</header>
+
+<div class="metrics" id="metrics"></div>
+
+<div class="panel">
+  <h2>Criterio de selección: fan-in medido, no opinado</h2>
+  <p class="sub">Cuántos módulos <em>externos</em> referencian o validan cada entidad. Verificado en los adaptadores
+  de validación de relaciones y en las 8 tablas puente <code>CRM_*</code>. Un caso de uso es base si su entidad
+  tiene fan-in ≥ 2, si lleva invariantes propias, o si está en la espina del funnel.</p>
+  <table class="fanin">
+    <thead><tr><th>Entidad</th><th>Módulos externos que la consumen</th><th style="text-align:center">Fan-in</th></tr></thead>
+    <tbody>
+      <tr><td><b>Usuario</b></td><td>actividades · equipos · mensajería · oportunidades · relationshipmap</td><td class="score hi">5</td></tr>
+      <tr><td><b>Cliente</b></td><td>actividades · oportunidades · propuestas · relationshipmap</td><td class="score hi">4</td></tr>
+      <tr><td><b>Producto</b></td><td>oportunidades · propuestas · relationshipmap</td><td class="score hi">3</td></tr>
+      <tr><td><b>Oportunidad</b></td><td>actividades · propuestas · relationshipmap</td><td class="score hi">3</td></tr>
+      <tr><td><b>Contacto</b></td><td>actividades (participantes) · oportunidades (N:M)</td><td class="score mid">2</td></tr>
+      <tr><td><b>Lead</b></td><td>actividades · marketing</td><td class="score mid">2</td></tr>
+      <tr><td>Etiqueta</td><td>actividades (tabla puente, máx. 8)</td><td class="score lo">1</td></tr>
+      <tr><td>Actividad / Propuesta</td><td>relationshipmap (solo proyección de grafo)</td><td class="score lo">1</td></tr>
+      <tr><td>Fuente · Campaña · Equipo</td><td>ninguno — catálogos sin dependientes</td><td class="score lo">0</td></tr>
+      <tr><td>Dashboard · Mapa · Mensajería</td><td>ninguno — consumidores puros</td><td class="score lo">0</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="panel" style="margin-bottom:30px">
+  <h2>Modelo de actores</h2>
+  <p class="sub">Tres roles, definidos en <code>RolUsuario</code>. La autorización lee el claim
+  <code>realm_access.roles</code> del JWT, <strong>no</strong> la columna <code>CRM_USUARIOS.ROL</code>: las dos
+  fuentes pueden divergir y manda el token. No hay temporizadores, correo ni broker: Keycloak es el único actor
+  secundario real.</p>
+  <div id="actor-diagram" style="background:var(--paper);border-radius:10px;padding:14px"></div>
+</div>
+
+<div class="controls">
+  <div class="fgroup" id="filters"></div>
+  <button class="copyall" id="copyall">📋 Copiar los visibles para Miro</button>
+</div>
+
+<div class="sep"><h2>Los 12 casos de uso del núcleo</h2><div class="line"></div></div>
+<div id="cards"></div>
+
+<div class="sep"><h2>Hallazgos del análisis</h2><div class="line"></div></div>
+<div id="gaps"></div>
+
+<div class="sep"><h2>Tabla resumen y trazabilidad</h2><div class="line"></div></div>
+<div class="panel" style="padding:0;overflow:hidden">
+  <table class="summary">
+    <thead><tr><th>ID</th><th>Caso de uso</th><th>Módulo</th><th>Actor</th><th>Prioridad</th><th>Endpoints</th></tr></thead>
+    <tbody id="summary-body"></tbody>
+  </table>
+</div>
+
+<footer class="footer">
+  <div>Viernes CRM V1 · Núcleo de 12 casos de uso sobre 88 identificados · Auditoría estática del código fuente</div>
+  <div>05/11/2026</div>
+</footer>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite">✓ Copiado al portapapeles</div>
+
+<script>
+const UC = [
+{
+ id:'UC01', title:'Iniciar sesión (SSO con Keycloak)', module:'Acceso', actor:'Todos', priority:'CRÍTICA',
+ primary:'Usuario del CRM (rol desconocido hasta recibir el token)',
+ secondary:'Keycloak — IdP OIDC Authorization Code + PKCE',
+ risk:'Establecer identidad y roles antes de cualquier operación del sistema.',
+ precondition:'El usuario tiene cuenta activa en el realm <code>viernes</code>.',
+ trigger:'Navegar a una ruta protegida: <code>authGuard</code> redirige a <code>/login</code>.',
+ mainFlow:[
+  'El usuario pulsa el botón «Entrar» en <code>/login</code>.',
+  'El frontend inicia la redirección OIDC con PKCE hacia Keycloak.',
+  'Keycloak valida credenciales y emite un JWT firmado.',
+  'El backend verifica la firma contra <code>jwk-set-uri</code>.',
+  'El converter toma <code>preferred_username</code> como principal del token.',
+  'Lee <code>realm_access.roles</code>, lo normaliza a mayúsculas y le añade prefijo <code>ROLE_</code>.',
+  'Descarta los roles <code>default-roles*</code>, <code>offline_access</code> y <code>uma_authorization</code>.',
+  'Se establece sesión sin estado (<code>STATELESS</code>, sin cookie).',
+  'El usuario aterriza en <code>/dashboard</code> con su rol visible en la cabecera.'],
+ altFlow:[
+  '3a — Si ya existe un token válido, se omite el login y se va directo a <code>/dashboard</code>.',
+  '8a — La entrada «Gestión de Usuarios» del menú solo se renderiza para ADMIN.'],
+ exceptions:[
+  'Keycloak no responde → <code>/login</code> muestra mensaje de error y no se crea sesión.',
+  'Token ausente o inválido en ruta protegida → <b>401</b> con cuerpo JSON <code>{timestamp,status,error,message}</code>.',
+  'Token válido pero rol insuficiente → <b>403</b> (<code>AccessDeniedException</code>).'],
+ postcondition:'Identidad y roles disponibles durante toda la sesión; el acceso queda gobernado por el token, no por la base de datos.',
+ rules:[
+  'Roles posibles: <code>VENDEDOR</code>, <code>JEFE</code>, <code>ADMIN</code> — exactamente tres.',
+  '<code>/actuator/**</code>, <code>/swagger-ui/**</code> e <code>/index.html</code> son públicos: no exigen token.',
+  'El rol en <code>CRM_USUARIOS.ROL</code> puede divergir del claim; la autorización solo obedece al token.'],
+ includes:[], extends:['Cerrar sesión','Recuperar credenciales (delegado a Keycloak)'],
+ trace:['authGuard','KeycloakSecurityConfig','jwk-set-uri'],
+ warn:['El perfil <code>keycloak</code> es el único que define una <code>SecurityFilterChain</code>. Si no está activo, no se aplica ningún control de roles.','Los usuarios precargados del realm incluyen <code>admin@viernes.com</code> con los tres roles a la vez.']
+},
+{
+ id:'UC02', title:'Crear usuario', module:'Acceso', actor:'ADMIN', priority:'CRÍTICA',
+ primary:'ADMIN', secondary:'—',
+ risk:'Definir quién puede operar el CRM y con qué rol.',
+ precondition:'Sesión iniciada con rol <code>ADMIN</code>.',
+ trigger:'<code>/usuarios</code> → botón «Nuevo Usuario».',
+ mainFlow:[
+  'El ADMIN abre el formulario de usuario.',
+  'Captura nombre, apellido, correo, contraseña y rol.',
+  'Valida contraseña no vacía y de al menos 8 caracteres.',
+  'Comprueba que el correo no exista (<code>existsByCorreo</code>).',
+  'Cifra la contraseña con <code>BCryptPasswordEncoder(12)</code>.',
+  'Persiste en <code>CRM_USUARIOS</code> con estado <code>ACTIVO</code> por defecto.',
+  'Asigna uno de los tres valores de <code>RolUsuario</code>.'],
+ altFlow:['2a — Al <em>editar</em>, la contraseña es opcional: si viene vacía se conserva la actual.'],
+ exceptions:[
+  'Correo duplicado → <code>IllegalArgumentException</code> → <b>400</b>.',
+  'Contraseña de menos de 8 caracteres → <b>400</b> por Bean Validation.',
+  'Petición sin rol ADMIN → <b>403</b>.'],
+ postcondition:'Existe un registro <code>CRM_USUARIOS</code> con rol y hash de contraseña; queda disponible como responsable, colaborador o miembro.',
+ rules:[
+  'Toda la escritura de usuarios es exclusiva de ADMIN: <code>POST/PUT/PATCH/DELETE /api/v1/usuarios/**</code>.',
+  'No existe <code>DELETE</code> de usuario: solo se activa o desactiva.',
+  'Fan-in 5, el más alto del sistema: actividades, equipos, mensajería, oportunidades y relationshipmap lo referencian.'],
+ includes:['Asignar rol (VENDEDOR · JEFE · ADMIN)'],
+ extends:['Activar usuario','Desactivar usuario'],
+ trace:['POST /usuarios','PUT /usuarios/{id}','PATCH /usuarios/{id}/activar'],
+ warn:['<b>No aprovisiona Keycloak.</b> <code>UsuarioService.crear</code> escribe solo <code>CRM_USUARIOS</code> y nunca llama a la API de administración del realm: el usuario creado <em>no puede iniciar sesión</em> hasta que alguien lo dé de alta aparte.',
+  '<code>UsuarioResumen</code> expone <code>passwordHash</code> a todos los módulos que consultan <code>UsuariosApi</code>.',
+  'El estado <code>INACTIVO</code> no bloquea el acceso: ningún código lo comprueba.']
+},
+{
+ id:'UC03', title:'Registrar cliente', module:'Maestros', actor:'VENDEDOR', priority:'CRÍTICA',
+ primary:'VENDEDOR', secondary:'—',
+ risk:'Construir el maestro comercial del que dependen ventas, actividades y propuestas.',
+ precondition:'Sesión iniciada con cualquier rol.',
+ trigger:'<code>/clientes</code> → «Nuevo Cliente» (dialog).',
+ mainFlow:[
+  'El vendedor captura nombre, empresa, correo, teléfono y estado.',
+  'Designa un responsable.',
+  'Envía <code>POST /api/v1/clientes</code>.',
+  'Se persiste en <code>CRM_CLIENTES</code>.',
+  'El cliente queda disponible como referencia para oportunidades, actividades, propuestas y el grafo de relaciones.'],
+ altFlow:['2a — El campo responsable es texto libre: puede no corresponder a ningún usuario real.'],
+ exceptions:[
+  'DTO inválido → <b>400</b> con mapa <code>fieldErrors</code>.',
+  'Referencia inexistente → <b>404</b> (<code>ResourceNotFoundException</code>).'],
+ postcondition:'Existe un cliente <code>ACTIVO</code> consultable desde los 4 módulos que lo referencian.',
+ rules:[
+  '<code>EstadoCliente</code> solo tiene dos valores: <code>ACTIVO</code> e <code>INACTIVO</code>.',
+  'No hay regla de unicidad: dos clientes pueden compartir nombre o correo.',
+  '<code>responsable</code> NO se valida contra <code>UsuariosApi</code>.'],
+ includes:['Indexar cliente en el mapa de relaciones'],
+ extends:['Desactivar cliente','Eliminar cliente (ADMIN)'],
+ trace:['POST /clientes','PUT /clientes/{id}','PATCH /clientes/{id}/desactivar'],
+ warn:['No existe «Reactivar cliente». Volver a <code>ACTIVO</code> solo ocurre con <code>PUT</code> llevando <code>estado</code> en el body. Equipos y Usuarios sí tienen su <code>activar</code>: es una asimetría, no una decisión de diseño.',
+  '<code>DELETE /clientes/**</code> es exclusivo de ADMIN, pero la papelera se muestra a todos los roles: el VENDEDOR ve el botón, pulsa y recibe <b>403</b>.']
+},
+{
+ id:'UC04', title:'Gestionar contactos del cliente', module:'Maestros', actor:'VENDEDOR', priority:'ALTA',
+ primary:'VENDEDOR', secondary:'—',
+ risk:'Mantener el capital relacional: sin contacto no hay decisor de compra.',
+ precondition:'Cliente existente.',
+ trigger:'Pestaña «Contactos» del dialog de cliente.',
+ mainFlow:[
+  'Se listan los contactos del cliente (<code>GET /clientes/{id}/contactos</code>).',
+  'El vendedor agrega nombre, cargo, correo y teléfono.',
+  'Marca el flag <code>principal</code> (default <code>false</code>).',
+  'Envía <code>POST /clientes/{clienteId}/contactos</code>.',
+  'El contacto queda elegible para oportunidades y para participantes de actividad.'],
+ altFlow:['4a — Editar un contacto existente usa <code>PUT /clientes/{cId}/contactos/{contactoId}</code>.'],
+ exceptions:[
+  'Contacto ya vinculado a la oportunidad → <code>IllegalArgumentException</code> → <b>400</b>.',
+  'Eliminar contacto exige rol ADMIN → <b>403</b> para VENDEDOR.'],
+ postcondition:'El cliente tiene un contacto disponible para los módulos de oportunidades y actividades.',
+ rules:[
+  'Fan-in 2: <code>ContactoQueryPort</code> es consumido por actividades y oportunidades.',
+  'No existe <code>obtenerContacto(id)</code>: el puerto recorre TODOS los clientes y TODOS sus contactos en memoria para resolver uno.',
+  'Un mismo contacto solo puede aparecer una vez por oportunidad.'],
+ includes:['Validar pertenencia del contacto al cliente'],
+ extends:['Marcar contacto como decisor en la oportunidad'],
+ trace:['GET /clientes/{id}/contactos','POST /clientes/{id}/contactos','PUT · DELETE'],
+ warn:['<code>ClienteService.agregarContacto</code> (97-103) recupera el contacto creado asumiendo que es el último de la lista tras <code>save()</code>. El orden de <code>@OneToMany</code> no está garantizado: puede devolver un ID incorrecto.']
+},
+{
+ id:'UC05', title:'Registrar producto', module:'Maestros', actor:'JEFE', priority:'ALTA',
+ primary:'JEFE o ADMIN', secondary:'—',
+ risk:'Sostener el catálogo del que se alimentan oportunidades y propuestas.',
+ precondition:'Sesión con rol <code>JEFE</code> o <code>ADMIN</code>.',
+ trigger:'<code>/productos</code> → «Nuevo Producto».',
+ mainFlow:[
+  'Captura código, nombre, descripción, categoría, precio base, unidad y estado.',
+  'Valida la unicidad del código.',
+  'Envía <code>POST /api/v1/productos</code> → <code>CRM_PRODUCTOS</code>.',
+  'El producto pasa a estar disponible en líneas de oportunidad y en el detalle de propuesta.'],
+ altFlow:['— No hay flujo alternativo de cambio de estado dedicado: se hace por <code>PUT</code>.'],
+ exceptions:['Código duplicado → <code>IllegalArgumentException</code> → <b>400</b>.','Rol que no sea ADMIN ni JEFE → <b>403</b> (lista <code>GESTION_COMERCIAL</code>).'],
+ postcondition:'Existe un producto con precio base, referenciable desde los 3 módulos que lo consumen.',
+ rules:[
+  '<code>EstadoProducto</code>: <code>ACTIVO</code>, <code>INACTIVO</code>, <code>DESCONTINUADO</code>.',
+  'Fan-in 3: oportunidades, propuestas y relationshipmap lo referencian.',
+  'La propuesta toma <code>precioBase</code> como snapshot solo si el detalle no trae precio propio.'],
+ includes:['Cotizar precio base en la línea de propuesta'],
+ extends:['Vincular producto a la oportunidad'],
+ trace:['POST /productos','PUT /productos/{id}','DELETE /productos/{id}'],
+ warn:['No hay caso de uso de cambio de estado de producto: <code>DESCONTINUADO</code> no lo asigna ningún endpoint dedicado.',
+  '<code>ProductoService.eliminar</code> no chequea referencias: un producto en uso se borra y deja referencia huérfana en oportunidades.',
+  'No se valida que el producto esté <code>ACTIVO</code> al incluirlo en una propuesta.',
+  'El frontend no oculta «Nuevo/Editar/Eliminar» por rol: un VENDEDOR abre el dialog y recibe <b>403</b> al guardar.']
+},
+{
+ id:'UC06', title:'Registrar oportunidad', module:'Embudo', actor:'VENDEDOR', priority:'CRÍTICA',
+ primary:'VENDEDOR', secondary:'—',
+ risk:'Abrir una oportunidad de venta real y medible.',
+ precondition:'Cliente registrado (la oportunidad exige cliente válido).',
+ trigger:'<code>/oportunidades</code> → «Nueva Oportunidad».',
+ mainFlow:[
+  'Captura nombre, cliente, valor, probabilidad, etapa, responsable y fecha de cierre.',
+  'Valida probabilidad entre 0 y 100 (<code>@Min(0) @Max(100)</code>).',
+  'Valida que el cliente referenciado exista.',
+  'Envía <code>POST /api/v1/oportunidades</code> → <code>CRM_OPORTUNIDADES</code>.',
+  'El sistema expone <code>valorPonderado = valor × probabilidad / 100</code> con redondeo HALF_UP a 2 decimales.',
+  'Quedan habilitadas las tres relaciones N:M: contactos, productos y colaboradores.'],
+ altFlow:['— Si <code>valor</code> o <code>probabilidad</code> son nulos, el valor ponderado se reporta como <code>0</code>.'],
+ exceptions:['Probabilidad fuera de rango → <b>400</b>.','Cliente inexistente → <b>404</b>.'],
+ postcondition:'La oportunidad existe con etapa inicial y valor ponderado derivado; alimenta el pipeline del dashboard.',
+ rules:[
+  '<code>valorPonderado</code> es un getter derivado: <strong>no se persiste</strong>.',
+  '<code>EtapaOportunidad</code>: PROSPECCION · CONTACTO · CALIFICACION · PROPUESTA · NEGOCIACION · GANADA · PERDIDA.',
+  'Fan-in 3 y 3 tablas puente (<code>CRM_OPORTUNIDAD_CONTACTOS</code>, <code>_PRODUCTOS</code>, <code>_COLABORADORES</code>).'],
+ includes:['Vincular contactos del cliente','Vincular productos','Asignar colaboradores'],
+ extends:['Eliminar oportunidad (ADMIN)'],
+ trace:['POST /oportunidades','GET /oportunidades','PUT /oportunidades/{id}'],
+ warn:['<code>responsable</code> es texto libre y no se valida contra <code>UsuariosApi</code>; en cambio <code>OportunidadColaborador</code> sí es una relación validada.']
+},
+{
+ id:'UC07', title:'Cambiar etapa de oportunidad', module:'Embudo', actor:'VENDEDOR', priority:'CRÍTICA',
+ primary:'VENDEDOR', secondary:'—',
+ risk:'Mover el valor comercial del embudo y su pronóstico.',
+ precondition:'Oportunidad existente.',
+ trigger:'Arrastrar la tarjeta en el kanban, usar el stepper ◀ ▶ o el menú «Mover a etapa».',
+ mainFlow:[
+  'El usuario arrastra la tarjeta a otra columna del tablero.',
+  'La interfaz aplica la actualización optimista.',
+  'Se envía <code>PATCH /api/v1/oportunidades/{id}/etapa?etapa=X</code>.',
+  'El servicio asigna la etapa nueva y persiste.',
+  'Si la petición falla, la interfaz revierte el movimiento.',
+  'El pipeline del dashboard y el valor ponderado se recalculan.'],
+ altFlow:['— El mismo resultado se obtiene con <code>PUT /oportunidades/{id}</code> si el body trae <code>etapa</code>.'],
+ exceptions:['Sin validación de dominio: no existe excepción de negocio para este caso.'],
+ postcondition:'La oportunidad cambia de etapa sin restricción de secuencia.',
+ rules:['Es el único motor del pipeline comercial y alimenta la proyección de ventas.'],
+ includes:[], extends:['Generar propuesta desde la etapa PROPUESTA'],
+ trace:['PATCH /oportunidades/{id}/etapa','PUT /oportunidades/{id}','drag-drop kanban'],
+ warn:['<code>OportunidadService.cambiarEtapa</code> (97-102) no valida nada: cualquier etapa → cualquier etapa. <code>PROSPECCION → GANADA</code> es legal y una <code>GANADA</code> puede reabrirse a <code>CONTACTO</code>.',
+  'Hay dos caminos para el mismo cambio: el <code>PATCH</code> dedicado y el <code>PUT</code> que pisa la etapa si viene en el body (línea 226).',
+  '<code>PATCH /oportunidades/{id}/etapa</code> no está en ninguna lista de roles: un VENDEDOR mueve el pipeline sin límite. Solo las propuestas tienen gobierno.',
+  'No existe conversión automática <code>GANADA → cliente</code>.']
+},
+{
+ id:'UC08', title:'Registrar lead', module:'Embudo', actor:'VENDEDOR', priority:'ALTA',
+ primary:'VENDEDOR', secondary:'—',
+ risk:'Capturar demanda potencial antes de calificarla.',
+ precondition:'Sesión iniciada.',
+ trigger:'<code>/leads</code> → «Nuevo Lead».',
+ mainFlow:[
+  'Captura nombre, empresa, correo, teléfono, fuente, estado y responsable.',
+  'Envía <code>POST /api/v1/leads</code> → <code>CRM_LEADS</code>.',
+  'El lead queda disponible para actividades y para campañas de marketing.'],
+ altFlow:['— Cambiar estado después del alta: <code>PATCH /leads/{id}/estado</code> existe, pero la UI lo omite y usa <code>PUT</code> con <code>estado</code> en el body.'],
+ exceptions:['DTO inválido → <b>400</b>.','Eliminar un lead exige ADMIN → <b>403</b> para VENDEDOR.'],
+ postcondition:'Existe un lead con estado inicial <code>NUEVO</code>, referenciable por actividades y campañas.',
+ rules:[
+  '<code>EstadoLead</code>: NUEVO · CONTACTADO · CALIFICADO · CONVERTIDO · DESCARTADO.',
+  'Fan-in 2: actividades y marketing lo referencian.'],
+ includes:['Asociar lead a una campaña'],
+ extends:['Descartar lead'],
+ trace:['POST /leads','PATCH /leads/{id}/estado','DELETE /leads/{id}'],
+ warn:['<b>El embudo está roto en este eslabón.</b> No existe «Convertir lead en oportunidad o cliente»: el literal <code>CONVERTIDO</code> no lo asigna ni lo consulta ningún código (grep <code>convertir|conversion</code> = 0 coincidencias). Es un estado declarativo sin comportamiento.',
+  'El campo «fuente» es un input de texto libre: el catálogo <code>/api/v1/fuentes</code> (5 endpoints) no se consume desde ninguna pantalla.',
+  '<code>LeadService.eliminar</code> no chequea referencias; por eso <code>CampaniaService</code> captura <code>ResourceNotFoundException</code> al enriquecer leads.']
+},
+{
+ id:'UC09', title:'Crear propuesta (borrador)', module:'Propuesta', actor:'VENDEDOR', priority:'CRÍTICA',
+ primary:'VENDEDOR', secondary:'—',
+ risk:'Comprometer una oferta económicamente válida ante el cliente.',
+ precondition:'Oportunidad o cliente existente.',
+ trigger:'<code>/propuestas</code> → «Nueva Propuesta».',
+ mainFlow:[
+  'Selecciona oportunidad o cliente; la interfaz autocompleta responsable y líneas.',
+  'Captura fechas de emisión y vencimiento, descuento y observaciones.',
+  'Agrega líneas de detalle: producto, cantidad y precio unitario.',
+  'Valida al menos una línea (<code>@NotEmpty</code>) y <code>cantidad ≥ 1</code>.',
+  'Valida <code>descuento ≥ 0</code> (<code>@DecimalMin("0.00")</code>).',
+  'Valida fecha de vencimiento ≥ fecha de emisión.',
+  'Toma el <code>precioBase</code> del producto como snapshot solo si el detalle no trae precio.',
+  'Genera el número correlativo <code>PROP-YYYY-####</code>.',
+  'Calcula <code>subtotal = Σ(cantidad × precioUnitario)</code> y <code>total = subtotal − descuento</code>.',
+  'Fija el estado en <code>BORRADOR</code> ignorando el estado que traiga la solicitud.',
+  'Envía <code>POST /api/v1/propuestas</code> → <code>CRM_PROPUESTAS</code> + <code>CRM_PROPUESTA_DETALLES</code>.'],
+ altFlow:['7a — Si el detalle trae precio propio, gana como override comercial sobre el catálogo.','3a — Si no hay <code>productoId</code> y el producto no aporta nombre, la descripción pasa a ser obligatoria.'],
+ exceptions:[
+  'Sin líneas de detalle → <b>400</b>.',
+  'Vencimiento anterior a la emisión → <code>IllegalArgumentException</code> → <b>400</b>.',
+  'Descripción obligatoria ausente → <b>400</b>.',
+  'Colisión de número correlativo → constraint UNIQUE → <b>409</b>.'],
+ postcondition:'Existe una propuesta <code>BORRADOR</code> con totales calculados y precio congelado por línea.',
+ rules:[
+  'Es el <strong>único agregado con lógica de dominio real</strong> del sistema.',
+  '<code>recalcularTotales()</code> vive en la entidad, no en un servicio: Experto en Información.',
+  '<code>version</code> se fija en 1 y no hay <code>@Version</code> de JPA: no existe control de concurrencia optimista.',
+  'La validación de fechas de la propuesta es la única validación de rangos de todo el sistema.'],
+ includes:['Recalcular subtotal y total','Snapshot de precio del catálogo'],
+ extends:['Actualizar propuesta (solo en BORRADOR)','Eliminar propuesta (solo en BORRADOR)'],
+ trace:['POST /propuestas','GET /propuestas','PUT /propuestas/{id}'],
+ warn:['No hay regla que impida <code>descuento &gt; subtotal</code>: el <code>total</code> puede quedar <strong>negativo</strong> y se persiste igual (<code>TOTAL nullable=false</code>).',
+  'El riesgo de colisión concurrente en el número correlativo está documentado en el propio Javadoc como deuda técnica.',
+  'No se valida que el producto siga existiendo ni esté activo al crear la línea.']
+},
+{
+ id:'UC10', title:'Enviar propuesta', module:'Propuesta', actor:'VENDEDOR', priority:'ALTA',
+ primary:'VENDEDOR', secondary:'—',
+ risk:'Comprometer formalmente la oferta ante el cliente.',
+ precondition:'Propuesta en estado <code>BORRADOR</code>.',
+ trigger:'Botón «Enviar» en la sección «Flujo de aprobación».',
+ mainFlow:[
+  'Se envía <code>PATCH /api/v1/propuestas/{id}/enviar</code>.',
+  'El servicio verifica que el estado actual sea <code>BORRADOR</code>.',
+  'Transiciona a <code>ENVIADA</code> y persiste.'],
+ altFlow:['— No hay flujo alternativo: no existe transición inversa.'],
+ exceptions:['Estado distinto de <code>BORRADOR</code> → <code>IllegalStateException</code> → <b>409 CONFLICT</b>.'],
+ postcondition:'La propuesta es <code>ENVIADA</code>: queda bloqueada para edición y eliminación.',
+ rules:[
+  '<code>ENVIADA</code> bloquea <code>actualizar</code> y <code>eliminar</code>: ambos exigen <code>BORRADOR</code> y devuelven <b>409</b>.',
+  'Es una de las 4 transiciones gobernadas del único estado real del sistema.'],
+ includes:[], extends:['Aprobar propuesta (UC11)','Rechazar propuesta','Cancelar propuesta'],
+ trace:['PATCH /propuestas/{id}/enviar'],
+ warn:['No existe <code>revocar</code> ni <code>devolver a BORRADOR</code>. Una propuesta enviada queda inmutable salvo aprobar, rechazar o cancelar.',
+  'A diferencia de aprobar, <code>enviar</code> sí lo puede un VENDEDOR: cae a <code>anyRequest().authenticated()</code>.']
+},
+{
+ id:'UC11', title:'Aprobar propuesta', module:'Propuesta', actor:'JEFE / ADMIN', priority:'CRÍTICA',
+ primary:'JEFE o ADMIN', secondary:'—',
+ risk:'Comprometer económicamente a la empresa por encima del umbral del vendedor.',
+ precondition:'Propuesta en estado <code>ENVIADA</code>.',
+ trigger:'Botón «Aprobar» en el formulario de propuesta.',
+ mainFlow:[
+  'La cadena de seguridad exige rol <code>ADMIN</code> o <code>JEFE</code>.',
+  'Se envía <code>PATCH /api/v1/propuestas/{id}/aprobar</code>.',
+  'El servicio verifica que el estado sea <code>ENVIADA</code>.',
+  'Transiciona a <code>APROBADA</code>, estado terminal.'],
+ altFlow:['— <code>rechazar</code> hace <code>ENVIADA → RECHAZADA</code>.','— <code>cancelar</code> solo se permite si la propuesta <em>no</em> está en estado terminal.'],
+ exceptions:[
+  'Rol insuficiente → <b>403</b>.',
+  'Estado ≠ <code>ENVIADA</code> → <code>IllegalStateException</code> → <b>409</b>.'],
+ postcondition:'La propuesta queda <code>APROBADA</code> y es inmutable: no puede cancelarse ni editarse.',
+ rules:[
+  'Estados terminales: <code>APROBADA | RECHAZADA | CANCELADA</code>.',
+  'Es la <strong>única capacidad que justifica que existan tres roles</strong>: sin ella, VENDEDOR y JEFE serían indiferenciables.',
+  '<code>DELETE /propuestas/{id}</code> es exclusivo de ADMIN: resulta más restrictivo que aprobar.'],
+ includes:[], extends:['Emitir notificación de aprobación (NO implementado)'],
+ trace:['PATCH /propuestas/{id}/aprobar','PATCH ·/rechazar','PATCH ·/cancelar'],
+ warn:['Los botones Aprobar / Rechazar / Cancelar dependen <strong>solo del estado, nunca del rol</strong>: un VENDEDOR los ve habilitados, pulsa «Aprobar» y recibe <b>403</b>. No hay candado ni deshabilitado en la UI.',
+  'La aprobación no dispara ningún efecto: no crea cliente, no genera actividad, no envía correo.']
+},
+{
+ id:'UC12', title:'Crear actividad', module:'Ejecución', actor:'VENDEDOR', priority:'ALTA',
+ primary:'VENDEDOR', secondary:'—',
+ risk:'Ejecutar y dejar trazable el seguimiento comercial.',
+ precondition:'Sesión iniciada; la entidad a vincular ya existe.',
+ trigger:'<code>/actividades</code> → «Nueva Actividad».',
+ mainFlow:[
+  'Captura título, descripción, tipo (LLAMADA · REUNION · TAREA · SEGUIMIENTO), estado y fecha-hora.',
+  'Elige el vínculo polimórfico: Cliente, Lead u Oportunidad (o ninguno).',
+  'Valida que la entidad vinculada exista (<code>RelacionValidationAdapter</code>).',
+  'Selecciona hasta 8 etiquetas existentes.',
+  'Deduplica y valida cada etiqueta.',
+  'Envía <code>POST /api/v1/actividades</code> → <code>CRM_ACTIVIDADES</code> + <code>CRM_ACTIVIDAD_ETIQUETAS</code>.'],
+ altFlow:['2a — También puede asignarse a un usuario por correo además de por ID.'],
+ exceptions:[
+  'Entidad vinculada inexistente → <b>404</b>.',
+  'Más de 8 etiquetas → <code>IllegalArgumentException</code> → <b>400</b>.',
+  'Etiqueta inexistente o repetida → <b>400</b>.'],
+ postcondition:'Existe una actividad <code>PENDIENTE</code> vinculada a la entidad del funnel correspondiente.',
+ rules:[
+  'Máximo 8 etiquetas, doblemente enforced: <code>MAX_ETIQUETAS=8</code> en runtime y <code>@Size(max=8)</code> en el DTO.',
+  '<code>esVencida = estado PENDIENTE &amp;&amp; fecha &lt; now()</code> — se calcula en la respuesta, no se persiste.',
+  'Fan-in alto: valida contra clientes, leads, oportunidades y usuarios.'],
+ includes:['Validar entidad vinculada','Validar y deduplicar etiquetas'],
+ extends:['Consultar actividades vencidas','Marcar como completada'],
+ trace:['POST /actividades','PATCH /actividades/{id}/estado','GET /actividades?vencidas=true'],
+ warn:['<code>cambiarEstado</code> (184-192) no tiene guardas: <code>COMPLETADA → PENDIENTE</code> es legal.',
+  'Los participantes (<code>GET/POST/DELETE /{id}/participantes</code>) existen en API pero la interfaz nunca los llama.',
+  '<b>Ninguna notificación de vencimiento se dispara</b>: no hay <code>@Scheduled</code> en todo el backend. El vencimiento solo existe bajo petición.']
+}
+];
+
+const GAPS = [
+ {t:'No existe «Convertir lead en oportunidad»',
+  d:'La espina del CRM es <code>Lead → Oportunidad → Propuesta → Actividad</code>, pero el primer eslabón no tiene implementación. El literal <code>CONVERTIDO</code> de <code>EstadoLead</code> no lo asigna ni lo consulta ningún código, y grep de <code>convertir|conversion</code> devuelve 0 coincidencias en <code>src/main</code>. El lead es un callejón sin salida funcional.',
+  e:'EstadoLead.java:4 · LeadService.java:66-71 · grep "convertir|conversion" = 0'},
+ {t:'No existe «Reactivar cliente»',
+  d:'Hay <code>desactivar</code> pero el camino inverso no tiene endpoint dedicado: volver a <code>ACTIVO</code> solo ocurre con <code>PUT</code> llevando <code>estado</code> en el body. Equipos y Usuarios sí exponen <code>activar</code> y <code>desactivar</code> como par. Es una asimetría de modelo, no una regla de negocio.',
+  e:'ManageClienteUseCase (8 métodos, ninguno "activar") vs EquipoService.java:81-91'},
+ {t:'No existe «Notificar vencimientos»',
+  d:'<code>esVencida</code> se calcula bajo petición y <code>listarVencidas()</code> se expone por query param, pero ningún temporizador lo evalúa. Verificado por ausencia: 0 coincidencias de <code>@Scheduled</code>, <code>@Async</code>, <code>@EventListener</code>, <code>ApplicationEventPublisher</code>, <code>JavaMailSender</code> ni <code>RestTemplate/WebClient</code> en todo el backend.',
+  e:'ActividadService.java:393-395 · ViernesaApplication.java sin @EnableScheduling'},
+ {t:'El pipeline no tiene gobierno de estado',
+  d:'<code>cambiarEtapa</code> no valida secuencia y no está restringido por rol: un VENDEDOR puede saltar <code>PROSPECCION → GANADA</code> o reabrir una oportunidad cerrada. De los 9 enums de estado del sistema, <strong>solo <code>EstadoPropuesta</code></strong> tiene transiciones prohibidas con excepción 409.',
+  e:'OportunidadService.java:97-102 · KeycloakSecurityConfig.java:128-142'},
+ {t:'Una propuesta puede quedar con total negativo',
+  d:'<code>descuento</code> se valida no negativo, pero nada impide que supere el <code>subtotal</code>. <code>recalcularTotales()</code> resta sin clamp y la columna <code>TOTAL</code> lo persiste igual. Es el invariante económico más básico del agregado con más lógica del sistema.',
+  e:'Propuesta.java:39 · PropuestaRequest.java:30 · PropuestaEntity TOTAL nullable=false'}
+];
+
+/* ---------- helpers ---------- */
+function wrap(t,max){
+  const w=t.replace(/<[^>]+>/g,'').split(' ');const out=[];let c='';
+  w.forEach(x=>{ if((c+' '+x).trim().length>max){ if(c)out.push(c); c=x; } else c=(c?c+' ':'')+x; });
+  if(c)out.push(c); return out;
+}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function strip(s){return s.replace(/<[^>]+>/g,'');}
+
+function ellipse(cx,cy,rx,ry,label,fs){
+  const lines=wrap(label,22); const lh=fs+2.5;
+  const startY=cy-((lines.length-1)*lh)/2+fs*0.34;
+  const tsp=lines.map((l,i)=>`<text x="${cx}" y="${i===0?startY:cy-((lines.length-1)*lh)/2+fs*0.34+i*lh}" text-anchor="middle" font-size="${fs}" fill="#16213a" font-family="Inter,sans-serif">${esc(l)}</text>`).join('');
+  return `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="#ffffff" stroke="#16213a" stroke-width="1.8"/>${tsp}`;
+}
+function actor(x,y,name,fs){
+  return `<g stroke="#16213a" stroke-width="2" fill="none" stroke-linecap="round">
+    <circle cx="${x}" cy="${y-26}" r="9" fill="#16213a" stroke="none"/>
+    <line x1="${x}" y1="${y-16}" x2="${x}" y2="${y+8}"/>
+    <line x1="${x-14}" y1="${y-8}" x2="${x+14}" y2="${y-8}"/>
+    <line x1="${x}" y1="${y+8}" x2="${x-11}" y2="${y+24}"/>
+    <line x1="${x}" y1="${y+8}" x2="${x+11}" y2="${y+24}"/></g>
+    <text x="${x}" y="${y+42}" text-anchor="middle" font-size="${fs||12}" font-weight="600" fill="#16213a" font-family="Inter,sans-serif">${esc(name)}</text>`;
+}
+function arrow(x1,y1,x2,y2,dash,label,lx,ly){
+  const d=dash?'stroke-dasharray="6 5"':'';
+  const lab=label?`<text x="${lx}" y="${ly}" text-anchor="middle" font-size="10.5" font-style="italic" fill="#5a6b8c" font-family="Inter,sans-serif">${esc(label)}</text>`:'';
+  return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#5a6b8c" stroke-width="1.6" marker-end="url(#ah)" ${d}/>${lab}`;
+}
+
+function diagram(uc){
+  const RX=104,RY=34,ERX=92,ERY=32;
+  const mainX=330, mainY=96, stepY=112, extX=592;
+  const chain=[{x:mainX,y:mainY,label:strip(uc.title),main:true}];
+  uc.includes.forEach((inc,i)=>chain.push({x:mainX,y:mainY+stepY*(i+1),label:inc}));
+  const exts=[];
+  uc.extends.forEach((ex,i)=>exts.push({x:extX,y:mainY+88*i,label:ex,target:Math.min(i,chain.length-1)}));
+  const bottom=Math.max(chain[chain.length-1].y, exts.length?exts[exts.length-1].y:0);
+  const H=bottom+RY+34, W=760;
+  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagrama de casos de uso ${esc(uc.id)}">
+    <defs><marker id="ah" markerWidth="9" markerHeight="9" refX="8" refY="3.2" orient="auto">
+      <path d="M0,0 L8,3.2 L0,6.4 z" fill="#5a6b8c"/></marker></defs>`;
+  s+=`<text x="${W/2}" y="22" text-anchor="middle" font-size="14" font-weight="700" fill="#16213a" font-family="Inter,sans-serif">${esc(uc.id)}: ${esc(strip(uc.title))}</text>`;
+  s+=`<rect x="158" y="34" width="${W-178}" height="${H-52}" rx="8" fill="none" stroke="#16213a" stroke-width="2"/>`;
+  s+=actor(84,mainY+6,uc.actor,11);
+  chain.forEach((n,i)=>{ s+=ellipse(n.x,n.y,RX,RY,n.label,i===0?12.5:11.5); });
+  for(let i=0;i<chain.length-1;i++){
+    const a=chain[i],b=chain[i+1];
+    s+=arrow(a.x,a.y+RY,a.x,b.y-RY,true,'include',a.x+RX+30,(a.y+b.y)/2+3);
+  }
+  exts.forEach(e=>{
+    const t=chain[e.target];
+    s+=ellipse(e.x,e.y,ERX,ERY,e.label,11);
+    s+=arrow(e.x-ERX,e.y,t.x+RX+(e.target===0?0:0),t.y,true,'extend',(e.x-ERX+t.x+RX)/2,e.y-9);
+  });
+  s+=`<line x1="98" y1="${mainY+6}" x2="${mainX-RX}" y2="${mainY}" stroke="#16213a" stroke-width="1.8" marker-end="url(#ah)"/>`;
+  s+='</svg>';
+  return s;
+}
+
+function actorDiagram(){
+  const W=760,H=300;
+  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Generalización de actores">
+   <defs><marker id="gen" markerWidth="12" markerHeight="12" refX="10" refY="5" orient="auto">
+   <path d="M0,10 L10,5 L0,0 z" fill="#f4f6fb" stroke="#16213a" stroke-width="1.4"/></marker></defs>`;
+  s+=`<text x="${W/2}" y="24" text-anchor="middle" font-size="13" font-weight="700" fill="#16213a" font-family="Inter,sans-serif">Actores primarios y secundarios · Viernes CRM V1</text>`;
+  s+=`<rect x="30" y="238" width="330" height="46" rx="6" fill="none" stroke="#16213a" stroke-width="1.6" stroke-dasharray="5 4"/>`;
+  s+=`<text x="46" y="262" font-size="11" fill="#5a6b8c" font-family="Inter,sans-serif">Fuente de verdad del rol:</text>`;
+  s+=`<text x="46" y="276" font-size="11" font-weight="600" fill="#16213a" font-family="JetBrains Mono,monospace">claim realm_access.roles del JWT</text>`;
+  s+=actor(150,90,'Usuario del CRM',12);
+  s+=`<text x="150" y="118" text-anchor="middle" font-size="10" font-style="italic" fill="#5a6b8c" font-family="Inter,sans-serif">(abstracto)</text>`;
+  const kids=[['VENDEDOR',90],['JEFE',250],['ADMIN',410]];
+  kids.forEach(([n,x])=>{ s+=actor(x,170,n,11.5);
+    s+=`<line x1="${x}" y1="132" x2="150" y2="112" stroke="#16213a" stroke-width="1.5" marker-end="url(#gen)"/>`; });
+  s+=`<line x1="300" y1="90" x2="215" y2="90" stroke="#5a6b8c" stroke-width="1.5" stroke-dasharray="6 5" marker-end="url(#gen)"/>`;
+  s+=`<rect x="300" y="70" width="180" height="40" rx="6" fill="#ffffff" stroke="#16213a" stroke-width="1.8"/>`;
+  s+=`<text x="390" y="87" text-anchor="middle" font-size="11.5" font-weight="600" fill="#16213a" font-family="Inter,sans-serif">«system»</text>`;
+  s+=`<text x="390" y="101" text-anchor="middle" font-size="11.5" fill="#16213a" font-family="Inter,sans-serif">Keycloak (IdP OIDC)</text>`;
+  s+=`<rect x="530" y="150" width="150" height="40" rx="6" fill="#ffffff" stroke="#16213a" stroke-width="1.4" stroke-dasharray="5 4"/>`;
+  s+=`<text x="605" y="167" text-anchor="middle" font-size="11" fill="#16213a" font-family="Inter,sans-serif">«system» Oracle</text>`;
+  s+=`<text x="605" y="181" text-anchor="middle" font-size="10" font-style="italic" fill="#5a6b8c" font-family="Inter,sans-serif">persistencia</text>`;
+  s+=`<rect x="530" y="210" width="150" height="40" rx="6" fill="#ffffff" stroke="#16213a" stroke-width="1.4" stroke-dasharray="5 4"/>`;
+  s+=`<text x="605" y="227" text-anchor="middle" font-size="11" fill="#16213a" font-family="Inter,sans-serif">«system» Prometheus</text>`;
+  s+=`<text x="605" y="241" text-anchor="middle" font-size="10" font-style="italic" fill="#5a6b8c" font-family="Inter,sans-serif">lee /actuator sin token</text>`;
+  s+=`<text x="390" y="140" text-anchor="middle" font-size="10.5" font-style="italic" fill="#5a6b8c" font-family="Inter,sans-serif">único actor secundario real — no hay</text>`;
+  s+=`<text x="390" y="154" text-anchor="middle" font-size="10.5" font-style="italic" fill="#5a6b8c" font-family="Inter,sans-serif">@Scheduled, ni correo, ni broker</text>`;
+  s+='</svg>';
+  return s;
+}
+
+/* ---------- render ---------- */
+const GROUPS=[['Todos','all'],['Acceso','Acceso'],['Maestros','Maestros'],['Embudo','Embudo'],['Propuesta','Propuesta'],['Ejecución','Ejecución']];
+let active='all';
+
+function renderFilters(){
+  document.getElementById('filters').innerHTML=GROUPS.map(([lab,g])=>{
+    const n=g==='all'?UC.length:UC.filter(u=>u.module===g).length;
+    return `<button class="fbtn${g===active?' active':''}" data-g="${g}">${lab} (${n})</button>`;
+  }).join('');
+  document.querySelectorAll('.fbtn').forEach(b=>b.onclick=()=>{active=b.dataset.g;renderFilters();renderCards();});
+}
+
+function renderMetrics(){
+  const eps=UC.reduce((a,u)=>a+u.trace.filter(t=>t.includes('/')).length,0);
+  const warns=UC.reduce((a,u)=>a+u.warn.length,0);
+  const m=[['Casos de uso núcleo','12 / 88','#6ee7b7'],['Endpoints trazados',eps,'#93c5fd'],
+           ['Actores primarios','3','#c4b5fd'],['Módulos cubiertos','5','#fde68a'],
+           ['Hallazgos de riesgo',warns,'#fda4af']];
+  document.getElementById('metrics').innerHTML=m.map(([l,v,c])=>
+    `<div class="metric"><span class="l">${l}</span><span class="v" style="color:${c}">${v}</span></div>`).join('');
+}
+
+function renderCards(){
+  const vis=UC.filter(u=>active==='all'||u.module===active);
+  document.getElementById('cards').innerHTML=vis.map(u=>`
+  <article class="uc" id="${u.id}">
+    <div class="uc-head">
+      <div><div class="uc-id">${u.id}</div><div class="uc-title">${u.title}</div></div>
+      <div class="uc-meta">
+        <span class="tag t-mod">${u.module}</span>
+        <span class="tag t-actor">Actor: ${u.actor}</span>
+        <span class="tag t-pri">${u.priority}</span>
+      </div>
+    </div>
+    <div class="uc-body">
+      <figure class="diagram">${diagram(u)}<figcaption>Frontera del sistema · include / extend</figcaption></figure>
+      <div class="spec">
+        <h4>Contexto</h4>
+        <p><strong>Actor primario:</strong> ${u.primary}</p>
+        <p><strong>Actor secundario:</strong> ${u.secondary}</p>
+        <p><strong>Interés en riesgo:</strong> ${u.risk}</p>
+        <p><strong>Precondición:</strong> ${u.precondition}</p>
+        <p><strong>Disparador:</strong> ${u.trigger}</p>
+        <h4>Flujo principal</h4>
+        <ol class="flow">${u.mainFlow.map(s=>`<li>${s}</li>`).join('')}</ol>
+        <h4>Flujos alternativos</h4>
+        <ul class="pl">${u.altFlow.map(s=>`<li>${s}</li>`).join('')}</ul>
+        <h4>Excepciones</h4>
+        <ul class="pl ex">${u.exceptions.map(s=>`<li>${s}</li>`).join('')}</ul>
+        <h4>Postcondición</h4>
+        <p>${u.postcondition}</p>
+        <h4>Reglas de negocio</h4>
+        <ul class="pl">${u.rules.map(s=>`<li>${s}</li>`).join('')}</ul>
+        ${u.warn.length?`<h4>Hallazgos de la auditoría</h4><ul class="wa">${u.warn.map(s=>`<li>${s}</li>`).join('')}</ul>`:''}
+      </div>
+    </div>
+    <div class="uc-foot">
+      <div class="trace">${u.trace.map(t=>`<span>${esc(t)}</span>`).join('')}</div>
+      <button class="cbtn" data-id="${u.id}">Copiar para Miro</button>
+    </div>
+  </article>`).join('');
+  document.querySelectorAll('.cbtn').forEach(b=>b.onclick=()=>copyText(toText(UC.find(u=>u.id===b.dataset.id)),`✓ ${b.dataset.id} copiado`));
+}
+
+function renderGaps(){
+  document.getElementById('gaps').innerHTML=GAPS.map(g=>`
+    <div class="gapcard"><h3><span>⚠</span>${g.t}</h3><p>${g.d}</p><div class="evid">${esc(g.e)}</div></div>`).join('');
+}
+
+function renderSummary(){
+  document.getElementById('summary-body').innerHTML=UC.map(u=>`
+    <tr><td class="mono">${u.id}</td><td><b>${u.title}</b></td><td>${u.module}</td>
+    <td>${u.actor}</td><td>${u.priority}</td><td class="mono">${u.trace.filter(t=>t.includes('/')).length}</td></tr>`).join('');
+}
+
+/* ---------- clipboard (sin regex destructiva) ---------- */
+function toText(u){
+  const T=s=>strip(String(s));
+  const L=[];
+  L.push(`${u.id} — ${T(u.title)}`);
+  L.push(`Módulo: ${u.module} · Actor: ${u.actor} · Prioridad: ${u.priority}`);
+  L.push('');
+  L.push(`Actor primario: ${T(u.primary)}`);
+  L.push(`Actor secundario: ${T(u.secondary)}`);
+  L.push(`Interés en riesgo: ${T(u.risk)}`);
+  L.push(`Precondición: ${T(u.precondition)}`);
+  L.push(`Disparador: ${T(u.trigger)}`);
+  L.push('');
+  L.push('FLUJO PRINCIPAL');
+  u.mainFlow.forEach((s,i)=>L.push(`  ${i+1}. ${T(s)}`));
+  L.push('');
+  L.push('FLUJOS ALTERNATIVOS');
+  u.altFlow.forEach(s=>L.push(`  ${T(s)}`));
+  L.push('');
+  L.push('EXCEPCIONES');
+  u.exceptions.forEach(s=>L.push(`  ${T(s)}`));
+  L.push('');
+  L.push(`POSTCONDICIÓN: ${T(u.postcondition)}`);
+  L.push('');
+  L.push('REGLAS DE NEGOCIO');
+  u.rules.forEach(s=>L.push(`  • ${T(s)}`));
+  if(u.includes.length){L.push('');L.push('«INCLUDE»');u.includes.forEach(s=>L.push(`  → ${T(s)}`));}
+  if(u.extends.length){L.push('');L.push('«EXTEND»');u.extends.forEach(s=>L.push(`  ← ${T(s)}`));}
+  L.push('');
+  L.push('TRAZA API');
+  u.trace.forEach(t=>L.push(`  ${t}`));
+  if(u.warn.length){L.push('');L.push('HALLAZGOS');u.warn.forEach(s=>L.push(`  ! ${T(s)}`));}
+  return L.join('\n');
+}
+function copyText(t,msg){
+  const done=()=>showToast(msg);
+  if(navigator.clipboard&&window.isSecureContext){
+    navigator.clipboard.writeText(t).then(done).catch(()=>fallback(t,done));
+  } else fallback(t,done);
+}
+function fallback(t,done){
+  const ta=document.createElement('textarea');
+  ta.value=t; ta.setAttribute('readonly',''); ta.style.cssText='position:absolute;left:-9999px';
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); done(); }
+  catch(e){ showToast('✗ No se pudo copiar — selecciona el texto manualmente'); }
+  ta.remove();
+}
+let toastTimer;
+function showToast(m){
+  const el=document.getElementById('toast');
+  el.textContent=m; el.classList.add('show');
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove('show'),2400);
+}
+document.getElementById('copyall').onclick=()=>{
+  const vis=UC.filter(u=>active==='all'||u.module===active);
+  const body=vis.map(u=>'='.repeat(52)+'\n'+toText(u)).join('\n\n\n');
+  copyText(body,`✓ ${vis.length} casos de uso copiados`);
+};
+
+document.getElementById('actor-diagram').innerHTML=actorDiagram();
+renderMetrics(); renderFilters(); renderCards(); renderGaps(); renderSummary();
+</script>
+</body>
+</html>

@@ -36,7 +36,7 @@
       </div>
 
       <!-- New Product Button -->
-      <button class="btn-primary-mac" routerLink="/productos/nuevo">
+      <button class="btn-primary-mac" (click)="nuevoProducto()">
         <mat-icon>add</mat-icon> Nuevo Producto
       </button>
     </div>
@@ -60,7 +60,7 @@
       <mat-icon>inventory_2</mat-icon>
       <h3>No hay productos registrados</h3>
       <p>Comienza agregando un nuevo producto o servicio a tu catálogo comercial.</p>
-      <button class="btn-primary-mac" routerLink="/productos/nuevo" style="margin-top: 16px;">
+      <button class="btn-primary-mac" (click)="nuevoProducto()" style="margin-top: 16px;">
         <mat-icon>add</mat-icon> Registrar primer Producto
       </button>
     </div>
@@ -68,17 +68,19 @@
 
   @if (hasProductos()) {
     <div class="mac-table-card">
-      <table mat-table [dataSource]="productosFiltrados()">
+      <table mat-table [dataSource]="productosOrdenados()" matSort matSortDisableClear
+             [matSortActive]="sortState().active" [matSortDirection]="sortState().direction"
+             (matSortChange)="onSortChange($event)">
 
         <!-- ID Column -->
         <ng-container matColumnDef="id">
-          <th mat-header-cell *matHeaderCellDef> ID </th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="id"> ID </th>
           <td mat-cell *matCellDef="let producto" class="id-cell"> #{{ producto.id }} </td>
         </ng-container>
 
         <!-- Codigo Column -->
         <ng-container matColumnDef="codigo">
-          <th mat-header-cell *matHeaderCellDef> Código </th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="codigo"> Código </th>
           <td mat-cell *matCellDef="let producto">
             <span class="codigo-tag">{{ producto.codigo }}</span>
           </td>
@@ -86,7 +88,7 @@
 
         <!-- Nombre Column -->
         <ng-container matColumnDef="nombre">
-          <th mat-header-cell *matHeaderCellDef> Producto </th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="nombre"> Producto </th>
           <td mat-cell *matCellDef="let producto">
             <div class="producto-avatar-name">
               <div class="producto-mini-avatar">{{ (producto.nombre || 'P').charAt(0).toUpperCase() }}</div>
@@ -100,7 +102,7 @@
 
         <!-- Categoria Column -->
         <ng-container matColumnDef="categoria">
-          <th mat-header-cell *matHeaderCellDef> Categoría </th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="categoria"> Categoría </th>
           <td mat-cell *matCellDef="let producto">
             <span class="categoria-label">{{ producto.categoria || '-' }}</span>
           </td>
@@ -108,7 +110,7 @@
 
         <!-- Precio Base Column -->
         <ng-container matColumnDef="precioBase">
-          <th mat-header-cell *matHeaderCellDef> Precio Base </th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="precioBase"> Precio Base </th>
           <td mat-cell *matCellDef="let producto">
             <span class="precio-label">{{ formatearPrecio(producto.precioBase) }}</span>
           </td>
@@ -116,7 +118,7 @@
 
         <!-- Estado Column -->
         <ng-container matColumnDef="estado">
-          <th mat-header-cell *matHeaderCellDef> Estado </th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="estado"> Estado </th>
           <td mat-cell *matCellDef="let producto">
             <span class="status-pill {{ getEstadoClass(producto.estado) }}">
               {{ producto.estado }}

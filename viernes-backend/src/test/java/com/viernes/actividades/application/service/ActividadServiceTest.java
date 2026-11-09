@@ -3,15 +3,19 @@ package com.viernes.actividades.application.service;
 import com.viernes.actividades.application.dto.ActividadRequest;
 import com.viernes.actividades.application.dto.ActividadResponse;
 import com.viernes.actividades.application.dto.ParticipanteResponse;
+import com.viernes.actividades.application.port.out.ActividadEtiquetaPersistencePort;
 import com.viernes.actividades.application.port.out.ActividadParticipantePersistencePort;
 import com.viernes.actividades.application.port.out.ActividadPersistencePort;
 import com.viernes.actividades.application.port.out.ContactoQueryPort;
 import com.viernes.actividades.application.port.out.RelacionValidationPort;
 import com.viernes.actividades.domain.Actividad;
+import com.viernes.actividades.domain.ActividadEtiqueta;
 import com.viernes.actividades.domain.ActividadParticipante;
 import com.viernes.actividades.domain.EstadoActividad;
 import com.viernes.actividades.domain.TipoActividad;
 import com.viernes.clientes.application.dto.ContactoResponse;
+import com.viernes.etiquetas.application.port.out.EtiquetaPersistencePort;
+import com.viernes.etiquetas.domain.Etiqueta;
 import com.viernes.shared.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,6 +47,12 @@ class ActividadServiceTest {
     @Mock
     private ContactoQueryPort contactoQueryPort;
 
+    @Mock
+    private ActividadEtiquetaPersistencePort actividadEtiquetaPort;
+
+    @Mock
+    private EtiquetaPersistencePort etiquetaPort;
+
     @InjectMocks
     private ActividadService servicio;
 
@@ -70,6 +80,93 @@ class ActividadServiceTest {
         assertEquals(1L, response.id());
         assertEquals(EstadoActividad.PENDIENTE, response.estado());
         assertFalse(response.vencida());
+    }
+
+    @Test
+    void crearActividadConEtiquetas() {
+        ActividadRequest request = new ActividadRequest(
+                null, null, null, null, TipoActividad.REUNION, "Titulo", "Desc",
+                LocalDateTime.now().plusDays(1), null, List.of(3L, 4L)
+        );
+        Actividad savedEntity = new Actividad(
+                1L, null, null, null, null, TipoActividad.REUNION, "Titulo", "Desc",
+                request.fecha(), EstadoActividad.PENDIENTE, LocalDateTime.now()
+        );
+        Etiqueta tag3 = Etiqueta.builder().id(3L).nombre("Cliente").color("#2563EB").activa(true).build();
+        Etiqueta tag4 = Etiqueta.builder().id(4L).nombre("Urgente").color("#DC2626").activa(true).build();
+
+        when(etiquetaPort.findAllById(any())).thenReturn(List.of(tag3, tag4));
+        when(persistencePort.save(any(Actividad.class))).thenReturn(savedEntity);
+        when(actividadEtiquetaPort.findByIdActividad(1L)).thenReturn(List.of(
+                new ActividadEtiqueta(1L, 1L, 3L, LocalDateTime.now(), 0),
+                new ActividadEtiqueta(2L, 1L, 4L, LocalDateTime.now(), 1)
+        ));
+
+        ActividadResponse response = servicio.crear(request);
+
+        assertEquals(2, response.etiquetas().size());
+        assertEquals(3L, response.etiquetas().get(0).id());
+        assertEquals(4L, response.etiquetas().get(1).id());
+        verify(actividadEtiquetaPort).reemplazarEtiquetas(1L, List.of(3L, 4L));
+    }
+
+    @Test
+    void crearActividadConservaElOrdenElegidoDeEtiquetas() {
+        ActividadRequest request = new ActividadRequest(
+                null, null, null, null, TipoActividad.TAREA, "Titulo", "Desc",
+                LocalDateTime.now().plusDays(1), null, List.of(4L, 3L)
+        );
+        Actividad savedEntity = new Actividad(
+                1L, null, null, null, null, TipoActividad.TAREA, "Titulo", "Desc",
+                request.fecha(), EstadoActividad.PENDIENTE, LocalDateTime.now()
+        );
+        Etiqueta tag3 = Etiqueta.builder().id(3L).nombre("Cliente").color("#2563EB").activa(true).build();
+        Etiqueta tag4 = Etiqueta.builder().id(4L).nombre("Urgente").color("#DC2626").activa(true).build();
+
+        when(etiquetaPort.findAllById(any())).thenReturn(List.of(tag3, tag4));
+        when(persistencePort.save(any(Actividad.class))).thenReturn(savedEntity);
+        when(actividadEtiquetaPort.findByIdActividad(1L)).thenReturn(List.of(
+                new ActividadEtiqueta(1L, 1L, 4L, LocalDateTime.now(), 0),
+                new ActividadEtiqueta(2L, 1L, 3L, LocalDateTime.now(), 1)
+        ));
+
+        ActividadResponse response = servicio.crear(request);
+
+        assertEquals(List.of(4L, 3L), response.etiquetas().stream().map(e -> e.id()).toList());
+        verify(actividadEtiquetaPort).reemplazarEtiquetas(1L, List.of(4L, 3L));
+    }
+
+    @Test
+    void crearActividadRechazaMasDeOchoEtiquetas() {
+        ActividadRequest request = new ActividadRequest(
+                null, null, null, null, TipoActividad.TAREA, "Titulo", "Desc",
+                LocalDateTime.now().plusDays(1), null,
+                List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L)
+        );
+
+        assertThrows(IllegalArgumentException.class, () -> servicio.crear(request));
+        verify(persistencePort, never()).save(any(Actividad.class));
+    }
+
+    @Test
+    void filtrarActividadesPorEtiqueta() {
+        Actividad actividad = new Actividad(
+                1L, null, null, null, null, TipoActividad.TAREA, "Titulo", "Desc",
+                LocalDateTime.now().plusDays(1), EstadoActividad.PENDIENTE, LocalDateTime.now()
+        );
+        Etiqueta etiqueta = Etiqueta.builder().id(3L).nombre("Cliente").color("#2563EB").activa(true).build();
+
+        when(etiquetaPort.findById(3L)).thenReturn(Optional.of(etiqueta));
+        when(persistencePort.findByEtiquetaId(3L)).thenReturn(List.of(actividad));
+        when(actividadEtiquetaPort.findByIdActividadIn(any())).thenReturn(List.of(
+                new ActividadEtiqueta(1L, 1L, 3L, LocalDateTime.now())
+        ));
+        when(etiquetaPort.findAllById(any())).thenReturn(List.of(etiqueta));
+
+        List<ActividadResponse> response = servicio.filtrarPorEtiqueta(3L);
+
+        assertEquals(1, response.size());
+        assertEquals(3L, response.get(0).etiquetas().get(0).id());
     }
 
     @Test

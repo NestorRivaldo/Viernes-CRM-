@@ -2,7 +2,18 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiService } from '../../core/services/api-service';
-import { OportunidadRequest, OportunidadResponse, EtapaOportunidad } from './oportunidades.model';
+import {
+  OportunidadRequest,
+  OportunidadResponse,
+  EtapaOportunidad,
+  OportunidadContactoRequest,
+  OportunidadContactoResponse,
+  OportunidadContactoUpdateRequest,
+  OportunidadProductoRequest,
+  OportunidadProductoResponse,
+  OportunidadColaboradorRequest,
+  OportunidadColaboradorResponse,
+} from './oportunidades.model';
 
 @Injectable({ providedIn: 'root' })
 export class OportunidadesService {
@@ -37,5 +48,82 @@ export class OportunidadesService {
 
   eliminar(id: number): Observable<void> {
     return this.http.delete<void>(this.apiService.buildUrl(`${this.path}/${id}`));
+  }
+
+  /* --- N:M: contactos participantes --- */
+
+  listarContactos(idOportunidad: number): Observable<OportunidadContactoResponse[]> {
+    return this.http.get<OportunidadContactoResponse[]>(
+      this.apiService.buildUrl(`${this.path}/${idOportunidad}/contactos`)
+    );
+  }
+
+  agregarContacto(idOportunidad: number, request: OportunidadContactoRequest): Observable<OportunidadContactoResponse> {
+    return this.http.post<OportunidadContactoResponse>(
+      this.apiService.buildUrl(`${this.path}/${idOportunidad}/contactos`),
+      request
+    );
+  }
+
+  actualizarContacto(
+    idOportunidad: number,
+    contactoId: number,
+    request: OportunidadContactoUpdateRequest
+  ): Observable<OportunidadContactoResponse> {
+    return this.http.put<OportunidadContactoResponse>(
+      this.apiService.buildUrl(`${this.path}/${idOportunidad}/contactos/${contactoId}`),
+      request
+    );
+  }
+
+  quitarContacto(idOportunidad: number, contactoId: number): Observable<void> {
+    return this.http.delete<void>(
+      this.apiService.buildUrl(`${this.path}/${idOportunidad}/contactos/${contactoId}`)
+    );
+  }
+
+  /* --- N:M: productos de la oportunidad --- */
+
+  listarProductos(idOportunidad: number): Observable<OportunidadProductoResponse[]> {
+    return this.http.get<OportunidadProductoResponse[]>(
+      this.apiService.buildUrl(`${this.path}/${idOportunidad}/productos`)
+    );
+  }
+
+  agregarProducto(idOportunidad: number, request: OportunidadProductoRequest): Observable<OportunidadProductoResponse> {
+    return this.http.post<OportunidadProductoResponse>(
+      this.apiService.buildUrl(`${this.path}/${idOportunidad}/productos`),
+      request
+    );
+  }
+
+  quitarProducto(idOportunidad: number, productoId: number): Observable<void> {
+    return this.http.delete<void>(
+      this.apiService.buildUrl(`${this.path}/${idOportunidad}/productos/${productoId}`)
+    );
+  }
+
+  /* --- N:M: colaboradores --- */
+
+  listarColaboradores(idOportunidad: number): Observable<OportunidadColaboradorResponse[]> {
+    return this.http.get<OportunidadColaboradorResponse[]>(
+      this.apiService.buildUrl(`${this.path}/${idOportunidad}/colaboradores`)
+    );
+  }
+
+  agregarColaborador(
+    idOportunidad: number,
+    request: OportunidadColaboradorRequest
+  ): Observable<OportunidadColaboradorResponse> {
+    return this.http.post<OportunidadColaboradorResponse>(
+      this.apiService.buildUrl(`${this.path}/${idOportunidad}/colaboradores`),
+      request
+    );
+  }
+
+  quitarColaborador(idOportunidad: number, usuarioId: number): Observable<void> {
+    return this.http.delete<void>(
+      this.apiService.buildUrl(`${this.path}/${idOportunidad}/colaboradores/${usuarioId}`)
+    );
   }
 }

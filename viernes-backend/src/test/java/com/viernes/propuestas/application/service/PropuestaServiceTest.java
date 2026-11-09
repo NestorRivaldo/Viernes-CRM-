@@ -8,10 +8,14 @@ import com.viernes.propuestas.application.port.out.PropuestaRelacionValidationPo
 import com.viernes.propuestas.domain.DetallePropuesta;
 import com.viernes.propuestas.domain.EstadoPropuesta;
 import com.viernes.propuestas.domain.Propuesta;
+import com.viernes.productos.application.dto.ProductoResponse;
+import com.viernes.productos.application.port.in.ManageProductoUseCase;
+import com.viernes.productos.domain.EstadoProducto;
 import com.viernes.shared.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -36,18 +40,27 @@ class PropuestaServiceTest {
     @Mock
     private PropuestaRelacionValidationPort validationPort;
 
+    @Mock
+    private ManageProductoUseCase productoUseCase;
+
     @InjectMocks
     private PropuestaService servicio;
 
     private PropuestaRequest validRequest;
     private Propuesta entidadGuardada;
+    private ProductoResponse productoCatalogo;
 
     @BeforeEach
     void setUp() {
-        DetallePropuestaRequest detalleReq = new DetallePropuestaRequest("Servicio", 2, new BigDecimal("100.00"));
+        DetallePropuestaRequest detalleReq = new DetallePropuestaRequest("Servicio", 2, new BigDecimal("100.00"), null);
         validRequest = new PropuestaRequest(
                 1L, 1L, "Cliente XYZ", "Juan", LocalDate.now(), LocalDate.now().plusDays(15),
                 new BigDecimal("10.00"), "Obs", List.of(detalleReq)
+        );
+
+        productoCatalogo = new ProductoResponse(
+                5L, "COD-05", "Producto Catálogo", "Descripción de catálogo", "Categoría",
+                new BigDecimal("250.00"), EstadoProducto.ACTIVO, LocalDateTime.now()
         );
 
         DetallePropuesta detalle = DetallePropuesta.builder()
@@ -168,5 +181,126 @@ class PropuestaServiceTest {
         when(persistencePort.findById(1L)).thenReturn(Optional.of(entidadGuardada));
 
         assertThrows(IllegalStateException.class, () -> servicio.cancelar(1L));
+    }
+
+    @Test
+    void crear_conProductoValido_prefillDesdeCatalogo() {
+        DetallePropuestaRequest detalleReq = new DetallePropuestaRequest(null, 3, null, 5L);
+        PropuestaRequest request = new PropuestaRequest(
+                1L, 1L, "Cliente XYZ", "Juan", LocalDate.now(), LocalDate.now().plusDays(15),
+                new BigDecimal("10.00"), "Obs", List.of(detalleReq)
+        );
+        when(validationPort.existeOportunidad(1L)).thenReturn(true);
+        when(validationPort.existeCliente(1L)).thenReturn(true);
+        when(productoUseCase.obtener(5L)).thenReturn(productoCatalogo);
+        when(persistencePort.countByNumeroPropuestaStartsWith(anyString())).thenReturn(0L);
+        when(persistencePort.save(any(Propuesta.class))).thenAnswer(i -> i.getArgument(0));
+
+        PropuestaResponse response = servicio.crear(request);
+
+        ArgumentCaptor<Propuesta> captor = ArgumentCaptor.forClass(Propuesta.class);
+        verify(persistencePort).save(captor.capture());
+        DetallePropuesta guardado = captor.getValue().getDetalles().get(0);
+        assertEquals(5L, guardado.getIdProducto());
+        assertEquals("Producto Catálogo", guardado.getDescripcion());
+        assertEquals(new BigDecimal("250.00"), guardado.getPrecioUnitario());
+        assertEquals(new BigDecimal("750.00"), guardado.getSubtotal());
+        assertEquals(new BigDecimal("750.00"), captor.getValue().getSubtotal());
+        assertEquals(new BigDecimal("740.00"), captor.getValue().getTotal());
+        assertEquals(5L, response.detalles().get(0).productoId());
+    }
+
+    @Test
+    void crear_conProductoYOverride_respetaValoresEnviados() {
+        DetallePropuestaRequest detalleReq = new DetallePropuestaRequest(
+                "Servicio personalizado", 2, new BigDecimal("999.00"), 5L);
+        PropuestaRequest request = new PropuestaRequest(
+                1L, 1L, "Cliente XYZ", "Juan", LocalDate.now(), LocalDate.now().plusDays(15),
+                new BigDecimal("10.00"), "Obs", List.of(detalleReq)
+        );
+        when(validationPort.existeOportunidad(1L)).thenReturn(true);
+        when(validationPort.existeCliente(1L)).thenReturn(true);
+        when(productoUseCase.obtener(5L)).thenReturn(productoCatalogo);
+        when(persistencePort.countByNumeroPropuestaStartsWith(anyString())).thenReturn(0L);
+        when(persistencePort.save(any(Propuesta.class))).thenAnswer(i -> i.getArgument(0));
+
+        servicio.crear(request);
+
+        ArgumentCaptor<Propuesta> captor = ArgumentCaptor.forClass(Propuesta.class);
+        verify(persistencePort).save(captor.capture());
+        DetallePropuesta guardado = captor.getValue().getDetalles().get(0);
+        assertEquals(5L, guardado.getIdProducto());
+        assertEquals("Servicio personalizado", guardado.getDescripcion());
+        assertEquals(new BigDecimal("999.00"), guardado.getPrecioUnitario());
+        assertEquals(new BigDecimal("1998.00"), guardado.getSubtotal());
+    }
+
+    @Test
+    void crear_conProductoInexistente_lanzaNotFound() {
+        DetallePropuestaRequest detalleReq = new DetallePropuestaRequest(null, 1, null, 99L);
+        PropuestaRequest request = new PropuestaRequest(
+                1L, 1L, "Cliente XYZ", "Juan", LocalDate.now(), LocalDate.now().plusDays(15),
+                new BigDecimal("10.00"), "Obs", List.of(detalleReq)
+        );
+        when(validationPort.existeOportunidad(1L)).thenReturn(true);
+        when(validationPort.existeCliente(1L)).thenReturn(true);
+        when(productoUseCase.obtener(99L))
+                .thenThrow(new ResourceNotFoundException("Producto no encontrado: 99"));
+
+        assertThrows(ResourceNotFoundException.class, () -> servicio.crear(request));
+        verify(persistencePort, never()).save(any());
+    }
+
+    @Test
+    void crear_detalleLibreSinProducto_noConsultaCatalogo() {
+        when(validationPort.existeOportunidad(1L)).thenReturn(true);
+        when(validationPort.existeCliente(1L)).thenReturn(true);
+        when(persistencePort.countByNumeroPropuestaStartsWith(anyString())).thenReturn(0L);
+        when(persistencePort.save(any(Propuesta.class))).thenReturn(entidadGuardada);
+
+        PropuestaResponse response = servicio.crear(validRequest);
+
+        assertNotNull(response);
+        assertNull(response.detalles().get(0).productoId());
+        verifyNoInteractions(productoUseCase);
+    }
+
+    @Test
+    void crear_detalleLibreSinDescripcion_lanzaIllegalArgument() {
+        DetallePropuestaRequest detalleReq = new DetallePropuestaRequest(null, 1, new BigDecimal("10.00"), null);
+        PropuestaRequest request = new PropuestaRequest(
+                1L, 1L, "Cliente XYZ", "Juan", LocalDate.now(), LocalDate.now().plusDays(15),
+                new BigDecimal("10.00"), "Obs", List.of(detalleReq)
+        );
+        when(validationPort.existeOportunidad(1L)).thenReturn(true);
+        when(validationPort.existeCliente(1L)).thenReturn(true);
+
+        assertThrows(IllegalArgumentException.class, () -> servicio.crear(request));
+        verify(persistencePort, never()).save(any());
+    }
+
+    @Test
+    void actualizar_conProductoNuevo_aplicaPrefillYRecalculaTotales() {
+        DetallePropuestaRequest detalleReq = new DetallePropuestaRequest(null, 4, null, 5L);
+        PropuestaRequest request = new PropuestaRequest(
+                1L, 1L, "Cliente XYZ", "Juan", LocalDate.now(), LocalDate.now().plusDays(15),
+                new BigDecimal("10.00"), "Obs", List.of(detalleReq)
+        );
+        when(persistencePort.findById(1L)).thenReturn(Optional.of(entidadGuardada));
+        when(validationPort.existeOportunidad(1L)).thenReturn(true);
+        when(validationPort.existeCliente(1L)).thenReturn(true);
+        when(productoUseCase.obtener(5L)).thenReturn(productoCatalogo);
+        when(persistencePort.save(any(Propuesta.class))).thenAnswer(i -> i.getArgument(0));
+
+        servicio.actualizar(1L, request);
+
+        ArgumentCaptor<Propuesta> captor = ArgumentCaptor.forClass(Propuesta.class);
+        verify(persistencePort).save(captor.capture());
+        DetallePropuesta guardado = captor.getValue().getDetalles().get(0);
+        assertEquals(5L, guardado.getIdProducto());
+        assertEquals(new BigDecimal("250.00"), guardado.getPrecioUnitario());
+        assertEquals(new BigDecimal("1000.00"), guardado.getSubtotal());
+        assertEquals(new BigDecimal("1000.00"), captor.getValue().getSubtotal());
+        assertEquals(new BigDecimal("990.00"), captor.getValue().getTotal());
     }
 }

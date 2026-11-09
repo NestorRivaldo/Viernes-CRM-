@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Informe explicativo sobre qué es Viernes CRM V1: propósito, alcance funcional, módulos del sistema, tecnologías, roles de usuario y arquitectura general.">
+    <title>¿Qué es Viernes CRM? – Informe del Sistema V1</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #090d16;
+            --surface: #111726;
+            --surface2: #172033;
+            --surface3: #1c2740;
+            --border: #232f48;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --text-subtle: #64748b;
+            --accent: #3b82f6;
+            --accent-soft: rgba(59, 130, 246, 0.12);
+            --green: #10b981;
+            --green-soft: rgba(16, 185, 129, 0.12);
+            --purple: #a855f7;
+            --purple-soft: rgba(168, 85, 247, 0.12);
+            --amber: #f59e0b;
+            --amber-soft: rgba(245, 158, 11, 0.12);
+            --cyan: #06b6d4;
+            --cyan-soft: rgba(6, 182, 212, 0.12);
+            --rose: #f43f5e;
+            --rose-soft: rgba(244, 63, 94, 0.12);
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            padding: 34px 20px 70px;
+            background-image:
+                radial-gradient(circle at 15% 5%, rgba(59, 130, 246, 0.10) 0%, transparent 40%),
+                radial-gradient(circle at 80% 90%, rgba(168, 85, 247, 0.06) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+
+        .container { max-width: 1080px; margin: 0 auto; }
+        a { color: #60a5fa; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        /* Hero */
+        .hero {
+            text-align: center; padding: 50px 0 40px;
+            border-bottom: 1px solid var(--border); margin-bottom: 40px;
+        }
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: var(--accent-soft); color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.35);
+            padding: 7px 16px; border-radius: 30px;
+            font-size: 13px; font-weight: 700;
+            letter-spacing: 0.03em; margin-bottom: 16px;
+            animation: pulse-blue 3s ease-in-out infinite;
+        }
+        @keyframes pulse-blue {
+            0%, 100% { box-shadow: 0 0 8px rgba(59, 130, 246, 0.15); }
+            50% { box-shadow: 0 0 22px rgba(59, 130, 246, 0.3); }
+        }
+        .hero h1 {
+            font-size: 38px; font-weight: 800; letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #ffffff 20%, #60a5fa 60%, #a855f7 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin-bottom: 12px;
+        }
+        .hero .subtitle { font-size: 16px; color: var(--text-muted); max-width: 700px; margin: 0 auto; }
+        .stats-row {
+            display: flex; justify-content: center; gap: 16px;
+            margin: 28px 0 0; flex-wrap: wrap;
+        }
+        .stat-pill {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 10px; padding: 8px 16px;
+            font-size: 13px; display: flex; align-items: center; gap: 6px;
+        }
+        .stat-pill strong { font-family: var(--mono); color: #60a5fa; }
+        .stat-pill.green strong { color: #6ee7b7; }
+        .stat-pill.purple strong { color: #c084fc; }
+        .stat-pill.amber strong { color: #fde68a; }
+
+        /* TOC */
+        .toc {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius-md); padding: 22px 28px; margin-bottom: 40px;
+        }
+        .toc h3 { font-size: 15px; font-weight: 700; margin-bottom: 12px; color: #e2e8f0; }
+        .toc ol { padding-left: 20px; }
+        .toc li { margin-bottom: 6px; }
+        .toc a { font-size: 14px; font-weight: 500; }
+
+        /* Section */
+        .section { margin-bottom: 50px; padding-top: 10px; }
+        .section-header {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 18px; padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+        .section-num {
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            color: #fff; font-size: 13px; font-weight: 800;
+            min-width: 32px; height: 32px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .section-title { font-size: 22px; font-weight: 700; }
+
+        /* Cards */
+        .card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius-md); padding: 22px 26px;
+            margin-bottom: 20px; transition: border-color 0.3s;
+        }
+        .card:hover { border-color: rgba(59, 130, 246, 0.4); }
+        .card h4 { font-size: 16px; font-weight: 700; margin-bottom: 10px; color: #e2e8f0; }
+        .card p, .card li { font-size: 14px; color: var(--text-muted); }
+        .card ul { margin: 8px 0 0 18px; }
+        .card li { margin-bottom: 5px; }
+
+        /* Feature card */
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+        .feature-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius-md); padding: 20px 22px;
+            transition: all 0.25s ease; position: relative; overflow: hidden;
+        }
+        .feature-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+        }
+        .feature-card:hover { border-color: rgba(59, 130, 246, 0.5); transform: translateY(-2px); }
+        .feature-card .icon { font-size: 28px; margin-bottom: 10px; }
+        .feature-card h4 { font-size: 15px; font-weight: 700; margin-bottom: 6px; color: #e2e8f0; }
+        .feature-card p { font-size: 13px; color: var(--text-muted); }
+
+        .fc-blue::before { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+        .fc-green::before { background: linear-gradient(90deg, #10b981, #34d399); }
+        .fc-purple::before { background: linear-gradient(90deg, #a855f7, #c084fc); }
+        .fc-amber::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+        .fc-cyan::before { background: linear-gradient(90deg, #06b6d4, #22d3ee); }
+        .fc-rose::before { background: linear-gradient(90deg, #f43f5e, #fb7185); }
+
+        /* Highlight box */
+        .highlight-box {
+            background: var(--surface2); border: 1px solid var(--border);
+            border-radius: var(--radius-md); padding: 24px 28px;
+            margin-bottom: 24px; position: relative; overflow: hidden;
+        }
+        .highlight-box::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, #3b82f6, #06b6d4, #10b981, #a855f7);
+        }
+        .highlight-box h3 {
+            font-size: 18px; font-weight: 700; margin-bottom: 14px;
+            display: flex; align-items: center; gap: 10px;
+        }
+
+        /* Data table */
+        .data-table {
+            width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 13px;
+        }
+        .data-table th {
+            background: var(--surface2); color: #e2e8f0; font-weight: 700;
+            text-align: left; padding: 10px 14px;
+            border-bottom: 2px solid var(--border);
+            font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em;
+        }
+        .data-table td {
+            padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--text-muted);
+        }
+        .data-table tr:hover td { background: rgba(59, 130, 246, 0.04); }
+        .data-table code {
+            font-family: var(--mono); font-size: 12px;
+            background: var(--surface2); padding: 2px 6px; border-radius: 4px; color: #60a5fa;
+        }
+
+        /* Chips */
+        .chip {
+            display: inline-block; font-size: 11px; font-weight: 600;
+            padding: 2px 8px; border-radius: 5px; margin-right: 4px;
+        }
+        .chip-blue { background: var(--accent-soft); color: #60a5fa; }
+        .chip-green { background: var(--green-soft); color: #6ee7b7; }
+        .chip-purple { background: var(--purple-soft); color: #c084fc; }
+        .chip-cyan { background: var(--cyan-soft); color: #67e8f9; }
+        .chip-amber { background: var(--amber-soft); color: #fde68a; }
+        .chip-rose { background: var(--rose-soft); color: #fda4af; }
+
+        /* Alert */
+        .alert {
+            border-radius: var(--radius-sm); padding: 14px 18px;
+            margin: 14px 0; font-size: 13.5px; display: flex; gap: 10px; align-items: flex-start;
+        }
+        .alert-icon { font-size: 18px; flex-shrink: 0; }
+        .alert-info { background: var(--accent-soft); border: 1px solid rgba(59,130,246,0.3); color: #93c5fd; }
+        .alert-success { background: var(--green-soft); border: 1px solid rgba(16,185,129,0.3); color: #6ee7b7; }
+
+        /* Roles section */
+        .role-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius-md); padding: 18px 22px;
+            margin-bottom: 12px; display: flex; align-items: flex-start; gap: 14px;
+        }
+        .role-icon {
+            font-size: 28px; min-width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            background: var(--surface2); border-radius: 10px;
+        }
+        .role-info h4 { font-size: 15px; font-weight: 700; color: #e2e8f0; margin-bottom: 4px; }
+        .role-info p { font-size: 13px; color: var(--text-muted); }
+
+        /* Tech stack */
+        .tech-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+        .tech-item {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 10px; padding: 14px 18px; text-align: center;
+            transition: border-color 0.2s;
+        }
+        .tech-item:hover { border-color: rgba(59, 130, 246, 0.5); }
+        .tech-item .tech-name {
+            font-size: 14px; font-weight: 700; color: #e2e8f0; margin-bottom: 4px;
+        }
+        .tech-item .tech-ver {
+            font-size: 12px; font-family: var(--mono); color: var(--text-muted);
+        }
+
+        /* Back link */
+        .back-link {
+            display: inline-flex; align-items: center; gap: 6px;
+            color: var(--text-muted); font-size: 13px; font-weight: 500;
+            margin-bottom: 16px; transition: color 0.2s;
+        }
+        .back-link:hover { color: #60a5fa; text-decoration: none; }
+
+        footer {
+            text-align: center; padding: 40px 0 10px;
+            color: var(--text-subtle); font-size: 13px;
+            border-top: 1px solid var(--border); margin-top: 50px;
+        }
+
+        @media (max-width: 600px) {
+            .hero h1 { font-size: 26px; }
+            .feature-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- ENTRADA MINIMALISTA -->
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0 25px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #2563eb, #3b82f6); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; color: white;">V</div>
+            <span style="font-weight: 700; font-size: 16px; color: #f8fafc; letter-spacing: -0.01em;">Viernes</span>
+            <span style="font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 12px; background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3);">CRM · V1</span>
+        </div>
+        <a href="index.html" class="back-link" style="margin-bottom: 0;">← Volver al Portal</a>
+    </div>
+
+    <header style="padding: 10px 0 35px; border-bottom: 1px solid var(--border); margin-bottom: 35px;">
+        <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(59, 130, 246, 0.12); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.25); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; margin-bottom: 16px; text-transform: uppercase;">
+            • PLATAFORMA COMERCIAL
+        </div>
+        <h1 style="font-size: 38px; font-weight: 800; letter-spacing: -0.03em; color: #ffffff; margin-bottom: 12px; line-height: 1.2;">
+            Todo tu ciclo de ventas, en un solo lugar.
+        </h1>
+        <p style="font-size: 16px; color: var(--text-muted); max-width: 650px; line-height: 1.6; margin: 0;">
+            Propósito, alcance comercial y arquitectura de módulos diseñada para gestionar clientes, oportunidades y actividades con máxima trazabilidad.
+        </p>
+    </header>
+
+    <!-- TOC -->
+    <nav class="toc">
+        <h3>📋 Índice de Contenidos</h3>
+        <ol>
+            <li><a href="#definicion">Definición y propósito del sistema</a></li>
+            <li><a href="#problema">El problema que resuelve</a></li>
+            <li><a href="#modulos">Módulos funcionales del sistema</a></li>
+            <li><a href="#roles">Roles de usuario y permisos</a></li>
+            <li><a href="#tecnologias">Stack tecnológico</a></li>
+            <li><a href="#arquitectura">Arquitectura del sistema</a></li>
+            <li><a href="#ciclo-ventas">Ciclo de ventas en el CRM</a></li>
+            <li><a href="#datos">Modelo de datos (tablas Oracle)</a></li>
+            <li><a href="#contexto">Contexto académico</a></li>
+        </ol>
+    </nav>
+
+    <!-- 1. Definición -->
+    <section class="section" id="definicion">
+        <div class="section-header">
+            <span class="section-num">1</span>
+            <h2 class="section-title">Definición y propósito del sistema</h2>
+        </div>
+
+        <div class="highlight-box">
+            <h3>🏢 ¿Qué es Viernes CRM V1?</h3>
+            <p style="font-size: 15px; color: var(--text-muted); margin-bottom: 14px;">
+                <strong style="color: #e2e8f0;">Viernes CRM V1</strong> es un <strong>sistema de Gestión de Relaciones con Clientes</strong> 
+                (Customer Relationship Management) diseñado para equipos comerciales y de ventas. 
+                Permite gestionar de forma integral todo el ciclo de vida comercial: desde la captación de 
+                leads hasta el cierre de oportunidades, la generación de propuestas/cotizaciones y el 
+                seguimiento de actividades.
+            </p>
+            <p style="font-size: 14px; color: var(--text-muted);">
+                El sistema fue desarrollado como <strong>proyecto final integrador</strong> de la asignatura 
+                <em>Lenguaje de Programación II (LP2)</em>, bajo el marco del proyecto BomERP, que busca 
+                construir módulos ERP funcionales con tecnologías empresariales reales.
+            </p>
+        </div>
+
+        <div class="alert alert-info">
+            <span class="alert-icon">💡</span>
+            <div>
+                <strong>CRM = Customer Relationship Management.</strong> Es un software que centraliza toda la información 
+                de clientes, contactos, oportunidades de venta y actividades comerciales en un solo lugar, 
+                facilitando la toma de decisiones y el seguimiento del equipo de ventas.
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. Problema que resuelve -->
+    <section class="section" id="problema">
+        <div class="section-header">
+            <span class="section-num">2</span>
+            <h2 class="section-title">El problema que resuelve</h2>
+        </div>
+
+        <div class="card">
+            <h4>❌ Sin un CRM, las empresas enfrentan:</h4>
+            <ul>
+                <li>Información de clientes dispersa en hojas de Excel, correos y notas</li>
+                <li>No hay visibilidad del avance del equipo de ventas</li>
+                <li>Se pierden oportunidades por falta de seguimiento</li>
+                <li>No se puede medir el rendimiento del equipo comercial</li>
+                <li>Los leads captados de campañas de marketing no se gestionan</li>
+                <li>Las propuestas/cotizaciones se hacen manualmente sin trazabilidad</li>
+            </ul>
+        </div>
+
+        <div class="card" style="border-color: rgba(16, 185, 129, 0.4);">
+            <h4>✅ Con Viernes CRM V1, la empresa puede:</h4>
+            <ul>
+                <li>Centralizar clientes, contactos y leads en una sola plataforma</li>
+                <li>Seguir el pipeline de ventas con oportunidades en etapas visuales</li>
+                <li>Generar propuestas/cotizaciones con productos del catálogo</li>
+                <li>Programar y dar seguimiento a llamadas, reuniones y tareas</li>
+                <li>Ver un dashboard con métricas de ventas en tiempo real</li>
+                <li>Gestionar campañas de marketing y sus leads asociados</li>
+                <li>Controlar permisos por rol (ADMIN, JEFE, VENDEDOR)</li>
+                <li>Comunicarse internamente a través de la mensajería del sistema</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- 3. Módulos -->
+    <section class="section" id="modulos">
+        <div class="section-header">
+            <span class="section-num">3</span>
+            <h2 class="section-title">Módulos funcionales del sistema</h2>
+        </div>
+
+        <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px;">
+            Viernes CRM V1 está compuesto por <strong>12 módulos funcionales</strong> organizados en una 
+            arquitectura modular (Spring Modulith). Cada módulo es independiente y se comunica con otros 
+            mediante referencias lógicas de ID.
+        </p>
+
+        <div class="feature-grid">
+            <div class="feature-card fc-blue">
+                <div class="icon">👥</div>
+                <h4>Clientes</h4>
+                <p>Gestión de empresas clientes con datos fiscales, dirección, industria y contactos asociados (1:N).</p>
+            </div>
+
+            <div class="feature-card fc-blue">
+                <div class="icon">📇</div>
+                <h4>Contactos</h4>
+                <p>Personas clave dentro de cada cliente: nombre, cargo, email, teléfono. Vinculados a actividades y oportunidades.</p>
+            </div>
+
+            <div class="feature-card fc-green">
+                <div class="icon">🎯</div>
+                <h4>Leads</h4>
+                <p>Prospectos de venta con información de fuente de captación, estado (nuevo, contactado, calificado) y datos de empresa.</p>
+            </div>
+
+            <div class="feature-card fc-purple">
+                <div class="icon">💰</div>
+                <h4>Oportunidades</h4>
+                <p>Pipeline de ventas con etapas (Prospección → Calificación → Propuesta → Negociación → Cerrada). Incluye relaciones N:M con contactos, productos y colaboradores.</p>
+            </div>
+
+            <div class="feature-card fc-amber">
+                <div class="icon">📋</div>
+                <h4>Propuestas / Cotizaciones</h4>
+                <p>Documentos comerciales con detalles de productos, cantidades, precios y estados (borrador, enviada, aprobada, rechazada, cancelada).</p>
+            </div>
+
+            <div class="feature-card fc-cyan">
+                <div class="icon">📅</div>
+                <h4>Actividades</h4>
+                <p>Llamadas, reuniones, tareas y seguimientos. Con participantes (N:M contactos) y etiquetas (N:M etiquetas).</p>
+            </div>
+
+            <div class="feature-card fc-rose">
+                <div class="icon">📊</div>
+                <h4>Dashboard</h4>
+                <p>Métricas en tiempo real: conteo de clientes, leads, oportunidades, valor total del pipeline. Datos reales de Oracle, sin mocks.</p>
+            </div>
+
+            <div class="feature-card fc-green">
+                <div class="icon">📦</div>
+                <h4>Productos</h4>
+                <p>Catálogo de productos/servicios con nombre, precio, categoría y descripción. Asociables a oportunidades y propuestas.</p>
+            </div>
+
+            <div class="feature-card fc-blue">
+                <div class="icon">👫</div>
+                <h4>Equipos</h4>
+                <p>Grupos de vendedores con nombre, líder y miembros (N:M con usuarios). Permiten organizar el equipo comercial.</p>
+            </div>
+
+            <div class="feature-card fc-amber">
+                <div class="icon">📣</div>
+                <h4>Marketing / Campañas</h4>
+                <p>Campañas de marketing con presupuesto, fechas y leads asociados (N:M). Permiten rastrear la fuente de cada prospecto.</p>
+            </div>
+
+            <div class="feature-card fc-purple">
+                <div class="icon">🏷️</div>
+                <h4>Etiquetas</h4>
+                <p>Sistema de clasificación por tags con color configurable. Asociables a actividades para categorización flexible (N:M).</p>
+            </div>
+
+            <div class="feature-card fc-cyan">
+                <div class="icon">💬</div>
+                <h4>Mensajería</h4>
+                <p>Sala de chat general para comunicación interna del equipo. Mensajes en tiempo real con polling cada 5 segundos y badge de no leídos.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. Roles -->
+    <section class="section" id="roles">
+        <div class="section-header">
+            <span class="section-num">4</span>
+            <h2 class="section-title">Roles de usuario y permisos</h2>
+        </div>
+
+        <div class="card">
+            <p>
+                El sistema implementa control de acceso basado en roles (RBAC) mediante <strong>Keycloak OIDC</strong>. 
+                Cada usuario tiene asignado un rol que determina qué operaciones puede realizar.
+            </p>
+        </div>
+
+        <div class="role-card" style="border-left: 3px solid #f43f5e;">
+            <div class="role-icon">🛡️</div>
+            <div class="role-info">
+                <h4>ADMIN <span class="chip chip-rose">Administrador</span></h4>
+                <p>
+                    Acceso total al sistema. Puede crear, editar y <strong>eliminar</strong> cualquier registro. 
+                    Gestiona usuarios. Puede aprobar, rechazar y cancelar propuestas. 
+                    Administra catálogos (productos, equipos, etiquetas, campañas, fuentes).
+                </p>
+            </div>
+        </div>
+
+        <div class="role-card" style="border-left: 3px solid #f59e0b;">
+            <div class="role-icon">👔</div>
+            <div class="role-info">
+                <h4>JEFE <span class="chip chip-amber">Jefe de Ventas</span></h4>
+                <p>
+                    Puede crear y editar registros. Puede <strong>aprobar, rechazar y cancelar</strong> propuestas. 
+                    Puede gestionar catálogos. <strong>No puede eliminar</strong> registros de negocio (clientes, leads, 
+                    oportunidades, propuestas, actividades). No puede gestionar usuarios.
+                </p>
+            </div>
+        </div>
+
+        <div class="role-card" style="border-left: 3px solid #3b82f6;">
+            <div class="role-icon">🧑‍💼</div>
+            <div class="role-info">
+                <h4>VENDEDOR <span class="chip chip-blue">Vendedor</span></h4>
+                <p>
+                    Puede crear y editar clientes, leads, oportunidades, propuestas y actividades. 
+                    <strong>No puede eliminar</strong> registros. <strong>No puede aprobar/rechazar</strong> propuestas. 
+                    No puede modificar catálogos ni gestionar usuarios. Si intenta una acción prohibida, 
+                    recibe un error <strong>403 Forbidden</strong>.
+                </p>
+            </div>
+        </div>
+
+        <div class="card" style="overflow-x: auto;">
+            <h4>📊 Matriz de permisos</h4>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Operación</th>
+                        <th>ADMIN</th>
+                        <th>JEFE</th>
+                        <th>VENDEDOR</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Crear/editar clientes, leads, oportunidades</td><td>✅</td><td>✅</td><td>✅</td></tr>
+                    <tr><td>Eliminar clientes, leads, oportunidades, propuestas, actividades</td><td>✅</td><td>❌ (403)</td><td>❌ (403)</td></tr>
+                    <tr><td>Aprobar/rechazar/cancelar propuestas</td><td>✅</td><td>✅</td><td>❌ (403)</td></tr>
+                    <tr><td>Gestionar catálogos (productos, equipos, etiquetas, campañas)</td><td>✅</td><td>✅</td><td>❌ (403)</td></tr>
+                    <tr><td>Gestionar usuarios</td><td>✅</td><td>❌ (403)</td><td>❌ (403)</td></tr>
+                    <tr><td>Ver dashboard y métricas</td><td>✅</td><td>✅</td><td>✅</td></tr>
+                    <tr><td>Usar mensajería interna</td><td>✅</td><td>✅</td><td>✅</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- 5. Tecnologías -->
+    <section class="section" id="tecnologias">
+        <div class="section-header">
+            <span class="section-num">5</span>
+            <h2 class="section-title">Stack tecnológico</h2>
+        </div>
+
+        <div class="tech-grid">
+            <div class="tech-item">
+                <div class="tech-name">☕ Java</div>
+                <div class="tech-ver">JDK 21</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-name">🍃 Spring Boot</div>
+                <div class="tech-ver">4.0.7</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-name">🧩 Spring Modulith</div>
+                <div class="tech-ver">Arquitectura modular</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-name">🔐 Keycloak</div>
+                <div class="tech-ver">25.0.6 (OIDC)</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-name">🅰️ Angular</div>
+                <div class="tech-ver">v22 + Standalone</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-name">⚡ Vite</div>
+                <div class="tech-ver">Build tool frontend</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-name">🗄️ Oracle</div>
+                <div class="tech-ver">23c (Base de datos)</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-name">🐳 Docker</div>
+                <div class="tech-ver">Keycloak container</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-name">📖 Swagger</div>
+                <div class="tech-ver">OpenAPI 3 (docs)</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-name">🎨 Angular Material</div>
+                <div class="tech-ver">UI Components</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. Arquitectura -->
+    <section class="section" id="arquitectura">
+        <div class="section-header">
+            <span class="section-num">6</span>
+            <h2 class="section-title">Arquitectura del sistema</h2>
+        </div>
+
+        <div class="highlight-box">
+            <h3>🏛️ Arquitectura Hexagonal (Ports & Adapters)</h3>
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 16px;">
+                El backend de Viernes CRM utiliza <strong>Arquitectura Hexagonal</strong>, donde cada módulo 
+                se organiza en tres capas independientes que separan la lógica de negocio de la infraestructura.
+            </p>
+            <div class="card" style="background: #0c1222; font-family: var(--mono); font-size: 12.5px; line-height: 1.8; color: #cbd5e1;">
+<span style="color: #6ee7b7;">com.viernes.{modulo}/</span>
+├── <span style="color: #60a5fa;">adapters/</span>
+│   ├── <span style="color: #60a5fa;">in/web/</span>           → <span style="color: #94a3b8;">Controllers REST (@RestController)</span>
+│   └── <span style="color: #60a5fa;">out/persistence/</span>  → <span style="color: #94a3b8;">Entities JPA, Repositories, Adapters</span>
+├── <span style="color: #c084fc;">application/</span>
+│   ├── <span style="color: #c084fc;">dto/</span>              → <span style="color: #94a3b8;">Request/Response DTOs</span>
+│   ├── <span style="color: #c084fc;">port/in/</span>          → <span style="color: #94a3b8;">Use Case interfaces (puertos de entrada)</span>
+│   ├── <span style="color: #c084fc;">port/out/</span>         → <span style="color: #94a3b8;">Persistence Port interfaces (puertos de salida)</span>
+│   └── <span style="color: #c084fc;">service/</span>          → <span style="color: #94a3b8;">Implementación de los Use Cases</span>
+└── <span style="color: #fde68a;">domain/</span>               → <span style="color: #94a3b8;">Entidades de dominio, enums, value objects</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <h4>🔄 Flujo de una petición HTTP</h4>
+            <p>
+                <strong>1.</strong> El usuario hace una acción en el frontend Angular →
+                <strong>2.</strong> Angular envía una petición HTTP con token JWT →
+                <strong>3.</strong> Spring Security valida el token con Keycloak →
+                <strong>4.</strong> El Controller recibe la petición y llama al Use Case →
+                <strong>5.</strong> El Service ejecuta la lógica de negocio →
+                <strong>6.</strong> El Adapter de persistencia guarda/lee datos en Oracle →
+                <strong>7.</strong> La respuesta DTO regresa al frontend.
+            </p>
+        </div>
+    </section>
+
+    <!-- 7. Ciclo de ventas -->
+    <section class="section" id="ciclo-ventas">
+        <div class="section-header">
+            <span class="section-num">7</span>
+            <h2 class="section-title">Ciclo de ventas en el CRM</h2>
+        </div>
+
+        <div class="highlight-box">
+            <h3>🔄 Pipeline de ventas completo</h3>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 0; flex-wrap: wrap; margin: 20px 0; font-size: 13px;">
+                <div style="background: var(--accent-soft); border: 1px solid rgba(59,130,246,0.3); border-radius: 10px; padding: 10px 16px; text-align: center;">
+                    <div style="font-weight: 700; color: #60a5fa;">📣 Captación</div>
+                    <div style="color: var(--text-muted); font-size: 11px;">Campañas → Leads</div>
+                </div>
+                <div style="padding: 0 6px; color: var(--text-subtle);">→</div>
+                <div style="background: var(--green-soft); border: 1px solid rgba(16,185,129,0.3); border-radius: 10px; padding: 10px 16px; text-align: center;">
+                    <div style="font-weight: 700; color: #6ee7b7;">🎯 Calificación</div>
+                    <div style="color: var(--text-muted); font-size: 11px;">Lead → Cliente</div>
+                </div>
+                <div style="padding: 0 6px; color: var(--text-subtle);">→</div>
+                <div style="background: var(--purple-soft); border: 1px solid rgba(168,85,247,0.3); border-radius: 10px; padding: 10px 16px; text-align: center;">
+                    <div style="font-weight: 700; color: #c084fc;">💰 Oportunidad</div>
+                    <div style="color: var(--text-muted); font-size: 11px;">Pipeline de ventas</div>
+                </div>
+                <div style="padding: 0 6px; color: var(--text-subtle);">→</div>
+                <div style="background: var(--amber-soft); border: 1px solid rgba(245,158,11,0.3); border-radius: 10px; padding: 10px 16px; text-align: center;">
+                    <div style="font-weight: 700; color: #fde68a;">📋 Propuesta</div>
+                    <div style="color: var(--text-muted); font-size: 11px;">Cotización formal</div>
+                </div>
+                <div style="padding: 0 6px; color: var(--text-subtle);">→</div>
+                <div style="background: var(--rose-soft); border: 1px solid rgba(244,63,94,0.3); border-radius: 10px; padding: 10px 16px; text-align: center;">
+                    <div style="font-weight: 700; color: #fda4af;">🤝 Cierre</div>
+                    <div style="color: var(--text-muted); font-size: 11px;">Ganada / Perdida</div>
+                </div>
+            </div>
+            <p style="font-size: 13px; color: var(--text-muted); text-align: center;">
+                Las <strong>Actividades</strong> (llamadas, reuniones, tareas) acompañan todo el proceso como seguimiento continuo.
+            </p>
+        </div>
+    </section>
+
+    <!-- 8. Modelo de datos -->
+    <section class="section" id="datos">
+        <div class="section-header">
+            <span class="section-num">8</span>
+            <h2 class="section-title">Modelo de datos (tablas Oracle)</h2>
+        </div>
+
+        <div class="card" style="overflow-x: auto;">
+            <h4>🗄️ 21 tablas en Oracle 23c</h4>
+            <table class="data-table">
+                <thead>
+                    <tr><th>#</th><th>Tabla</th><th>Módulo</th><th>Tipo</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>1</td><td><code>CRM_CLIENTES</code></td><td>clientes</td><td><span class="chip chip-blue">Maestra</span></td></tr>
+                    <tr><td>2</td><td><code>CRM_CONTACTOS</code></td><td>clientes</td><td><span class="chip chip-blue">Maestra</span></td></tr>
+                    <tr><td>3</td><td><code>CRM_LEADS</code></td><td>leads</td><td><span class="chip chip-blue">Maestra</span></td></tr>
+                    <tr><td>4</td><td><code>CRM_FUENTES</code></td><td>leads</td><td><span class="chip chip-blue">Catálogo</span></td></tr>
+                    <tr><td>5</td><td><code>CRM_OPORTUNIDADES</code></td><td>oportunidades</td><td><span class="chip chip-blue">Maestra</span></td></tr>
+                    <tr><td>6</td><td><code>CRM_OPORTUNIDAD_CONTACTOS</code></td><td>oportunidades</td><td><span class="chip chip-green">N:M</span></td></tr>
+                    <tr><td>7</td><td><code>CRM_OPORTUNIDAD_PRODUCTOS</code></td><td>oportunidades</td><td><span class="chip chip-green">N:M</span></td></tr>
+                    <tr><td>8</td><td><code>CRM_OPORTUNIDAD_COLABORADORES</code></td><td>oportunidades</td><td><span class="chip chip-green">N:M</span></td></tr>
+                    <tr><td>9</td><td><code>CRM_PROPUESTAS</code></td><td>propuestas</td><td><span class="chip chip-blue">Maestra</span></td></tr>
+                    <tr><td>10</td><td><code>CRM_PROPUESTA_DETALLES</code></td><td>propuestas</td><td><span class="chip chip-amber">1:N</span></td></tr>
+                    <tr><td>11</td><td><code>CRM_ACTIVIDADES</code></td><td>actividades</td><td><span class="chip chip-blue">Maestra</span></td></tr>
+                    <tr><td>12</td><td><code>CRM_ACTIVIDAD_PARTICIPANTES</code></td><td>actividades</td><td><span class="chip chip-green">N:M</span></td></tr>
+                    <tr><td>13</td><td><code>CRM_ACTIVIDAD_ETIQUETAS</code></td><td>actividades</td><td><span class="chip chip-green">N:M</span></td></tr>
+                    <tr><td>14</td><td><code>CRM_PRODUCTOS</code></td><td>productos</td><td><span class="chip chip-blue">Catálogo</span></td></tr>
+                    <tr><td>15</td><td><code>CRM_EQUIPOS</code></td><td>equipos</td><td><span class="chip chip-blue">Maestra</span></td></tr>
+                    <tr><td>16</td><td><code>CRM_EQUIPO_MIEMBROS</code></td><td>equipos</td><td><span class="chip chip-green">N:M</span></td></tr>
+                    <tr><td>17</td><td><code>CRM_CAMPANIAS</code></td><td>marketing</td><td><span class="chip chip-blue">Maestra</span></td></tr>
+                    <tr><td>18</td><td><code>CRM_CAMPANIA_LEADS</code></td><td>marketing</td><td><span class="chip chip-green">N:M</span></td></tr>
+                    <tr><td>19</td><td><code>CRM_ETIQUETAS</code></td><td>etiquetas</td><td><span class="chip chip-blue">Catálogo</span></td></tr>
+                    <tr><td>20</td><td><code>CRM_MENSAJES</code></td><td>mensajería</td><td><span class="chip chip-blue">Maestra</span></td></tr>
+                    <tr><td>21</td><td><code>CRM_USUARIOS</code></td><td>usuarios</td><td><span class="chip chip-blue">Maestra</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- 9. Contexto académico -->
+    <section class="section" id="contexto">
+        <div class="section-header">
+            <span class="section-num">9</span>
+            <h2 class="section-title">Contexto académico</h2>
+        </div>
+
+        <div class="card">
+            <h4>🎓 Datos del proyecto</h4>
+            <table class="data-table">
+                <thead><tr><th>Campo</th><th>Valor</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Asignatura</strong></td><td>Lenguaje de Programación II (LP2)</td></tr>
+                    <tr><td><strong>Marco del proyecto</strong></td><td>BomERP — Sistema ERP modular</td></tr>
+                    <tr><td><strong>Módulo asignado</strong></td><td>CRM (Customer Relationship Management)</td></tr>
+                    <tr><td><strong>Nombre del sistema</strong></td><td>Viernes CRM V1</td></tr>
+                    <tr><td><strong>Versión</strong></td><td>1.0</td></tr>
+                    <tr><td><strong>Backend</strong></td><td>Java 21 + Spring Boot 4.0.7 + Oracle 23c</td></tr>
+                    <tr><td><strong>Frontend</strong></td><td>Angular 22 + Vite + Angular Material</td></tr>
+                    <tr><td><strong>Seguridad</strong></td><td>Keycloak 25.0.6 (OAuth2 OIDC + PKCE)</td></tr>
+                    <tr><td><strong>Arquitectura</strong></td><td>Hexagonal (Ports & Adapters) + Spring Modulith</td></tr>
+                    <tr><td><strong>Pruebas</strong></td><td>260/260 tests OK (JUnit + SpringBootTest + Modulith)</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="alert alert-success">
+            <span class="alert-icon">🏆</span>
+            <div>
+                <strong>Diferenciador del proyecto:</strong> A diferencia de un CRUD básico, Viernes CRM implementa 
+                7 relaciones N:M con tablas intermedias, arquitectura hexagonal real, seguridad OIDC con Keycloak, 
+                matriz de roles con 403 Forbidden verificables, y 260 pruebas automatizadas — demostrando dominio 
+                de patrones empresariales reales.
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>VIERNES CRM V1.0 • ¿Qué es Viernes CRM?</p>
+        <p style="margin-top: 4px; font-size: 12px; color: #475569;">
+            Lenguaje de Programación II (LP2) • BomERP – Viernes CRM V1
+        </p>
+    </footer>
+
+</div>
+
+</body>
+</html>

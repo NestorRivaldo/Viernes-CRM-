@@ -1,67 +1,243 @@
-<div class="form-container">
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>{{ isEdit ? 'Editar Lead' : 'Nuevo Lead' }}</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <form [formGroup]="form" (ngSubmit)="guardar()">
-        
-        <div class="form-row">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Nombre</mat-label>
-            <input matInput formControlName="nombre" required>
-          </mat-form-field>
-  
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Empresa</mat-label>
-            <input matInput formControlName="empresa">
-          </mat-form-field>
-        </div>
+<div class="entity-page" [class.is-dialog]="esDialogo">
+  <div class="entity-dialog lead-dialog">
+    <header class="entity-header">
+      <div class="entity-icon">
+        <mat-icon>{{ isEdit ? 'person_search' : 'person_add' }}</mat-icon>
+      </div>
+      <div class="entity-heading">
+        <span class="entity-eyebrow">Ventas · Leads</span>
+        <h2>{{ isEdit ? 'Editar lead' : 'Nuevo lead' }}</h2>
+        <p>
+          {{ isEdit
+            ? 'Actualiza la información y el seguimiento del prospecto.'
+            : 'Registra un nuevo prospecto para tu embudo comercial.' }}
+        </p>
+      </div>
+      <button type="button" class="entity-close" (click)="cerrar()" [disabled]="loading" title="Cerrar">
+        <mat-icon>close</mat-icon>
+      </button>
+    </header>
 
-        <div class="form-row">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Correo</mat-label>
-            <input matInput formControlName="correo" type="email" required>
-          </mat-form-field>
-  
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Teléfono</mat-label>
-            <input matInput formControlName="telefono">
-          </mat-form-field>
+    <form id="leadForm" [formGroup]="form" (ngSubmit)="guardar()" class="entity-body">
+      @if (cargandoLead) {
+        <div class="entity-loading">
+          <mat-spinner diameter="34"></mat-spinner>
+          <span>Cargando lead...</span>
         </div>
+      } @else {
+        @if (serverError) {
+          <div class="entity-alert error">
+            <mat-icon>error_outline</mat-icon>
+            <span>{{ serverError }}</span>
+          </div>
+        }
 
-        <div class="form-row">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Fuente</mat-label>
-            <input matInput formControlName="fuente">
-          </mat-form-field>
+        <section class="entity-section">
+          <div class="entity-section-heading">
+            <span class="entity-index">01</span>
+            <div class="entity-section-copy">
+              <h3>Datos del prospecto</h3>
+              <p>Información de contacto y empresa del lead.</p>
+            </div>
+          </div>
 
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Estado</mat-label>
-            <mat-select formControlName="estado" required>
-              <mat-option *ngFor="let est of estados" [value]="est">{{ est }}</mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div>
+          <div class="entity-grid two">
+            <div class="entity-field">
+              <label class="entity-label" for="leadNombre">
+                Nombre <span class="entity-req">*</span>
+              </label>
+              <div class="entity-input-wrap">
+                <mat-icon class="entity-input-icon">person</mat-icon>
+                <input
+                  id="leadNombre"
+                  class="entity-input"
+                  [class.invalid]="mostrarError('nombre')"
+                  formControlName="nombre"
+                  maxlength="150"
+                  autocomplete="name"
+                  placeholder="Ej. Ana Torres"
+                />
+              </div>
+              @if (mostrarError('nombre')) {
+                <span class="entity-error">{{ mensajeError('nombre') }}</span>
+              }
+            </div>
 
-        <div class="form-row">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Responsable</mat-label>
-            <input matInput formControlName="responsable">
-          </mat-form-field>
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Fecha</mat-label>
-            <input matInput formControlName="fecha" type="date">
-          </mat-form-field>
-        </div>
+            <div class="entity-field">
+              <label class="entity-label" for="leadEmpresa">Empresa</label>
+              <div class="entity-input-wrap">
+                <mat-icon class="entity-input-icon">business</mat-icon>
+                <input
+                  id="leadEmpresa"
+                  class="entity-input"
+                  [class.invalid]="mostrarError('empresa')"
+                  formControlName="empresa"
+                  maxlength="150"
+                  autocomplete="organization"
+                  placeholder="Ej. Acme Corp"
+                />
+              </div>
+              @if (mostrarError('empresa')) {
+                <span class="entity-error">{{ mensajeError('empresa') }}</span>
+              }
+            </div>
 
-        <div class="form-actions">
-          <button mat-button type="button" routerLink="/leads">Cancelar</button>
-          <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || loading">
-            {{ loading ? 'Guardando...' : 'Guardar' }}
-          </button>
-        </div>
-      </form>
-    </mat-card-content>
-  </mat-card>
+            <div class="entity-field">
+              <label class="entity-label" for="leadCorreo">
+                Correo <span class="entity-req">*</span>
+              </label>
+              <div class="entity-input-wrap">
+                <mat-icon class="entity-input-icon">mail</mat-icon>
+                <input
+                  id="leadCorreo"
+                  type="email"
+                  class="entity-input"
+                  [class.invalid]="mostrarError('correo')"
+                  formControlName="correo"
+                  maxlength="150"
+                  autocomplete="email"
+                  placeholder="nombre@empresa.com"
+                />
+              </div>
+              @if (mostrarError('correo')) {
+                <span class="entity-error">{{ mensajeError('correo') }}</span>
+              }
+            </div>
+
+            <div class="entity-field">
+              <label class="entity-label" for="leadTelefono">Teléfono</label>
+              <div class="entity-input-wrap">
+                <mat-icon class="entity-input-icon">call</mat-icon>
+                <input
+                  id="leadTelefono"
+                  type="tel"
+                  class="entity-input"
+                  [class.invalid]="mostrarError('telefono')"
+                  formControlName="telefono"
+                  maxlength="30"
+                  autocomplete="tel"
+                  placeholder="Ej. +51 999 888 777"
+                />
+              </div>
+              @if (mostrarError('telefono')) {
+                <span class="entity-error">{{ mensajeError('telefono') }}</span>
+              }
+            </div>
+          </div>
+        </section>
+
+        <section class="entity-section">
+          <div class="entity-section-heading">
+            <span class="entity-index">02</span>
+            <div class="entity-section-copy">
+              <h3>Seguimiento comercial</h3>
+              <p>Origen, estado y responsable del prospecto.</p>
+            </div>
+          </div>
+
+          <div class="entity-grid two">
+            <div class="entity-field">
+              <label class="entity-label" for="leadFuente">Fuente</label>
+              <div class="entity-input-wrap">
+                <mat-icon class="entity-input-icon">campaign</mat-icon>
+                <input
+                  id="leadFuente"
+                  class="entity-input"
+                  [class.invalid]="mostrarError('fuente')"
+                  formControlName="fuente"
+                  maxlength="80"
+                  placeholder="Ej. Web, referido, feria"
+                />
+              </div>
+              @if (mostrarError('fuente')) {
+                <span class="entity-error">{{ mensajeError('fuente') }}</span>
+              }
+            </div>
+
+            <div class="entity-field">
+              <label class="entity-label" for="leadEstado">
+                Estado <span class="entity-req">*</span>
+              </label>
+              <div class="entity-select-wrap">
+                <select
+                  id="leadEstado"
+                  class="entity-select"
+                  [class.invalid]="mostrarError('estado')"
+                  formControlName="estado"
+                >
+                  @for (estado of estados; track estado) {
+                    <option [value]="estado">{{ estado }}</option>
+                  }
+                </select>
+                <mat-icon class="entity-select-chevron">expand_more</mat-icon>
+              </div>
+              @if (mostrarError('estado')) {
+                <span class="entity-error">{{ mensajeError('estado') }}</span>
+              } @else {
+                <span class="entity-hint">Estado actual dentro del embudo.</span>
+              }
+            </div>
+
+            <div class="entity-field">
+              <label class="entity-label" for="leadResponsable">Responsable</label>
+              <div class="entity-input-wrap">
+                <mat-icon class="entity-input-icon">assignment_ind</mat-icon>
+                <input
+                  id="leadResponsable"
+                  class="entity-input"
+                  [class.invalid]="mostrarError('responsable')"
+                  formControlName="responsable"
+                  maxlength="100"
+                  placeholder="Ej. Vendedor asignado"
+                />
+              </div>
+              @if (mostrarError('responsable')) {
+                <span class="entity-error">{{ mensajeError('responsable') }}</span>
+              }
+            </div>
+
+            <div class="entity-field">
+              <label class="entity-label" for="leadFecha">Fecha</label>
+              <div class="entity-input-wrap">
+                <mat-icon class="entity-input-icon">event</mat-icon>
+                <input
+                  id="leadFecha"
+                  type="date"
+                  class="entity-input"
+                  formControlName="fecha"
+                />
+              </div>
+              <span class="entity-hint">Fecha de contacto o próximo seguimiento.</span>
+            </div>
+          </div>
+        </section>
+      }
+    </form>
+
+    <footer class="entity-footer">
+      <span class="entity-footer-hint">
+        <mat-icon>info</mat-icon>
+        Los campos con <strong>*</strong> son obligatorios
+      </span>
+      <div class="entity-actions">
+        <button type="button" class="entity-btn-ghost" (click)="cerrar()" [disabled]="loading">
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          form="leadForm"
+          class="entity-btn-primary"
+          [disabled]="loading || cargandoLead"
+        >
+          @if (loading) {
+            <span class="entity-spinner"></span>
+            Guardando...
+          } @else {
+            <mat-icon>save</mat-icon>
+            {{ isEdit ? 'Guardar cambios' : 'Crear lead' }}
+          }
+        </button>
+      </div>
+    </footer>
+  </div>
 </div>

@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class DetallePropuesta {
     private Long id;
+    private Long idProducto;
     private String descripcion;
     private Integer cantidad;
     private BigDecimal precioUnitario;

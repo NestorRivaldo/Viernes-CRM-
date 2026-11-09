@@ -1,13 +1,17 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
+import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { UsuariosService } from '../usuarios.service';
 import { UsuarioResponse, EstadoUsuario, RolUsuario } from '../usuarios.model';
+import { UsuarioDialogResult, UsuarioForm } from '../usuario-form/usuario-form';
+import { sortRows } from '../../../shared/table-sort';
 
 @Component({
   selector: 'app-usuario-list',
@@ -16,16 +20,19 @@ import { UsuarioResponse, EstadoUsuario, RolUsuario } from '../usuarios.model';
     CommonModule,
     FormsModule,
     MatTableModule,
+    MatSortModule,
     MatButtonModule,
     MatIconModule,
-    RouterLink,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatDialogModule
   ],
   templateUrl: './usuario-list.html',
   styleUrl: './usuario-list.css'
 })
 export class UsuarioList implements OnInit {
   private usuariosService = inject(UsuariosService);
+  private dialog = inject(MatDialog);
+  private route = inject(ActivatedRoute);
   private router = inject(Router);
 
   usuarios = signal<UsuarioResponse[]>([]);
@@ -34,6 +41,8 @@ export class UsuarioList implements OnInit {
   error = signal('');
 
   displayedColumns: string[] = ['id', 'nombre', 'correo', 'rol', 'estado', 'acciones'];
+
+  sortState = signal<Sort>({ active: 'id', direction: 'asc' });
 
   usuariosFiltrados = computed(() => {
     const q = this.filtroTexto().toLowerCase().trim();
@@ -46,11 +55,34 @@ export class UsuarioList implements OnInit {
     });
   });
 
+  usuariosOrdenados = computed(() => sortRows(this.usuariosFiltrados(), this.sortState()));
+
+
+  onSortChange(sort: Sort) {
+
+    this.sortState.set(sort);
+
+  }
+
+
   hasUsuarios = computed(() => this.usuariosFiltrados().length > 0 && !this.loading());
   isEmpty = computed(() => !this.loading() && this.usuariosFiltrados().length === 0 && !this.error());
 
   ngOnInit() {
     this.cargarUsuarios();
+
+    if (this.route.snapshot.data['abrirNuevoUsuario']) {
+      this.abrirDialogo();
+      return;
+    }
+
+    const idParam = this.route.snapshot.paramMap.get('id');
+    if (this.route.snapshot.data['abrirEdicionUsuario'] && idParam) {
+      const id = Number(idParam);
+      if (Number.isFinite(id) && id > 0) {
+        this.abrirDialogo(id);
+      }
+    }
   }
 
   cargarUsuarios() {
@@ -93,7 +125,37 @@ export class UsuarioList implements OnInit {
     }
   }
 
+  nuevoUsuario() {
+    this.abrirDialogo();
+  }
+
   editar(id: number) {
-    this.router.navigate(['/usuarios', id, 'editar']);
+    this.abrirDialogo(id);
+  }
+
+  private abrirDialogo(id?: number) {
+    const enRutaDirecta = !!(
+      this.route.snapshot.data['abrirNuevoUsuario'] || this.route.snapshot.data['abrirEdicionUsuario']
+    );
+
+    this.dialog
+      .open(UsuarioForm, {
+        data: { id: id ?? null },
+        panelClass: 'entity-dialog-panel',
+        backdropClass: 'entity-dialog-backdrop',
+        width: '840px',
+        maxWidth: '95vw',
+        disableClose: false,
+        autoFocus: false,
+      })
+      .afterClosed()
+      .subscribe((result: UsuarioDialogResult | undefined) => {
+        if (result?.saved) {
+          this.cargarUsuarios();
+        }
+        if (enRutaDirecta) {
+          this.router.navigate(['/usuarios'], { replaceUrl: true });
+        }
+      });
   }
 }

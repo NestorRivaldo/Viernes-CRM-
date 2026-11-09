@@ -6,6 +6,7 @@ import com.viernes.actividades.application.port.out.ActividadPersistencePort;
 import com.viernes.actividades.domain.Actividad;
 import com.viernes.actividades.domain.EstadoActividad;
 import com.viernes.actividades.domain.TipoActividad;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -35,7 +36,12 @@ public class ActividadPersistenceAdapter implements ActividadPersistencePort {
 
     @Override
     public List<Actividad> findAll() {
-        return repository.findAll().stream().map(this::toDomain).collect(Collectors.toList());
+        // Orden explícito: sin ORDER BY, Oracle devuelve las filas en orden de
+        // almacenamiento y cualquier UPDATE puede alterarlo. Se ordena por ID
+        // descendente (creación más reciente primero), de modo que una
+        // actividad recién creada aparezca en la primera fila.
+        Sort orden = Sort.by(Sort.Direction.DESC, "id");
+        return repository.findAll(orden).stream().map(this::toDomain).collect(Collectors.toList());
     }
 
     @Override
@@ -56,6 +62,11 @@ public class ActividadPersistenceAdapter implements ActividadPersistencePort {
     @Override
     public List<Actividad> findByIdOportunidad(Long idOportunidad) {
         return repository.findByIdOportunidad(idOportunidad).stream().map(this::toDomain).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Actividad> findByEtiquetaId(Long idEtiqueta) {
+        return repository.findByEtiquetaId(idEtiqueta).stream().map(this::toDomain).collect(Collectors.toList());
     }
 
     @Override

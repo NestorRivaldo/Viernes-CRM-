@@ -6,6 +6,7 @@ import com.viernes.oportunidades.application.port.out.OportunidadPersistencePort
 import com.viernes.oportunidades.domain.EtapaOportunidad;
 import com.viernes.oportunidades.domain.Oportunidad;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -21,7 +22,7 @@ public class OportunidadPersistenceAdapter implements OportunidadPersistencePort
 
     @Override
     public List<Oportunidad> findAll() {
-        return repository.findAll().stream().map(this::toDomain).toList();
+        return repository.findAll(Sort.by(Sort.Direction.ASC, "id")).stream().map(this::toDomain).toList();
     }
 
     @Override
@@ -82,6 +83,7 @@ public class OportunidadPersistenceAdapter implements OportunidadPersistencePort
                 .etapa(entity.getEtapa())
                 .responsable(entity.getResponsable())
                 .fechaCierre(entity.getFechaCierre())
+                .descripcion(entity.getDescripcion())
                 .creadoEn(entity.getCreadoEn())
                 .build();
     }
@@ -96,6 +98,7 @@ public class OportunidadPersistenceAdapter implements OportunidadPersistencePort
                 .etapa(domain.getEtapa())
                 .responsable(domain.getResponsable())
                 .fechaCierre(domain.getFechaCierre())
+                .descripcion(domain.getDescripcion())
                 .creadoEn(domain.getCreadoEn())
                 .build();
     }

@@ -15,6 +15,7 @@ public interface ActividadPersistencePort {
     List<Actividad> findByIdCliente(Long idCliente);
     List<Actividad> findByIdLead(Long idLead);
     List<Actividad> findByIdOportunidad(Long idOportunidad);
+    List<Actividad> findByEtiquetaId(Long idEtiqueta);
     List<Actividad> findByIdUsuario(String idUsuario);
     List<Actividad> findByTipo(TipoActividad tipo);
     List<Actividad> findVencidas(EstadoActividad estado, LocalDateTime ahora);

@@ -1,13 +1,17 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { MatTableModule } from '@angular/material/table';
+import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ClientesService } from '../clientes.service';
 import { ClienteResponse } from '../clientes.model';
+import { ClienteDialog, ClienteDialogResult } from '../cliente-dialog/cliente-dialog';
+import { sortRows } from '../../../shared/table-sort';
 
 @Component({
   selector: 'app-cliente-list',
@@ -16,18 +20,19 @@ import { ClienteResponse } from '../clientes.model';
     CommonModule,
     FormsModule,
     MatTableModule,
+    MatSortModule,
     MatButtonModule,
     MatIconModule,
-    RouterLink,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatDialogModule
   ],
   templateUrl: './cliente-list.html',
   styleUrl: './cliente-list.css'
 })
 export class ClienteList implements OnInit {
   private clientesService = inject(ClientesService);
+  private dialog = inject(MatDialog);
   private router = inject(Router);
-  private route = inject(ActivatedRoute);
 
   clientes = signal<ClienteResponse[]>([]);
   filtroTexto = signal('');
@@ -35,7 +40,8 @@ export class ClienteList implements OnInit {
   loading = signal(false);
   error = signal('');
 
-  displayedColumns: string[] = ['id', 'nombre', 'empresa', 'correo', 'estado', 'acciones'];
+  displayedColumns: string[] = ['id', 'nombre', 'empresa', 'documento', 'correo', 'estado', 'acciones'];
+  sortState = signal<Sort>({ active: 'id', direction: 'asc' });
 
   clientesFiltrados = computed(() => {
     const q = this.filtroTexto().toLowerCase().trim();
@@ -44,11 +50,24 @@ export class ClienteList implements OnInit {
       const matchText = !q || 
         c.nombre?.toLowerCase().includes(q) || 
         c.empresa?.toLowerCase().includes(q) || 
-        c.correo?.toLowerCase().includes(q);
+        c.correo?.toLowerCase().includes(q) ||
+        c.numeroDocumento?.toLowerCase().includes(q) ||
+        c.tipoDocumento?.toLowerCase().includes(q);
       const matchEstado = est === 'TODOS' || c.estado === est;
       return matchText && matchEstado;
     });
   });
+
+  clientesOrdenados = computed(() => sortRows(this.clientesFiltrados(), this.sortState()));
+
+  onSortChange(sort: Sort) {
+    this.sortState.set(sort);
+  }
+
+  documentoCliente(cliente: ClienteResponse): string {
+    if (!cliente.numeroDocumento) return '-';
+    return `${cliente.tipoDocumento || 'DOC'} ${cliente.numeroDocumento}`;
+  }
 
   hasClientes = computed(() => this.clientesFiltrados().length > 0 && !this.loading());
   isEmpty = computed(() => !this.loading() && this.clientesFiltrados().length === 0 && !this.error());
@@ -91,6 +110,33 @@ export class ClienteList implements OnInit {
   }
 
   editar(id: number) {
-    this.router.navigate(['/clientes', id, 'editar']);
+    this.abrirDialogo(id);
+  }
+
+  verMapa(id: number) {
+    this.router.navigate(['/relaciones/clientes', id]);
+  }
+
+  nuevoCliente() {
+    this.abrirDialogo();
+  }
+
+  private abrirDialogo(id?: number) {
+    this.dialog
+      .open(ClienteDialog, {
+        data: { id: id ?? null },
+        panelClass: 'opp-dialog-panel',
+        backdropClass: 'opp-dialog-backdrop',
+        width: '720px',
+        maxWidth: '95vw',
+        disableClose: false,
+        autoFocus: false,
+      })
+      .afterClosed()
+      .subscribe((result: ClienteDialogResult | undefined) => {
+        if (result?.saved) {
+          this.cargarClientes();
+        }
+      });
   }
 }

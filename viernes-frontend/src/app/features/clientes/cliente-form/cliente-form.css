@@ -44,3 +44,29 @@
   color: #b00020;
   padding: 10px 0;
 }
+
+.documento-feedback {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: -12px;
+  margin-bottom: 12px;
+  font-size: 12px;
+}
+
+.documento-error {
+  color: #b00020;
+}
+
+.documento-ok {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #15803d;
+}
+
+.documento-ok mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}

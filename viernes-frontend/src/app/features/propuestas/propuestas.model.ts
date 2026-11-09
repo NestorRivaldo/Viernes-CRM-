@@ -8,6 +8,7 @@ export enum EstadoPropuesta {
 
 export interface DetallePropuestaResponse {
   id: number;
+  productoId?: number | null;
   descripcion: string;
   cantidad: number;
   precioUnitario: number;
@@ -18,6 +19,7 @@ export interface DetallePropuestaRequest {
   descripcion: string;
   cantidad: number;
   precioUnitario: number;
+  productoId?: number | null;
 }
 
 export interface PropuestaResponse {

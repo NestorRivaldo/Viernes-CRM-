@@ -4,11 +4,15 @@ import com.viernes.clientes.application.dto.ClienteRequest;
 import com.viernes.clientes.application.dto.ClienteResponse;
 import com.viernes.clientes.application.dto.ContactoRequest;
 import com.viernes.clientes.application.dto.ContactoResponse;
+import com.viernes.clientes.application.dto.DocumentoConsultaResponse;
 import com.viernes.clientes.application.port.in.ManageClienteUseCase;
 import com.viernes.clientes.application.port.out.ClientePersistencePort;
+import com.viernes.clientes.application.port.out.DocumentoLookupPort;
 import com.viernes.clientes.domain.Cliente;
 import com.viernes.clientes.domain.Contacto;
+import com.viernes.clientes.domain.DocumentoConsultado;
 import com.viernes.clientes.domain.EstadoCliente;
+import com.viernes.clientes.domain.TipoDocumento;
 import com.viernes.shared.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,6 +25,7 @@ import java.util.List;
 public class ClienteService implements ManageClienteUseCase {
 
     private final ClientePersistencePort persistencePort;
+    private final DocumentoLookupPort documentoLookupPort;
 
     @Override
     @Transactional(readOnly = true)
@@ -36,6 +41,17 @@ public class ClienteService implements ManageClienteUseCase {
 
     @Override
     @Transactional(readOnly = true)
+    public List<ClienteResponse> buscarPorDocumento(String numeroDocumento) {
+        if (numeroDocumento == null || numeroDocumento.isBlank()) {
+            return List.of();
+        }
+        return persistencePort.findByNumeroDocumento(numeroDocumento.trim()).stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<ClienteResponse> filtrarPorEstado(EstadoCliente estado) {
         return persistencePort.findByEstado(estado).stream().map(this::toResponse).toList();
     }
@@ -47,8 +63,23 @@ public class ClienteService implements ManageClienteUseCase {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public DocumentoConsultaResponse consultarDocumento(TipoDocumento tipoDocumento, String numeroDocumento) {
+        String numeroLimpio = validarDocumento(tipoDocumento, numeroDocumento);
+        if (numeroLimpio == null) {
+            throw new IllegalArgumentException("Debe ingresar el número de documento");
+        }
+
+        DocumentoConsultado documento = documentoLookupPort.consultar(tipoDocumento, numeroLimpio);
+        return toDocumentoResponse(documento);
+    }
+
+    @Override
     @Transactional
     public ClienteResponse crear(ClienteRequest request) {
+        String numeroDocumento = validarDocumento(request.tipoDocumento(), request.numeroDocumento());
+        validarDocumentoUnico(numeroDocumento, null);
+
         Cliente c = Cliente.builder()
             .creadoEn(LocalDateTime.now())
             .estado(request.estado() != null ? request.estado() : EstadoCliente.ACTIVO)
@@ -61,6 +92,9 @@ public class ClienteService implements ManageClienteUseCase {
     @Transactional
     public ClienteResponse actualizar(Long id, ClienteRequest request) {
         Cliente c = findOrThrow(id);
+        String numeroDocumento = validarDocumento(request.tipoDocumento(), request.numeroDocumento());
+        validarDocumentoUnico(numeroDocumento, id);
+
         apply(c, request);
         return toResponse(persistencePort.save(c));
     }
@@ -156,10 +190,62 @@ public class ClienteService implements ManageClienteUseCase {
     private void apply(Cliente c, ClienteRequest r) {
         c.setNombre(r.nombre());
         c.setEmpresa(r.empresa());
+        c.setTipoDocumento(r.tipoDocumento());
+        c.setNumeroDocumento(validarDocumento(r.tipoDocumento(), r.numeroDocumento()));
         c.setCorreo(r.correo());
         c.setTelefono(r.telefono());
         c.setResponsable(r.responsable());
         if (r.estado() != null) c.setEstado(r.estado());
+    }
+
+    private String validarDocumento(TipoDocumento tipoDocumento, String numeroDocumento) {
+        boolean tieneTipo = tipoDocumento != null;
+        boolean tieneNumero = numeroDocumento != null && !numeroDocumento.isBlank();
+
+        if (!tieneTipo && !tieneNumero) {
+            return null;
+        }
+        if (!tieneTipo) {
+            throw new IllegalArgumentException("Debe seleccionar el tipo de documento");
+        }
+        if (!tieneNumero) {
+            throw new IllegalArgumentException("Debe ingresar el número de documento");
+        }
+
+        String numeroLimpio = numeroDocumento.trim();
+        if (tipoDocumento == TipoDocumento.DNI && !numeroLimpio.matches("\\d{8}")) {
+            throw new IllegalArgumentException("El DNI debe tener exactamente 8 dígitos");
+        }
+        if (tipoDocumento == TipoDocumento.RUC && !numeroLimpio.matches("\\d{11}")) {
+            throw new IllegalArgumentException("El RUC debe tener exactamente 11 dígitos");
+        }
+        return numeroLimpio;
+    }
+
+    private void validarDocumentoUnico(String numeroDocumento, Long id) {
+        if (numeroDocumento == null) {
+            return;
+        }
+        boolean existe = id == null
+                ? persistencePort.existsByNumeroDocumento(numeroDocumento)
+                : persistencePort.existsByNumeroDocumentoAndIdNot(numeroDocumento, id);
+        if (existe) {
+            throw new IllegalArgumentException("Ya existe un cliente con el documento: " + numeroDocumento);
+        }
+    }
+
+    private DocumentoConsultaResponse toDocumentoResponse(DocumentoConsultado documento) {
+        return new DocumentoConsultaResponse(
+                documento.tipoDocumento(),
+                documento.numeroDocumento(),
+                documento.nombreCompleto(),
+                documento.razonSocial(),
+                documento.nombreComercial(),
+                documento.estado(),
+                documento.condicion(),
+                documento.direccion(),
+                documento.telefonos()
+        );
     }
 
     private ClienteResponse toResponse(Cliente c) {
@@ -167,6 +253,7 @@ public class ClienteService implements ManageClienteUseCase {
                 c.getContactos().stream().map(this::toContactoResponse).toList() : List.of();
                 
         return new ClienteResponse(c.getId(), c.getNombre(), c.getEmpresa(),
+                c.getTipoDocumento(), c.getNumeroDocumento(),
                 c.getCorreo(), c.getTelefono(), c.getEstado(), c.getResponsable(), c.getCreadoEn(), contactosDto);
     }
 

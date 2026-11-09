@@ -1,3 +1,5 @@
+import { EtiquetaResponse } from '../etiquetas/etiquetas.model';
+
 export enum EstadoActividad {
   PENDIENTE = 'PENDIENTE',
   EN_PROCESO = 'EN_PROCESO',
@@ -25,6 +27,7 @@ export interface ActividadResponse {
   estado: EstadoActividad;
   creadoEn: string;
   vencida: boolean;
+  etiquetas: EtiquetaResponse[];
 }
 
 export interface ActividadRequest {
@@ -37,4 +40,5 @@ export interface ActividadRequest {
   descripcion?: string;
   fecha: string;
   estado?: EstadoActividad;
+  etiquetaIds?: number[];
 }

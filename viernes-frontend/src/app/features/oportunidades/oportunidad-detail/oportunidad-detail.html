@@ -1,0 +1,368 @@
+<div class="module-view-container">
+
+  @if (loading()) {
+    <div class="loading-state">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Cargando oportunidad...</p>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="error-message">{{ error() }}</div>
+  }
+
+  @if (oportunidad(); as op) {
+    <div class="view-toolbar">
+      <div class="view-title-group">
+        <div class="title-line">
+          <a class="back-link" routerLink="/oportunidades" title="Volver al pipeline">
+            <mat-icon>arrow_back</mat-icon>
+          </a>
+          <h2>{{ op.nombre }}</h2>
+          <span class="status-pill {{ getEtapaClass(op.etapa) }}">{{ op.etapa }}</span>
+        </div>
+        <p>
+          {{ op.clienteNombre || 'Sin cliente' }}
+          · Responsable: {{ op.responsable || 'Sin asignar' }}
+          · Cierre: {{ op.fechaCierre ? (op.fechaCierre | date:'mediumDate') : 'Sin fecha' }}
+        </p>
+        @if (op.descripcion) {
+          <p class="opp-descripcion">{{ op.descripcion }}</p>
+        }
+      </div>
+
+      <div class="toolbar-actions-group">
+        <button class="btn-secondary-mac" type="button" (click)="verPropuestas()">
+          <mat-icon>description</mat-icon> Ver propuestas
+        </button>
+        <button class="btn-primary-mac" type="button" (click)="editarOportunidad()">
+          <mat-icon>edit</mat-icon> Editar oportunidad
+        </button>
+      </div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <span>Valor de la oportunidad</span>
+        <strong>{{ formatearMoneda(op.valor) }}</strong>
+      </div>
+      <div class="kpi-card">
+        <span>Probabilidad</span>
+        <strong>{{ op.probabilidad || 0 }}%</strong>
+        <div class="prob-track">
+          <div class="prob-bar" [style.width.%]="op.probabilidad || 0"></div>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <span>Valor ponderado</span>
+        <strong>{{ formatearMoneda(op.valorPonderado) }}</strong>
+      </div>
+      <div class="kpi-card">
+        <span>Productos vinculados</span>
+        <strong>{{ formatearMoneda(totalProductos(), 2) }}</strong>
+        <small>{{ productos().length }} ítem(s) del catálogo</small>
+      </div>
+    </div>
+
+    @if (errorRelaciones()) {
+      <div class="error-message">{{ errorRelaciones() }}</div>
+    }
+
+    @if (loadingRelaciones()) {
+      <div class="loading-state">
+        <mat-spinner diameter="32"></mat-spinner>
+        <p>Cargando relaciones N:M...</p>
+      </div>
+    } @else {
+
+      <!-- ================= CONTACTOS PARTICIPANTES ================= -->
+      <section class="nm-section">
+        <header class="nm-header">
+          <div class="nm-title">
+            <span class="nm-icon blue"><mat-icon>groups</mat-icon></span>
+            <div>
+              <h3>Contactos participantes</h3>
+              <p>Decisores e influenciadores que intervienen en la negociación.</p>
+            </div>
+          </div>
+          <span class="nm-count">{{ contactos().length }}</span>
+        </header>
+
+        <form #contactoFormDir="ngForm" class="nm-add-form" [formGroup]="contactoForm" (ngSubmit)="agregarContacto(contactoFormDir)">
+          <mat-form-field appearance="outline">
+            <mat-label>Cliente</mat-label>
+            <mat-select formControlName="clienteId" (selectionChange)="onClienteChange()">
+              @for (cliente of clientes(); track cliente.id) {
+                <mat-option [value]="cliente.id">{{ cliente.nombre }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Contacto</mat-label>
+            <mat-select formControlName="contactoId">
+              @if (cargandoContactosCliente()) {
+                <mat-option disabled>Cargando contactos...</mat-option>
+              }
+              @for (contacto of contactosDisponibles(); track contacto.id) {
+                <mat-option [value]="contacto.id">
+                  {{ contacto.nombre }} {{ contacto.apellido }}
+                </mat-option>
+              }
+            </mat-select>
+            @if (contactoForm.value.clienteId && !cargandoContactosCliente() && contactosDisponibles().length === 0) {
+              <mat-hint>Este cliente no tiene contactos disponibles.</mat-hint>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Rol en la decisión</mat-label>
+            <input matInput formControlName="rol" placeholder="Económico, técnico...">
+          </mat-form-field>
+
+          <mat-checkbox formControlName="esDecisor" class="nm-check">Decisor</mat-checkbox>
+
+          <button class="btn-primary-mac" type="submit"
+                  [disabled]="guardandoContacto() || contactoForm.invalid">
+            <mat-icon>add_link</mat-icon>
+            {{ guardandoContacto() ? 'Vinculando...' : 'Vincular' }}
+          </button>
+        </form>
+
+        @if (contactos().length === 0) {
+          <div class="nm-empty">Aún no hay contactos vinculados a esta oportunidad.</div>
+        } @else {
+          <div class="mac-table-card">
+            <table mat-table [dataSource]="contactos()">
+              <ng-container matColumnDef="contacto">
+                <th mat-header-cell *matHeaderCellDef>Contacto</th>
+                <td mat-cell *matCellDef="let c">
+                  <div class="entity-cell">
+                    <span class="avatar">{{ iniciales(c.nombreContacto) }}</span>
+                    <div class="entity-text">
+                      <strong>{{ c.nombreContacto || 'Sin nombre' }}</strong>
+                      <small>{{ c.correoContacto || 'Sin correo' }}</small>
+                    </div>
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="rol">
+                <th mat-header-cell *matHeaderCellDef>Rol</th>
+                <td mat-cell *matCellDef="let c">
+                  @if (contactoEnEdicion() === c.id) {
+                    <input class="inline-input" [formControl]="contactoEditForm.controls.rol"
+                           placeholder="Rol en la decisión">
+                  } @else {
+                    <span class="muted">{{ c.rol || '—' }}</span>
+                  }
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="decisor">
+                <th mat-header-cell *matHeaderCellDef>Decisor</th>
+                <td mat-cell *matCellDef="let c">
+                  @if (contactoEnEdicion() === c.id) {
+                    <mat-checkbox [formControl]="contactoEditForm.controls.esDecisor"></mat-checkbox>
+                  } @else {
+                    <span class="status-pill" [class.success]="c.esDecisor" [class.neutral]="!c.esDecisor">
+                      {{ c.esDecisor ? 'Sí' : 'No' }}
+                    </span>
+                  }
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef class="actions-header">Acciones</th>
+                <td mat-cell *matCellDef="let c" class="actions-cell">
+                  @if (contactoEnEdicion() === c.id) {
+                    <button class="mac-action-btn save" title="Guardar" (click)="guardarEdicionContacto(c)">
+                      <mat-icon>check</mat-icon>
+                    </button>
+                    <button class="mac-action-btn" title="Cancelar" (click)="cancelarEdicionContacto()">
+                      <mat-icon>close</mat-icon>
+                    </button>
+                  } @else {
+                    <button class="mac-action-btn edit" title="Editar rol / decisor" (click)="editarContacto(c)">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button class="mac-action-btn delete" title="Quitar contacto" (click)="quitarContacto(c)">
+                      <mat-icon>link_off</mat-icon>
+                    </button>
+                  }
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedContactos"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedContactos;"></tr>
+            </table>
+          </div>
+        }
+      </section>
+
+      <!-- ================= PRODUCTOS ================= -->
+      <section class="nm-section">
+        <header class="nm-header">
+          <div class="nm-title">
+            <span class="nm-icon purple"><mat-icon>inventory_2</mat-icon></span>
+            <div>
+              <h3>Productos de la oportunidad</h3>
+              <p>Ítems del catálogo que se están cotizando en esta negociación.</p>
+            </div>
+          </div>
+          <span class="nm-count">{{ productos().length }}</span>
+        </header>
+
+        <form #productoFormDir="ngForm" class="nm-add-form compact" [formGroup]="productoForm" (ngSubmit)="agregarProducto(productoFormDir)">
+          <mat-form-field appearance="outline" class="grow">
+            <mat-label>Producto</mat-label>
+            <mat-select formControlName="productoId">
+              @for (producto of productosDisponibles(); track producto.id) {
+                <mat-option [value]="producto.id">
+                  {{ producto.codigo }} — {{ producto.nombre }}
+                </mat-option>
+              }
+            </mat-select>
+            @if (productosDisponibles().length === 0) {
+              <mat-hint>No hay productos disponibles en el catálogo.</mat-hint>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="qty">
+            <mat-label>Cantidad</mat-label>
+            <input matInput type="number" formControlName="cantidad" min="1">
+          </mat-form-field>
+
+          <button class="btn-primary-mac" type="submit"
+                  [disabled]="guardandoProducto() || productoForm.invalid">
+            <mat-icon>add_link</mat-icon>
+            {{ guardandoProducto() ? 'Vinculando...' : 'Vincular' }}
+          </button>
+        </form>
+
+        @if (productos().length === 0) {
+          <div class="nm-empty">Aún no hay productos vinculados a esta oportunidad.</div>
+        } @else {
+          <div class="mac-table-card">
+            <table mat-table [dataSource]="productos()">
+              <ng-container matColumnDef="producto">
+                <th mat-header-cell *matHeaderCellDef>Producto</th>
+                <td mat-cell *matCellDef="let p">
+                  <div class="entity-cell">
+                    <span class="avatar square"><mat-icon>inventory_2</mat-icon></span>
+                    <div class="entity-text">
+                      <strong>{{ p.nombreProducto || 'Sin nombre' }}</strong>
+                      <small>{{ p.codigo || 'Sin código' }}</small>
+                    </div>
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="precio">
+                <th mat-header-cell *matHeaderCellDef>Precio base</th>
+                <td mat-cell *matCellDef="let p">{{ formatearMoneda(p.precioBase, 2) }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="cantidad">
+                <th mat-header-cell *matHeaderCellDef>Cantidad</th>
+                <td mat-cell *matCellDef="let p"><strong>{{ p.cantidad }}</strong></td>
+              </ng-container>
+
+              <ng-container matColumnDef="subtotal">
+                <th mat-header-cell *matHeaderCellDef>Subtotal</th>
+                <td mat-cell *matCellDef="let p">
+                  <strong>{{ formatearMoneda(p.precioBase * p.cantidad, 2) }}</strong>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef class="actions-header">Acciones</th>
+                <td mat-cell *matCellDef="let p" class="actions-cell">
+                  <button class="mac-action-btn delete" title="Quitar producto" (click)="quitarProducto(p)">
+                    <mat-icon>link_off</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedProductos"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedProductos;"></tr>
+            </table>
+
+            <div class="table-total">
+              Total productos: <strong>{{ formatearMoneda(totalProductos(), 2) }}</strong>
+            </div>
+          </div>
+        }
+      </section>
+
+      <!-- ================= COLABORADORES ================= -->
+      <section class="nm-section">
+        <header class="nm-header">
+          <div class="nm-title">
+            <span class="nm-icon emerald"><mat-icon>support_agent</mat-icon></span>
+            <div>
+              <h3>Colaboradores</h3>
+              <p>Usuarios del equipo que apoyan la venta además del responsable.</p>
+            </div>
+          </div>
+          <span class="nm-count">{{ colaboradores().length }}</span>
+        </header>
+
+        <form #colaboradorFormDir="ngForm" class="nm-add-form compact" [formGroup]="colaboradorForm" (ngSubmit)="agregarColaborador(colaboradorFormDir)">
+          <mat-form-field appearance="outline" class="grow">
+            <mat-label>Usuario</mat-label>
+            <mat-select formControlName="usuarioId">
+              @for (usuario of usuariosDisponibles(); track usuario.id) {
+                <mat-option [value]="usuario.id">
+                  {{ usuario.nombre }} {{ usuario.apellido }} — {{ usuario.correo }}
+                </mat-option>
+              }
+            </mat-select>
+            @if (usuariosDisponibles().length === 0) {
+              <mat-hint>No hay usuarios disponibles para vincular.</mat-hint>
+            }
+          </mat-form-field>
+
+          <button class="btn-primary-mac" type="submit"
+                  [disabled]="guardandoColaborador() || colaboradorForm.invalid">
+            <mat-icon>person_add</mat-icon>
+            {{ guardandoColaborador() ? 'Vinculando...' : 'Vincular' }}
+          </button>
+        </form>
+
+        @if (colaboradores().length === 0) {
+          <div class="nm-empty">Aún no hay colaboradores vinculados a esta oportunidad.</div>
+        } @else {
+          <div class="mac-table-card">
+            <table mat-table [dataSource]="colaboradores()">
+              <ng-container matColumnDef="colaborador">
+                <th mat-header-cell *matHeaderCellDef>Colaborador</th>
+                <td mat-cell *matCellDef="let c">
+                  <div class="entity-cell">
+                    <span class="avatar">{{ iniciales(c.nombreCompleto) }}</span>
+                    <div class="entity-text">
+                      <strong>{{ c.nombreCompleto || 'Sin nombre' }}</strong>
+                      <small>{{ c.correo || 'Sin correo' }}</small>
+                    </div>
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef class="actions-header">Acciones</th>
+                <td mat-cell *matCellDef="let c" class="actions-cell">
+                  <button class="mac-action-btn delete" title="Quitar colaborador" (click)="quitarColaborador(c)">
+                    <mat-icon>person_remove</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColaboradores"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColaboradores;"></tr>
+            </table>
+          </div>
+        }
+      </section>
+    }
+  }
+</div>

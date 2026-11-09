@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Informe técnico de la mensajería interna de Viernes CRM V1: arquitectura, API, base de datos, interfaz, seguridad, pruebas y limitaciones.">
+    <title>Informe de Mensajería Interna · VIERNES CRM V1</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #090d16;
+            --surface: #111726;
+            --surface2: #172033;
+            --surface3: #1c2740;
+            --border: #232f48;
+            --border-strong: #31415f;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --text-subtle: #64748b;
+            --accent: #3b82f6;
+            --accent-soft: rgba(59, 130, 246, 0.12);
+            --cyan: #06b6d4;
+            --cyan-soft: rgba(6, 182, 212, 0.12);
+            --green: #10b981;
+            --green-soft: rgba(16, 185, 129, 0.12);
+            --purple: #a855f7;
+            --purple-soft: rgba(168, 85, 247, 0.12);
+            --amber: #f59e0b;
+            --amber-soft: rgba(245, 158, 11, 0.12);
+            --rose: #f43f5e;
+            --rose-soft: rgba(244, 63, 94, 0.12);
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            padding: 34px 20px 70px;
+            background-image:
+                radial-gradient(circle at 8% 4%, rgba(59, 130, 246, 0.10) 0%, transparent 38%),
+                radial-gradient(circle at 92% 24%, rgba(168, 85, 247, 0.07) 0%, transparent 34%),
+                radial-gradient(circle at 50% 100%, rgba(6, 182, 212, 0.05) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+
+        a { color: #93c5fd; text-decoration: none; }
+        a:hover { color: #dbeafe; }
+        .container { max-width: 1180px; margin: 0 auto; }
+
+        .skip-link {
+            position: absolute;
+            left: -9999px;
+            top: 10px;
+            background: #fff;
+            color: #0f172a;
+            padding: 8px 14px;
+            border-radius: 6px;
+            z-index: 999;
+        }
+        .skip-link:focus { left: 20px; }
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+            padding-bottom: 18px;
+            margin-bottom: 34px;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+        }
+        .topbar .back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+            font-weight: 600;
+            letter-spacing: 0.01em;
+        }
+        .topbar .back:hover { color: #fff; }
+        .topbar-meta {
+            color: var(--text-subtle);
+            font-family: var(--mono);
+            font-size: 11.5px;
+            text-align: right;
+        }
+
+        .hero {
+            padding: 8px 0 34px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 28px;
+        }
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #60a5fa;
+            background: var(--accent-soft);
+            border: 1px solid rgba(59, 130, 246, 0.32);
+            border-radius: 30px;
+            padding: 6px 13px;
+            font-size: 11.5px;
+            font-weight: 700;
+            letter-spacing: 0.10em;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+        .hero h1 {
+            font-size: clamp(34px, 5vw, 54px);
+            line-height: 1.08;
+            letter-spacing: -0.035em;
+            font-weight: 800;
+            max-width: 980px;
+            background: linear-gradient(135deg, #ffffff 35%, #93c5fd 72%, #c4b5fd 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 18px;
+        }
+        .hero .lead {
+            color: var(--text-muted);
+            font-size: 17px;
+            max-width: 900px;
+            line-height: 1.75;
+        }
+        .hero-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            border: 1px solid var(--border-strong);
+            background: rgba(23, 32, 51, 0.78);
+            color: #cbd5e1;
+            border-radius: 999px;
+            padding: 5px 11px;
+            font-size: 11.5px;
+            font-weight: 600;
+        }
+        .pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px rgba(16,185,129,.8); }
+        .pill.blue .dot { background: var(--accent); box-shadow: 0 0 8px rgba(59,130,246,.8); }
+        .pill.purple .dot { background: var(--purple); box-shadow: 0 0 8px rgba(168,85,247,.8); }
+        .pill.amber .dot { background: var(--amber); box-shadow: 0 0 8px rgba(245,158,11,.8); }
+
+        .doc-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 26px;
+            margin-top: 18px;
+            color: var(--text-subtle);
+            font-size: 12.5px;
+        }
+        .doc-meta strong { color: #cbd5e1; font-weight: 600; }
+
+        .toc {
+            background: linear-gradient(180deg, rgba(17, 23, 38, 0.92), rgba(17, 23, 38, 0.70));
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 18px;
+            margin-bottom: 34px;
+        }
+        .toc-title {
+            font-size: 11px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--text-subtle);
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        .toc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 8px;
+        }
+        .toc a {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 7px 9px;
+            border-radius: 7px;
+            color: var(--text-muted);
+            font-size: 12.5px;
+            border: 1px solid transparent;
+        }
+        .toc a:hover { background: var(--surface2); border-color: var(--border); color: #fff; }
+        .toc .n { font-family: var(--mono); font-size: 10.5px; color: #60a5fa; }
+
+        .section { margin: 0 0 52px; }
+        .section-head {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+        .section-num {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: #60a5fa;
+            background: var(--accent-soft);
+            border: 1px solid rgba(59, 130, 246, 0.26);
+            border-radius: 7px;
+            padding: 3px 8px;
+            flex: 0 0 auto;
+        }
+        h2 {
+            font-size: clamp(22px, 3vw, 30px);
+            letter-spacing: -0.02em;
+            line-height: 1.25;
+            font-weight: 750;
+        }
+        h3 {
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            margin: 24px 0 10px;
+            color: #e2e8f0;
+        }
+        h4 { font-size: 13.5px; font-weight: 700; color: #dbeafe; margin-bottom: 5px; }
+        p { color: var(--text-muted); margin: 0 0 12px; }
+        p strong, li strong { color: #e2e8f0; font-weight: 650; }
+        ul, ol { color: var(--text-muted); padding-left: 22px; margin: 0 0 14px; }
+        li { margin: 5px 0; }
+        code {
+            font-family: var(--mono);
+            font-size: 0.86em;
+            color: #bae6fd;
+            background: rgba(6, 182, 212, 0.09);
+            border: 1px solid rgba(6, 182, 212, 0.16);
+            border-radius: 5px;
+            padding: 1px 5px;
+            overflow-wrap: anywhere;
+        }
+        pre {
+            font-family: var(--mono);
+            font-size: 12.5px;
+            line-height: 1.65;
+            color: #cbd5e1;
+            background: #0b1220;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px 18px;
+            overflow-x: auto;
+            margin: 12px 0 18px;
+            tab-size: 2;
+        }
+        pre code { background: none; border: 0; padding: 0; color: inherit; font-size: inherit; }
+        .muted { color: var(--text-subtle); }
+        .small { font-size: 12.5px; }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+            gap: 12px;
+            margin: 18px 0 24px;
+        }
+        .kpi {
+            background: linear-gradient(180deg, rgba(23, 32, 51, 0.88), rgba(17, 23, 38, 0.92));
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 15px 16px;
+            position: relative;
+            overflow: hidden;
+        }
+        .kpi::before {
+            content: "";
+            position: absolute;
+            inset: 0 auto auto 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #3b82f6, #06b6d4, transparent);
+            opacity: 0.85;
+        }
+        .kpi .label {
+            font-size: 10.5px;
+            text-transform: uppercase;
+            letter-spacing: 0.09em;
+            color: var(--text-subtle);
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .kpi .value {
+            font-family: var(--mono);
+            font-size: 25px;
+            line-height: 1.15;
+            color: #fff;
+            font-weight: 600;
+            letter-spacing: -0.03em;
+        }
+        .kpi .note { font-size: 11.5px; color: var(--text-subtle); margin-top: 3px; }
+
+        .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+        .card {
+            background: rgba(17, 23, 38, 0.88);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 18px 19px;
+        }
+        .card h3 { margin-top: 0; }
+        .card p:last-child, .card ul:last-child { margin-bottom: 0; }
+        .card.blue { border-color: rgba(59, 130, 246, 0.34); background: linear-gradient(180deg, rgba(59,130,246,.07), rgba(17,23,38,.92)); }
+        .card.green { border-color: rgba(16, 185, 129, 0.30); background: linear-gradient(180deg, rgba(16,185,129,.06), rgba(17,23,38,.92)); }
+        .card.purple { border-color: rgba(168, 85, 247, 0.30); background: linear-gradient(180deg, rgba(168,85,247,.06), rgba(17,23,38,.92)); }
+        .card.amber { border-color: rgba(245, 158, 11, 0.30); background: linear-gradient(180deg, rgba(245,158,11,.06), rgba(17,23,38,.92)); }
+        .card.rose { border-color: rgba(244, 63, 94, 0.30); background: linear-gradient(180deg, rgba(244,63,94,.06), rgba(17,23,38,.92)); }
+
+        .callout {
+            border-left: 3px solid var(--accent);
+            background: linear-gradient(90deg, rgba(59, 130, 246, 0.10), rgba(59, 130, 246, 0.025));
+            border-radius: 0 10px 10px 0;
+            padding: 14px 17px;
+            margin: 16px 0;
+            color: #cbd5e1;
+            font-size: 13.5px;
+        }
+        .callout strong { color: #dbeafe; }
+        .callout.green { border-left-color: var(--green); background: linear-gradient(90deg, rgba(16,185,129,.10), rgba(16,185,129,.02)); }
+        .callout.amber { border-left-color: var(--amber); background: linear-gradient(90deg, rgba(245,158,11,.10), rgba(245,158,11,.02)); }
+        .callout.rose { border-left-color: var(--rose); background: linear-gradient(90deg, rgba(244,63,94,.10), rgba(244,63,94,.02)); }
+
+        .flow {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 0;
+            align-items: stretch;
+            margin: 18px 0 22px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            background: rgba(11, 18, 32, 0.72);
+        }
+        .flow-step {
+            padding: 15px 14px;
+            position: relative;
+            border-right: 1px solid var(--border);
+        }
+        .flow-step:last-child { border-right: 0; }
+        .flow-step .step-num {
+            font-family: var(--mono);
+            font-size: 10px;
+            color: #60a5fa;
+            margin-bottom: 5px;
+        }
+        .flow-step h4 { font-size: 12.5px; color: #f1f5f9; }
+        .flow-step p { font-size: 11.5px; line-height: 1.55; color: var(--text-subtle); margin: 3px 0 0; }
+        .flow-step::after {
+            content: "›";
+            position: absolute;
+            right: -9px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--surface2);
+            border: 1px solid var(--border-strong);
+            color: #93c5fd;
+            font-size: 14px;
+            line-height: 16px;
+            text-align: center;
+            z-index: 2;
+        }
+        .flow-step:last-child::after { display: none; }
+
+        .seq {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 16px 0 20px;
+        }
+        .seq-row {
+            display: grid;
+            grid-template-columns: 38px minmax(0, 1.1fr) minmax(0, 1.9fr);
+            gap: 14px;
+            align-items: start;
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(17, 23, 38, 0.58);
+        }
+        .seq-row:last-child { border-bottom: 0; }
+        .seq-row:nth-child(even) { background: rgba(23, 32, 51, 0.48); }
+        .seq-num {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: #60a5fa;
+            background: var(--accent-soft);
+            border: 1px solid rgba(59,130,246,.25);
+            border-radius: 6px;
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .seq-actor { font-size: 12.5px; font-weight: 700; color: #dbeafe; }
+        .seq-desc { font-size: 12.5px; color: var(--text-muted); }
+        .seq-desc code { font-size: 11.5px; }
+
+        .table-wrap {
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin: 14px 0 20px;
+            background: rgba(17, 23, 38, 0.70);
+        }
+        table { width: 100%; border-collapse: collapse; font-size: 12.5px; min-width: 720px; }
+        thead { background: rgba(28, 39, 64, 0.78); }
+        th {
+            text-align: left;
+            padding: 11px 13px;
+            color: #cbd5e1;
+            font-weight: 700;
+            font-size: 11px;
+            letter-spacing: 0.055em;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border-strong);
+            white-space: nowrap;
+        }
+        td {
+            padding: 10px 13px;
+            color: var(--text-muted);
+            border-bottom: 1px solid rgba(35, 47, 72, 0.7);
+            vertical-align: top;
+        }
+        tbody tr:last-child td { border-bottom: 0; }
+        tbody tr:hover { background: rgba(59, 130, 246, 0.045); }
+        td strong { color: #e2e8f0; }
+        td code { font-size: 11.5px; }
+
+        .method {
+            display: inline-block;
+            min-width: 46px;
+            text-align: center;
+            border-radius: 5px;
+            padding: 2px 6px;
+            font-family: var(--mono);
+            font-size: 10.5px;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            border: 1px solid;
+            white-space: nowrap;
+        }
+        .get { color: #6ee7b7; background: rgba(16,185,129,.12); border-color: rgba(16,185,129,.30); }
+        .post { color: #93c5fd; background: rgba(59,130,246,.12); border-color: rgba(59,130,246,.30); }
+        .put { color: #fcd34d; background: rgba(245,158,11,.12); border-color: rgba(245,158,11,.30); }
+        .patch { color: #c4b5fd; background: rgba(168,85,247,.12); border-color: rgba(168,85,247,.30); }
+        .delete { color: #fda4af; background: rgba(244,63,94,.12); border-color: rgba(244,63,94,.30); }
+
+        .pill-list { display: flex; flex-wrap: wrap; gap: 6px; }
+        .tag {
+            font-size: 10.5px;
+            color: #cbd5e1;
+            background: rgba(28, 39, 64, 0.72);
+            border: 1px solid rgba(49, 65, 95, 0.7);
+            padding: 2px 7px;
+            border-radius: 5px;
+            white-space: nowrap;
+        }
+
+        .tree {
+            font-family: var(--mono);
+            font-size: 12px;
+            line-height: 1.7;
+            color: #cbd5e1;
+            background: #0b1220;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 17px 19px;
+            overflow-x: auto;
+            margin: 14px 0 18px;
+            white-space: pre;
+        }
+        .tree .dir { color: #93c5fd; }
+        .tree .file { color: #cbd5e1; }
+        .tree .note { color: #8494ad; }
+        .tree .hl { color: #6ee7b7; }
+
+        .checklist { list-style: none; padding-left: 0; }
+        .checklist li { position: relative; padding-left: 23px; margin: 6px 0; }
+        .checklist li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            top: 0;
+            color: var(--green);
+            font-weight: 800;
+            font-size: 12px;
+        }
+        .crosslist { list-style: none; padding-left: 0; }
+        .crosslist li { position: relative; padding-left: 23px; margin: 6px 0; }
+        .crosslist li::before {
+            content: "×";
+            position: absolute;
+            left: 0;
+            top: -1px;
+            color: var(--rose);
+            font-weight: 800;
+            font-size: 15px;
+        }
+
+        .badge-inline {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 10.5px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 5px;
+            border: 1px solid;
+            white-space: nowrap;
+        }
+        .b-green { color: #6ee7b7; background: rgba(16,185,129,.10); border-color: rgba(16,185,129,.28); }
+        .b-amber { color: #fcd34d; background: rgba(245,158,11,.10); border-color: rgba(245,158,11,.28); }
+        .b-rose { color: #fda4af; background: rgba(244,63,94,.10); border-color: rgba(244,63,94,.28); }
+        .b-blue { color: #93c5fd; background: rgba(59,130,246,.10); border-color: rgba(59,130,246,.28); }
+
+        .footer {
+            margin-top: 56px;
+            padding-top: 22px;
+            border-top: 1px solid var(--border);
+            color: var(--text-subtle);
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
+        .footer strong { color: #cbd5e1; }
+
+        @media (max-width: 900px) {
+            .flow { grid-template-columns: 1fr 1fr; }
+            .flow-step:nth-child(2)::after { display: none; }
+            .grid-3 { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 680px) {
+            body { padding: 22px 14px 56px; }
+            .topbar { align-items: flex-start; }
+            .topbar-meta { display: none; }
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+            .flow { grid-template-columns: 1fr; }
+            .flow-step { border-right: 0; border-bottom: 1px solid var(--border); }
+            .flow-step::after { display: none; }
+            .flow-step:last-child { border-bottom: 0; }
+            .seq-row { grid-template-columns: 30px 1fr; gap: 8px; }
+            .seq-desc { grid-column: 2; }
+            .kpi-grid { grid-template-columns: 1fr 1fr; }
+            .section { margin-bottom: 42px; }
+        }
+        @media (max-width: 430px) {
+            .kpi-grid { grid-template-columns: 1fr; }
+            .hero h1 { font-size: 32px; }
+        }
+        @media print {
+            body { background: #fff; color: #111; padding: 0; }
+            .topbar, .toc { display: none; }
+            .container { max-width: none; }
+            .section { break-inside: avoid; }
+            .card, .table-wrap, pre, .flow, .seq { border-color: #ccc; background: #fff; }
+            p, li, td { color: #222; }
+            h1, h2, h3, h4, .kpi .value { color: #111; -webkit-text-fill-color: #111; background: none; }
+            a { color: #1d4ed8; }
+        }
+    </style>
+</head>
+<body>
+<a class="skip-link" href="#contenido">Ir al contenido</a>
+<div class="container">
+
+    <nav class="topbar" aria-label="Navegación del informe">
+        <a class="back" href="../index.html">← Volver al portal de informes</a>
+        <span class="topbar-meta">VIERNES CRM V1 · Módulo Mensajería · Informe v1.0</span>
+    </nav>
+
+    <header class="hero">
+        <div class="eyebrow">Mensajería interna · Sala general</div>
+        <h1>Mensajería interna del CRM</h1>
+        <p class="lead">
+            Implementación full-stack de una sala de mensajes compartida para los usuarios autenticados de Viernes CRM.
+            El informe describe la arquitectura, el contrato REST, el modelo Oracle, el flujo de envío, el polling de
+            actualización, el contador de no leídos, la interfaz del panel de chat, la seguridad y las pruebas ejecutadas.
+        </p>
+        <div class="hero-pills">
+            <span class="pill"><span class="dot"></span> Operativo en entorno local</span>
+            <span class="pill blue"><span class="dot"></span> 3 endpoints REST</span>
+            <span class="pill purple"><span class="dot"></span> Oracle CRM_MENSAJES</span>
+            <span class="pill amber"><span class="dot"></span> Polling cada 5 s</span>
+        </div>
+        <div class="doc-meta">
+            <span><strong>Versión:</strong> 1.0</span>
+            <span><strong>Fecha:</strong> 21 de octubre de 2026</span>
+            <span><strong>Alcance:</strong> backend + frontend + persistencia</span>
+            <span><strong>Fuente:</strong> código actual del repositorio</span>
+        </div>
+    </header>
+
+    <nav class="toc" aria-label="Contenido del informe">
+        <div class="toc-title">Contenido</div>
+        <div class="toc-grid">
+            <a href="#resumen"><span class="n">01</span> Resumen ejecutivo</a>
+            <a href="#alcance"><span class="n">02</span> Alcance y decisiones</a>
+            <a href="#arquitectura"><span class="n">03</span> Arquitectura</a>
+            <a href="#backend"><span class="n">04</span> Capas del backend</a>
+            <a href="#api"><span class="n">05</span> API REST</a>
+            <a href="#datos"><span class="n">06</span> Modelo de datos</a>
+            <a href="#envio"><span class="n">07</span> Flujo de envío</a>
+            <a href="#polling"><span class="n">08</span> Polling y no leídos</a>
+            <a href="#frontend"><span class="n">09</span> Interfaz y frontend</a>
+            <a href="#seguridad"><span class="n">10</span> Seguridad e identidad</a>
+            <a href="#pruebas"><span class="n">11</span> Pruebas y verificación</a>
+            <a href="#limitaciones"><span class="n">12</span> Limitaciones y deuda</a>
+            <a href="#operacion"><span class="n">13</span> Operación y diagnóstico</a>
+            <a href="#conclusion"><span class="n">14</span> Conclusión</a>
+        </div>
+    </nav>
+
+    <main id="contenido">
+
+        <section class="section" id="resumen">
+            <div class="section-head"><span class="section-num">01</span><h2>Resumen ejecutivo</h2></div>
+            <p>
+                La mensajería interna es una <strong>sala general única</strong> integrada en el layout principal del CRM.
+                Cualquier usuario con sesión válida puede leer los mensajes recientes y publicar uno nuevo. Los mensajes
+                se guardan en la tabla Oracle <code>CRM_MENSAJES</code> y se comparten entre todos los usuarios; no existen
+                conversaciones privadas, canales, adjuntos ni notificaciones externas en esta versión.
+            </p>
+            <div class="kpi-grid">
+                <div class="kpi"><div class="label">Endpoints</div><div class="value">3</div><div class="note">listar, resumen y enviar</div></div>
+                <div class="kpi"><div class="label">Tabla Oracle</div><div class="value">1</div><div class="note">CRM_MENSAJES</div></div>
+                <div class="kpi"><div class="label">Polling</div><div class="value">5 s</div><div class="note">actualización incremental</div></div>
+                <div class="kpi"><div class="label">Historial UI</div><div class="value">100</div><div class="note">mensajes máximos cargados</div></div>
+                <div class="kpi"><div class="label">Contenido</div><div class="value">2.000</div><div class="note">caracteres por mensaje</div></div>
+                <div class="kpi"><div class="label">Pruebas módulo</div><div class="value">11</div><div class="note">6 servicio + 5 controlador</div></div>
+            </div>
+            <div class="grid-2">
+                <div class="card green">
+                    <h3>Qué resuelve</h3>
+                    <ul class="checklist">
+                        <li>Comunicación rápida entre miembros del equipo dentro del CRM.</li>
+                        <li>Historial persistente y compartido, sin depender de correo o mensajería externa.</li>
+                        <li>Indicador de mensajes no leídos en la cabecera, por usuario y por navegador.</li>
+                        <li>Panel lateral que no interrumpe la pantalla de trabajo.</li>
+                        <li>Autor tomado del token y del usuario autenticado, no del cuerpo de la petición.</li>
+                    </ul>
+                </div>
+                <div class="card amber">
+                    <h3>Qué no incluye</h3>
+                    <ul class="crosslist">
+                        <li>Mensajes directos entre dos usuarios.</li>
+                        <li>Canales, grupos, hilos o menciones.</li>
+                        <li>Adjuntos, imágenes, audio o enlaces enriquecidos.</li>
+                        <li>WebSocket, SSE o notificaciones push.</li>
+                        <li>Edición, borrado, reacciones o búsqueda avanzada.</li>
+                        <li>Confirmaciones de lectura del lado servidor.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="callout green">
+                <strong>Estado actual:</strong> el módulo está implementado y verificado en el entorno local. La suite
+                completa del backend se ejecutó con <strong>257 pruebas, 0 fallos y 0 errores</strong>, y el build de
+                Angular finalizó correctamente con un bundle inicial de <strong>342,38 kB</strong>
+                (<strong>94,11 kB</strong> transferidos).
+            </div>
+        </section>
+
+        <section class="section" id="alcance">
+            <div class="section-head"><span class="section-num">02</span><h2>Alcance y decisiones de diseño</h2></div>
+            <p>
+                El diseño prioriza simplicidad operativa y bajo acoplamiento con el resto del CRM. La mensajería se trató
+                como un módulo funcional independiente, con su propio dominio, puertos, adaptador de persistencia y
+                endpoints, siguiendo el mismo patrón hexagonal del backend.
+            </p>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Decisión</th><th>Implementación actual</th><th>Motivo / consecuencia</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Una sola sala</strong></td>
+                            <td>Todos los mensajes pertenecen a la misma conversación global.</td>
+                            <td>Resuelve la necesidad inmediata del equipo sin modelar canales ni membresías.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Polling en lugar de WebSocket</strong></td>
+                            <td>El frontend consulta cada 5 segundos los mensajes posteriores al último ID conocido.</td>
+                            <td>Menor complejidad de infraestructura; la latencia máxima esperada es de unos 5 segundos.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Actualización incremental</strong></td>
+                            <td>Parámetro <code>despuesDeId</code>; la consulta inicial trae los últimos 100.</td>
+                            <td>Evita recargar todo el historial en cada ciclo y reduce tráfico.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Sin FK física a usuarios</strong></td>
+                            <td>Se guardan <code>USUARIO_CORREO</code> y <code>USUARIO_NOMBRE</code> como datos históricos.</td>
+                            <td>Evita acoplar la tabla de mensajes al módulo de usuarios y conserva el autor original.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Nombre visible desde el JWT</strong></td>
+                            <td>Claim <code>name</code>; si no existe, <code>given_name + family_name</code>; luego <code>UsuariosApi</code>; último recurso, el correo.</td>
+                            <td>El mensaje muestra el nombre sin obligar al cliente a enviarlo.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>No leídos en localStorage</strong></td>
+                            <td>Clave <code>viernes_chat_last_read_&lt;correo&gt;</code> con el último ID leído.</td>
+                            <td>El contador es por navegador y no requiere una tabla adicional de recibos.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Contenido como texto plano</strong></td>
+                            <td>Angular interpola el contenido; no se usa <code>innerHTML</code>.</td>
+                            <td>Reduce el riesgo de XSS y conserva saltos de línea con <code>white-space: pre-wrap</code>.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="callout amber">
+                <strong>Límite consciente:</strong> el contador de no leídos se calcula sobre los mensajes cargados en el
+                navegador, no sobre el total histórico del servidor. El endpoint <code>/resumen</code> existe y está
+                probado, pero la interfaz actual no lo consume.
+            </div>
+        </section>
+
+        <section class="section" id="arquitectura">
+            <div class="section-head"><span class="section-num">03</span><h2>Arquitectura de la solución</h2></div>
+            <p>
+                La mensajería atraviesa cuatro capas: SPA Angular, API REST Spring Boot, dominio/aplicación y persistencia
+                Oracle. La autenticación se delega en Keycloak mediante un JWT Bearer validado por el resource server.
+            </p>
+<h3 class="sr-only">Flujo general de la mensajería</h3>
+            <div class="flow" aria-label="Flujo general de la mensajería">
+                <div class="flow-step">
+                    <div class="step-num">01 · UI</div>
+                    <h4>Layout + ChatPanel</h4>
+                    <p>Botón “Mensajes”, badge y panel lateral dentro del shell autenticado.</p>
+                </div>
+                <div class="flow-step">
+                    <div class="step-num">02 · CLIENTE</div>
+                    <h4>MensajeriaService</h4>
+                    <p>Signals, polling, merge por ID, último leído y peticiones HTTP.</p>
+                </div>
+                <div class="flow-step">
+                    <div class="step-num">03 · API</div>
+                    <h4>MensajeController</h4>
+                    <p>Valida el JWT, recibe el contenido y obtiene la identidad del token.</p>
+                </div>
+                <div class="flow-step">
+                    <div class="step-num">04 · DOMINIO</div>
+                    <h4>MensajeService</h4>
+                    <p>Reglas de contenido, límite, autor, nombre visible y transacción.</p>
+                </div>
+                <div class="flow-step">
+                    <div class="step-num">05 · DATOS</div>
+                    <h4>Adapter + Oracle</h4>
+                    <p>JPA sobre <code>CRM_MENSAJES</code>; consultas por ID y resumen.</p>
+                </div>
+            </div>
+            <div class="grid-2">
+                <div class="card blue">
+                    <h3>Topología local</h3>
+                    <div class="table-wrap" style="margin-bottom:0">
+                        <table style="min-width:0">
+                            <tbody>
+                                <tr><td><strong>Frontend</strong></td><td><code>http://localhost:4200</code></td></tr>
+                                <tr><td><strong>Backend</strong></td><td><code>http://localhost:8080</code></td></tr>
+                                <tr><td><strong>Keycloak</strong></td><td><code>http://localhost:8180</code></td></tr>
+                                <tr><td><strong>Oracle</strong></td><td><code>localhost:1521/FREEPDB1</code></td></tr>
+                                <tr><td><strong>Perfiles</strong></td><td><code>dev,keycloak</code></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card purple">
+                    <h3>Paquete del módulo</h3>
+                    <p class="small" style="margin-bottom:8px"><code>com.viernes.mensajeria</code></p>
+                    <p class="small">
+                        Declarado como módulo Spring Modulith con dependencias permitidas a
+                        <code>usuarios</code>, <code>shared</code> y <code>shared.exception</code>.
+                        No depende de clientes, oportunidades ni propuestas.
+                    </p>
+                    <div class="pill-list">
+                        <span class="tag">adapters/in/web</span>
+                        <span class="tag">application</span>
+                        <span class="tag">domain</span>
+                        <span class="tag">adapters/out/persistence</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="backend">
+            <div class="section-head"><span class="section-num">04</span><h2>Capas y clases del backend</h2></div>
+            <p>
+                El módulo replica la arquitectura hexagonal usada en el resto del sistema. El controlador solo conoce el
+                puerto de entrada; el servicio de aplicación implementa las reglas y depende de un puerto de salida; el
+                adaptador JPA es la única pieza que conoce Hibernate y Oracle.
+            </p>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Capa</th><th>Clase / artefacto</th><th>Responsabilidad</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>Entrada web</strong></td><td><code>MensajeController</code></td><td>Expone los tres endpoints, valida el cuerpo, obtiene la autenticación y traduce a DTO de respuesta.</td></tr>
+                        <tr><td><strong>Puerto de entrada</strong></td><td><code>ManageMensajeUseCase</code></td><td>Contrato de aplicación: listar, resumir y enviar.</td></tr>
+                        <tr><td><strong>Aplicación</strong></td><td><code>MensajeService</code></td><td>Normaliza el contenido, aplica límites, resuelve el autor y coordina la persistencia.</td></tr>
+                        <tr><td><strong>Dominio</strong></td><td><code>Mensaje</code></td><td>Modelo inmutable del mensaje: ID, correo, nombre, contenido y fecha de creación.</td></tr>
+                        <tr><td><strong>Puerto de salida</strong></td><td><code>MensajePersistencePort</code></td><td>Contrato de persistencia: guardar, buscar últimos, buscar posteriores y contar.</td></tr>
+                        <tr><td><strong>Adaptador de salida</strong></td><td><code>MensajePersistenceAdapter</code></td><td>Convierte dominio ↔ entidad y usa el repositorio Spring Data.</td></tr>
+                        <tr><td><strong>Repositorio</strong></td><td><code>MensajeSpringDataRepository</code></td><td>Consultas JPA derivadas y paginación de últimos mensajes.</td></tr>
+                        <tr><td><strong>Entidad</strong></td><td><code>MensajeEntity</code></td><td>Mapeo de <code>CRM_MENSAJES</code> con columnas en mayúsculas.</td></tr>
+                        <tr><td><strong>DTO</strong></td><td><code>MensajeRequest</code>, <code>MensajeResponse</code>, <code>ResumenMensajesResponse</code></td><td>Contrato JSON estable y desacoplado de la entidad.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Estructura de carpetas</h3>
+            <div class="tree"><span class="dir">viernes-backend/src/main/java/com/viernes/mensajeria/</span>
+├── <span class="dir">adapters/</span>
+│   ├── <span class="dir">in/web/</span>
+│   │   └── <span class="file">MensajeController.java</span>
+│   └── <span class="dir">out/persistence/</span>
+│       ├── <span class="file">MensajePersistenceAdapter.java</span>
+│       ├── <span class="dir">entity/</span><span class="file">MensajeEntity.java</span>
+│       └── <span class="dir">repository/</span><span class="file">MensajeSpringDataRepository.java</span>
+├── <span class="dir">application/</span>
+│   ├── <span class="dir">dto/</span><span class="file">MensajeRequest.java · MensajeResponse.java · ResumenMensajesResponse.java</span>
+│   ├── <span class="dir">port/in/</span><span class="file">ManageMensajeUseCase.java</span>
+│   ├── <span class="dir">port/out/</span><span class="file">MensajePersistencePort.java</span>
+│   └── <span class="dir">service/</span><span class="file">MensajeService.java</span>
+├── <span class="dir">domain/</span><span class="file">Mensaje.java</span>
+└── <span class="file">package-info.java</span> <span class="note">// allowedDependencies: usuarios, shared, shared.exception</span></div>
+
+            <h3>Reglas de aplicación</h3>
+            <div class="grid-3">
+                <div class="card">
+                    <h4>Contenido</h4>
+                    <p class="small">Se aplica <code>trim()</code>. No se permiten mensajes vacíos ni solo espacios. El máximo es de 2.000 caracteres.</p>
+                </div>
+                <div class="card">
+                    <h4>Límite de consulta</h4>
+                    <p class="small">El parámetro <code>limite</code> se normaliza al rango 1–100. Si no se envía, el valor por defecto es 50.</p>
+                </div>
+                <div class="card">
+                    <h4>Autor</h4>
+                    <p class="small">El correo proviene de <code>Authentication.getName()</code>; el nombre se toma del claim <code>name</code>, de <code>given_name + family_name</code> o de <code>UsuariosApi</code>.</p>
+                </div>
+                <div class="card">
+                    <h4>Orden</h4>
+                    <p class="small">La consulta inicial devuelve los últimos mensajes y los entrega en orden ascendente para pintarlos como un chat.</p>
+                </div>
+                <div class="card">
+                    <h4>Transacciones</h4>
+                    <p class="small">Lecturas con <code>@Transactional(readOnly = true)</code>; el envío usa una transacción de escritura.</p>
+                </div>
+                <div class="card">
+                    <h4>Sin borrado</h4>
+                    <p class="small">No hay endpoint de edición ni eliminación. La tabla conserva el historial salvo limpieza manual de desarrollo.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="api">
+            <div class="section-head"><span class="section-num">05</span><h2>Contrato REST</h2></div>
+            <p>
+                Todos los endpoints requieren un JWT válido emitido por Keycloak. La API no recibe el autor en el cuerpo:
+                lo deriva de la sesión autenticada, lo que evita suplantaciones accidentales desde el cliente.
+            </p>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Método</th><th>Ruta</th><th>Parámetros / cuerpo</th><th>Respuesta</th><th>Estado</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="method get">GET</span></td>
+                            <td><code>/api/v1/mensajeria</code></td>
+                            <td><code>despuesDeId</code> (opcional), <code>limite</code> (opcional, 1–100, por defecto 50)</td>
+                            <td><code>MensajeResponse[]</code> en orden ascendente</td>
+                            <td><span class="badge-inline b-green">200</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="method get">GET</span></td>
+                            <td><code>/api/v1/mensajeria/resumen</code></td>
+                            <td><code>despuesDeId</code> (opcional)</td>
+                            <td><code>{ total, ultimoId }</code></td>
+                            <td><span class="badge-inline b-green">200</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="method post">POST</span></td>
+                            <td><code>/api/v1/mensajeria</code></td>
+                            <td><code>{ "contenido": "texto" }</code></td>
+                            <td><code>MensajeResponse</code> del mensaje creado</td>
+                            <td><span class="badge-inline b-blue">201</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Ejemplos</h3>
+            <pre><code># Listar los últimos 50 mensajes
+curl -s "http://localhost:8080/api/v1/mensajeria?limite=50" \
+  -H "Authorization: Bearer $TOKEN"
+
+# Consultar solo los mensajes posteriores al ID 42
+curl -s "http://localhost:8080/api/v1/mensajeria?despuesDeId=42&amp;limite=50" \
+  -H "Authorization: Bearer $TOKEN"
+
+# Enviar un mensaje
+curl -s -X POST "http://localhost:8080/api/v1/mensajeria" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"contenido":"Revisemos el pipeline de la semana."}'</code></pre>
+
+            <div class="grid-2">
+                <div class="card">
+                    <h4>Respuesta de mensaje</h4>
+                    <pre style="margin-bottom:0"><code>{
+  "id": 15,
+  "usuarioCorreo": "admin@viernes.com",
+  "usuarioNombre": "Nestor Barrantes",
+  "contenido": "Revisemos el pipeline de la semana.",
+  "creadoEn": "2026-10-21T16:42:10.318"
+}</code></pre>
+                </div>
+                <div class="card">
+                    <h4>Respuesta de resumen</h4>
+                    <pre style="margin-bottom:0"><code>{
+  "total": 3,
+  "ultimoId": 15
+}</code></pre>
+                    <p class="small muted" style="margin-top:10px">Si la tabla está vacía, <code>total</code> es 0 y <code>ultimoId</code> es <code>null</code>. Si hay historial pero ninguno posterior a <code>despuesDeId</code>, <code>total</code> es 0 y <code>ultimoId</code> conserva el último ID global.</p>
+                </div>
+            </div>
+
+            <h3>Errores esperados</h3>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Código</th><th>Escenario</th><th>Respuesta</th></tr></thead>
+                    <tbody>
+                        <tr><td><span class="badge-inline b-amber">400</span></td><td>Contenido vacío, solo espacios o mayor a 2.000 caracteres.</td><td>Error de validación con mensaje descriptivo.</td></tr>
+                        <tr><td><span class="badge-inline b-amber">400</span></td><td>JSON malformado o tipo de dato incorrecto.</td><td>Error de lectura del cuerpo.</td></tr>
+                        <tr><td><span class="badge-inline b-rose">401</span></td><td>Token ausente, expirado o inválido.</td><td>No autorizado; el frontend redirige al login.</td></tr>
+                        <tr><td><span class="badge-inline b-rose">403</span></td><td>Usuario autenticado sin permiso suficiente.</td><td>Acceso denegado.</td></tr>
+                        <tr><td><span class="badge-inline b-rose">500</span></td><td>Fallo de base de datos o error no controlado.</td><td>Error interno; se registra en el backend.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="small muted">La documentación interactiva está disponible en <code>http://localhost:8080/swagger-ui.html</code> bajo la etiqueta «Mensajería».</p>
+        </section>
+
+        <section class="section" id="datos">
+            <div class="section-head"><span class="section-num">06</span><h2>Modelo de datos</h2></div>
+            <p>
+                La persistencia se resuelve con una única tabla. El esquema se crea o actualiza con
+                <code>spring.jpa.hibernate.ddl-auto=update</code> en el perfil de desarrollo; no hay migraciones
+                versionadas en esta versión.
+            </p>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Columna</th><th>Tipo Oracle</th><th>Nulidad</th><th>Descripción</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>ID</code></td><td><code>NUMBER</code></td><td>PK, generado</td><td>Identidad del mensaje; se usa para ordenar e incrementar el polling.</td></tr>
+                        <tr><td><code>USUARIO_CORREO</code></td><td><code>VARCHAR2(150)</code></td><td>NOT NULL</td><td>Correo del autor según el token. Referencia lógica a <code>CRM_USUARIOS</code>.</td></tr>
+                        <tr><td><code>USUARIO_NOMBRE</code></td><td><code>VARCHAR2(200)</code></td><td>NOT NULL</td><td>Nombre visible congelado al momento del envío.</td></tr>
+                        <tr><td><code>CONTENIDO</code></td><td><code>VARCHAR2(2000)</code></td><td>NOT NULL</td><td>Texto plano del mensaje, sin HTML.</td></tr>
+                        <tr><td><code>CREADO_EN</code></td><td><code>TIMESTAMP</code></td><td>NOT NULL</td><td>Fecha y hora del servidor al persistir.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="grid-2">
+                <div class="card blue">
+                    <h3>DDL de referencia</h3>
+                    <pre style="margin-bottom:0"><code>CREATE TABLE CRM_MENSAJES (
+  ID              NUMBER GENERATED BY DEFAULT AS IDENTITY,
+  USUARIO_CORREO  VARCHAR2(150) NOT NULL,
+  USUARIO_NOMBRE  VARCHAR2(200) NOT NULL,
+  CONTENIDO       VARCHAR2(2000) NOT NULL,
+  CREADO_EN       TIMESTAMP NOT NULL,
+  CONSTRAINT PK_CRM_MENSAJES PRIMARY KEY (ID)
+);</code></pre>
+                    <p class="small muted" style="margin-top:10px">DDL orientativo. En desarrollo Hibernate genera el esquema real.</p>
+                </div>
+                <div class="card green">
+                    <h3>Relación lógica</h3>
+                    <p class="small">
+                        No existe una foreign key física hacia <code>CRM_USUARIOS</code>. El vínculo es por correo y se
+                        resuelve en aplicación. Esto permite conservar mensajes aunque el usuario se desactive y evita
+                        que el módulo de mensajería dependa del esquema de usuarios.
+                    </p>
+                    <div class="pill-list">
+                        <span class="tag">1 tabla</span>
+                        <span class="tag">0 FK físicas</span>
+                        <span class="tag">PK por ID</span>
+                        <span class="tag">Historial inmutable</span>
+                    </div>
+                </div>
+            </div>
+            <div class="callout">
+                <strong>Recomendación de índice:</strong> la consulta incremental usa la PK (<code>ID</code>), que ya está
+                indexada. Si en el futuro se agregan filtros por fecha o políticas de retención, conviene un índice sobre
+                <code>CREADO_EN</code>.
+            </div>
+        </section>
+
+        <section class="section" id="envio">
+            <div class="section-head"><span class="section-num">07</span><h2>Flujo de envío de un mensaje</h2></div>
+            <p>
+                El envío es una operación de escritura corta. El cliente no decide el autor ni la fecha: ambos se
+                resuelven en el servidor, lo que mantiene la integridad del historial.
+            </p>
+            <div class="seq">
+                <div class="seq-row"><div class="seq-num">1</div><div class="seq-actor">Usuario</div><div class="seq-desc">Escribe en el <code>textarea</code> y pulsa <strong>Enter</strong> (o el botón de enviar). <strong>Shift+Enter</strong> inserta un salto de línea.</div></div>
+                <div class="seq-row"><div class="seq-num">2</div><div class="seq-actor">ChatPanel</div><div class="seq-desc">Recorta espacios, ignora envíos vacíos, bloquea el botón mientras envía y llama a <code>MensajeriaService.enviar()</code>.</div></div>
+                <div class="seq-row"><div class="seq-num">3</div><div class="seq-actor">MensajeriaService</div><div class="seq-desc">Ejecuta <code>POST /api/v1/mensajeria</code> con <code>{ contenido }</code>. El interceptor agrega <code>Authorization: Bearer …</code>.</div></div>
+                <div class="seq-row"><div class="seq-num">4</div><div class="seq-actor">Spring Security</div><div class="seq-desc">Valida firma, emisor y expiración del JWT contra el JWK Set de Keycloak. Sin token válido devuelve 401.</div></div>
+                <div class="seq-row"><div class="seq-num">5</div><div class="seq-actor">MensajeController</div><div class="seq-desc">Comprueba que exista autenticación, extrae el correo con <code>Authentication.getName()</code> y el nombre del claim <code>name</code> (o <code>given_name + family_name</code>).</div></div>
+                <div class="seq-row"><div class="seq-num">6</div><div class="seq-actor">MensajeService</div><div class="seq-desc">Valida contenido y límite, resuelve el nombre con <code>UsuariosApi</code> si hace falta, construye el dominio y persiste.</div></div>
+                <div class="seq-row"><div class="seq-num">7</div><div class="seq-actor">Adapter + Oracle</div><div class="seq-desc">Convierte a <code>MensajeEntity</code>, asigna <code>LocalDateTime.now()</code> y ejecuta el <code>INSERT</code> en <code>CRM_MENSAJES</code>.</div></div>
+                <div class="seq-row"><div class="seq-num">8</div><div class="seq-actor">Respuesta</div><div class="seq-desc">Se devuelve <strong>201 Created</strong> con el mensaje y su ID. El servicio lo inserta en la signal, marca leído y limpia el campo.</div></div>
+            </div>
+            <div class="callout green">
+                <strong>Resultado:</strong> el mensaje aparece de inmediato para el autor y, como máximo, en el siguiente
+                ciclo de polling para los demás usuarios conectados.
+            </div>
+        </section>
+
+        <section class="section" id="polling">
+            <div class="section-head"><span class="section-num">08</span><h2>Polling, historial y contador de no leídos</h2></div>
+            <p>
+                El servicio del frontend mantiene el estado con señales de Angular. Al inicializar, carga los últimos 100
+                mensajes y arranca un intervalo de 5 segundos. Cada ciclo pide únicamente los mensajes con ID mayor al
+                último conocido.
+            </p>
+            <div class="grid-2">
+                <div class="card">
+                    <h3>Algoritmo de actualización</h3>
+                    <ol>
+                        <li>Si cambia el usuario autenticado, se reinicia el estado y el último ID.</li>
+                        <li><code>GET /mensajeria?limite=100</code> carga la ventana inicial.</li>
+                        <li>Cada 5 s: <code>GET /mensajeria?despuesDeId=&lt;ultimoId&gt;&amp;limite=100</code>.</li>
+                        <li>Los mensajes nuevos se concatenan y se deduplican por ID.</li>
+                        <li>Si el panel está abierto, se marca leído; si está cerrado, se recalcula el badge.</li>
+                        <li>Si hay error de red, se muestra «Sin conexión» y se reintenta en el siguiente ciclo.</li>
+                    </ol>
+                </div>
+                <div class="card">
+                    <h3>Contador de no leídos</h3>
+                    <p class="small">
+                        Se consideran no leídos los mensajes cargados cuyo ID sea mayor al último leído y cuyo autor no sea
+                        el usuario actual. El valor se guarda en <code>localStorage</code> con la clave
+                        <code>viernes_chat_last_read_&lt;correo&gt;</code>.
+                    </p>
+                    <p class="small">
+                        En el primer inicio, si no existe una marca previa, se toma el último mensaje cargado como leído
+                        para evitar que todo el historial aparezca como no leído.
+                    </p>
+                    <div class="pill-list">
+                        <span class="tag">5.000 ms</span>
+                        <span class="tag">máx. 100</span>
+                        <span class="tag">dedupe por ID</span>
+                        <span class="tag">badge 99+</span>
+                    </div>
+                </div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Escenario</th><th>Comportamiento</th></tr></thead>
+                    <tbody>
+                        <tr><td>Panel cerrado y llega un mensaje de otro usuario</td><td>Se incrementa el badge; el mensaje queda en la lista cargada.</td></tr>
+                        <tr><td>Panel abierto</td><td>El mensaje se marca leído y el badge se limpia.</td></tr>
+                        <tr><td>Recarga de página</td><td>Se recupera el último ID leído desde <code>localStorage</code>; el historial se vuelve a cargar.</td></tr>
+                        <tr><td>Otro usuario en el mismo navegador</td><td>La clave incluye el correo, por lo que cada cuenta mantiene su propia marca.</td></tr>
+                        <tr><td>Más de 100 mensajes entre dos ciclos</td><td>La ventana se limita a 100; el badge puede quedar acotado a ese máximo.</td></tr>
+                        <tr><td>Fallo de red</td><td>El polling falla silenciosamente, se marca «Sin conexión» y se reintenta.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="callout amber">
+                <strong>Alternativa ya disponible:</strong> <code>GET /api/v1/mensajeria/resumen?despuesDeId=…</code>
+                devuelve <code>total</code> y <code>ultimoId</code> sin traer el contenido. Es una base lista para un badge
+                más liviano, aunque la UI actual todavía no la usa.
+            </div>
+        </section>
+
+        <section class="section" id="frontend">
+            <div class="section-head"><span class="section-num">09</span><h2>Interfaz y frontend</h2></div>
+            <p>
+                La funcionalidad se integra en el <code>Layout</code> autenticado. El buscador de la cabecera fue
+                reemplazado por el botón <strong>Mensajes</strong>, que muestra un badge cuando hay mensajes de otros
+                usuarios. El panel se abre como capa lateral y no cambia de ruta.
+            </p>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Archivo</th><th>Función</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>features/mensajeria/mensajeria.model.ts</code></td><td>Interfaces <code>MensajeResponse</code>, <code>MensajeRequest</code> y <code>ResumenMensajesResponse</code>.</td></tr>
+                        <tr><td><code>features/mensajeria/mensajeria.service.ts</code></td><td>Estado con signals, carga inicial, polling, envío, merge y persistencia del último leído.</td></tr>
+                        <tr><td><code>features/mensajeria/chat-panel/chat-panel.ts</code></td><td>Componente del panel: formulario, historial, scroll, cierre con Escape y clic fuera.</td></tr>
+                        <tr><td><code>features/mensajeria/chat-panel/chat-panel.html</code></td><td>Estructura del diálogo, cabecera, lista de mensajes, estados vacío/carga/error y composer.</td></tr>
+                        <tr><td><code>features/mensajeria/chat-panel/chat-panel.css</code></td><td>Estilos del panel, burbujas, avatar, badge, responsive y animación de apertura.</td></tr>
+                        <tr><td><code>core/layout/layout.ts</code></td><td>Inyecta el servicio, arranca/detiene el polling y controla la apertura del panel.</td></tr>
+                        <tr><td><code>core/layout/layout.html</code></td><td>Botón «Mensajes» con icono, texto y badge; renderiza <code>&lt;app-chat-panel&gt;</code>.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Comportamiento visual</h3>
+            <div class="grid-3">
+                <div class="card blue">
+                    <h4>Cabecera</h4>
+                    <p class="small">Botón con icono de chat, etiqueta «Mensajes» y badge rojo. El badge se oculta cuando el contador es cero y muestra <strong>99+</strong> al superar ese valor.</p>
+                </div>
+                <div class="card green">
+                    <h4>Historial</h4>
+                    <p class="small">Cada fila muestra avatar con iniciales, autor, hora y burbuja. Los mensajes propios se alinean a la derecha y usan la etiqueta «Tú»; los ajenos se alinean a la izquierda.</p>
+                </div>
+                <div class="card purple">
+                    <h4>Composer</h4>
+                    <p class="small">Campo multilínea con límite de 2.000 caracteres. Enter envía; Shift+Enter crea una línea. El botón se deshabilita si el texto está vacío o mientras se envía.</p>
+                </div>
+                <div class="card">
+                    <h4>Cierre</h4>
+                    <p class="small">Tecla Escape, clic en el fondo oscuro o botón de cerrar. Al abrir, el foco pasa al campo de texto y el historial se desplaza al final.</p>
+                </div>
+                <div class="card">
+                    <h4>Estados</h4>
+                    <p class="small">Carga inicial, sala vacía, error de conexión y estado «Sin conexión». El polling continúa aunque falle un ciclo.</p>
+                </div>
+                <div class="card">
+                    <h4>Responsive</h4>
+                    <p class="small">En escritorio el panel mide unos 430 px; en móvil ocupa el ancho completo y el historial se adapta a la altura disponible.</p>
+                </div>
+            </div>
+
+            <div class="callout">
+                <strong>Accesibilidad:</strong> el panel usa semántica de diálogo, <code>aria-modal</code>, etiqueta de
+                título, cierre con Escape y foco inicial en el composer. El contenido se muestra con interpolación de
+                Angular, que escapa HTML.
+            </div>
+        </section>
+
+        <section class="section" id="seguridad">
+            <div class="section-head"><span class="section-num">10</span><h2>Seguridad e identidad</h2></div>
+            <p>
+                La mensajería no implementa su propio sistema de login. Se apoya en el resource server OAuth2/JWT del
+                backend y en el token que el frontend obtiene de Keycloak. Cualquier usuario autenticado puede participar
+                en la sala; no hay roles específicos para leer o escribir mensajes.
+            </p>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Control</th><th>Implementación</th><th>Observación</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Autenticación</strong></td><td>Spring Security OAuth2 Resource Server valida el JWT con el JWK Set de Keycloak.</td><td>Perfil activo <code>keycloak</code>; emisor <code>http://localhost:8180/realms/viernes-realm</code>.</td></tr>
+                        <tr><td><strong>Autorización</strong></td><td>Todos los endpoints exigen autenticación; no se exige rol.</td><td>Coherente con una sala general para todo el equipo.</td></tr>
+                        <tr><td><strong>Identidad del autor</strong></td><td>Correo desde <code>Authentication.getName()</code>; nombre desde el claim <code>name</code> o <code>given_name + family_name</code>.</td><td>El cliente no puede elegir el autor en el cuerpo.</td></tr>
+                        <tr><td><strong>Fallback de nombre</strong></td><td>Claim <code>name</code>; si falta, <code>given_name + family_name</code>; luego <code>UsuariosApi.buscarPorCorreo()</code>; último recurso, el correo.</td><td>Cubre tokens sin claim <code>name</code> y usuarios no sincronizados.</td></tr>
+                        <tr><td><strong>XSS</strong></td><td>Interpolación de Angular y <code>white-space: pre-wrap</code>; sin <code>innerHTML</code>.</td><td>El contenido se trata como texto, no como marcado.</td></tr>
+                        <tr><td><strong>CSRF</strong></td><td>API stateless con Bearer token; no se usan cookies de sesión para la API.</td><td>El token se guarda en <code>localStorage</code>, lo que exige cuidado frente a XSS.</td></tr>
+                        <tr><td><strong>CORS</strong></td><td>Orígenes de desarrollo <code>localhost:4200</code>, <code>8080</code> y <code>3000</code>.</td><td>Configuración de desarrollo; producción requiere lista explícita.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="grid-2">
+                <div class="card green">
+                    <h3>Fortalezas</h3>
+                    <ul class="checklist">
+                        <li>Autor derivado del token, no del JSON.</li>
+                        <li>Validación de contenido en API y UI.</li>
+                        <li>Contenido mostrado como texto escapado.</li>
+                        <li>Token con expiración y renovación en el cliente.</li>
+                        <li>Sin claves de base de datos en el frontend.</li>
+                    </ul>
+                </div>
+                <div class="card rose">
+                    <h3>Riesgos y controles pendientes</h3>
+                    <ul class="crosslist">
+                        <li>No hay rate limiting ni antispam por usuario.</li>
+                        <li>No hay moderación ni borrado administrativo.</li>
+                        <li>Todo usuario autenticado lee toda la sala; no hay ACL por área.</li>
+                        <li>El token en <code>localStorage</code> es sensible a XSS.</li>
+                        <li>No hay auditoría específica de mensajes.</li>
+                        <li>No hay cifrado adicional a nivel de aplicación.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="callout amber">
+                <strong>Nota sobre el login:</strong> el backend conserva el endpoint local
+                <code>/api/v1/auth/login</code> para el modo JWT propio. En el perfil <code>keycloak</code> el resource
+                server no acepta ese token local; el flujo operativo del frontend es el Direct Grant contra Keycloak.
+                Esta dualidad debe consolidarse antes de producción.
+            </div>
+        </section>
+
+        <section class="section" id="pruebas">
+            <div class="section-head"><span class="section-num">11</span><h2>Pruebas y verificación</h2></div>
+            <p>
+                El módulo cuenta con pruebas unitarias del servicio y pruebas de controlador con Spring MVC. Las pruebas
+                globales del backend incluyen además la verificación de la estructura modular y el arranque del contexto.
+            </p>
+            <div class="kpi-grid">
+                <div class="kpi"><div class="label">Pruebas del módulo</div><div class="value">11</div><div class="note">servicio + controlador</div></div>
+                <div class="kpi"><div class="label">Suite backend</div><div class="value">257</div><div class="note">0 fallos · 0 errores</div></div>
+                <div class="kpi"><div class="label">Build Angular</div><div class="value">OK</div><div class="note">342,38 kB inicial</div></div>
+                <div class="kpi"><div class="label">Transferencia</div><div class="value">94,11 kB</div><div class="note">estimado por Angular</div></div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Archivo</th><th>Pruebas</th><th>Cobertura funcional</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>MensajeServiceTest</code></td><td>6</td><td>Listado, incremental, resumen, nombre desde token, fallback de usuario y validación de contenido.</td></tr>
+                        <tr><td><code>MensajeControllerTest</code></td><td>5</td><td>GET de lista, GET de resumen, POST 201, nombre desde JWT y rechazo de contenido vacío.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <h3>Evidencia de ejecución</h3>
+            <pre><code># Backend
+.\mvnw.cmd test
+# Resultado: Tests run: 257, Failures: 0, Errors: 0, Skipped: 0
+# BUILD SUCCESS
+
+# Frontend
+npm.cmd run build
+# Initial total: 342.38 kB (94.11 kB transferidos)
+# Build terminado correctamente</code></pre>
+            <h3>Verificación manual en navegador</h3>
+            <ul class="checklist">
+                <li>Envío de un mensaje y aparición inmediata en el panel.</li>
+                <li>Persistencia tras recargar la página.</li>
+                <li>Badge con un mensaje simulado de otro usuario.</li>
+                <li>Limpieza del badge al abrir el panel.</li>
+                <li>Cierre con Escape y con clic en el fondo.</li>
+            </ul>
+            <p class="small muted">
+                No existen pruebas end-to-end automatizadas ni pruebas unitarias específicas del componente Angular de
+                mensajería; la validación del frontend se realizó con build y prueba manual.
+            </p>
+        </section>
+
+        <section class="section" id="limitaciones">
+            <div class="section-head"><span class="section-num">12</span><h2>Limitaciones y deuda técnica</h2></div>
+            <div class="grid-2">
+                <div class="card amber">
+                    <h3>Funcionales</h3>
+                    <ul>
+                        <li>Sala única: no hay mensajes directos, canales ni grupos.</li>
+                        <li>Sin adjuntos, imágenes, audio, reacciones ni menciones.</li>
+                        <li>Sin edición ni borrado de mensajes.</li>
+                        <li>Sin búsqueda ni paginación hacia atrás.</li>
+                        <li>Sin notificaciones fuera de la aplicación.</li>
+                        <li>Sin estados de escritura ni presencia.</li>
+                    </ul>
+                </div>
+                <div class="card rose">
+                    <h3>Técnicas</h3>
+                    <ul>
+                        <li>Polling cada 5 s: 12 peticiones por minuto por usuario conectado.</li>
+                        <li>El badge se calcula sobre la ventana de 100 mensajes, no sobre el total.</li>
+                        <li><code>/resumen</code> no se consume desde la UI.</li>
+                        <li>Último leído en <code>localStorage</code>: no se sincroniza entre dispositivos.</li>
+                        <li>Sin pruebas frontend específicas del módulo.</li>
+                        <li>Sin migraciones Flyway/Liquibase; el esquema depende de <code>ddl-auto</code>.</li>
+                        <li>Sin rate limiting, moderación ni retención automática.</li>
+                        <li>Fecha sin zona horaria explícita; se asume hora del servidor.</li>
+                    </ul>
+                </div>
+            </div>
+            <h3>Evolución recomendada</h3>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Prioridad</th><th>Mejora</th><th>Impacto</th></tr></thead>
+                    <tbody>
+                        <tr><td><span class="badge-inline b-rose">P1</span></td><td>Usar <code>/resumen</code> para el badge y añadir rate limiting básico.</td><td>Menos carga y menor riesgo de abuso.</td></tr>
+                        <tr><td><span class="badge-inline b-rose">P1</span></td><td>Añadir pruebas del componente Angular y un E2E de envío/lectura.</td><td>Protege la regresión de la interfaz.</td></tr>
+                        <tr><td><span class="badge-inline b-amber">P2</span></td><td>Migrar a SSE o WebSocket para actualización en tiempo real.</td><td>Elimina la latencia de 5 s y reduce peticiones.</td></tr>
+                        <tr><td><span class="badge-inline b-amber">P2</span></td><td>Persistir recibos de lectura en servidor y sincronizar entre dispositivos.</td><td>Contador consistente y auditable.</td></tr>
+                        <tr><td><span class="badge-inline b-blue">P3</span></td><td>Canales, mensajes directos, adjuntos y búsqueda.</td><td>Conversión en una mensajería corporativa completa.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="section" id="operacion">
+            <div class="section-head"><span class="section-num">13</span><h2>Operación y diagnóstico</h2></div>
+            <h3>Consultas útiles en Oracle</h3>
+            <pre><code>-- Ver el total de mensajes
+SELECT COUNT(*) AS total FROM CRM_MENSAJES;
+
+-- Ver los últimos 20 mensajes
+SELECT ID, USUARIO_CORREO, USUARIO_NOMBRE, CREADO_EN
+FROM CRM_MENSAJES
+ORDER BY ID DESC
+FETCH FIRST 20 ROWS ONLY;
+
+-- Limpiar datos de prueba SOLO en desarrollo
+DELETE FROM CRM_MENSAJES;
+COMMIT;</code></pre>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Síntoma</th><th>Revisión recomendada</th></tr></thead>
+                    <tbody>
+                        <tr><td>401 al enviar o listar</td><td>Token ausente/expirado, Keycloak no disponible o emisor distinto. Revisar la petición en DevTools.</td></tr>
+                        <tr><td>403</td><td>Sesión sin autenticación válida o configuración de seguridad del perfil activo.</td></tr>
+                        <tr><td>400 al enviar</td><td>Contenido vacío o superior a 2.000 caracteres; revisar el JSON.</td></tr>
+                        <tr><td>El badge no cambia</td><td>Comprobar que el polling está activo, que el panel está cerrado y que el mensaje proviene de otro usuario.</td></tr>
+                        <tr><td>No aparecen mensajes antiguos</td><td>La ventana inicial es de 100; verificar la tabla y el parámetro <code>limite</code>.</td></tr>
+                        <tr><td>Error de conexión a Oracle</td><td>Contenedor <code>bomerp-oracle</code>, puerto 1521, credenciales del perfil <code>dev</code>.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <h3>Referencias rápidas</h3>
+            <div class="grid-3">
+                <div class="card"><h4>Swagger UI</h4><p class="small"><code>http://localhost:8080/swagger-ui.html</code></p></div>
+                <div class="card"><h4>Actuator</h4><p class="small"><code>http://localhost:8080/actuator/health</code></p></div>
+                <div class="card"><h4>Keycloak</h4><p class="small"><code>http://localhost:8180</code> · realm <code>viernes-realm</code></p></div>
+            </div>
+        </section>
+
+        <section class="section" id="conclusion">
+            <div class="section-head"><span class="section-num">14</span><h2>Conclusión</h2></div>
+            <p>
+                La mensajería interna cumple el objetivo de dar al equipo un canal compartido dentro del CRM con una
+                implementación pequeña, comprensible y alineada con la arquitectura existente. La separación por puertos y
+                adaptadores permite reemplazar el polling por tiempo real o cambiar la persistencia sin reescribir el
+                controlador ni la interfaz.
+            </p>
+            <p>
+                El módulo es adecuado para un equipo pequeño en un entorno controlado. Antes de llevarlo a producción se
+                recomienda cerrar las brechas de pruebas frontend, rate limiting, migraciones de esquema, sincronización
+                de lecturas y consolidación del flujo de autenticación.
+            </p>
+            <div class="callout green">
+                <strong>Resumen final:</strong> 3 endpoints, 1 tabla, 11 pruebas del módulo, polling de 5 segundos y una
+                experiencia de chat integrada en el layout. La base está lista para evolucionar a tiempo real y canales
+                múltiples cuando el producto lo requiera.
+            </div>
+            <p class="small muted">
+                Para el mapa completo de carpetas, módulos y flujo del sistema, consultar
+                <a href="informe_tecnico_sistema_v1.html">Informe técnico del sistema y sus módulos</a>.
+            </p>
+        </section>
+
+    </main>
+
+    <footer class="footer">
+        <span><strong>VIERNES CRM V1</strong> · Informe de Mensajería Interna · v1.0</span>
+        <span>Generado desde el código actual · 21/10/2026 · <a href="../index.html">Portal de informes</a></span>
+    </footer>
+
+</div>
+</body>
+</html>

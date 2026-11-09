@@ -1,5 +1,5 @@
 <div class="module-view-container">
-  
+
   <!-- VIEW TOOLBAR -->
   <div class="view-toolbar">
     <div class="view-title-group">
@@ -11,10 +11,10 @@
       <!-- Search Pill -->
       <div class="toolbar-search-pill">
         <mat-icon>search</mat-icon>
-        <input 
-          type="text" 
-          placeholder="Buscar por título, tipo o estado..." 
-          [ngModel]="filtroTexto()" 
+        <input
+          type="text"
+          placeholder="Buscar por título, tipo o estado..."
+          [ngModel]="filtroTexto()"
           (ngModelChange)="filtroTexto.set($event)"
         />
         @if (filtroTexto()) {
@@ -24,8 +24,39 @@
         }
       </div>
 
+      <!-- Tag Filter -->
+      <div class="toolbar-tag-filter">
+        <mat-icon>sell</mat-icon>
+        <select
+          [ngModel]="filtroEtiquetaId()"
+          (ngModelChange)="onFiltroEtiquetaChange($event)"
+          aria-label="Filtrar actividades por etiqueta"
+        >
+          <option [ngValue]="null">Todas las etiquetas</option>
+          @for (etiqueta of etiquetas(); track etiqueta.id) {
+            <option [ngValue]="etiqueta.id">{{ etiqueta.nombre }}</option>
+          }
+        </select>
+        @if (filtroEtiquetaId() !== null) {
+          <button
+            type="button"
+            class="clear-search-btn"
+            (click)="limpiarFiltroEtiqueta()"
+            title="Quitar filtro de etiqueta"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+        }
+      </div>
+
+      @if (puedeGestionarEtiquetas) {
+        <button class="btn-secondary-mac" (click)="abrirGestionEtiquetas()">
+          <mat-icon>sell</mat-icon> Etiquetas
+        </button>
+      }
+
       <!-- New Button -->
-      <button class="btn-primary-mac" routerLink="/actividades/nuevo">
+      <button class="btn-primary-mac" (click)="nuevaActividad()">
         <mat-icon>add</mat-icon> Nueva Actividad
       </button>
     </div>
@@ -46,78 +77,110 @@
 
   @if (isEmpty()) {
     <div class="empty-state">
-      <mat-icon>event</mat-icon>
-      <h3>No hay actividades registradas</h3>
-      <p>Planifica reuniones, llamadas y tareas de seguimiento con tus prospectos.</p>
-      <button class="btn-primary-mac" routerLink="/actividades/nuevo" style="margin-top: 16px;">
-        <mat-icon>add</mat-icon> Programar Actividad
-      </button>
+      <mat-icon>{{ filtroTexto() || filtroEtiquetaId() !== null ? 'filter_alt_off' : 'event' }}</mat-icon>
+      <h3>
+        {{ filtroTexto() || filtroEtiquetaId() !== null
+          ? 'No hay actividades que coincidan'
+          : 'No hay actividades registradas' }}
+      </h3>
+      <p>
+        {{ filtroTexto() || filtroEtiquetaId() !== null
+          ? 'Prueba con otro texto o cambia la etiqueta seleccionada.'
+          : 'Planifica reuniones, llamadas y tareas de seguimiento con tus prospectos.' }}
+      </p>
+      @if (filtroTexto() || filtroEtiquetaId() !== null) {
+        <button class="btn-secondary-mac" (click)="limpiarFiltros()" style="margin-top: 16px;">
+          <mat-icon>filter_alt_off</mat-icon> Limpiar filtros
+        </button>
+      } @else {
+        <button class="btn-primary-mac" (click)="nuevaActividad()" style="margin-top: 16px;">
+          <mat-icon>add</mat-icon> Programar Actividad
+        </button>
+      }
     </div>
   }
 
   @if (hasActividades()) {
     <div class="mac-table-card">
-      <table mat-table [dataSource]="actividadesFiltradas()">
-        
+      <table mat-table [dataSource]="actividadesOrdenadas()" matSort matSortDisableClear
+             [matSortActive]="sortState().active" [matSortDirection]="sortState().direction"
+             (matSortChange)="onSortChange($event)">
+
         <!-- ID Column -->
         <ng-container matColumnDef="id">
-          <th mat-header-cell *matHeaderCellDef> ID </th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="id"> ID </th>
           <td mat-cell *matCellDef="let act" class="id-cell"> #{{ act.id }} </td>
         </ng-container>
 
-        <!-- Título Column -->
+        <!-- Actividad Column -->
         <ng-container matColumnDef="titulo">
-          <th mat-header-cell *matHeaderCellDef> Actividad </th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="titulo"> Actividad </th>
           <td mat-cell *matCellDef="let act">
             <div class="act-title-row">
-              <strong class="act-name-bold">{{ act.titulo }}</strong>
-              <small class="act-desc-sub">{{ act.descripcion || 'Sin descripción adicional' }}</small>
+              <span class="act-icon-badge {{ getTipoClass(act.tipo) }}">
+                <mat-icon>{{ getTipoIcon(act.tipo) }}</mat-icon>
+              </span>
+              <div class="act-meta-col">
+                <strong class="act-name-bold" [title]="act.titulo">{{ act.titulo }}</strong>
+                <small class="act-desc-sub" [title]="act.descripcion || 'Sin descripción adicional'">
+                  {{ act.descripcion || 'Sin descripción adicional' }}
+                </small>
+                @if (act.etiquetas?.length) {
+                  <div class="act-tags-row">
+                    @for (etiqueta of getEtiquetasVisibles(act); track etiqueta.id) {
+                      <span
+                        class="act-tag"
+                        [style.background]="colorEtiqueta(etiqueta) + '14'"
+                        [style.color]="colorEtiqueta(etiqueta)"
+                        [style.border-color]="colorEtiqueta(etiqueta) + '33'"
+                        [title]="etiqueta.nombre"
+                      >
+                        {{ etiqueta.nombre }}
+                      </span>
+                    }
+                    @if (getEtiquetasOcultas(act) > 0) {
+                      <span class="act-tag-more" [title]="'Y ' + getEtiquetasOcultas(act) + ' etiqueta(s) más'">
+                        +{{ getEtiquetasOcultas(act) }}
+                      </span>
+                    }
+                  </div>
+                }
+              </div>
             </div>
           </td>
         </ng-container>
 
         <!-- Tipo Column -->
         <ng-container matColumnDef="tipo">
-          <th mat-header-cell *matHeaderCellDef> Tipo </th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="tipo"> Tipo </th>
           <td mat-cell *matCellDef="let act">
-            <span class="type-pill">
-              <mat-icon class="mini-icon">
-                {{ act.tipo === 'REUNION' ? 'groups' : (act.tipo === 'LLAMADA' ? 'call' : 'check_circle_outline') }}
-              </mat-icon>
-              {{ act.tipo }}
-            </span>
+            <span class="tipo-label">{{ getTipoLabel(act.tipo) }}</span>
           </td>
         </ng-container>
 
         <!-- Estado Column -->
         <ng-container matColumnDef="estado">
-          <th mat-header-cell *matHeaderCellDef> Estado </th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="estado"> Estado </th>
           <td mat-cell *matCellDef="let act">
             <span class="status-pill {{ getEstadoClass(act.estado) }}">
-              {{ act.estado }}
+              {{ getEstadoLabel(act.estado) }}
             </span>
           </td>
         </ng-container>
 
-        <!-- Fecha Column -->
+        <!-- Programada Column -->
         <ng-container matColumnDef="fecha">
-          <th mat-header-cell *matHeaderCellDef> Fecha / Hora </th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="fecha"> Programada </th>
           <td mat-cell *matCellDef="let act">
-            <span class="date-time-label">{{ act.fecha | date:'medium' }}</span>
-          </td>
-        </ng-container>
-
-        <!-- Vencida Column -->
-        <ng-container matColumnDef="vencida">
-          <th mat-header-cell *matHeaderCellDef> Alerta </th>
-          <td mat-cell *matCellDef="let act">
-            @if (act.vencida) {
-              <span class="status-pill danger" title="Actividad vencida">
-                <mat-icon class="mini-icon">warning</mat-icon> Vencida
-              </span>
-            } @else {
-              <span class="on-time-text">A tiempo</span>
-            }
+            <div class="date-time-cell">
+              <span class="date-label">{{ act.fecha | date:'dd/MM/yyyy' }}</span>
+              <span class="time-label">{{ act.fecha | date:'HH:mm' }}</span>
+              @if (act.vencida) {
+                <span class="overdue-chip" title="Actividad vencida">
+                  <mat-icon>warning</mat-icon> Vencida
+                </span>
+              }
+            </div>
           </td>
         </ng-container>
 

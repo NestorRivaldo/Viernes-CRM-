@@ -5,6 +5,7 @@ import com.viernes.usuarios.adapters.out.persistence.repository.UsuarioSpringDat
 import com.viernes.usuarios.application.port.out.UsuarioPersistencePort;
 import com.viernes.usuarios.domain.Usuario;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -18,7 +19,7 @@ public class UsuarioPersistenceAdapter implements UsuarioPersistencePort {
 
     @Override
     public List<Usuario> findAll() {
-        return repository.findAll().stream().map(this::toDomain).toList();
+        return repository.findAll(Sort.by(Sort.Direction.ASC, "id")).stream().map(this::toDomain).toList();
     }
 
     @Override

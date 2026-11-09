@@ -1,0 +1,484 @@
+<div class="opp-dialog">
+  <header class="dialog-header">
+    <div class="dialog-icon">
+      <mat-icon>track_changes</mat-icon>
+    </div>
+    <div class="dialog-heading">
+      <h2>{{ esEdicion() ? 'Editar oportunidad' : 'Nueva oportunidad' }}</h2>
+      <p>
+        {{ esEdicion()
+          ? 'Actualiza la información de la oportunidad comercial.'
+          : 'Registra una nueva oportunidad en el pipeline.' }}
+      </p>
+    </div>
+    <button type="button" class="dialog-close" (click)="cerrar()" title="Cerrar">
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
+
+  @if (esEdicion()) {
+    <nav class="dialog-tabs">
+      @for (tab of tabs; track tab.id) {
+        <button
+          type="button"
+          class="dialog-tab"
+          [class.active]="tabActiva() === tab.id"
+          (click)="tabActiva.set(tab.id)"
+        >
+          {{ tab.label }}
+          @if (tab.id !== 'general') {
+            <span class="tab-count">{{ contador(tab.id) }}</span>
+          }
+        </button>
+      }
+    </nav>
+  }
+
+  <div class="dialog-body">
+    @if (cargando()) {
+      <div class="dialog-loading">
+        <mat-spinner diameter="34"></mat-spinner>
+        <p>Cargando oportunidad...</p>
+      </div>
+    } @else {
+      @if (error() || errorRelaciones()) {
+        <div class="alert error">{{ error() || errorRelaciones() }}</div>
+      }
+
+      @if (tabActiva() === 'general') {
+        <form id="oppGeneralForm" [formGroup]="form" (ngSubmit)="guardar()" class="opp-form">
+          <div class="form-grid">
+            <div class="field">
+              <label class="field-label" for="oppNombre">
+                Nombre de la oportunidad <span class="req">*</span>
+              </label>
+              <input
+                id="oppNombre"
+                class="mac-input"
+                [class.invalid]="mostrarError('nombre')"
+                formControlName="nombre"
+                placeholder="Ej. Implementación de servicios de auditoría"
+              />
+              @if (mostrarError('nombre')) {
+                <span class="field-error">{{ mensajeError('nombre') }}</span>
+              }
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="oppCliente">
+                Cliente <span class="req">*</span>
+              </label>
+              <div class="input-with-icon">
+                <input
+                  #clienteInput
+                  id="oppCliente"
+                  class="mac-input"
+                  [class.invalid]="mostrarError('clienteNombre')"
+                  list="oppClientesList"
+                  formControlName="clienteNombre"
+                  placeholder="Buscar cliente..."
+                />
+                <mat-icon class="field-icon-right" (click)="clienteInput.focus()">search</mat-icon>
+                <datalist id="oppClientesList">
+                  @for (cliente of clientes(); track cliente.id) {
+                    <option [value]="cliente.nombre"></option>
+                  }
+                </datalist>
+              </div>
+              @if (mostrarError('clienteNombre')) {
+                <span class="field-error">{{ mensajeError('clienteNombre') }}</span>
+              }
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="oppValor">
+                Valor <span class="req">*</span>
+              </label>
+              <div class="input-suffix">
+                <input
+                  id="oppValor"
+                  type="number"
+                  class="mac-input"
+                  [class.invalid]="mostrarError('valor')"
+                  formControlName="valor"
+                  min="0"
+                  step="0.01"
+                />
+                <span class="suffix">PEN</span>
+              </div>
+              @if (mostrarError('valor')) {
+                <span class="field-error">{{ mensajeError('valor') }}</span>
+              }
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="oppProbabilidad">
+                Probabilidad (%) <span class="req">*</span>
+              </label>
+              <div class="input-suffix">
+                <input
+                  id="oppProbabilidad"
+                  type="number"
+                  class="mac-input"
+                  [class.invalid]="mostrarError('probabilidad')"
+                  formControlName="probabilidad"
+                  min="0"
+                  max="100"
+                />
+                <span class="suffix">%</span>
+              </div>
+              @if (mostrarError('probabilidad')) {
+                <span class="field-error">{{ mensajeError('probabilidad') }}</span>
+              }
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="oppEtapa">
+                Etapa <span class="req">*</span>
+              </label>
+              <div class="select-wrap">
+                <select id="oppEtapa" class="mac-input" formControlName="etapa">
+                  @for (etapa of etapas; track etapa) {
+                    <option [value]="etapa">{{ etiquetaEtapa(etapa) }}</option>
+                  }
+                </select>
+                <mat-icon class="select-chevron">expand_more</mat-icon>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="oppResponsable">
+                Responsable <span class="req">*</span>
+              </label>
+              <div class="select-wrap with-avatar">
+                <span class="mini-avatar">{{ iniciales(form.controls.responsable.value) || '?' }}</span>
+                <select
+                  id="oppResponsable"
+                  class="mac-input has-avatar"
+                  [class.invalid]="mostrarError('responsable')"
+                  formControlName="responsable"
+                >
+                  <option value="">Seleccionar responsable</option>
+                  @for (usuario of usuarios(); track usuario.id) {
+                    <option [value]="nombreCompleto(usuario)">{{ nombreCompleto(usuario) }}</option>
+                  }
+                  @if (form.controls.responsable.value && !usuarioSeleccionado()) {
+                    <option [value]="form.controls.responsable.value">
+                      {{ form.controls.responsable.value }}
+                    </option>
+                  }
+                </select>
+                <mat-icon class="select-chevron">expand_more</mat-icon>
+              </div>
+              @if (mostrarError('responsable')) {
+                <span class="field-error">{{ mensajeError('responsable') }}</span>
+              }
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="oppFecha">
+                Fecha de cierre <span class="req">*</span>
+              </label>
+              <div class="date-wrap">
+                <mat-icon class="date-icon" (click)="abrirCalendario(fechaInput)">calendar_today</mat-icon>
+                <input
+                  #fechaInput
+                  id="oppFecha"
+                  type="date"
+                  class="mac-input has-date"
+                  [class.invalid]="mostrarError('fechaCierre')"
+                  formControlName="fechaCierre"
+                />
+                @if (form.controls.fechaCierre.value) {
+                  <button type="button" class="clear-date" (click)="limpiarFecha()" title="Limpiar fecha">
+                    <mat-icon>close</mat-icon>
+                  </button>
+                }
+              </div>
+              @if (mostrarError('fechaCierre')) {
+                <span class="field-error">{{ mensajeError('fechaCierre') }}</span>
+              }
+            </div>
+
+            <div class="field full">
+              <label class="field-label" for="oppDescripcion">Descripción</label>
+              <div class="textarea-wrap">
+                <textarea
+                  id="oppDescripcion"
+                  class="mac-input mac-textarea"
+                  formControlName="descripcion"
+                  maxlength="500"
+                  rows="3"
+                  placeholder="Detalles, alcance o contexto de la oportunidad..."
+                ></textarea>
+                <span class="char-count">{{ form.controls.descripcion.value?.length || 0 }}/500</span>
+              </div>
+            </div>
+          </div>
+        </form>
+      }
+
+      @if (tabActiva() === 'contactos') {
+        <div class="tab-panel">
+          <div class="panel-head">
+            <div>
+              <h3>Contactos participantes</h3>
+              <p>Decisores e influenciadores que intervienen en la negociación.</p>
+            </div>
+            <span class="panel-count">{{ contactos().length }}</span>
+          </div>
+
+          <form class="rel-add" [formGroup]="contactoForm">
+            <div class="rel-grid">
+              <div class="field">
+                <label class="field-label">Cliente</label>
+                <div class="select-wrap">
+                  <select class="mac-input" formControlName="clienteId" (change)="onClienteChange()">
+                    <option value="">Seleccionar cliente</option>
+                    @for (cliente of clientes(); track cliente.id) {
+                      <option [value]="cliente.id">{{ cliente.nombre }}</option>
+                    }
+                  </select>
+                  <mat-icon class="select-chevron">expand_more</mat-icon>
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="field-label">Contacto</label>
+                <div class="select-wrap">
+                  <select class="mac-input" formControlName="contactoId">
+                    <option value="">
+                      {{ cargandoContactosCliente() ? 'Cargando contactos...' : 'Seleccionar contacto' }}
+                    </option>
+                    @for (contacto of contactosDisponibles(); track contacto.id) {
+                      <option [value]="contacto.id">
+                        {{ contacto.nombre }} {{ contacto.apellido }}
+                      </option>
+                    }
+                  </select>
+                  <mat-icon class="select-chevron">expand_more</mat-icon>
+                </div>
+                @if (contactoForm.controls.clienteId.value && !cargandoContactosCliente() && contactosDisponibles().length === 0) {
+                  <span class="field-hint">Este cliente no tiene contactos disponibles.</span>
+                }
+              </div>
+
+              <div class="field">
+                <label class="field-label">Rol en la decisión</label>
+                <input class="mac-input" formControlName="rol" placeholder="Ej. Decisor técnico" />
+              </div>
+
+              <div class="field checkbox-field">
+                <label class="check"><input type="checkbox" formControlName="esDecisor" /> Es decisor</label>
+              </div>
+            </div>
+
+            <div class="rel-add-actions">
+              <button
+                type="button"
+                class="btn-primary btn-sm"
+                (click)="agregarContacto()"
+                [disabled]="!puedeAgregarContacto()"
+              >
+                <mat-icon>add_link</mat-icon>
+                {{ guardandoContacto() ? 'Vinculando...' : 'Vincular contacto' }}
+              </button>
+            </div>
+          </form>
+
+          @if (cargandoRelaciones()) {
+            <div class="rel-loading"><mat-spinner diameter="28"></mat-spinner></div>
+          } @else if (contactos().length === 0) {
+            <div class="rel-empty">
+              <mat-icon>groups</mat-icon>
+              <span>Aún no hay contactos vinculados.</span>
+            </div>
+          } @else {
+            <div class="rel-list">
+              @for (contacto of contactos(); track contacto.id) {
+                <div class="rel-row">
+                  <span class="rel-avatar">{{ iniciales(contacto.nombreContacto) || '?' }}</span>
+                  <div class="rel-main">
+                    <strong>{{ contacto.nombreContacto || 'Sin nombre' }}</strong>
+                    <small>
+                      {{ contacto.correoContacto || 'Sin correo' }}
+                      @if (contacto.rol) { · {{ contacto.rol }} }
+                    </small>
+                  </div>
+                  @if (contacto.esDecisor) {
+                    <span class="pill blue">Decisor</span>
+                  }
+                  <button type="button" class="rel-remove" (click)="quitarContacto(contacto)" title="Quitar contacto">
+                    <mat-icon>close</mat-icon>
+                  </button>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      @if (tabActiva() === 'productos') {
+        <div class="tab-panel">
+          <div class="panel-head">
+            <div>
+              <h3>Productos de la oportunidad</h3>
+              <p>Ítems del catálogo que se están cotizando en esta negociación.</p>
+            </div>
+            <span class="panel-count">{{ productos().length }}</span>
+          </div>
+
+          <form class="rel-add" [formGroup]="productoForm">
+            <div class="rel-grid products">
+              <div class="field">
+                <label class="field-label">Producto</label>
+                <div class="select-wrap">
+                  <select class="mac-input" formControlName="productoId">
+                    <option value="">Seleccionar producto</option>
+                    @for (producto of productosDisponibles(); track producto.id) {
+                      <option [value]="producto.id">
+                        {{ producto.codigo }} — {{ producto.nombre }}
+                      </option>
+                    }
+                  </select>
+                  <mat-icon class="select-chevron">expand_more</mat-icon>
+                </div>
+              </div>
+
+              <div class="field qty-field">
+                <label class="field-label">Cantidad</label>
+                <input type="number" class="mac-input" formControlName="cantidad" min="1" />
+              </div>
+            </div>
+
+            <div class="rel-add-actions">
+              <button
+                type="button"
+                class="btn-primary btn-sm"
+                (click)="agregarProducto()"
+                [disabled]="guardandoProducto() || productoForm.invalid"
+              >
+                <mat-icon>add_link</mat-icon>
+                {{ guardandoProducto() ? 'Vinculando...' : 'Vincular producto' }}
+              </button>
+            </div>
+          </form>
+
+          @if (cargandoRelaciones()) {
+            <div class="rel-loading"><mat-spinner diameter="28"></mat-spinner></div>
+          } @else if (productos().length === 0) {
+            <div class="rel-empty">
+              <mat-icon>inventory_2</mat-icon>
+              <span>Aún no hay productos vinculados.</span>
+            </div>
+          } @else {
+            <div class="rel-list">
+              @for (producto of productos(); track producto.id) {
+                <div class="rel-row">
+                  <span class="rel-avatar square"><mat-icon>inventory_2</mat-icon></span>
+                  <div class="rel-main">
+                    <strong>{{ producto.nombreProducto || 'Sin nombre' }}</strong>
+                    <small>{{ producto.codigo || 'Sin código' }} · {{ formatearMoneda(producto.precioBase) }} c/u</small>
+                  </div>
+                  <span class="rel-qty">{{ producto.cantidad }} ×</span>
+                  <span class="rel-subtotal">{{ formatearMoneda((producto.precioBase || 0) * (producto.cantidad || 0)) }}</span>
+                  <button type="button" class="rel-remove" (click)="quitarProducto(producto)" title="Quitar producto">
+                    <mat-icon>close</mat-icon>
+                  </button>
+                </div>
+              }
+            </div>
+            <div class="rel-total">
+              Total productos: <strong>{{ formatearMoneda(totalProductos()) }}</strong>
+            </div>
+          }
+        </div>
+      }
+
+      @if (tabActiva() === 'colaboradores') {
+        <div class="tab-panel">
+          <div class="panel-head">
+            <div>
+              <h3>Colaboradores</h3>
+              <p>Usuarios del equipo que apoyan la venta además del responsable.</p>
+            </div>
+            <span class="panel-count">{{ colaboradores().length }}</span>
+          </div>
+
+          <form class="rel-add" [formGroup]="colaboradorForm">
+            <div class="rel-grid">
+              <div class="field">
+                <label class="field-label">Usuario</label>
+                <div class="select-wrap">
+                  <select class="mac-input" formControlName="usuarioId">
+                    <option value="">Seleccionar usuario</option>
+                    @for (usuario of usuariosDisponibles(); track usuario.id) {
+                      <option [value]="usuario.id">
+                        {{ nombreCompleto(usuario) }} — {{ usuario.correo }}
+                      </option>
+                    }
+                  </select>
+                  <mat-icon class="select-chevron">expand_more</mat-icon>
+                </div>
+              </div>
+            </div>
+
+            <div class="rel-add-actions">
+              <button
+                type="button"
+                class="btn-primary btn-sm"
+                (click)="agregarColaborador()"
+                [disabled]="guardandoColaborador() || colaboradorForm.invalid"
+              >
+                <mat-icon>person_add</mat-icon>
+                {{ guardandoColaborador() ? 'Vinculando...' : 'Vincular colaborador' }}
+              </button>
+            </div>
+          </form>
+
+          @if (cargandoRelaciones()) {
+            <div class="rel-loading"><mat-spinner diameter="28"></mat-spinner></div>
+          } @else if (colaboradores().length === 0) {
+            <div class="rel-empty">
+              <mat-icon>support_agent</mat-icon>
+              <span>Aún no hay colaboradores vinculados.</span>
+            </div>
+          } @else {
+            <div class="rel-list">
+              @for (colaborador of colaboradores(); track colaborador.id) {
+                <div class="rel-row">
+                  <span class="rel-avatar">{{ iniciales(colaborador.nombreCompleto) || '?' }}</span>
+                  <div class="rel-main">
+                    <strong>{{ colaborador.nombreCompleto || 'Sin nombre' }}</strong>
+                    <small>{{ colaborador.correo || 'Sin correo' }}</small>
+                  </div>
+                  <button type="button" class="rel-remove" (click)="quitarColaborador(colaborador)" title="Quitar colaborador">
+                    <mat-icon>close</mat-icon>
+                  </button>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+    }
+  </div>
+
+  <footer class="dialog-footer">
+    <button type="button" class="btn-ghost" (click)="cerrar()" [disabled]="guardando()">Cancelar</button>
+    <button
+      type="button"
+      class="btn-primary"
+      (click)="guardar()"
+      [disabled]="guardando() || cargando()"
+    >
+      @if (guardando()) {
+        <span class="btn-spinner"></span>
+        Guardando...
+      } @else {
+        <mat-icon>save</mat-icon>
+        {{ esEdicion() ? 'Guardar cambios' : 'Crear oportunidad' }}
+      }
+    </button>
+  </footer>
+</div>

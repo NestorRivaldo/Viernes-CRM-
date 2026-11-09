@@ -1,0 +1,373 @@
+<div class="cliente-dialog">
+  <header class="dialog-header">
+    <div class="dialog-icon">
+      <mat-icon>business</mat-icon>
+    </div>
+    <div class="dialog-heading">
+      <h2>{{ esEdicion() ? 'Editar cliente' : 'Nuevo cliente' }}</h2>
+      <p>
+        {{ esEdicion()
+          ? 'Actualiza los datos de la cuenta comercial.'
+          : 'Registra una nueva cuenta de cliente en el directorio.' }}
+      </p>
+    </div>
+    <button type="button" class="dialog-close" (click)="cerrar()" title="Cerrar">
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
+
+  @if (esEdicion()) {
+    <nav class="dialog-tabs">
+      <button
+        type="button"
+        class="dialog-tab"
+        [class.active]="tabActiva() === 'general'"
+        (click)="tabActiva.set('general')"
+      >
+        Información general
+      </button>
+      <button
+        type="button"
+        class="dialog-tab"
+        [class.active]="tabActiva() === 'contactos'"
+        (click)="tabActiva.set('contactos')"
+      >
+        Contactos
+        <span class="tab-count">{{ contactos().length }}</span>
+      </button>
+    </nav>
+  }
+
+  <div class="dialog-body">
+    @if (cargando()) {
+      <div class="dialog-loading">
+        <mat-spinner diameter="34"></mat-spinner>
+        <p>Cargando cliente...</p>
+      </div>
+    } @else {
+      @if (error()) {
+        <div class="alert error">{{ error() }}</div>
+      }
+
+      @if (tabActiva() === 'general') {
+        <form id="clienteGeneralForm" [formGroup]="form" (ngSubmit)="guardar()">
+          <div class="form-grid">
+            <div class="field">
+              <label class="field-label" for="clienteNombre">
+                Nombre <span class="req">*</span>
+              </label>
+              <input
+                id="clienteNombre"
+                class="mac-input"
+                [class.invalid]="mostrarError('nombre')"
+                formControlName="nombre"
+                placeholder="Ej. María Fernanda López"
+              />
+              @if (mostrarError('nombre')) {
+                <span class="field-error">{{ mensajeError('nombre') }}</span>
+              }
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="clienteEmpresa">Empresa</label>
+              <input
+                id="clienteEmpresa"
+                class="mac-input"
+                [class.invalid]="mostrarError('empresa')"
+                formControlName="empresa"
+                placeholder="Ej. Tecnología Norte S.A.C."
+              />
+              @if (mostrarError('empresa')) {
+                <span class="field-error">{{ mensajeError('empresa') }}</span>
+              }
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="clienteTipoDocumento">Tipo de documento</label>
+              <div class="select-wrap">
+                <select id="clienteTipoDocumento" class="mac-input" formControlName="tipoDocumento">
+                  <option [ngValue]="null">Sin documento</option>
+                  @for (tipo of tiposDocumento; track tipo) {
+                    <option [ngValue]="tipo">{{ tipo }}</option>
+                  }
+                </select>
+                <mat-icon class="select-chevron">expand_more</mat-icon>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="clienteNumeroDocumento">Número de documento</label>
+              <div class="documento-row">
+                <input
+                  id="clienteNumeroDocumento"
+                  class="mac-input"
+                  [class.invalid]="mostrarError('numeroDocumento')"
+                  formControlName="numeroDocumento"
+                  inputmode="numeric"
+                  [placeholder]="form.get('tipoDocumento')?.value === 'RUC' ? '11 dígitos' : '8 dígitos'"
+                />
+                <button
+                  type="button"
+                  class="btn-ghost btn-sm documento-lookup"
+                  (click)="consultarDocumento()"
+                  [disabled]="consultandoDocumento() || !form.get('tipoDocumento')?.value"
+                  title="Consultar datos oficiales en RENIEC/SUNAT"
+                >
+                  @if (consultandoDocumento()) {
+                    <span class="btn-spinner dark"></span>
+                    Consultando
+                  } @else {
+                    <mat-icon>search</mat-icon>
+                    Consultar
+                  }
+                </button>
+              </div>
+              @if (mostrarError('numeroDocumento')) {
+                <span class="field-error">{{ mensajeError('numeroDocumento') }}</span>
+              }
+              @if (errorDocumento()) {
+                <span class="field-error">{{ errorDocumento() }}</span>
+              }
+              @if (documentoConsultado(); as doc) {
+                <span class="documento-hint">
+                  <mat-icon>verified</mat-icon>
+                  {{ doc.tipoDocumento === 'RUC'
+                    ? (doc.razonSocial || 'RUC consultado')
+                    : (doc.nombreCompleto || 'DNI consultado') }}
+                  @if (doc.estado) { · {{ doc.estado }} }
+                  @if (doc.condicion) { · {{ doc.condicion }} }
+                </span>
+              }
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="clienteCorreo">
+                Correo <span class="req">*</span>
+              </label>
+              <input
+                id="clienteCorreo"
+                type="email"
+                class="mac-input"
+                [class.invalid]="mostrarError('correo')"
+                formControlName="correo"
+                placeholder="contacto@empresa.com"
+              />
+              @if (mostrarError('correo')) {
+                <span class="field-error">{{ mensajeError('correo') }}</span>
+              }
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="clienteTelefono">Teléfono</label>
+              <input
+                id="clienteTelefono"
+                class="mac-input"
+                [class.invalid]="mostrarError('telefono')"
+                formControlName="telefono"
+                placeholder="+51 999 999 999"
+              />
+              @if (mostrarError('telefono')) {
+                <span class="field-error">{{ mensajeError('telefono') }}</span>
+              }
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="clienteEstado">
+                Estado <span class="req">*</span>
+              </label>
+              <div class="select-wrap">
+                <select id="clienteEstado" class="mac-input" formControlName="estado">
+                  @for (estado of estados; track estado) {
+                    <option [value]="estado">{{ estado }}</option>
+                  }
+                </select>
+                <mat-icon class="select-chevron">expand_more</mat-icon>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="clienteResponsable">Responsable</label>
+              <input
+                id="clienteResponsable"
+                class="mac-input"
+                [class.invalid]="mostrarError('responsable')"
+                formControlName="responsable"
+                placeholder="Ej. Admin Viernes"
+              />
+              @if (mostrarError('responsable')) {
+                <span class="field-error">{{ mensajeError('responsable') }}</span>
+              }
+            </div>
+          </div>
+        </form>
+      }
+
+      @if (tabActiva() === 'contactos') {
+        <div class="tab-panel">
+          @if (errorContactos()) {
+            <div class="alert error">{{ errorContactos() }}</div>
+          }
+
+          <div class="panel-head">
+            <div>
+              <h3>Contactos del cliente</h3>
+              <p>Personas de contacto asociadas a esta cuenta comercial.</p>
+            </div>
+            <span class="panel-count">{{ contactos().length }}</span>
+          </div>
+
+          <form class="rel-add" [formGroup]="contactoForm" (ngSubmit)="guardarContacto()">
+            <div class="panel-form-title">
+              {{ editandoContactoId() ? 'Editar contacto' : 'Agregar contacto' }}
+            </div>
+
+            <div class="rel-grid">
+              <div class="field">
+                <label class="field-label" for="contactoNombre">
+                  Nombre <span class="req">*</span>
+                </label>
+                <input
+                  id="contactoNombre"
+                  class="mac-input"
+                  [class.invalid]="mostrarErrorContacto('nombre')"
+                  formControlName="nombre"
+                  placeholder="Nombre del contacto"
+                />
+                @if (mostrarErrorContacto('nombre')) {
+                  <span class="field-error">{{ mensajeErrorContacto('nombre') }}</span>
+                }
+              </div>
+
+              <div class="field">
+                <label class="field-label" for="contactoApellido">Apellido</label>
+                <input
+                  id="contactoApellido"
+                  class="mac-input"
+                  formControlName="apellido"
+                  placeholder="Apellido"
+                />
+              </div>
+
+              <div class="field">
+                <label class="field-label" for="contactoCargo">Cargo</label>
+                <input
+                  id="contactoCargo"
+                  class="mac-input"
+                  formControlName="cargo"
+                  placeholder="Ej. Gerente de compras"
+                />
+              </div>
+
+              <div class="field">
+                <label class="field-label" for="contactoCorreo">Correo</label>
+                <input
+                  id="contactoCorreo"
+                  type="email"
+                  class="mac-input"
+                  [class.invalid]="mostrarErrorContacto('correo')"
+                  formControlName="correo"
+                  placeholder="contacto@empresa.com"
+                />
+                @if (mostrarErrorContacto('correo')) {
+                  <span class="field-error">{{ mensajeErrorContacto('correo') }}</span>
+                }
+              </div>
+
+              <div class="field">
+                <label class="field-label" for="contactoTelefono">Teléfono</label>
+                <input
+                  id="contactoTelefono"
+                  class="mac-input"
+                  formControlName="telefono"
+                  placeholder="+51 999 999 999"
+                />
+              </div>
+
+              <div class="field checkbox-field">
+                <label class="check">
+                  <input type="checkbox" formControlName="principal" />
+                  Contacto principal
+                </label>
+              </div>
+            </div>
+
+            <div class="rel-add-actions">
+              @if (editandoContactoId()) {
+                <button type="button" class="btn-ghost btn-sm" (click)="cancelarEdicionContacto()">
+                  Cancelar edición
+                </button>
+              }
+              <button type="submit" class="btn-primary btn-sm" [disabled]="guardandoContacto()">
+                <mat-icon>{{ editandoContactoId() ? 'save' : 'person_add' }}</mat-icon>
+                {{ guardandoContacto() ? 'Guardando...' : editandoContactoId() ? 'Actualizar contacto' : 'Agregar contacto' }}
+              </button>
+            </div>
+          </form>
+
+          @if (cargandoContactos()) {
+            <div class="rel-loading"><mat-spinner diameter="28"></mat-spinner></div>
+          } @else if (contactos().length === 0) {
+            <div class="rel-empty">
+              <mat-icon>contacts</mat-icon>
+              <span>Este cliente aún no tiene contactos registrados.</span>
+            </div>
+          } @else {
+            <div class="contact-list">
+              @for (contacto of contactos(); track contacto.id) {
+                <div class="contact-row">
+                  <span class="contact-avatar">{{ iniciales(nombreCompleto(contacto)) || '?' }}</span>
+                  <div class="contact-main">
+                    <strong>{{ nombreCompleto(contacto) || 'Sin nombre' }}</strong>
+                    <small>
+                      {{ contacto.cargo || 'Sin cargo' }}
+                      @if (contacto.correo) { · {{ contacto.correo }} }
+                    </small>
+                  </div>
+                  @if (contacto.principal) {
+                    <span class="pill blue">Principal</span>
+                  }
+                  <div class="contact-actions">
+                    <button
+                      type="button"
+                      class="icon-btn"
+                      (click)="editarContacto(contacto)"
+                      title="Editar contacto"
+                    >
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button
+                      type="button"
+                      class="icon-btn danger"
+                      (click)="eliminarContacto(contacto)"
+                      title="Eliminar contacto"
+                    >
+                      <mat-icon>delete_outline</mat-icon>
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+    }
+  </div>
+
+  <footer class="dialog-footer">
+    <button type="button" class="btn-ghost" (click)="cerrar()" [disabled]="guardando()">Cancelar</button>
+    <button
+      type="button"
+      class="btn-primary"
+      (click)="guardar()"
+      [disabled]="guardando() || cargando()"
+    >
+      @if (guardando()) {
+        <span class="btn-spinner"></span>
+        Guardando...
+      } @else {
+        <mat-icon>save</mat-icon>
+        Guardar
+      }
+    </button>
+  </footer>
+</div>

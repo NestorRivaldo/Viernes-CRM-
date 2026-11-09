@@ -6,6 +6,7 @@ import com.viernes.equipos.application.port.out.EquipoPersistencePort;
 import com.viernes.equipos.domain.Equipo;
 import com.viernes.equipos.domain.EstadoEquipo;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
@@ -18,7 +19,7 @@ public class EquipoPersistenceAdapter implements EquipoPersistencePort {
 
     @Override
     public List<Equipo> findAll() {
-        return repository.findAll().stream().map(this::toDomain).toList();
+        return repository.findAll(Sort.by(Sort.Direction.ASC, "id")).stream().map(this::toDomain).toList();
     }
 
     @Override

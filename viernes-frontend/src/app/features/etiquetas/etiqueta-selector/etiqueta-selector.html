@@ -1,0 +1,139 @@
+<div class="tag-selector" [class.disabled]="disabled" [class.focused]="abierto">
+
+  <div class="tag-chips">
+    @for (etiqueta of seleccionadas; track etiqueta.id) {
+      <span
+        class="tag-chip"
+        [style.background]="colorConAlfa(etiqueta, '16')"
+        [style.color]="colorEtiqueta(etiqueta)"
+        [style.border-color]="colorConAlfa(etiqueta, '3d')"
+        [class.dragging]="draggingId === etiqueta.id"
+        [class.drag-over]="dragOverId === etiqueta.id"
+        [attr.draggable]="!disabled"
+        [attr.title]="disabled ? null : 'Arrastra para ordenar'"
+        (dragstart)="onDragStart(etiqueta, $event)"
+        (dragover)="onDragOver(etiqueta, $event)"
+        (drop)="onDrop(etiqueta, $event)"
+        (dragend)="onDragEnd()"
+      >
+        <mat-icon class="tag-drag">drag_indicator</mat-icon>
+        <span class="tag-dot" [style.background]="colorEtiqueta(etiqueta)"></span>
+        <span class="tag-chip-name">{{ etiqueta.nombre }}</span>
+        <button
+          type="button"
+          class="tag-remove"
+          [disabled]="disabled"
+          [attr.aria-label]="'Quitar etiqueta ' + etiqueta.nombre"
+          (click)="quitar(etiqueta)"
+        >
+          <mat-icon>close</mat-icon>
+        </button>
+      </span>
+    }
+
+    <div class="tag-input-wrap">
+      <mat-icon class="tag-input-icon">sell</mat-icon>
+      <input
+        type="text"
+        class="tag-input"
+        role="combobox"
+        aria-autocomplete="list"
+        [attr.aria-expanded]="mostrarDropdown"
+        aria-controls="tagOptions"
+        [attr.aria-activedescendant]="indiceActivo >= 0 ? 'tag-option-' + indiceActivo : null"
+        [value]="busqueda"
+        [disabled]="disabled || alcanzoMaximo"
+        [placeholder]="placeholderInput"
+        (input)="onBusqueda($event)"
+        (focus)="abrir()"
+        (keydown)="onKeydown($event)"
+      />
+      @if (creando) {
+        <span class="tag-spinner" aria-label="Creando etiqueta"></span>
+      } @else {
+        <button
+          type="button"
+          class="tag-quick-add"
+          [disabled]="disabled || alcanzoMaximo"
+          title="Crear nueva etiqueta"
+          aria-label="Crear nueva etiqueta"
+          (click)="iniciarCreacionRapida()"
+        >
+          <mat-icon>add</mat-icon>
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (mostrarDropdown) {
+    <div class="tag-dropdown" [class.drop-up]="dropUp" id="tagOptions" role="listbox">
+      @if (cargando) {
+        <div class="tag-dropdown-state">
+          <span class="tag-spinner dark"></span>
+          <span>Cargando etiquetas...</span>
+        </div>
+      } @else {
+        @if (creacionRapida && !busqueda.trim()) {
+          <div class="tag-quick-hint">
+            <mat-icon>edit</mat-icon>
+            <span>Escribe el nombre y presiona Enter.</span>
+          </div>
+        }
+
+        @for (etiqueta of etiquetasDisponibles; track etiqueta.id; let i = $index) {
+          <button
+            type="button"
+            class="tag-option"
+            role="option"
+            [id]="'tag-option-' + i"
+            [class.active]="indiceActivo === i"
+            [attr.aria-selected]="indiceActivo === i"
+            (mousedown)="$event.preventDefault(); seleccionar(etiqueta)"
+          >
+            <span class="tag-option-dot" [style.background]="colorEtiqueta(etiqueta)"></span>
+            <span class="tag-option-copy">
+              <strong>{{ etiqueta.nombre }}</strong>
+              @if (etiqueta.descripcion) {
+                <small>{{ etiqueta.descripcion }}</small>
+              }
+            </span>
+            <mat-icon class="tag-option-add">add</mat-icon>
+          </button>
+        }
+
+        @if (puedeCrear) {
+          <button
+            type="button"
+            class="tag-create"
+            (mousedown)="$event.preventDefault(); crear()"
+          >
+            <span class="tag-create-icon"><mat-icon>add</mat-icon></span>
+            <span>Crear etiqueta <strong>“{{ busqueda.trim() }}”</strong></span>
+          </button>
+        }
+
+        @if (!etiquetasDisponibles.length && !puedeCrear && !(creacionRapida && !busqueda.trim())) {
+          <div class="tag-dropdown-state">
+            <mat-icon>sell</mat-icon>
+            <span>
+              {{ busqueda.trim() ? 'No hay etiquetas que coincidan.' : 'No hay etiquetas disponibles.' }}
+            </span>
+          </div>
+        }
+      }
+    </div>
+  }
+
+  <div class="tag-meta">
+    <span class="tag-counter">{{ seleccionadas.length }} de {{ max }} etiquetas</span>
+    @if (alcanzoMaximo && !disabled) {
+      <span class="tag-limit">Límite alcanzado</span>
+    }
+    @if (errorCarga) {
+      <span class="tag-error">{{ errorCarga }}</span>
+    }
+    @if (errorCreacion) {
+      <span class="tag-error">{{ errorCreacion }}</span>
+    }
+  </div>
+</div>

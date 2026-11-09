@@ -371,3 +371,80 @@ html, body {
   background: var(--primary-blue-hover) !important;
   box-shadow: 0 6px 16px rgba(37, 99, 235, 0.38) !important;
 }
+
+/* ==========================================================================
+   OPORTUNIDAD DIALOG (modal con pestañas)
+   ========================================================================== */
+
+.opp-dialog-panel {
+  max-width: 95vw;
+}
+
+.opp-dialog-panel .mat-mdc-dialog-container {
+  padding: 0 !important;
+  border-radius: 20px !important;
+}
+
+.opp-dialog-panel .mdc-dialog__surface {
+  border-radius: 20px !important;
+  overflow: hidden !important;
+  box-shadow: 0 30px 80px rgba(15, 23, 42, 0.28) !important;
+}
+
+.opp-dialog-backdrop {
+  background: rgba(15, 23, 42, 0.42) !important;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* ==========================================================================
+   ACTIVIDAD DIALOG (modal sobre el listado)
+   ========================================================================== */
+
+.actividad-dialog-panel {
+  max-width: 95vw;
+}
+
+.actividad-dialog-panel .mat-mdc-dialog-container {
+  padding: 0 !important;
+  border-radius: 22px !important;
+}
+
+.actividad-dialog-panel .mdc-dialog__surface {
+  border-radius: 22px !important;
+  overflow: hidden !important;
+  background: #ffffff !important;
+  box-shadow: 0 34px 90px rgba(15, 23, 42, 0.32) !important;
+}
+
+.actividad-dialog-backdrop {
+  background: rgba(15, 23, 42, 0.44) !important;
+  backdrop-filter: blur(6px) saturate(115%);
+  -webkit-backdrop-filter: blur(6px) saturate(115%);
+}
+
+/* ==========================================================================
+   ENTITY DIALOG (modales de entidades)
+   ========================================================================== */
+
+.entity-dialog-panel {
+  max-width: 95vw;
+}
+
+.entity-dialog-panel .mat-mdc-dialog-container {
+  padding: 0 !important;
+  border-radius: 22px !important;
+}
+
+.entity-dialog-panel .mdc-dialog__surface {
+  border-radius: 22px !important;
+  overflow: hidden !important;
+  background: #ffffff !important;
+  box-shadow: 0 34px 90px rgba(15, 23, 42, 0.32) !important;
+}
+
+.entity-dialog-backdrop {
+  background: rgba(15, 23, 42, 0.44) !important;
+  backdrop-filter: blur(6px) saturate(115%);
+  -webkit-backdrop-filter: blur(6px) saturate(115%);
+}

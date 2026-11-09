@@ -1,0 +1,139 @@
+<div class="tag-manager">
+  <header class="tag-manager-header">
+    <div class="tag-manager-icon"><mat-icon>sell</mat-icon></div>
+    <div class="tag-manager-heading">
+      <span class="tag-manager-eyebrow">Catálogo global · CRM</span>
+      <h2>Gestionar etiquetas</h2>
+      <p>Crea, edita y archiva las etiquetas disponibles para tus actividades.</p>
+    </div>
+    <button type="button" class="tag-manager-close" (click)="cerrar()" title="Cerrar">
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
+
+  <div class="tag-manager-body">
+    @if (error) {
+      <div class="tag-manager-alert error">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ error }}</span>
+      </div>
+    }
+    @if (mensaje) {
+      <div class="tag-manager-alert success">
+        <mat-icon>check_circle</mat-icon>
+        <span>{{ mensaje }}</span>
+      </div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="guardar()" class="tag-manager-form">
+      <div class="tag-manager-form-title">
+        <strong>{{ editandoId ? 'Editar etiqueta' : 'Nueva etiqueta' }}</strong>
+        @if (editandoId) {
+          <button type="button" class="tag-manager-link" (click)="cancelarEdicion()">Cancelar edición</button>
+        }
+      </div>
+
+      <div class="tag-manager-grid">
+        <div class="tag-manager-field">
+          <label for="tagNombre">Nombre</label>
+          <input
+            id="tagNombre"
+            type="text"
+            formControlName="nombre"
+            placeholder="Ej. Seguimiento prioritario"
+            maxlength="40"
+          />
+          @if (form.get('nombre')?.touched && form.get('nombre')?.invalid) {
+            <small class="tag-manager-error">El nombre es obligatorio.</small>
+          }
+        </div>
+
+        <div class="tag-manager-field color-field">
+          <label for="tagColor">Color</label>
+          <div class="tag-color-control">
+            <input id="tagColor" type="color" formControlName="color" />
+            <span>{{ form.get('color')?.value }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tag-manager-field">
+        <label for="tagDescripcion">Descripción <span>(opcional)</span></label>
+        <input
+          id="tagDescripcion"
+          type="text"
+          formControlName="descripcion"
+          placeholder="Para qué se usa esta etiqueta"
+          maxlength="160"
+        />
+      </div>
+
+      <div class="tag-manager-form-footer">
+        <label class="tag-manager-check">
+          <input type="checkbox" formControlName="activa" />
+          <span>Etiqueta activa</span>
+        </label>
+        <button type="submit" class="tag-manager-submit" [disabled]="guardando">
+          @if (guardando) {
+            <span class="tag-manager-spinner"></span>
+            Guardando...
+          } @else {
+            <mat-icon>{{ editandoId ? 'save' : 'add' }}</mat-icon>
+            {{ editandoId ? 'Guardar cambios' : 'Crear etiqueta' }}
+          }
+        </button>
+      </div>
+    </form>
+
+    <div class="tag-manager-list-heading">
+      <strong>Etiquetas del catálogo</strong>
+      <span>{{ etiquetas.length }} registradas</span>
+    </div>
+
+    @if (cargando) {
+      <div class="tag-manager-state">
+        <span class="tag-manager-spinner dark"></span>
+        <span>Cargando etiquetas...</span>
+      </div>
+    } @else if (!etiquetas.length) {
+      <div class="tag-manager-state">
+        <mat-icon>sell</mat-icon>
+        <span>Aún no hay etiquetas. Crea la primera arriba.</span>
+      </div>
+    } @else {
+      <div class="tag-manager-list">
+        @for (etiqueta of etiquetas; track etiqueta.id) {
+          <div class="tag-manager-row" [class.inactive]="!etiqueta.activa">
+            <span class="tag-manager-dot" [style.background]="colorEtiqueta(etiqueta)"></span>
+            <div class="tag-manager-copy">
+              <strong>{{ etiqueta.nombre }}</strong>
+              <small>{{ etiqueta.descripcion || 'Sin descripción' }}</small>
+            </div>
+            <span class="tag-manager-state-pill" [class.inactive]="!etiqueta.activa">
+              {{ etiqueta.activa ? 'Activa' : 'Archivada' }}
+            </span>
+            <div class="tag-manager-actions">
+              <button type="button" class="tag-manager-action" title="Editar" (click)="editar(etiqueta)">
+                <mat-icon>edit</mat-icon>
+              </button>
+              @if (etiqueta.activa) {
+                <button type="button" class="tag-manager-action danger" title="Archivar" (click)="archivar(etiqueta)">
+                  <mat-icon>archive</mat-icon>
+                </button>
+              } @else {
+                <button type="button" class="tag-manager-action success" title="Reactivar" (click)="reactivar(etiqueta)">
+                  <mat-icon>unarchive</mat-icon>
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <footer class="tag-manager-footer">
+    <span>Las etiquetas archivadas no se ofrecen en el selector, pero se conservan en el historial.</span>
+    <button type="button" class="tag-manager-done" (click)="cerrar()">Cerrar</button>
+  </footer>
+</div>

@@ -16,6 +16,7 @@ public interface ManageActividadUseCase {
     List<ActividadResponse> filtrarPorCliente(Long idCliente);
     List<ActividadResponse> filtrarPorLead(Long idLead);
     List<ActividadResponse> filtrarPorOportunidad(Long idOportunidad);
+    List<ActividadResponse> filtrarPorEtiqueta(Long idEtiqueta);
     List<ActividadResponse> filtrarPorUsuario(String idUsuario);
     ActividadResponse cambiarEstado(Long id, EstadoActividad estado);
     void eliminar(Long id);

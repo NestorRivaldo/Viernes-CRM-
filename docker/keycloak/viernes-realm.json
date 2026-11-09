@@ -9,7 +9,7 @@
   "resetPasswordAllowed": true,
   "editUsernameAllowed": false,
   "bruteForceProtected": true,
-  "accessTokenLifespan": 1800,
+  "accessTokenLifespan": 300,
   "ssoSessionIdleTimeout": 36000,
   "ssoSessionMaxLifespan": 72000,
   "roles": {
@@ -28,9 +28,6 @@
       }
     ]
   },
-  "defaultRoles": [
-    "VENDEDOR"
-  ],
   "clients": [
     {
       "clientId": "viernes-frontend",
@@ -39,7 +36,7 @@
       "publicClient": true,
       "standardFlowEnabled": true,
       "implicitFlowEnabled": false,
-      "directAccessGrantsEnabled": true,
+      "directAccessGrantsEnabled": false,
       "rootUrl": "http://localhost:4200",
       "baseUrl": "http://localhost:4200",
       "redirectUris": [
@@ -82,6 +79,42 @@
       "realmRoles": [
         "ADMIN",
         "JEFE",
+        "VENDEDOR"
+      ]
+    },
+    {
+      "username": "jefe@viernes.com",
+      "email": "jefe@viernes.com",
+      "firstName": "Carlos",
+      "lastName": "Mendoza",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Jefe12345",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "JEFE"
+      ]
+    },
+    {
+      "username": "vendedor@viernes.com",
+      "email": "vendedor@viernes.com",
+      "firstName": "Ana",
+      "lastName": "Lopez",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Vendedor12345",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
         "VENDEDOR"
       ]
     }

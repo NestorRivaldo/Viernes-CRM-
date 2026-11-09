@@ -1,15 +1,22 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
+import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { DragDropModule, CdkDragDrop } from '@angular/cdk/drag-drop';
 import { OportunidadesService } from '../oportunidades.service';
 import { OportunidadResponse, EtapaOportunidad } from '../oportunidades.model';
+import {
+  OportunidadDialog,
+  OportunidadDialogResult,
+} from '../oportunidad-dialog/oportunidad-dialog';
+import { sortRows } from '../../../shared/table-sort';
 
 export interface ColumnaKanban {
   id: EtapaOportunidad;
@@ -24,11 +31,12 @@ export interface ColumnaKanban {
     CommonModule,
     FormsModule,
     MatTableModule,
+    MatSortModule,
     MatButtonModule,
     MatIconModule,
     MatMenuModule,
+    MatDialogModule,
     DragDropModule,
-    RouterLink,
     MatProgressSpinnerModule
   ],
   templateUrl: './oportunidad-list.html',
@@ -38,6 +46,7 @@ export class OportunidadList implements OnInit {
   private oportunidadesService = inject(OportunidadesService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private dialog = inject(MatDialog);
 
   oportunidades = signal<OportunidadResponse[]>([]);
   filtroTexto = signal('');
@@ -46,6 +55,8 @@ export class OportunidadList implements OnInit {
   error = signal('');
 
   displayedColumns: string[] = ['id', 'nombre', 'clienteNombre', 'valor', 'probabilidad', 'etapa', 'acciones'];
+
+  sortState = signal<Sort>({ active: 'id', direction: 'asc' });
 
   columnasKanban: ColumnaKanban[] = [
     { id: EtapaOportunidad.PROSPECCION, titulo: 'Prospección', colorClass: 'blue' },
@@ -70,6 +81,16 @@ export class OportunidadList implements OnInit {
   totalPipeline = computed(() => {
     return this.oportunidadesFiltradas().reduce((acc, o) => acc + (o.valor || 0), 0);
   });
+
+  oportunidadesOrdenadas = computed(() => sortRows(this.oportunidadesFiltradas(), this.sortState()));
+
+
+  onSortChange(sort: Sort) {
+
+    this.sortState.set(sort);
+
+  }
+
 
   hasOportunidades = computed(() => this.oportunidadesFiltradas().length > 0 && !this.loading());
   isEmpty = computed(() => !this.loading() && this.oportunidadesFiltradas().length === 0 && !this.error());
@@ -217,6 +238,33 @@ export class OportunidadList implements OnInit {
   }
 
   editar(id: number) {
-    this.router.navigate(['/oportunidades', id, 'editar']);
+    this.abrirDialogo(id);
+  }
+
+  nuevaOportunidad() {
+    this.abrirDialogo();
+  }
+
+  private abrirDialogo(id?: number) {
+    this.dialog
+      .open(OportunidadDialog, {
+        data: { id: id ?? null },
+        panelClass: 'opp-dialog-panel',
+        backdropClass: 'opp-dialog-backdrop',
+        width: '780px',
+        maxWidth: '95vw',
+        disableClose: false,
+        autoFocus: false,
+      })
+      .afterClosed()
+      .subscribe((result: OportunidadDialogResult | undefined) => {
+        if (result?.saved) {
+          this.cargarOportunidades();
+        }
+      });
+  }
+
+  verDetalle(id: number) {
+    this.router.navigate(['/oportunidades', id]);
   }
 }

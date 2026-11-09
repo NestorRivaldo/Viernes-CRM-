@@ -8,14 +8,38 @@ echo              VIERNES CRM V1 - LANZADOR AUTOMÁTICO DE SERVICIOS
 echo ==============================================================================
 echo.
 
+:: 0. Localizar Java 21 (JDK portable en .tools o Java del sistema)
+if not defined JAVA_HOME (
+    if exist "%~dp0.tools\jdk21" (
+        for /d %%D in ("%~dp0.tools\jdk21\jdk-*") do set "JAVA_HOME=%%~D"
+    )
+)
+if defined JAVA_HOME set "PATH=%JAVA_HOME%\bin;%PATH%"
+echo [0/5] Java: %JAVA_HOME%
+if not defined JAVA_HOME (
+    echo [ERROR] No se encontro Java 21. Instala un JDK 21 o coloca uno en .tools\jdk21\
+    pause
+    exit /b 1
+)
+
 :: 1. Verificar Docker
-echo [1/4] Verificando Docker Desktop...
-docker info >nul 2>&1
+echo [1/5] Verificando Docker Desktop...
+where docker >nul 2>&1
 if %ERRORLEVEL% NEQ 0 (
-    echo [ADVERTENCIA] Docker Desktop no parece estar iniciado.
-    echo Por favor, abre Docker Desktop y espera a que inicie antes de continuar.
+    echo [ERROR] Docker no esta instalado.
+    echo Instala Docker Desktop desde https://www.docker.com/products/docker-desktop/
+    echo y vuelve a ejecutar este lanzador.
     echo.
     pause
+    exit /b 1
+)
+docker info >nul 2>&1
+if %ERRORLEVEL% NEQ 0 (
+    echo [ERROR] Docker Desktop no esta iniciado.
+    echo Abre Docker Desktop y espera a que termine de iniciar antes de continuar.
+    echo.
+    pause
+    exit /b 1
 )
 
 :: 2. Iniciar Bases de Datos y Keycloak en Docker
@@ -32,6 +56,20 @@ if %ERRORLEVEL% NEQ 0 (
 echo.
 
 :: 4. Iniciar Backend Spring Boot
+:: 4a. Cargar secretos locales (viernes-backend\.env.local) antes de arrancar.
+::     Spring no lee .env solo: sin esto, APISPERU_TOKEN queda vacío y la
+::     consulta DNI/RUC falla. No se imprime el valor; solo se setea en el
+::     entorno que hereda el proceso del backend.
+if exist "%~dp0viernes-backend\.env.local" (
+    echo [4/5] Cargando variables locales desde viernes-backend\.env.local...
+    for /f "usebackq eol=# tokens=1,* delims==" %%A in ("%~dp0viernes-backend\.env.local") do (
+        set "%%A=%%B"
+    )
+) else (
+    echo [4/5] AVISO: no existe viernes-backend\.env.local.
+    echo         La consulta DNI/RUC no funcionará hasta definir APISPERU_TOKEN.
+    echo         Copia viernes-backend\.env.local.example a .env.local y pon tu token.
+)
 echo [4/5] Iniciando Backend Spring Boot (Java 21) en puerto 8080...
 start "VIERNES - Backend Spring Boot (8080)" cmd /k "cd /d %~dp0viernes-backend && mvnw.cmd spring-boot:run"
 echo [OK] Backend ejecutándose en segundo plano (Revisa la consola abierta para ver el progreso de arranque).

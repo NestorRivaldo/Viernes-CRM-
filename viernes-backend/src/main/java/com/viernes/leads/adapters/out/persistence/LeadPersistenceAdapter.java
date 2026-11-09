@@ -6,6 +6,7 @@ import com.viernes.leads.application.port.out.LeadPersistencePort;
 import com.viernes.leads.domain.EstadoLead;
 import com.viernes.leads.domain.Lead;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -19,7 +20,7 @@ public class LeadPersistenceAdapter implements LeadPersistencePort {
 
     @Override
     public List<Lead> findAll() {
-        return repository.findAll().stream().map(this::toDomain).toList();
+        return repository.findAll(Sort.by(Sort.Direction.ASC, "id")).stream().map(this::toDomain).toList();
     }
 
     @Override

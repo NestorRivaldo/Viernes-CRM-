@@ -4,14 +4,18 @@ import com.viernes.clientes.application.dto.ClienteRequest;
 import com.viernes.clientes.application.dto.ClienteResponse;
 import com.viernes.clientes.application.dto.ContactoRequest;
 import com.viernes.clientes.application.dto.ContactoResponse;
+import com.viernes.clientes.application.dto.DocumentoConsultaResponse;
 import com.viernes.clientes.domain.EstadoCliente;
+import com.viernes.clientes.domain.TipoDocumento;
 import com.viernes.clientes.application.port.in.ManageClienteUseCase;
+import com.viernes.shared.ratelimit.ConsultaDocumentoRateLimiter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -22,15 +26,28 @@ import java.util.List;
 public class ClienteController {
 
     private final ManageClienteUseCase useCase;
+    private final ConsultaDocumentoRateLimiter rateLimiter;
 
-    @Operation(summary = "Listar todos los clientes")
+    @Operation(summary = "Listar clientes, buscar por nombre/empresa/documento o filtrar por estado")
     @GetMapping
     public ResponseEntity<List<ClienteResponse>> listar(
             @RequestParam(required = false) String q,
+            @RequestParam(required = false) String documento,
             @RequestParam(required = false) EstadoCliente estado) {
+        if (documento != null && !documento.isBlank()) return ResponseEntity.ok(useCase.buscarPorDocumento(documento));
         if (q != null && !q.isBlank()) return ResponseEntity.ok(useCase.buscar(q));
         if (estado != null) return ResponseEntity.ok(useCase.filtrarPorEstado(estado));
         return ResponseEntity.ok(useCase.listar());
+    }
+
+    @Operation(summary = "Consultar DNI/RUC en RENIEC/SUNAT mediante APIsPERU")
+    @GetMapping("/documento/{tipoDocumento}/{numeroDocumento}")
+    public ResponseEntity<DocumentoConsultaResponse> consultarDocumento(
+            @PathVariable TipoDocumento tipoDocumento,
+            @PathVariable String numeroDocumento,
+            Authentication authentication) {
+        rateLimiter.verificar(authentication.getName());
+        return ResponseEntity.ok(useCase.consultarDocumento(tipoDocumento, numeroDocumento));
     }
 
     @Operation(summary = "Obtener cliente por ID")

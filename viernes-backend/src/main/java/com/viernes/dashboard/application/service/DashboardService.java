@@ -4,6 +4,7 @@ import com.viernes.dashboard.application.dto.DashboardResumenResponse;
 import com.viernes.dashboard.application.port.in.DashboardUseCase;
 import com.viernes.dashboard.application.port.out.DashboardPersistencePort;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,6 +14,7 @@ public class DashboardService implements DashboardUseCase {
     private final DashboardPersistencePort port;
 
     @Override
+    @Cacheable(cacheNames = "dashboard", key = "'resumen'")
     public DashboardResumenResponse getResumen() {
         return DashboardResumenResponse.builder()
                 .clientes(getKpis())
@@ -24,6 +26,7 @@ public class DashboardService implements DashboardUseCase {
     }
 
     @Override
+    @Cacheable(cacheNames = "dashboard", key = "'kpis'")
     public DashboardResumenResponse.ClienteResumen getKpis() {
         return DashboardResumenResponse.ClienteResumen.builder()
                 .total(port.countClientes())
@@ -31,6 +34,7 @@ public class DashboardService implements DashboardUseCase {
     }
 
     @Override
+    @Cacheable(cacheNames = "dashboard", key = "'pipeline'")
     public DashboardResumenResponse.OportunidadResumen getPipeline() {
         return DashboardResumenResponse.OportunidadResumen.builder()
                 .total(port.countOportunidades())
@@ -44,6 +48,7 @@ public class DashboardService implements DashboardUseCase {
     }
 
     @Override
+    @Cacheable(cacheNames = "dashboard", key = "'leads'")
     public DashboardResumenResponse.LeadResumen getLeads() {
         return DashboardResumenResponse.LeadResumen.builder()
                 .total(port.countLeads())
@@ -52,6 +57,7 @@ public class DashboardService implements DashboardUseCase {
     }
 
     @Override
+    @Cacheable(cacheNames = "dashboard", key = "'actividades'")
     public DashboardResumenResponse.ActividadResumen getActividades() {
         return DashboardResumenResponse.ActividadResumen.builder()
                 .pendientes(port.countActividadesPendientes())
@@ -65,6 +71,7 @@ public class DashboardService implements DashboardUseCase {
     }
 
     @Override
+    @Cacheable(cacheNames = "dashboard", key = "'propuestas'")
     public DashboardResumenResponse.PropuestaResumen getPropuestas() {
         java.math.BigDecimal valorAprobadas = port.sumValorPropuestasAprobadas();
         return DashboardResumenResponse.PropuestaResumen.builder()

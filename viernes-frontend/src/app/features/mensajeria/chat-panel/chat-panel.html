@@ -1,0 +1,96 @@
+<div class="chat-backdrop" (click)="cerrar()"></div>
+
+<aside class="chat-panel" role="dialog" aria-modal="true" aria-label="Mensajes internos">
+  <header class="chat-header">
+    <div class="chat-header-icon">
+      <mat-icon>forum</mat-icon>
+    </div>
+    <div class="chat-header-copy">
+      <h2>Mensajes</h2>
+      <p>Sala general del equipo</p>
+    </div>
+    <button type="button" class="chat-close" (click)="cerrar()" title="Cerrar mensajes">
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
+
+  <div class="chat-channel">
+    <span class="channel-symbol">#</span>
+    <div class="channel-copy">
+      <strong>Sala general</strong>
+      <small>Todos los usuarios del CRM</small>
+    </div>
+    <span class="channel-status" [class.offline]="!mensajeria.conectado()">
+      <span class="status-dot"></span>
+      {{ mensajeria.conectado() ? 'Conectado' : 'Sin conexión' }}
+    </span>
+  </div>
+
+  <div class="chat-messages" #scroll aria-live="polite">
+    @if (mensajeria.cargando() && mensajeria.mensajes().length === 0) {
+      <div class="chat-loading">
+        <div class="loading-dots"><span></span><span></span><span></span></div>
+        <p>Cargando mensajes...</p>
+      </div>
+    } @else if (mensajeria.mensajes().length === 0) {
+      <div class="chat-empty">
+        <div class="empty-icon"><mat-icon>forum</mat-icon></div>
+        <strong>Aún no hay mensajes</strong>
+        <p>Sé el primero en escribir en la sala general del equipo.</p>
+      </div>
+    } @else {
+      <div class="chat-start">
+        <mat-icon>groups</mat-icon>
+        <span>Este es el inicio de la sala general.</span>
+      </div>
+
+      @for (mensaje of mensajeria.mensajes(); track mensaje.id) {
+        <div class="message-row" [class.mine]="mensajeria.esMio(mensaje)">
+          <span class="message-avatar" [class.mine]="mensajeria.esMio(mensaje)">
+            {{ iniciales(mensaje.usuarioNombre) }}
+          </span>
+          <div class="message-content">
+            <div class="message-meta">
+              <strong>{{ mensajeria.esMio(mensaje) ? 'Tú' : mensaje.usuarioNombre }}</strong>
+              <span>{{ hora(mensaje) }}</span>
+            </div>
+            <div class="message-bubble">{{ mensaje.contenido }}</div>
+          </div>
+        </div>
+      }
+    }
+  </div>
+
+  @if (mensajeria.error()) {
+    <div class="chat-error">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ mensajeria.error() }}</span>
+    </div>
+  }
+
+  <form class="chat-composer" (submit)="enviar($event)">
+    <textarea
+      #composer
+      rows="1"
+      maxlength="2000"
+      [value]="texto()"
+      (input)="onInput($event)"
+      (keydown.enter)="onEnter($event)"
+      placeholder="Escribe un mensaje para el equipo..."
+      aria-label="Mensaje"
+    ></textarea>
+    <button
+      type="submit"
+      class="chat-send"
+      [disabled]="!texto().trim() || mensajeria.enviando()"
+      title="Enviar mensaje"
+    >
+      <mat-icon>{{ mensajeria.enviando() ? 'schedule' : 'send' }}</mat-icon>
+    </button>
+  </form>
+
+  <div class="chat-hint">
+    <span>Enter para enviar</span>
+    <span>Shift + Enter para salto de línea</span>
+  </div>
+</aside>

@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estructura de Módulos y Diseño V1 — Viernes CRM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#090d16; --surface:#111726; --surface2:#172033; --border:#232f48;
+  --text:#f1f5f9; --muted:#94a3b8; --subtle:#64748b;
+  --accent:#3b82f6; --accent-soft:rgba(59,130,246,.12);
+  --green:#10b981; --green-soft:rgba(16,185,129,.12);
+  --purple:#a855f7; --purple-soft:rgba(168,85,247,.12);
+  --amber:#f59e0b; --amber-soft:rgba(245,158,11,.12);
+  --cyan:#06b6d4; --cyan-soft:rgba(6,182,212,.12);
+  --rose:#f43f5e; --rose-soft:rgba(244,63,94,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;padding:40px 20px 80px;
+  background-image:radial-gradient(circle at 10% 10%,rgba(59,130,246,.08) 0%,transparent 45%),radial-gradient(circle at 90% 90%,rgba(168,85,247,.06) 0%,transparent 45%);background-attachment:fixed}
+.container{max-width:1200px;margin:0 auto}
+.top-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+.back-link{display:inline-flex;align-items:center;gap:8px;color:#60a5fa;text-decoration:none;font-size:13.5px;font-weight:600}
+header{text-align:center;margin-bottom:44px}
+.brand-badge{display:inline-flex;align-items:center;gap:8px;background:var(--accent-soft);color:#60a5fa;border:1px solid rgba(59,130,246,.3);padding:6px 16px;border-radius:30px;font-size:13px;font-weight:700;margin-bottom:18px;letter-spacing:.04em}
+h1{font-size:38px;font-weight:800;letter-spacing:-.025em;background:linear-gradient(135deg,#fff 30%,#93c5fd 80%,#38bdf8 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:14px;line-height:1.2}
+.subtitle{font-size:16.5px;color:var(--muted);max-width:860px;margin:0 auto 26px}
+.pills{display:flex;justify-content:center;flex-wrap:wrap;gap:10px}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;font-size:12.5px;font-weight:600}
+.p-green{background:var(--green-soft);color:#34d399;border:1px solid rgba(16,185,129,.3)}
+.p-blue{background:var(--accent-soft);color:#93c5fd;border:1px solid rgba(59,130,246,.3)}
+.p-purple{background:var(--purple-soft);color:#c084fc;border:1px solid rgba(168,85,247,.3)}
+.p-amber{background:var(--amber-soft);color:#fbbf24;border:1px solid rgba(245,158,11,.3)}
+.banner{display:flex;gap:14px;align-items:flex-start;background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:12px;padding:16px 18px;margin:0 0 30px;font-size:14px}
+.banner .bi{font-size:20px;line-height:1}
+.banner b{color:#93c5fd}
+h2{font-size:23px;font-weight:700;color:#fff;margin:48px 0 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);padding-bottom:12px}
+h2 .num{display:flex;align-items:center;justify-content:center;min-width:34px;height:34px;border-radius:8px;background:var(--accent-soft);color:#60a5fa;font-size:15px;font-family:'JetBrains Mono',monospace}
+h3{font-size:16.5px;font-weight:600;color:#e2e8f0;margin:24px 0 10px}
+p{margin:10px 0;color:#cbd5e1;font-size:14.5px}
+.sec-intro{color:var(--muted);font-size:14.5px;margin-bottom:16px}
+.lead{font-size:15px;color:#e2e8f0}
+code{font-family:'JetBrains Mono',Consolas,monospace;font-size:12.5px;background:var(--surface2);border:1px solid var(--border);padding:1px 6px;border-radius:5px;color:#a5f3fc}
+.anchor{font-family:'JetBrains Mono',Consolas,monospace;font-size:12px;background:rgba(59,130,246,.1);color:#93c5fd;border:1px solid rgba(59,130,246,.2);padding:1px 7px;border-radius:6px;white-space:nowrap;display:inline-block;margin:1px 0}
+.note{border-radius:10px;padding:13px 16px;margin:16px 0;font-size:13.5px;border:1px solid}
+.note.info{background:var(--accent-soft);border-color:rgba(59,130,246,.3);color:#bfdbfe}
+.note.warn{background:var(--amber-soft);border-color:rgba(245,158,11,.3);color:#fde68a}
+.note.danger{background:var(--rose-soft);border-color:rgba(244,63,94,.3);color:#fecdd3}
+.note.ok{background:var(--green-soft);border-color:rgba(16,185,129,.3);color:#a7f3d0}
+.badge{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.05em;padding:2px 8px;border-radius:5px;vertical-align:middle}
+.b-gap{background:var(--rose-soft);color:#fda4af;border:1px solid rgba(244,63,94,.35)}
+.b-ok{background:var(--green-soft);color:#6ee7b7;border:1px solid rgba(16,185,129,.35)}
+.tree{font-family:'JetBrains Mono',Consolas,monospace;font-size:12.5px;line-height:1.75;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;overflow-x:auto;white-space:pre;color:#cbd5e1}
+.tree .dir{color:#60a5fa;font-weight:600}
+.tree .cm{color:var(--subtle)}
+.tree .f{color:#a5f3fc}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13.5px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+th{background:var(--surface2);color:#e2e8f0;text-align:left;padding:10px 14px;font-weight:600;font-size:12.5px;letter-spacing:.03em;text-transform:uppercase;border-bottom:1px solid var(--border)}
+td{padding:10px 14px;border-bottom:1px solid var(--border);color:#cbd5e1;vertical-align:top}
+tr:last-child td{border-bottom:none}
+td .anchor{font-size:11px}
+.flow{margin:18px 0;position:relative;padding-left:8px}
+.flow-step{display:flex;gap:14px;margin:0 0 14px;position:relative}
+.flow-step .sn{flex:0 0 30px;height:30px;border-radius:50%;background:var(--accent-soft);border:1px solid rgba(59,130,246,.4);color:#60a5fa;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;counter-increment:step}
+.flow-step .sn::before{content:counter(step)}
+.flow{counter-reset:step}
+.flow-step .sb{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;flex:1}
+.flow-step .st{font-weight:600;color:#e2e8f0;font-size:14px;margin-bottom:4px}
+.flow-step .sd{color:var(--muted);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:16px 0}
+.mini{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+.mini .k{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--subtle)}
+.mini .v{font-size:15px;font-weight:600;color:#e2e8f0;margin:4px 0}
+.mini p{font-size:13px;margin:6px 0 0}
+.toc{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin:0 0 10px;display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:6px 22px}
+.toc a{color:#93c5fd;text-decoration:none;font-size:13.5px;display:flex;gap:8px;align-items:baseline}
+.toc a:hover{color:#bfdbfe}
+.toc a .n{font-family:'JetBrains Mono',monospace;color:var(--subtle);font-size:12px}
+.svgwrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin:16px 0;overflow-x:auto}
+.svgwrap svg{display:block;margin:0 auto;max-width:100%}
+.legend{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:10px;font-size:12px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.dot{width:10px;height:10px;border-radius:3px;display:inline-block}
+.btn{background:var(--accent);color:#fff;border:none;border-radius:9px;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn.ok{background:var(--green)}
+.copy-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:14px 0}
+.copy-hint{color:var(--muted);font-size:13px}
+footer{margin-top:50px;padding-top:20px;border-top:1px solid var(--border);color:var(--subtle);font-size:12.5px;text-align:center}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="top-nav">
+    <a class="back-link" href="index.html">&#8592; Portal de informes</a>
+    <span style="color:var(--subtle);font-size:12.5px;font-family:'JetBrains Mono',monospace">VIERNES CRM V1 · backend</span>
+  </div>
+
+  <header>
+    <div class="brand-badge">&#9670; VIERNES CRM V1</div>
+    <h1>Estructura de Módulos y Diseño</h1>
+    <p class="subtitle">Qué es cada carpeta de un módulo, cómo se comunican sus partes y cómo se comunican los módulos entre sí. Con un diseño simple del hexágono y el módulo <code>actividades</code> como ejemplo trabajado, todo citado sobre el código real.</p>
+    <div class="pills">
+      <span class="pill p-blue">14 módulos Modulith</span>
+      <span class="pill p-purple">Arquitectura hexagonal</span>
+      <span class="pill p-green">Ejemplo: actividades</span>
+      <span class="pill p-amber">Diseño + brechas</span>
+    </div>
+  </header>
+
+  <div class="banner">
+    <span class="bi">&#127891;</span>
+    <div><b>Docente &#8596; Viernes.</b> Lo que la sustentación exige demostrar &mdash; separación de responsabilidades, inversión de dependencias y límites entre módulos &mdash; es exactamente lo que este informe señala en el código: <code>adapters / application / domain</code>, puertos <code>in/out</code> y <code>package-info.java</code>. Cada afirmación lleva anclaje <code>archivo:línea</code> para que puedas defenderla mostrando el archivo, no de memoria.</div>
+  </div>
+
+  <div class="note info"><b>Cómo leer las rutas.</b> Todos los anclajes de backend son relativos a <code>viernes-backend/src/main/java/com/viernes/</code>. Ejemplo: <span class="anchor">actividades/application/service/ActividadService.java:63</span> = ese archivo, línea 63. El árbol canónico es <code>E:\Viernes\Viernes</code> (no <code>E:\LPII</code>).</div>
+
+  <nav class="toc">
+    <a href="#s01"><span class="n">01</span> Qué es un módulo</a>
+    <a href="#s02"><span class="n">02</span> Mapa de carpetas y función</a>
+    <a href="#s03"><span class="n">03</span> Diseño simple del módulo (SVG)</a>
+    <a href="#s04"><span class="n">04</span> Comunicación interna paso a paso</a>
+    <a href="#s05"><span class="n">05</span> Puertos in/out y la costura</a>
+    <a href="#s06"><span class="n">06</span> Comunicación entre módulos</a>
+    <a href="#s07"><span class="n">07</span> package-info y Modulith</a>
+    <a href="#s08"><span class="n">08</span> Comparador de los 14 módulos</a>
+    <a href="#s09"><span class="n">09</span> Plantilla de diseño para crear un módulo</a>
+    <a href="#s10"><span class="n">10</span> Brechas y huecos</a>
+    <a href="#s11"><span class="n">11</span> Cómo leer un módulo desconocido</a>
+    <a href="#miro"><span class="n">&#9635;</span> Copiar outline para Miro</a>
+  </nav>
+
+  <!-- ============ 01 ============ -->
+  <h2 id="s01"><span class="num">01</span> Qué es un módulo</h2>
+  <p class="sec-intro">Un módulo = una capacidad de negocio (clientes, actividades, oportunidades…) empaquetada con el mismo esqueleto hexagonal. No es una carpeta arbitraria: Spring Modulith la reconoce por su <code>package-info.java</code>.</p>
+  <p>Las carpetas se repiten en todos los módulos porque son <b>las mismas capas aplicadas a cada capacidad</b>, igual que todas las casas tienen cocina y baño. Cambia el contenido, no la forma. Eso hace que cualquier módulo se navegue, se pruebe y se modifique igual.</p>
+  <div class="grid">
+    <div class="mini"><div class="k">domain</div><div class="v">El negocio puro</div><p>POJOs, enums, records. Sin JPA, sin Spring. No depende de nada.</p></div>
+    <div class="mini"><div class="k">application</div><div class="v">Los casos de uso</div><p>Puertos (interfaces) + service con las reglas + DTOs. Solo conoce domain y sus propios puertos.</p></div>
+    <div class="mini"><div class="k">adapters</div><div class="v">Los enchufes</div><p>Única capa que toca tecnología: REST (in), JPA/Oracle y APIs (out). Implementan o llaman puertos.</p></div>
+  </div>
+  <div class="note ok"><b>Regla de dependencia:</b> <code>adapters &#8594; application &#8594; domain</code>. El núcleo nunca importa a los adapters. Spring inyecta las implementaciones en runtime. <span class="badge b-ok">HEXAGONAL</span></div>
+
+  <!-- ============ 02 ============ -->
+  <h2 id="s02"><span class="num">02</span> Mapa de carpetas y función</h2>
+  <p class="sec-intro">Árbol real de <code>actividades</code> (el de tu captura) y la función de cada carpeta. 29 archivos.</p>
+  <div class="tree"><span class="dir">actividades/</span>
+├─ <span class="f">package-info.java</span>              <span class="cm">@ApplicationModule OPEN + allowedDependencies</span>
+├─ <span class="dir">adapters/</span>                       <span class="cm">tecnología exterior</span>
+│  ├─ <span class="dir">in/web/</span>ActividadController      <span class="cm">REST: entra HTTP</span>
+│  └─ <span class="dir">out/persistence/</span>               <span class="cm">sale a Oracle / a otros módulos</span>
+│     ├─ ActividadPersistenceAdapter · ActividadEtiqueta… · ActividadParticipante…
+│     ├─ ContactoQueryAdapter · RelacionValidationAdapter   <span class="cm">cruzan a clientes/leads/usuarios</span>
+│     ├─ <span class="dir">entity/</span>ActividadEntity …      <span class="cm">@Entity JPA</span>
+│     └─ <span class="dir">repository/</span>…SpringDataRepository <span class="cm">interfaces Spring Data</span>
+├─ <span class="dir">application/</span>                    <span class="cm">casos de uso</span>
+│  ├─ <span class="dir">dto/</span>ActividadRequest/Response · Participante…  <span class="cm">contratos</span>
+│  ├─ <span class="dir">port/in/</span>ManageActividadUseCase  <span class="cm">interfaz: qué se puede hacer</span>
+│  ├─ <span class="dir">port/out/</span>ActividadPersistencePort · ContactoQueryPort · RelacionValidationPort …
+│  └─ <span class="dir">service/</span>ActividadService       <span class="cm">implementa port/in, usa port/out, reglas</span>
+└─ <span class="dir">domain/</span>Actividad · ActividadEtiqueta · ActividadParticipante · EstadoActividad · TipoActividad</div>
+
+  <table>
+    <thead><tr><th>Carpeta</th><th>Función</th><th>Ejemplo en actividades</th></tr></thead>
+    <tbody>
+      <tr><td><code>adapters/in/web/</code></td><td>Adapter de <b>entrada</b>: recibe HTTP y dispara un caso de uso. Cero reglas de negocio.</td><td><span class="anchor">actividades/adapters/in/web/ActividadController.java:27</span></td></tr>
+      <tr><td><code>adapters/out/persistence/</code></td><td>Adapter de <b>salida</b>: implementa un puerto out usando JPA (o el API público de otro módulo).</td><td><span class="anchor">actividades/adapters/out/persistence/ContactoQueryAdapter.java:21</span></td></tr>
+      <tr><td><code>…/entity/</code></td><td>Objeto JPA que mapea la tabla (<code>@Entity</code>, <code>@Column</code>, relaciones).</td><td><span class="anchor">actividades/adapters/out/persistence/entity/ActividadEntity.java</span></td></tr>
+      <tr><td><code>…/repository/</code></td><td>Interfaz Spring Data; las consultas salen del nombre del método. Sin implementación escrita.</td><td><span class="anchor">actividades/adapters/out/persistence/repository/ActividadSpringDataRepository.java</span></td></tr>
+      <tr><td><code>application/dto/</code></td><td>Records de entrada/salida (Request/Response). Lo que viaja por HTTP.</td><td><span class="anchor">actividades/application/dto/ActividadRequest.java</span></td></tr>
+      <tr><td><code>application/port/in/</code></td><td>Interfaz de casos de uso. La implementa el service; la llama el controller.</td><td><span class="anchor">actividades/application/port/in/ManageActividadUseCase.java:9</span></td></tr>
+      <tr><td><code>application/port/out/</code></td><td>Interfaces de lo que el núcleo necesita de fuera. Las implementan los adapters out.</td><td><span class="anchor">actividades/application/port/out/ContactoQueryPort.java:12</span></td></tr>
+      <tr><td><code>application/service/</code></td><td>Implementa port/in, orquesta port/out, aplica reglas y <code>@Transactional</code>.</td><td><span class="anchor">actividades/application/service/ActividadService.java:37</span></td></tr>
+      <tr><td><code>domain/</code></td><td>Núcleo: entidades de negocio puras + enums. Sin framework.</td><td><span class="anchor">actividades/domain/Actividad.java</span></td></tr>
+      <tr><td><code>package-info.java</code></td><td>Carnet del módulo ante Modulith: tipo OPEN/CLOSED + dependencias permitidas.</td><td><span class="anchor">actividades/package-info.java</span></td></tr>
+      <tr><td><code>mapper/</code> (algunos)</td><td><b>Vacía.</b> Placeholder de MapStruct (declarado en pom pero sin uso); el mapeo es manual. <span class="badge b-gap">BRECHA</span></td><td>clientes, leads, oportunidades (0 archivos)</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ============ 03 ============ -->
+  <h2 id="s03"><span class="num">03</span> Diseño simple del módulo</h2>
+  <p class="sec-intro">El hexágono en una imagen: el núcleo al centro, los puertos como costuras en el borde de <code>application</code>, y los adapters afuera. Las flechas muestran quién llama a quién.</p>
+  <div class="svgwrap">
+  <svg viewBox="0 0 860 430" width="860" height="430" role="img" aria-label="Diagrama hexagonal de un módulo">
+    <defs>
+      <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#60a5fa"/>
+      </marker>
+    </defs>
+    <!-- outer adapters -->
+    <rect x="8" y="8" width="844" height="414" rx="16" fill="#111726" stroke="#232f48"/>
+    <text x="26" y="34" fill="#64748b" font-size="13" font-family="JetBrains Mono,monospace">adapters/ (tecnología)</text>
+    <!-- middle application -->
+    <rect x="228" y="52" width="404" height="330" rx="14" fill="#172033" stroke="#3b82f6" stroke-opacity=".5"/>
+    <text x="246" y="76" fill="#93c5fd" font-size="13" font-family="JetBrains Mono,monospace">application/ (casos de uso)</text>
+    <!-- inner domain -->
+    <rect x="318" y="272" width="224" height="86" rx="12" fill="#0b1220" stroke="#10b981" stroke-opacity=".6"/>
+    <text x="336" y="300" fill="#6ee7b7" font-size="13" font-family="JetBrains Mono,monospace">domain/</text>
+    <text x="336" y="322" fill="#94a3b8" font-size="11.5">Actividad · enums (puro)</text>
+    <!-- service + dto -->
+    <rect x="300" y="96" width="260" height="58" rx="10" fill="#1e2942" stroke="#3b82f6" stroke-opacity=".4"/>
+    <text x="316" y="120" fill="#e2e8f0" font-size="13" font-weight="600">service/ ActividadService</text>
+    <text x="316" y="140" fill="#94a3b8" font-size="11.5">reglas + @Transactional</text>
+    <rect x="300" y="176" width="260" height="52" rx="10" fill="#1e2942" stroke="#232f48"/>
+    <text x="316" y="198" fill="#e2e8f0" font-size="12.5">dto/ Request · Response</text>
+    <text x="316" y="216" fill="#94a3b8" font-size="11">contratos de entrada/salida</text>
+    <!-- ports seams -->
+    <circle cx="228" cy="125" r="9" fill="#090d16" stroke="#a855f7" stroke-width="2"/>
+    <text x="240" y="112" fill="#c084fc" font-size="11.5" font-family="JetBrains Mono,monospace">port/in</text>
+    <circle cx="632" cy="120" r="9" fill="#090d16" stroke="#a855f7" stroke-width="2"/>
+    <circle cx="632" cy="210" r="9" fill="#090d16" stroke="#a855f7" stroke-width="2"/>
+    <text x="560" y="106" fill="#c084fc" font-size="11.5" font-family="JetBrains Mono,monospace">port/out</text>
+    <!-- in adapter -->
+    <rect x="34" y="150" width="150" height="86" rx="10" fill="#1e2942" stroke="#06b6d4" stroke-opacity=".6"/>
+    <text x="50" y="178" fill="#67e8f9" font-size="12.5" font-weight="600">in/web/</text>
+    <text x="50" y="198" fill="#94a3b8" font-size="11.5">Controller (REST)</text>
+    <text x="50" y="216" fill="#64748b" font-size="11">entra HTTP</text>
+    <!-- out adapters -->
+    <rect x="676" y="82" width="150" height="76" rx="10" fill="#1e2942" stroke="#f59e0b" stroke-opacity=".6"/>
+    <text x="692" y="108" fill="#fbbf24" font-size="12" font-weight="600">out/persistence/</text>
+    <text x="692" y="128" fill="#94a3b8" font-size="11">Adapter+Entity+Repo</text>
+    <text x="692" y="146" fill="#64748b" font-size="11">&#8594; Oracle</text>
+    <rect x="676" y="182" width="150" height="76" rx="10" fill="#1e2942" stroke="#f43f5e" stroke-opacity=".6"/>
+    <text x="692" y="208" fill="#fda4af" font-size="12" font-weight="600">out/external/</text>
+    <text x="692" y="228" fill="#94a3b8" font-size="11">RestClient (solo clientes)</text>
+    <text x="692" y="246" fill="#64748b" font-size="11">&#8594; APIsPERU</text>
+    <!-- arrows -->
+    <line x1="0" y1="193" x2="32" y2="193" stroke="#60a5fa" stroke-width="2" marker-end="url(#arr)"/>
+    <text x="2" y="180" fill="#64748b" font-size="11">HTTP</text>
+    <line x1="184" y1="193" x2="219" y2="132" stroke="#60a5fa" stroke-width="2" marker-end="url(#arr)"/>
+    <line x1="237" y1="125" x2="298" y2="125" stroke="#60a5fa" stroke-width="2" marker-end="url(#arr)"/>
+    <line x1="560" y1="120" x2="623" y2="120" stroke="#60a5fa" stroke-width="2" marker-end="url(#arr)"/>
+    <line x1="641" y1="120" x2="674" y2="120" stroke="#60a5fa" stroke-width="2" marker-end="url(#arr)"/>
+    <line x1="560" y1="210" x2="623" y2="210" stroke="#60a5fa" stroke-width="2" marker-end="url(#arr)"/>
+    <line x1="641" y1="210" x2="674" y2="216" stroke="#60a5fa" stroke-width="2" marker-end="url(#arr)"/>
+    <line x1="430" y1="154" x2="430" y2="270" stroke="#10b981" stroke-width="2" marker-end="url(#arr)"/>
+    <text x="438" y="250" fill="#6ee7b7" font-size="11">usa</text>
+  </svg>
+  <div class="legend">
+    <span><span class="dot" style="background:#06b6d4"></span> adapter in (entra)</span>
+    <span><span class="dot" style="background:#f59e0b"></span> adapter out persistence</span>
+    <span><span class="dot" style="background:#f43f5e"></span> adapter out external</span>
+    <span><span class="dot" style="background:#a855f7"></span> puerto (costura)</span>
+    <span><span class="dot" style="background:#10b981"></span> domain (núcleo)</span>
+  </div>
+  </div>
+  <div class="note info"><b>Lectura del diseño:</b> las flechas azules van de afuera hacia el núcleo por <code>port/in</code> (entrada) y del núcleo hacia afuera por <code>port/out</code> (salida). Los círculos morados son los puertos: la costura que permite cambiar un adapter sin tocar el centro.</div>
+
+  <!-- ============ 04 ============ -->
+  <h2 id="s04"><span class="num">04</span> Comunicación interna, paso a paso</h2>
+  <p class="sec-intro">Traceamos <code>POST /api/v1/actividades</code> (crear una actividad). Cada salto cita el archivo y la línea.</p>
+  <div class="flow">
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">HTTP llega al adapter in</div><div class="sd"><span class="anchor">actividades/adapters/in/web/ActividadController.java:27</span> <code>crear(@Valid @RequestBody ActividadRequest)</code>. El controller no valida reglas de negocio; solo recibe y delega (:28).</div></div></div>
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">Llama al puerto in (interfaz)</div><div class="sd">El controller conoce <code>ManageActividadUseCase</code> (:20), no al service. La interfaz está en <span class="anchor">actividades/application/port/in/ManageActividadUseCase.java:10</span> (<code>crear</code>).</div></div></div>
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">El service implementa el caso de uso</div><div class="sd"><span class="anchor">actividades/application/service/ActividadService.java:37</span> <code>implements ManageActividadUseCase</code>; <code>crear</code> en :63. Clase con <code>@Transactional</code> (:36).</div></div></div>
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">Regla: validar relaciones vía puerto out</div><div class="sd"><code>validarRelaciones</code> (:64 &#8594; :235) pregunta <code>validationPort.existeCliente/Lead/Oportunidad/Usuario</code> (:236&#8211;247). El puerto out lo implementa <span class="anchor">actividades/adapters/out/persistence/RelacionValidationAdapter.java:37</span>, que consulta repos de otros módulos.</div></div></div>
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">Regla: máximo 8 etiquetas</div><div class="sd"><code>etiquetaIdsValidos</code> (:65 &#8594; :250) limpia ids y lanza si &gt; <code>MAX_ETIQUETAS=8</code> (:39, :260). Consulta <code>etiquetaPort</code> (del módulo etiquetas) en :268.</div></div></div>
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">Construye el dominio y guarda por puerto out</div><div class="sd">Crea <code>Actividad</code> (domain) en :67&#8211;78 y llama <code>persistencePort.save</code> (:80). El adapter <code>ActividadPersistenceAdapter</code> mapea domain&#8594;entity y usa el repository Spring Data &#8594; tabla Oracle.</div></div></div>
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">Sincroniza etiquetas y arma la respuesta</div><div class="sd"><code>sincronizarEtiquetas</code> (:81 &#8594; :284) y <code>toResponse</code> (:82 &#8594; :382) convierten domain&#8594;DTO; ahí se calcula <code>esVencida</code> (:383). El DTO vuelve al controller.</div></div></div>
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">El adapter in envuelve el HTTP</div><div class="sd">El controller devuelve <code>ResponseEntity(response, HttpStatus.CREATED)</code> (:29) = 201. Si algo lanzó excepción, <code>GlobalExceptionHandler</code> (shared) la traduce a 400/404 con mensaje uniforme.</div></div></div>
+  </div>
+  <div class="note ok"><b>Lo que demuestra el trace:</b> el controller no sabe de BD; el service no sabe de JPA ni de HTTP; cada capa habla solo con su vecino mediante puertos. Esa es la separación que defiendes en la sustentación.</div>
+
+  <!-- ============ 05 ============ -->
+  <h2 id="s05"><span class="num">05</span> Puertos in/out: la costura que lo hace probable</h2>
+  <p class="sec-intro">Los puertos son interfaces en <code>application</code>. In = lo que el mundo puede pedir; Out = lo que el núcleo necesita. Su dirección de implementación es opuesta.</p>
+  <table>
+    <thead><tr><th>Puerto</th><th>Quién lo DEFINE</th><th>Quién lo IMPLEMENTA</th><th>Quién lo LLAMA</th></tr></thead>
+    <tbody>
+      <tr><td><code>port/in</code> (ManageActividadUseCase)</td><td>application</td><td>application/service (:37)</td><td>adapters/in/web (:28)</td></tr>
+      <tr><td><code>port/out</code> (ActividadPersistencePort, ContactoQueryPort…)</td><td>application</td><td>adapters/out/* (:21 ContactoQueryAdapter)</td><td>application/service (:80, :200)</td></tr>
+    </tbody>
+  </table>
+  <p>En <code>out</code> hay <b>inversión de dependencia</b>: el núcleo define la interfaz y el adapter de tecnología la implementa. Por eso <code>application</code> no importa Oracle ni APIsPERU. En <code>in</code>, el adapter depende de la interfaz del núcleo.</p>
+  <div class="note info"><b>Por esto es testeable:</b> como el service solo conoce puertos, un test puede inyectar mocks de <code>port/out</code> y probar las reglas sin BD ni red (igual que <code>ClienteServiceTest</code> mockeaba sus dos puertos). Los adapters reales se prueban aparte.</div>
+
+  <!-- ============ 06 ============ -->
+  <h2 id="s06"><span class="num">06</span> Comunicación ENTRE módulos</h2>
+  <p class="sec-intro">Un módulo no llama a otro "a lo bruto": usa puertos out cuyos adapters consumen la API pública del otro módulo (o sus internals si es OPEN). <code>actividades</code> es el mejor ejemplo.</p>
+  <div class="svgwrap">
+  <svg viewBox="0 0 860 300" width="860" height="300" role="img" aria-label="Comunicación entre módulos desde actividades">
+    <defs><marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c084fc"/></marker></defs>
+    <rect x="330" y="110" width="200" height="80" rx="12" fill="#1e2942" stroke="#3b82f6"/>
+    <text x="352" y="142" fill="#e2e8f0" font-size="14" font-weight="600">actividades</text>
+    <text x="352" y="164" fill="#94a3b8" font-size="11.5">ActividadService + ports out</text>
+    <rect x="40" y="30" width="180" height="60" rx="10" fill="#172033" stroke="#10b981"/>
+    <text x="60" y="56" fill="#6ee7b7" font-size="13" font-weight="600">clientes (OPEN)</text>
+    <text x="60" y="76" fill="#94a3b8" font-size="11">ManageClienteUseCase / repo</text>
+    <rect x="40" y="210" width="180" height="60" rx="10" fill="#172033" stroke="#10b981"/>
+    <text x="60" y="236" fill="#6ee7b7" font-size="13" font-weight="600">etiquetas (OPEN)</text>
+    <text x="60" y="256" fill="#94a3b8" font-size="11">EtiquetaPersistencePort</text>
+    <rect x="640" y="30" width="180" height="60" rx="10" fill="#172033" stroke="#10b981"/>
+    <text x="660" y="56" fill="#6ee7b7" font-size="13" font-weight="600">leads / oportunidades</text>
+    <text x="660" y="76" fill="#94a3b8" font-size="11">OPEN: repositorios</text>
+    <rect x="640" y="210" width="180" height="60" rx="10" fill="#172033" stroke="#f59e0b"/>
+    <text x="660" y="236" fill="#fbbf24" font-size="13" font-weight="600">usuarios (CLOSED)</text>
+    <text x="660" y="256" fill="#94a3b8" font-size="11">solo UsuariosApi pública</text>
+    <line x1="330" y1="130" x2="222" y2="62" stroke="#c084fc" stroke-width="2" marker-end="url(#arr2)"/>
+    <line x1="330" y1="170" x2="222" y2="238" stroke="#c084fc" stroke-width="2" marker-end="url(#arr2)"/>
+    <line x1="530" y1="130" x2="638" y2="62" stroke="#c084fc" stroke-width="2" marker-end="url(#arr2)"/>
+    <line x1="530" y1="170" x2="638" y2="238" stroke="#c084fc" stroke-width="2" marker-end="url(#arr2)"/>
+    <text x="240" y="100" fill="#c084fc" font-size="10.5">ContactoQueryAdapter / RelacionValidationAdapter</text>
+    <text x="548" y="100" fill="#c084fc" font-size="10.5">RelacionValidationAdapter</text>
+    <text x="240" y="212" fill="#c084fc" font-size="10.5">etiquetaPort (inyectado)</text>
+    <text x="548" y="212" fill="#c084fc" font-size="10.5">UsuariosApi</text>
+  </svg>
+  </div>
+  <h3>Dos patrones reales (y por qué importan)</h3>
+  <table>
+    <thead><tr><th>Adapter de actividades</th><th>Cómo consume al otro módulo</th><th>Qué demuestra</th></tr></thead>
+    <tbody>
+      <tr><td><span class="anchor">actividades/adapters/out/persistence/ContactoQueryAdapter.java:31</span></td><td>Usa <b>solo el puerto público</b> <code>ManageClienteUseCase.listar()</code> y recorre contactos. Nunca toca entities/repos de clientes.</td><td>La vía limpia Modulith: depender de la API pública. <span class="badge b-ok">BUENA</span></td></tr>
+      <tr><td><span class="anchor">actividades/adapters/out/persistence/RelacionValidationAdapter.java:20</span></td><td>Inyecta <b>repositorios</b> de clientes/leads/oportunidades (módulos OPEN) y <code>UsuariosApi</code> (usuarios es CLOSED, solo API).</td><td>OPEN permite internals; CLOSED obliga a la API pública. <span class="badge b-gap">ACOPLAMIENTO</span></td></tr>
+    </tbody>
+  </table>
+  <p>El service de actividades importa DTOs y puertos de otros módulos de forma explícita: <span class="anchor">actividades/application/service/ActividadService.java:16</span> (clientes.ContactoResponse), :17&#8211;19 (etiquetas). Esas dependencias están autorizadas en su <code>package-info</code> (§07); si no lo estuvieran, <code>ModularityTests</code> fallaría.</p>
+
+  <!-- ============ 07 ============ -->
+  <h2 id="s07"><span class="num">07</span> package-info y Spring Modulith</h2>
+  <p class="sec-intro">Cada módulo declara su tipo y sus dependencias permitidas. <code>ModularityTests.verify()</code> (<span class="anchor">ModularityTests.java:12</span>, en src/test) hace cumplir esto en cada build de tests.</p>
+  <table>
+    <thead><tr><th>Módulo</th><th>Tipo</th><th>allowedDependencies</th></tr></thead>
+    <tbody>
+      <tr><td>actividades</td><td>OPEN</td><td>clientes, oportunidades, leads, etiquetas, usuarios, shared</td></tr>
+      <tr><td>clientes</td><td>OPEN</td><td>&mdash;</td></tr>
+      <tr><td>dashboard</td><td>OPEN</td><td>&mdash;</td></tr>
+      <tr><td>etiquetas</td><td>OPEN</td><td>&mdash;</td></tr>
+      <tr><td>leads</td><td>OPEN</td><td>&mdash;</td></tr>
+      <tr><td>marketing</td><td>OPEN</td><td>&mdash;</td></tr>
+      <tr><td>oportunidades</td><td>OPEN</td><td>&mdash;</td></tr>
+      <tr><td>productos</td><td>OPEN</td><td>&mdash;</td></tr>
+      <tr><td>propuestas</td><td>OPEN</td><td>productos, clientes, oportunidades, shared</td></tr>
+      <tr><td>relationshipmap</td><td>OPEN</td><td>clientes, oportunidades, actividades, propuestas, productos, usuarios, shared</td></tr>
+      <tr><td>auth</td><td><b>CLOSED</b></td><td>usuarios</td></tr>
+      <tr><td>equipos</td><td><b>CLOSED</b></td><td>usuarios, shared</td></tr>
+      <tr><td>mensajeria</td><td><b>CLOSED</b></td><td>usuarios, shared</td></tr>
+      <tr><td>usuarios</td><td><b>CLOSED</b></td><td>shared</td></tr>
+    </tbody>
+  </table>
+  <div class="note info"><b>OPEN vs CLOSED:</b> OPEN = otros módulos pueden usar sus internals (por eso RelacionValidationAdapter puede inyectar repos de clientes/leads/oportunidades). CLOSED = solo su API pública raíz y solo hacia los módulos listados (por eso actividades usa <code>UsuariosApi</code> y no los repos de usuarios).</div>
+
+  <!-- ============ 08 ============ -->
+  <h2 id="s08"><span class="num">08</span> Comparador de los 14 módulos</h2>
+  <p class="sec-intro">Mismo esqueleto, distinto relleno. Conteo de archivos .java en src/main; "externo" = tiene adapters/out/external; "domain" = tiene carpeta domain propia.</p>
+  <table>
+    <thead><tr><th>Módulo</th><th>Archivos</th><th>Externo</th><th>domain</th><th>Rasgo distintivo</th></tr></thead>
+    <tbody>
+      <tr><td>oportunidades</td><td>40</td><td>no</td><td>sí</td><td>el más grande</td></tr>
+      <tr><td>actividades</td><td>29</td><td>no</td><td>sí</td><td>cruza a clientes/leads/etiquetas/usuarios (ejemplo de este informe)</td></tr>
+      <tr><td>clientes</td><td>24</td><td><b>sí</b></td><td>sí</td><td>único con APIsPERU + contactos</td></tr>
+      <tr><td>leads</td><td>22</td><td>no</td><td>sí</td><td>agrega leads + fuentes</td></tr>
+      <tr><td>equipos</td><td>21</td><td>no</td><td>sí</td><td>CLOSED</td></tr>
+      <tr><td>marketing</td><td>19</td><td>no</td><td>sí</td><td>campañas</td></tr>
+      <tr><td>propuestas</td><td>18</td><td>no</td><td>sí</td><td>OPEN + deps</td></tr>
+      <tr><td>usuarios</td><td>16</td><td>no</td><td>sí</td><td>CLOSED; API pública en raíz (UsuariosApi)</td></tr>
+      <tr><td>mensajeria</td><td>12</td><td>no</td><td>sí</td><td>CLOSED</td></tr>
+      <tr><td>productos</td><td>12</td><td>no</td><td>sí</td><td>plantilla más limpia</td></tr>
+      <tr><td>etiquetas</td><td>11</td><td>no</td><td>sí</td><td>catálogo simple</td></tr>
+      <tr><td>dashboard</td><td>11</td><td>no</td><td><b>no</b></td><td>solo lectura de KPIs</td></tr>
+      <tr><td>relationshipmap</td><td>9</td><td>no</td><td>sí</td><td>grafo de relaciones</td></tr>
+      <tr><td>auth</td><td>4</td><td>no</td><td><b>no</b></td><td>seguridad Keycloak (config/ + keycloak/)</td></tr>
+    </tbody>
+  </table>
+  <div class="note warn"><b>Excepciones al esqueleto:</b> <code>auth</code> y <code>dashboard</code> no tienen <code>domain/</code> (no son CRUD de entidad); <code>usuarios</code> expone API pública en la raíz; <code>shared/</code> <b>no es módulo</b> (sin package-info): es kernel compartido (cache, exception, filter, ratelimit). <code>mapper/</code> existe en clientes/leads/oportunidades pero está vacío.</div>
+
+  <!-- ============ 09 ============ -->
+  <h2 id="s09"><span class="num">09</span> Plantilla de diseño para crear un módulo</h2>
+  <p class="sec-intro">El diseño mínimo a copiar (el de <code>productos</code>, el más limpio). Añade solo lo que necesites.</p>
+  <div class="tree"><span class="dir">&lt;nuevo&gt;/</span>
+├─ <span class="f">package-info.java</span>      <span class="cm">@ApplicationModule(type=OPEN)  [+ allowedDependencies si cruza]</span>
+├─ <span class="dir">domain/</span>                 <span class="cm">&lt;Entidad&gt;.java + enums (puro)</span>
+├─ <span class="dir">application/</span>
+│  ├─ <span class="dir">port/in/</span>Manage&lt;Entidad&gt;UseCase.java
+│  ├─ <span class="dir">port/out/</span>&lt;Entidad&gt;PersistencePort.java
+│  ├─ <span class="dir">service/</span>&lt;Entidad&gt;Service.java   <span class="cm">implements port/in, usa port/out</span>
+│  └─ <span class="dir">dto/</span>&lt;Entidad&gt;Request/Response.java
+└─ <span class="dir">adapters/</span>
+   ├─ <span class="dir">in/web/</span>&lt;Entidad&gt;Controller.java
+   └─ <span class="dir">out/persistence/</span>&lt;Entidad&gt;PersistenceAdapter.java
+      ├─ <span class="dir">entity/</span>&lt;Entidad&gt;Entity.java
+      └─ <span class="dir">repository/</span>&lt;Entidad&gt;SpringDataRepository.java</div>
+  <h3>Checklist al modificar</h3>
+  <table>
+    <thead><tr><th>Quiero…</th><th>Toco…</th><th>No toco…</th></tr></thead>
+    <tbody>
+      <tr><td>Agregar un endpoint</td><td>in/web + port/in + service</td><td>domain, adapters/out</td></tr>
+      <tr><td>Cambiar una columna / consulta</td><td>out/persistence (entity+repo+adapter)</td><td>domain, service, controller</td></tr>
+      <tr><td>Agregar una regla de negocio</td><td>application/service</td><td>adapters (nunca reglas ahí)</td></tr>
+      <tr><td>Integrar una API externa</td><td>nuevo port/out + adapters/out/external</td><td>el resto del núcleo</td></tr>
+      <tr><td>Consumir otro módulo</td><td>port/out propio + adapter que use su API pública; declarar dep en package-info</td><td>internals del otro módulo si es CLOSED</td></tr>
+    </tbody>
+  </table>
+  <div class="note ok"><b>Verifica siempre:</b> corre los tests (<code>mvnw test</code>) tras el cambio; <code>ModularityTests</code> detecta si cruzaste un límite no declarado.</div>
+
+  <!-- ============ 10 ============ -->
+  <h2 id="s10"><span class="num">10</span> Brechas y huecos</h2>
+  <table>
+    <thead><tr><th>Hueco</th><th>Evidencia</th><th>Impacto</th></tr></thead>
+    <tbody>
+      <tr><td><code>mapper/</code> vacío / MapStruct sin uso <span class="badge b-gap">BRECHA</span></td><td>pom.xml:113 declara mapstruct; 0 usos de <code>org.mapstruct</code>; mapper_archivos=0</td><td>Mapeo manual repetido en cada adapter; carpeta fantasma confunde al leer.</td></tr>
+      <tr><td>ContactoQueryAdapter ineficiente <span class="badge b-gap">BRECHA</span></td><td><span class="anchor">actividades/adapters/out/persistence/ContactoQueryAdapter.java:31</span> hace listar()+flatMap para buscar un contacto por id</td><td>O(n) clientes por consulta; el propio comment pide un obtenerContacto(contactoId) en clientes.</td></tr>
+      <tr><td>Acoplamiento a repos OPEN <span class="badge b-gap">BRECHA</span></td><td><span class="anchor">actividades/adapters/out/persistence/RelacionValidationAdapter.java:20</span> inyecta repos de 3 módulos</td><td>Permitido (OPEN) pero acopla a internals; si esos módulos pasan a CLOSED, se rompe.</td></tr>
+      <tr><td>shared no es módulo <span class="badge b-gap">DOC</span></td><td>shared/ sin package-info</td><td>Kernel compartido; no aparece como módulo en Modulith. Hay que explicarlo aparte.</td></tr>
+      <tr><td>README/CLAUDE raíz desactualizados <span class="badge b-gap">DOC</span></td><td>describen BomERP/LP2, no Viernes</td><td>No usarlos como guía de estructura; este informe sí refleja el código.</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ============ 11 ============ -->
+  <h2 id="s11"><span class="num">11</span> Cómo leer un módulo desconocido</h2>
+  <p class="sec-intro">Ruta de 6 pasos para reconocer qué hace cualquier módulo sin perderte.</p>
+  <div class="flow">
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">package-info.java</div><div class="sd">Te dice tipo (OPEN/CLOSED) y de quién depende. Primer vistazo al rol del módulo.</div></div></div>
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">port/in (Manage…UseCase)</div><div class="sd">La lista de métodos = todo lo que el módulo ofrece. Es su contrato público de casos de uso.</div></div></div>
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">application/service</div><div class="sd">Ahí viven las reglas y la orquestación. Lee los métodos públicos y los privados de validación.</div></div></div>
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">port/out</div><div class="sd">Te dice qué necesita de fuera (BD, otros módulos, APIs). Cada puerto = una dependencia.</div></div></div>
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">adapters/out</div><div class="sd">Mira cómo se implementa cada puerto: JPA propio, API pública de otro módulo, o RestClient externo.</div></div></div>
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">domain + adapters/in/web</div><div class="sd">domain = el vocabulario del negocio; in/web = los endpoints HTTP que lo exponen. Con esto ya sabes qué hace y cómo se usa.</div></div></div>
+  </div>
+
+  <!-- ============ MIRO ============ -->
+  <h2 id="miro"><span class="num">&#9635;</span> Copiar outline para Miro</h2>
+  <p class="sec-intro">Genera un outline de texto (módulos, capas, comunicación y diseño) para pegarlo como nota o índice en un board de Miro.</p>
+  <div class="copy-row">
+    <button class="btn" id="copyMiroBtn" type="button">Copiar para Miro</button>
+    <span class="copy-hint" id="copyMiroHint">Copia el outline de estructura de módulos y diseño.</span>
+  </div>
+
+  <footer>VIERNES CRM V1 · Informe de estructura de módulos y diseño · generado sobre el código real de E:\Viernes\Viernes · anclajes archivo:línea verificados.</footer>
+</div>
+
+<script>
+(function(){
+  var miroEstructura = {
+    titulo: "VIERNES CRM V1 — Estructura de Módulos y Diseño",
+    secciones: [
+      "Modulo = capacidad de negocio con esqueleto hexagonal: adapters / application / domain + package-info. Dependencia: adapters -> application -> domain.",
+      "Carpetas: adapters/in/web (REST entra); adapters/out/persistence (JPA: adapter+entity+repository); adapters/out/external (APIs, solo clientes); application/dto (contratos); application/port/in (casos de uso); application/port/out (necesidades); application/service (reglas); domain (puro); package-info (Modulith); mapper (vacio, brecha).",
+      "Diseño: nucleo domain al centro; application con service+dto y puertos como costuras; adapters afuera (in izquierda, out derecha). Flechas: HTTP->in->port/in->service->port/out->out->BD/API.",
+      "Comunicacion interna (POST actividades): Controller:27 -> ManageActividadUseCase:10 -> ActividadService:63 -> validarRelaciones:235 (RelacionValidationAdapter) -> persistencePort.save:80 -> toResponse:382 -> 201.",
+      "Puertos: port/in lo implementa service y lo llama controller; port/out lo implementan adapters out y lo llama service. Inversion de dependencia => testeable con mocks.",
+      "Entre modulos: ContactoQueryAdapter usa solo API publica de clientes (limpio); RelacionValidationAdapter inyecta repos de OPEN (clientes/leads/oportunidades) + UsuariosApi de CLOSED (usuarios).",
+      "Modulith: OPEN permite internals; CLOSED solo API publica + allowedDependencies. ModularityTests.verify() lo hace cumplir. 14 modulos.",
+      "Comparador: oportunidades 40 arch (mayor); actividades 29; clientes 24 (unico externo); productos 12 (plantilla limpia); auth 4 y dashboard 11 sin domain; shared no es modulo.",
+      "Plantilla para crear modulo: copiar esqueleto de productos; endpoint->in/web+port/in+service; columna->out/persistence; regla->service; API externa->port/out+out/external; correr mvnw test.",
+      "Brechas: mapper vacio/MapStruct sin uso; ContactoQueryAdapter listar+flatMap ineficiente; RelacionValidationAdapter acoplado a repos OPEN; shared sin package-info; README/CLAUDE raiz desactualizados.",
+      "Leer modulo desconocido: package-info -> port/in -> service -> port/out -> adapters/out -> domain + in/web."
+    ]
+  };
+  function textoPlano(){
+    return miroEstructura.titulo + "\n" + "=".repeat(miroEstructura.titulo.length) + "\n\n" +
+      miroEstructura.secciones.map(function(s,i){ return (i+1) + ". " + s; }).join("\n\n");
+  }
+  var btn = document.getElementById('copyMiroBtn');
+  var hint = document.getElementById('copyMiroHint');
+  if(btn){
+    btn.addEventListener('click', async function(){
+      var texto = textoPlano();
+      try{
+        if(navigator.clipboard && navigator.clipboard.writeText){ await navigator.clipboard.writeText(texto); }
+        else { var ta=document.createElement('textarea'); ta.value=texto; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); }
+        btn.textContent='✓ Copiado'; btn.classList.add('ok');
+        hint.textContent='Pégalo en Miro como nota de texto o índice del board.';
+        setTimeout(function(){ btn.textContent='Copiar para Miro'; btn.classList.remove('ok'); hint.textContent='Copia el outline de estructura de módulos y diseño.'; },2600);
+      }catch(e){ hint.textContent='No se pudo copiar automáticamente. Selecciona el texto manualmente.'; }
+    });
+  }
+  window.__miroEstructuraModulos = miroEstructura;
+  window.__miroTextoPlano = textoPlano;
+})();
+</script>
+</body>
+</html>

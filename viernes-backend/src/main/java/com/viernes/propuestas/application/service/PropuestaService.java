@@ -7,6 +7,8 @@ import com.viernes.propuestas.application.port.out.PropuestaRelacionValidationPo
 import com.viernes.propuestas.domain.DetallePropuesta;
 import com.viernes.propuestas.domain.EstadoPropuesta;
 import com.viernes.propuestas.domain.Propuesta;
+import com.viernes.productos.application.dto.ProductoResponse;
+import com.viernes.productos.application.port.in.ManageProductoUseCase;
 import com.viernes.shared.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,7 @@ public class PropuestaService implements ManagePropuestaUseCase {
 
     private final PropuestaPersistencePort persistencePort;
     private final PropuestaRelacionValidationPort validationPort;
+    private final ManageProductoUseCase productoUseCase;
 
     @Override
     @Transactional
@@ -209,11 +212,39 @@ public class PropuestaService implements ManagePropuestaUseCase {
         return String.format("%s%04d", prefijo, count + 1);
     }
 
+    /**
+     * Construye el detalle guardando un snapshot: si trae productoId se valida
+     * contra el catálogo y los campos vacíos se prellenan desde el producto;
+     * los valores enviados se respetan como overrides comerciales.
+     */
     private DetallePropuesta toDetalleDomain(DetallePropuestaRequest r) {
+        String descripcion = r.descripcion();
+        BigDecimal precioUnitario = r.precioUnitario();
+
+        if (r.productoId() != null) {
+            ProductoResponse producto = productoUseCase.obtener(r.productoId());
+            if (descripcion == null || descripcion.isBlank()) {
+                descripcion = producto.nombre() != null && !producto.nombre().isBlank()
+                        ? producto.nombre()
+                        : producto.descripcion();
+            }
+            if (precioUnitario == null) {
+                precioUnitario = producto.precioBase();
+            }
+        }
+
+        if (descripcion == null || descripcion.isBlank()) {
+            throw new IllegalArgumentException("La descripción del detalle es obligatoria");
+        }
+        if (precioUnitario == null) {
+            throw new IllegalArgumentException("El precio unitario es obligatorio");
+        }
+
         DetallePropuesta d = DetallePropuesta.builder()
-                .descripcion(r.descripcion())
+                .idProducto(r.productoId())
+                .descripcion(descripcion)
                 .cantidad(r.cantidad())
-                .precioUnitario(r.precioUnitario())
+                .precioUnitario(precioUnitario)
                 .build();
         d.calcularSubtotal();
         return d;
@@ -222,7 +253,7 @@ public class PropuestaService implements ManagePropuestaUseCase {
     private PropuestaResponse toResponse(Propuesta p) {
         List<DetallePropuestaResponse> detallesResp = p.getDetalles().stream()
                 .map(d -> new DetallePropuestaResponse(
-                        d.getId(), d.getDescripcion(), d.getCantidad(),
+                        d.getId(), d.getIdProducto(), d.getDescripcion(), d.getCantidad(),
                         d.getPrecioUnitario(), d.getSubtotal()))
                 .toList();
 

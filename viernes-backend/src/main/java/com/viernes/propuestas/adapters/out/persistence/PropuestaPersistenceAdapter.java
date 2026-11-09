@@ -8,6 +8,7 @@ import com.viernes.propuestas.domain.DetallePropuesta;
 import com.viernes.propuestas.domain.EstadoPropuesta;
 import com.viernes.propuestas.domain.Propuesta;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -33,7 +34,7 @@ public class PropuestaPersistenceAdapter implements PropuestaPersistencePort {
 
     @Override
     public List<Propuesta> findAll() {
-        return repository.findAll().stream().map(this::toDomain).toList();
+        return repository.findAll(Sort.by(Sort.Direction.ASC, "id")).stream().map(this::toDomain).toList();
     }
 
     @Override
@@ -96,6 +97,7 @@ public class PropuestaPersistenceAdapter implements PropuestaPersistencePort {
     private DetallePropuesta toDetalleDomain(DetallePropuestaEntity entity) {
         return DetallePropuesta.builder()
                 .id(entity.getId())
+                .idProducto(entity.getIdProducto())
                 .descripcion(entity.getDescripcion())
                 .cantidad(entity.getCantidad())
                 .precioUnitario(entity.getPrecioUnitario())
@@ -131,6 +133,7 @@ public class PropuestaPersistenceAdapter implements PropuestaPersistencePort {
     private DetallePropuestaEntity toDetalleEntity(DetallePropuesta domain) {
         return DetallePropuestaEntity.builder()
                 .id(domain.getId())
+                .idProducto(domain.getIdProducto())
                 .descripcion(domain.getDescripcion())
                 .cantidad(domain.getCantidad())
                 .precioUnitario(domain.getPrecioUnitario())

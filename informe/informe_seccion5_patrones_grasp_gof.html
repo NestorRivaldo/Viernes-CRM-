@@ -1,0 +1,1849 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sesión 5 de Viernes CRM V1: auditoría de patrones GRASP y GoF sobre el código real, con evidencias, clasificación A/B/C/D y justificación académica.">
+    <title>Sesión 5 · Patrones GRASP y GoF · Viernes CRM V1</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #070b14;
+            --surface: #0f1626;
+            --surface2: #151f33;
+            --surface3: #1b2842;
+            --border: #22304a;
+            --border-strong: #33466a;
+            --text: #eef4ff;
+            --text-muted: #a5b4cb;
+            --text-subtle: #7385a1;
+            --blue: #60a5fa;
+            --blue-soft: rgba(96, 165, 250, 0.12);
+            --green: #34d399;
+            --green-soft: rgba(52, 211, 153, 0.12);
+            --amber: #fbbf24;
+            --amber-soft: rgba(251, 191, 36, 0.12);
+            --rose: #fb7185;
+            --rose-soft: rgba(251, 113, 133, 0.12);
+            --purple: #c084fc;
+            --purple-soft: rgba(192, 132, 252, 0.12);
+            --cyan: #22d3ee;
+            --cyan-soft: rgba(34, 211, 238, 0.12);
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            padding: 34px 20px 70px;
+            background-image:
+                radial-gradient(circle at 8% 0%, rgba(96, 165, 250, 0.10) 0%, transparent 36%),
+                radial-gradient(circle at 92% 12%, rgba(192, 132, 252, 0.07) 0%, transparent 34%),
+                radial-gradient(circle at 48% 100%, rgba(52, 211, 153, 0.05) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+
+        a { color: #93c5fd; text-decoration: none; }
+        a:hover { color: #dbeafe; }
+        .container { max-width: 1220px; margin: 0 auto; }
+
+        .skip-link {
+            position: absolute;
+            left: -9999px;
+            top: 10px;
+            background: #fff;
+            color: #0f172a;
+            padding: 8px 14px;
+            border-radius: 6px;
+            z-index: 999;
+        }
+        .skip-link:focus { left: 20px; }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+            padding-bottom: 18px;
+            margin-bottom: 32px;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+        }
+        .topbar .back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+        .topbar .back:hover { color: #fff; }
+        .topbar-meta {
+            color: var(--text-subtle);
+            font-family: var(--mono);
+            font-size: 11.5px;
+            text-align: right;
+        }
+
+        .hero { padding: 8px 0 34px; border-bottom: 1px solid var(--border); margin-bottom: 28px; }
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #6ee7b7;
+            background: var(--green-soft);
+            border: 1px solid rgba(52, 211, 153, 0.30);
+            border-radius: 30px;
+            padding: 6px 13px;
+            font-size: 11.5px;
+            font-weight: 700;
+            letter-spacing: 0.10em;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+        .hero h1 {
+            font-size: clamp(34px, 5vw, 54px);
+            line-height: 1.08;
+            letter-spacing: -0.035em;
+            font-weight: 800;
+            max-width: 1040px;
+            background: linear-gradient(135deg, #ffffff 32%, #93c5fd 62%, #6ee7b7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 18px;
+        }
+        .hero .lead { color: var(--text-muted); font-size: 17px; max-width: 980px; line-height: 1.75; }
+        .hero-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            border: 1px solid var(--border-strong);
+            background: rgba(21, 31, 51, 0.78);
+            color: #cbd5e1;
+            border-radius: 999px;
+            padding: 5px 11px;
+            font-size: 11.5px;
+            font-weight: 600;
+        }
+        .pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px rgba(52,211,153,.8); }
+        .pill.blue .dot { background: var(--blue); box-shadow: 0 0 8px rgba(96,165,250,.8); }
+        .pill.purple .dot { background: var(--purple); box-shadow: 0 0 8px rgba(192,132,252,.8); }
+        .pill.amber .dot { background: var(--amber); box-shadow: 0 0 8px rgba(251,191,36,.8); }
+
+        .doc-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 26px;
+            margin-top: 18px;
+            color: var(--text-subtle);
+            font-size: 12.5px;
+        }
+        .doc-meta strong { color: #cbd5e1; font-weight: 600; }
+
+        .toc {
+            background: linear-gradient(180deg, rgba(15, 22, 38, 0.92), rgba(15, 22, 38, 0.70));
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 18px;
+            margin-bottom: 34px;
+        }
+        .toc-title {
+            font-size: 11px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--text-subtle);
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        .toc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 8px; }
+        .toc a {
+            display: block;
+            padding: 8px 10px;
+            border-radius: 8px;
+            color: #cbd5e1;
+            font-size: 13px;
+            border: 1px solid transparent;
+        }
+        .toc a:hover { background: var(--surface2); border-color: var(--border); color: #fff; }
+        .toc a span { color: var(--text-subtle); font-family: var(--mono); font-size: 11px; margin-right: 6px; }
+
+        main { display: block; }
+        section { margin-bottom: 44px; }
+        .section-head { display: flex; align-items: flex-start; gap: 13px; margin-bottom: 16px; }
+        .section-num {
+            flex: 0 0 auto;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: var(--blue-soft);
+            border: 1px solid rgba(96, 165, 250, 0.30);
+            color: #93c5fd;
+            font-family: var(--mono);
+            font-size: 12px;
+            font-weight: 700;
+            margin-top: 3px;
+        }
+        h2 { font-size: clamp(24px, 3vw, 31px); letter-spacing: -0.02em; line-height: 1.2; }
+        h3 { font-size: 19px; letter-spacing: -0.01em; margin: 24px 0 10px; color: #f8fafc; }
+        h4 { font-size: 15px; margin: 18px 0 8px; color: #dbeafe; }
+        p { color: var(--text-muted); margin-bottom: 12px; }
+        p strong { color: #f1f5f9; }
+        ul, ol { color: var(--text-muted); padding-left: 22px; margin: 8px 0 16px; }
+        li { margin-bottom: 7px; }
+        li strong { color: #e2e8f0; }
+
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+
+        .card {
+            background: linear-gradient(180deg, rgba(21, 31, 51, 0.86), rgba(15, 22, 38, 0.86));
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 17px;
+        }
+        .card h4 { margin-top: 0; }
+        .card p:last-child { margin-bottom: 0; }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 15px 16px;
+        }
+        .stat-card .stat-value { font-family: var(--mono); font-size: 26px; font-weight: 700; color: #fff; line-height: 1.1; }
+        .stat-card .stat-label { color: var(--text-subtle); font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.08em; margin-top: 6px; }
+
+        .callout {
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--blue);
+            background: rgba(96, 165, 250, 0.07);
+            border-radius: var(--radius-sm);
+            padding: 13px 15px;
+            margin: 14px 0;
+            color: #cbd5e1;
+            font-size: 13.5px;
+        }
+        .callout strong { color: #fff; }
+        .callout.ok { border-left-color: var(--green); background: rgba(52, 211, 153, 0.07); }
+        .callout.warn { border-left-color: var(--amber); background: rgba(251, 191, 36, 0.07); }
+        .callout.rose { border-left-color: var(--rose); background: rgba(251, 113, 133, 0.07); }
+        .callout .label { display: block; font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-subtle); font-weight: 700; margin-bottom: 4px; }
+
+        .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius-md); margin: 14px 0; }
+        table { width: 100%; border-collapse: collapse; min-width: 680px; font-size: 13.2px; }
+        thead th {
+            background: var(--surface2);
+            color: #cbd5e1;
+            text-align: left;
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border-strong);
+            white-space: nowrap;
+        }
+        tbody td { padding: 10px 12px; border-bottom: 1px solid rgba(34, 48, 74, 0.7); vertical-align: top; color: var(--text-muted); }
+        tbody tr:nth-child(even) { background: rgba(21, 31, 51, 0.38); }
+        tbody tr:hover { background: rgba(96, 165, 250, 0.06); }
+        tbody tr:last-child td { border-bottom: 0; }
+        td strong { color: #f1f5f9; }
+        .nowrap { white-space: nowrap; }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            border-radius: 999px;
+            padding: 3px 8px;
+            font-size: 10.5px;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            border: 1px solid transparent;
+            white-space: nowrap;
+        }
+        .badge-a { background: var(--green-soft); color: #6ee7b7; border-color: rgba(52, 211, 153, 0.34); }
+        .badge-b { background: var(--amber-soft); color: #fde68a; border-color: rgba(251, 191, 36, 0.34); }
+        .badge-c { background: var(--blue-soft); color: #93c5fd; border-color: rgba(96, 165, 250, 0.34); }
+        .badge-d { background: rgba(115, 133, 161, 0.12); color: #a5b4cb; border-color: rgba(115, 133, 161, 0.30); }
+
+        .tag {
+            display: inline-block;
+            background: rgba(21, 31, 51, 0.9);
+            border: 1px solid var(--border);
+            color: #cbd5e1;
+            border-radius: 999px;
+            padding: 3px 8px;
+            font-size: 10.5px;
+            margin: 2px 3px 2px 0;
+        }
+        .tag.green { color: #6ee7b7; border-color: rgba(52, 211, 153, 0.30); background: var(--green-soft); }
+        .tag.blue { color: #93c5fd; border-color: rgba(96, 165, 250, 0.30); background: var(--blue-soft); }
+        .tag.amber { color: #fde68a; border-color: rgba(251, 191, 36, 0.30); background: var(--amber-soft); }
+        .tag.purple { color: #d8b4fe; border-color: rgba(192, 132, 252, 0.30); background: var(--purple-soft); }
+
+        .path { font-family: var(--mono); font-size: 11.5px; color: #93c5fd; word-break: break-word; }
+        code {
+            font-family: var(--mono);
+            font-size: 0.92em;
+            background: rgba(96, 165, 250, 0.10);
+            border: 1px solid rgba(96, 165, 250, 0.18);
+            border-radius: 5px;
+            padding: 1px 5px;
+            color: #dbeafe;
+        }
+        pre {
+            background: #050914;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 15px;
+            overflow-x: auto;
+            margin: 12px 0;
+            line-height: 1.65;
+            font-size: 12.5px;
+        }
+        pre code { background: none; border: 0; padding: 0; color: #dbeafe; font-size: inherit; font-variant-ligatures: none; }
+        .code-label {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: center;
+            margin: 16px 0 -4px;
+            color: var(--text-subtle);
+            font-family: var(--mono);
+            font-size: 10.5px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .arch-flow {
+            display: flex;
+            align-items: stretch;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 6px 0 10px;
+        }
+        .arch-node {
+            flex: 1 0 150px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 13px;
+        }
+        .arch-node .kicker { display: block; color: var(--text-subtle); font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; margin-bottom: 4px; }
+        .arch-node strong { display: block; color: #fff; font-size: 13px; }
+        .arch-node small { display: block; color: var(--text-muted); font-size: 11px; margin-top: 4px; line-height: 1.4; }
+        .arch-arrow { display: flex; align-items: center; color: var(--text-subtle); font-size: 20px; flex: 0 0 auto; }
+
+        .layer-stack { display: grid; gap: 8px; margin: 14px 0; }
+        .layer {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            gap: 12px;
+            align-items: center;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 11px 13px;
+        }
+        .layer strong { color: #fff; font-size: 13px; }
+        .layer span { color: var(--text-muted); font-size: 12.5px; }
+        .layer .layer-tag { font-family: var(--mono); font-size: 10px; color: var(--text-subtle); }
+
+        .pattern-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--blue);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            margin: 12px 0;
+        }
+        .pattern-card.a { border-left-color: var(--green); }
+        .pattern-card.b { border-left-color: var(--amber); }
+        .pattern-card.c { border-left-color: var(--blue); }
+        .pattern-card.d { border-left-color: var(--text-subtle); }
+        .pattern-card h3 { margin-top: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+        .pattern-card .pattern-question { color: var(--text-subtle); font-size: 12px; font-style: italic; margin-bottom: 8px; }
+
+        .bar-row { display: grid; grid-template-columns: 24px 1fr 34px; gap: 8px; align-items: center; margin: 7px 0; font-size: 12px; }
+        .bar { height: 8px; border-radius: 999px; background: var(--surface3); overflow: hidden; }
+        .bar span { display: block; height: 100%; border-radius: 999px; }
+        .bar-a span { background: var(--green); }
+        .bar-b span { background: var(--amber); }
+        .bar-c span { background: var(--blue); }
+        .bar-d span { background: var(--text-subtle); }
+
+        .footer {
+            margin-top: 54px;
+            padding-top: 18px;
+            border-top: 1px solid var(--border);
+            color: var(--text-subtle);
+            font-size: 11.5px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        @media (max-width: 680px) {
+            body { padding: 24px 14px 50px; }
+            .topbar { align-items: flex-start; flex-direction: column; gap: 8px; }
+            .topbar-meta { text-align: left; }
+            .layer { grid-template-columns: 1fr; gap: 4px; }
+            .hero .lead { font-size: 15.5px; }
+        }
+
+        @media print {
+            body { background: #fff; color: #111; padding: 0; }
+            .topbar, .toc, .footer { display: none; }
+            .hero h1 { -webkit-text-fill-color: #111; color: #111; }
+            .hero .lead, p, li, td, .card p { color: #222; }
+            .card, .table-wrap, .callout, .pattern-card, pre { border-color: #ccc; background: #fff; }
+            .badge, .tag, code { border-color: #bbb; }
+            a { color: #1d4ed8; }
+        }
+    </style>
+</head>
+<body>
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
+<div class="container">
+
+    <nav class="topbar">
+        <div style="display:flex;align-items:center;gap:16px;">
+            <a class="back" href="index.html">← Portal de informes</a>
+            <a href="guia_visual_patrones_grasp_gof.html" style="color:#6ee7b7;border:1px solid rgba(52,211,153,0.3);padding:4px 10px;border-radius:6px;background:rgba(52,211,153,0.08);text-decoration:none;font-weight:600;display:inline-flex;align-items:center;gap:6px;">⚡ Ver versión tarjetas didácticas (Miro)</a>
+        </div>
+        <div class="topbar-meta">Sesión 5 · Auditoría de diseño · 05/11/2026</div>
+    </nav>
+
+    <header class="hero" id="contenido">
+        <div class="eyebrow">Sesión 5 · Patrones de diseño</div>
+        <h1>GRASP y GoF en el código real de Viernes CRM V1</h1>
+        <p class="lead">
+            Informe académico y técnico que identifica, clasifica y justifica los patrones de diseño
+            realmente presentes en el sistema. No se implementaron patrones ni se modificó el código:
+            se auditaron <strong>246 archivos Java</strong>, 15 paquetes de primer nivel, 14 controladores,
+            14 servicios, 28 puertos y 27 adaptadores.
+        </p>
+        <div class="hero-pills">
+            <span class="pill"><span class="dot"></span>Auditoría estática</span>
+            <span class="pill blue"><span class="dot"></span>Java 21</span>
+            <span class="pill blue"><span class="dot"></span>Spring Boot 4.0.7</span>
+            <span class="pill purple"><span class="dot"></span>Oracle 23c</span>
+            <span class="pill amber"><span class="dot"></span>Angular 22</span>
+        </div>
+        <div class="doc-meta">
+            <span><strong>Proyecto:</strong> Viernes CRM V1</span>
+            <span><strong>Alcance:</strong> backend Java + verificación de stack frontend</span>
+            <span><strong>Versión:</strong> 1.0</span>
+            <span><strong>Código modificado:</strong> no</span>
+        </div>
+        <div class="callout ok">
+            <span class="label">Regla de oro</span>
+            Un patrón se declara solo si existe evidencia directa en el código. Un nombre de clase,
+            una anotación de Spring o una característica del framework no bastan para afirmar que el
+            patrón está implementado.
+        </div>
+    </header>
+
+    <nav class="toc" aria-label="Tabla de contenidos">
+        <div class="toc-title">Contenido del informe</div>
+        <div class="toc-grid">
+            <a href="#resumen"><span>00</span>Resumen ejecutivo</a>
+            <a href="#introduccion"><span>01</span>Introducción y alcance</a>
+            <a href="#metodologia"><span>02</span>Metodología y evidencias</a>
+            <a href="#grasp-vs-gof"><span>03</span>GRASP vs. GoF</a>
+            <a href="#grasp"><span>04</span>Los 9 principios GRASP</a>
+            <a href="#gof"><span>05</span>Los 23 patrones GoF</a>
+            <a href="#mapa"><span>06</span>Mapa por módulo</a>
+            <a href="#codigo"><span>07</span>Evidencias de código</a>
+            <a href="#discusion"><span>08</span>Discusión y riesgos</a>
+            <a href="#conclusiones"><span>09</span>Conclusiones y anexos</a>
+        </div>
+    </nav>
+
+    <main>
+        <section id="resumen">
+            <div class="section-head">
+                <div class="section-num">00</div>
+                <div>
+                    <h2>Resumen ejecutivo</h2>
+                    <p>Una lectura de conjunto antes de entrar en el detalle de cada patrón.</p>
+                </div>
+            </div>
+
+            <div class="grid-4">
+                <div class="stat-card"><div class="stat-value">246</div><div class="stat-label">Archivos Java</div></div>
+                <div class="stat-card"><div class="stat-value">15</div><div class="stat-label">Paquetes de primer nivel</div></div>
+                <div class="stat-card"><div class="stat-value">14</div><div class="stat-label">Controladores REST</div></div>
+                <div class="stat-card"><div class="stat-value">14</div><div class="stat-label">Servicios de aplicación</div></div>
+                <div class="stat-card"><div class="stat-value">28</div><div class="stat-label">Puertos</div></div>
+                <div class="stat-card"><div class="stat-value">27</div><div class="stat-label">Adaptadores</div></div>
+                <div class="stat-card"><div class="stat-value">21</div><div class="stat-label">Entidades JPA</div></div>
+                <div class="stat-card"><div class="stat-value">0</div><div class="stat-label">Cambios de código</div></div>
+            </div>
+
+            <div class="grid-2" style="margin-top:14px;">
+                <div class="card">
+                    <h4>GRASP: 9 principios</h4>
+                    <p>
+                        El sistema aplica con claridad la asignación de responsabilidades: el dominio calcula
+                        lo que conoce, los servicios coordinan casos de uso, los controladores reciben
+                        solicitudes y los puertos/adaptadores aíslan infraestructura.
+                    </p>
+                    <div class="bar-row"><span>A</span><div class="bar bar-a"><span style="width:78%"></span></div><strong>7</strong></div>
+                    <div class="bar-row"><span>B</span><div class="bar bar-b"><span style="width:22%"></span></div><strong>2</strong></div>
+                    <p style="font-size:12px;margin-top:10px;">
+                        <span class="badge badge-b">B</span> Alta Cohesión y Polimorfismo: hay elementos,
+                        pero no se cumplen de forma completa en todas las clases.
+                    </p>
+                </div>
+                <div class="card">
+                    <h4>GoF: 23 patrones</h4>
+                    <p>
+                        La presencia GoF es selectiva. Los patrones más nítidos son
+                        <strong>Builder</strong> y <strong>Adapter</strong>; <strong>Facade</strong>,
+                        <strong>Template Method</strong> y <strong>Chain of Responsibility</strong>
+                        aparecen de forma parcial o apoyados por Spring.
+                    </p>
+                    <div class="bar-row"><span>A</span><div class="bar bar-a"><span style="width:9%"></span></div><strong>2</strong></div>
+                    <div class="bar-row"><span>B</span><div class="bar bar-b"><span style="width:13%"></span></div><strong>3</strong></div>
+                    <div class="bar-row"><span>C</span><div class="bar bar-c"><span style="width:30%"></span></div><strong>7</strong></div>
+                    <div class="bar-row"><span>D</span><div class="bar bar-d"><span style="width:48%"></span></div><strong>11</strong></div>
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Hallazgo</th><th>Evidencia principal</th><th>Lectura académica</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Experto en Información</strong></td>
+                            <td><span class="path">Propuesta.recalcularTotales()</span>, <span class="path">DetallePropuesta.calcularSubtotal()</span>, <span class="path">Oportunidad.getValorPonderado()</span></td>
+                            <td>El cálculo vive donde están los datos. Es el GRASP más claro del sistema.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Creator y Controlador</strong></td>
+                            <td><span class="path">PropuestaService.crear()</span>, <span class="path">ClienteService.agregarContacto()</span>, controladores REST</td>
+                            <td>Los servicios coordinan la creación; los controladores solo reciben y delegan.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Adapter</strong></td>
+                            <td><span class="path">PropuestaPersistenceAdapter</span>, <span class="path">ContactoQueryAdapter</span>, <span class="path">KeycloakJwtAuthenticationConverter</span></td>
+                            <td>Conversión real entre dominio, entidades JPA, puertos y tokens JWT.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Builder</strong></td>
+                            <td><span class="path">@Builder</span> en dominio y entidades; uso explícito con <span class="path">Propuesta.builder()</span></td>
+                            <td>Patrón presente, aunque generado por Lombok. Es una implementación directa, no manual.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Facade / Template Method / Chain</strong></td>
+                            <td><span class="path">RelationshipMapService</span>, <span class="path">CorrelationIdFilter</span>, <span class="path">SecurityFilterChain</span></td>
+                            <td>Aplicación parcial o apoyada en Spring. No se elevan a “A” para no confundir framework con diseño propio.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>State, Strategy, Observer</strong></td>
+                            <td>Enums y validaciones de transición; no hay objetos Estado, estrategias intercambiables ni eventos de dominio</td>
+                            <td>Son oportunidades reales, no patrones implementados. Se clasifican como C.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="callout warn">
+                <span class="label">Conclusión anticipada</span>
+                El valor del sistema no está en “usar los 23 patrones”, sino en haber aplicado los que
+                resuelven problemas reales: calcular donde corresponde, crear donde se coordina,
+                aislar infraestructura y adaptar fronteras. Los patrones ausentes no son una deuda
+                automática; solo serían necesarios si apareciera el problema que resuelven.
+            </div>
+        </section>
+        <section id="introduccion">
+            <div class="section-head">
+                <div class="section-num">01</div>
+                <div>
+                    <h2>Introducción y alcance</h2>
+                    <p>Qué se entiende por patrón y qué se auditó exactamente en Viernes CRM V1.</p>
+                </div>
+            </div>
+
+            <p>
+                Un patrón de diseño es una solución reutilizable a un problema que se repite en un
+                contexto determinado. No es una clase, una anotación ni una biblioteca: es una
+                <strong>decisión de diseño</strong> que organiza responsabilidades, colaboraciones o
+                estructuras de objetos. Por eso, para afirmar que un patrón está presente, no basta
+                con encontrar una clase llamada <code>*Service</code>, <code>*Adapter</code> o
+                <code>*Controller</code>; hay que mostrar qué problema resuelve y cómo lo resuelve.
+            </p>
+            <p>
+                La Sesión 5 pide identificar y justificar GRASP y GoF en el sistema real. Este informe
+                responde a esa consigna con una auditoría estática del repositorio
+                <span class="path">E:\Viernes\Viernes</span>. No se creó ninguna clase para simular
+                patrones, no se instalaron dependencias y no se modificó el código de producción.
+            </p>
+
+            <div class="callout">
+                <span class="label">Alcance</span>
+                La evidencia principal está en el backend Java. El frontend Angular se verificó para
+                confirmar el stack, pero el análisis de patrones se concentra en el código de dominio,
+                aplicación, puertos y adaptadores, que es donde el sistema expresa sus decisiones de
+                diseño de forma más explícita.
+            </div>
+
+            <h3>Aclaraciones factuales del proyecto</h3>
+            <p>
+                Antes de analizar patrones conviene corregir algunos puntos que suelen aparecer en los
+                documentos académicos y que no coinciden exactamente con el repositorio:
+            </p>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Tema</th><th>Corrección verificada</th><th>Evidencia</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Contactos</strong></td>
+                            <td>No es un módulo independiente. Es una entidad dentro del módulo <code>clientes</code>.</td>
+                            <td><span class="path">com/viernes/clientes/domain/Contacto.java</span>; no existe el paquete <span class="path">com/viernes/contactos</span>.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Módulos reales</strong></td>
+                            <td><code>actividades</code>, <code>auth</code>, <code>clientes</code>, <code>dashboard</code>, <code>equipos</code>, <code>etiquetas</code>, <code>leads</code>, <code>marketing</code>, <code>mensajeria</code>, <code>oportunidades</code>, <code>productos</code>, <code>propuestas</code>, <code>relationshipmap</code>, <code>shared</code>, <code>usuarios</code>.</td>
+                            <td>Directorios de <span class="path">src/main/java/com/viernes</span>.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Spring Modulith</strong></td>
+                            <td>Versión <strong>2.0.7</strong>, no 1.6.x.</td>
+                            <td><span class="path">pom.xml:32</span>.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Stack</strong></td>
+                            <td>Java 21, Spring Boot 4.0.7, Spring Data JPA, Oracle 23c, Angular 22.1/22.2, Angular Material 22.2, Keycloak 25.0.6 y keycloak-js 26.2.4.</td>
+                            <td><span class="path">pom.xml</span>, <span class="path">package.json</span>, <span class="path">docker/keycloak/compose-keycloak.yml</span>.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Alta Cohesión</strong></td>
+                            <td><code>ActividadService</code> no es un ejemplo perfecto: concentra CRUD, etiquetas y participantes en 402 líneas. Se usa como evidencia parcial, no como modelo ideal.</td>
+                            <td><span class="path">ActividadService.java</span>; 402 líneas.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Preguntas que guían el informe</h3>
+            <div class="grid-2">
+                <div class="card">
+                    <h4>GRASP</h4>
+                    <p>¿Quién debe asumir cada responsabilidad? ¿La clase que calcula es la que conoce los datos? ¿El controlador solo coordina? ¿Los componentes están acoplados de forma razonable?</p>
+                </div>
+                <div class="card">
+                    <h4>GoF</h4>
+                    <p>¿Qué estructuras de colaboración existen? ¿Hay creación paso a paso, adaptación de interfaces, fachadas, plantillas o cadenas? ¿O solo hay oportunidades que todavía no se materializaron?</p>
+                </div>
+            </div>
+
+            <div class="callout rose">
+                <span class="label">Límite importante</span>
+                Este informe no convierte oportunidades en implementaciones. Si un patrón no existe,
+                se dice. La clasificación <strong>C</strong> y <strong>D</strong> es tan válida como la
+                <strong>A</strong>: describe el estado real del sistema y evita sobreinterpretar el código.
+            </div>
+        </section>
+        <section id="metodologia">
+            <div class="section-head">
+                <div class="section-num">02</div>
+                <div>
+                    <h2>Metodología y evidencias</h2>
+                    <p>Cómo se revisó el repositorio y con qué criterio se clasificó cada patrón.</p>
+                </div>
+            </div>
+
+            <h3>2.1. Procedimiento</h3>
+            <ol>
+                <li><strong>Inventario del código:</strong> se listaron los paquetes de primer nivel, controladores, servicios, puertos, adaptadores y entidades JPA.</li>
+                <li><strong>Lectura de clases clave:</strong> dominio, servicios de aplicación, controladores, puertos de entrada/salida, adaptadores y configuración de seguridad.</li>
+                <li><strong>Búsqueda de evidencia:</strong> se examinaron métodos, firmas, dependencias, anotaciones y relaciones entre clases; no se infirió un patrón por el nombre del archivo.</li>
+                <li><strong>Clasificación A/B/C/D:</strong> se aplicó el criterio de la consigna académica, distinguiendo implementación directa, aplicación parcial, posibilidad y ausencia.</li>
+                <li><strong>Contraste con el stack:</strong> se separó lo que es diseño propio de lo que es infraestructura de Spring, JPA, Spring Security o Lombok.</li>
+            </ol>
+
+            <h3>2.2. Criterios de clasificación</h3>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Clase</th><th>Significado</th><th>Criterio aplicado en este informe</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge badge-a">A</span></td>
+                            <td><strong>Implementado y verificado</strong></td>
+                            <td>Existe una estructura reconocible, con clases/métodos concretos que cumplen la intención del patrón. Se puede defender con archivo, clase y método.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-b">B</span></td>
+                            <td><strong>Aplicación parcial</strong></td>
+                            <td>Hay elementos del patrón, pero falta la estructura completa, la intención se cumple solo en parte, o el soporte es principalmente del framework.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-c">C</span></td>
+                            <td><strong>Posible aplicación</strong></td>
+                            <td>Existe una oportunidad clara, pero no hay implementación. Se documenta como recomendación, no como logro.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-d">D</span></td>
+                            <td><strong>No identificado</strong></td>
+                            <td>No se encontró evidencia suficiente en el código. No significa que sea imposible; significa que hoy no está.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>2.3. Stack verificado</h3>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Tecnología</th><th>Versión / uso</th><th>Fuente</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Java</td><td>21</td><td><span class="path">pom.xml:31</span></td></tr>
+                        <tr><td>Spring Boot</td><td>4.0.7</td><td><span class="path">pom.xml:9</span></td></tr>
+                        <tr><td>Spring Modulith</td><td>2.0.7</td><td><span class="path">pom.xml:32</span></td></tr>
+                        <tr><td>Spring Data JPA</td><td>Persistencia y repositorios</td><td><span class="path">pom.xml:41</span></td></tr>
+                        <tr><td>Oracle Database</td><td>23c; conexión <code>jdbc:oracle:thin:@localhost:1521/FREEPDB1</code></td><td><span class="path">application-dev.yml</span></td></tr>
+                        <tr><td>Angular</td><td>22.1 / 22.2</td><td><span class="path">viernes-frontend/package.json</span></td></tr>
+                        <tr><td>Angular Material</td><td>22.2.0</td><td><span class="path">viernes-frontend/package.json</span></td></tr>
+                        <tr><td>Keycloak</td><td>25.0.6 en Docker; keycloak-js 26.2.4 en frontend</td><td><span class="path">docker/keycloak/compose-keycloak.yml</span></td></tr>
+                        <tr><td>Lombok</td><td>Generación de getters, setters y builders</td><td><span class="path">pom.xml:80-83</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>2.4. Métricas del código auditado</h3>
+            <div class="grid-3">
+                <div class="card"><h4>Estructura</h4><p><strong>246 archivos Java</strong>, 15 paquetes de primer nivel, 21 entidades JPA, 28 puertos y 27 adaptadores.</p></div>
+                <div class="card"><h4>Capa web</h4><p><strong>14 controladores REST</strong> con rutas <code>/api/v1/...</code>, validación con Jakarta Validation y documentación OpenAPI.</p></div>
+                <div class="card"><h4>Capa de aplicación</h4><p><strong>14 servicios</strong> que implementan contratos <code>Manage*UseCase</code> y coordinan puertos de salida.</p></div>
+                <div class="card"><h4>Mayor servicio</h4><p><span class="path">RelationshipMapService</span>: <strong>741 líneas</strong>. Agrega información de seis módulos en un grafo.</p></div>
+                <div class="card"><h4>Segundo mayor</h4><p><span class="path">ActividadService</span>: <strong>402 líneas</strong>. CRUD, etiquetas, participantes y validaciones.</p></div>
+                <div class="card"><h4>Persistencia</h4><p>Adaptadores que mapean dominio ↔ entidad y repositorios Spring Data; sin exponer entidades JPA al dominio.</p></div>
+            </div>
+
+            <h3>2.5. Arquitectura observada</h3>
+            <div class="arch-flow" aria-label="Flujo de dependencias entre capas">
+                <div class="arch-node"><span class="kicker">Frontend</span><strong>Angular 22</strong><small>Componentes, servicios HTTP y guards</small></div>
+                <div class="arch-arrow">→</div>
+                <div class="arch-node"><span class="kicker">Entrada</span><strong>REST Controller</strong><small>Recibe DTO, valida y delega</small></div>
+                <div class="arch-arrow">→</div>
+                <div class="arch-node"><span class="kicker">Aplicación</span><strong>Use Case / Service</strong><small>Coordina el caso de uso</small></div>
+                <div class="arch-arrow">→</div>
+                <div class="arch-node"><span class="kicker">Dominio</span><strong>Entidades y reglas</strong><small>Cálculos y estado del negocio</small></div>
+                <div class="arch-arrow">→</div>
+                <div class="arch-node"><span class="kicker">Salida</span><strong>Puerto</strong><small>Contrato de persistencia o consulta</small></div>
+                <div class="arch-arrow">→</div>
+                <div class="arch-node"><span class="kicker">Infraestructura</span><strong>Adaptador</strong><small>JPA, mapeo y repositorios</small></div>
+                <div class="arch-arrow">→</div>
+                <div class="arch-node"><span class="kicker">Datos</span><strong>Oracle 23c</strong><small>Tablas CRM_*</small></div>
+            </div>
+            <p style="font-size:12.5px;">
+                La dirección de dependencias apunta al dominio y a los contratos de aplicación. Los
+                adaptadores implementan puertos; los controladores no conocen la persistencia. Esa es
+                la base de los GRASP <strong>Bajo Acoplamiento</strong>, <strong>Indirección</strong> y
+                <strong>Variaciones Protegidas</strong>.
+            </p>
+
+            <div class="layer-stack">
+                <div class="layer"><strong>domain</strong><span>Clases de negocio, enums y reglas. No dependen de Spring ni de JPA.</span></div>
+                <div class="layer"><strong>application</strong><span>DTO, puertos de entrada/salida y servicios que implementan los casos de uso.</span></div>
+                <div class="layer"><strong>adapters.in.web</strong><span>Controladores REST: traducen HTTP a llamadas de caso de uso.</span></div>
+                <div class="layer"><strong>adapters.out.persistence</strong><span>Adaptadores JPA, entidades y repositorios Spring Data. Traducen dominio ↔ entidad.</span></div>
+            </div>
+
+            <div class="callout">
+                <span class="label">Nota metodológica</span>
+                Las líneas de código se usan como indicio de tamaño y posible concentración de
+                responsabilidades, no como prueba automática de baja cohesión. La conclusión siempre
+                se justifica con las responsabilidades observadas.
+            </div>
+        </section>
+        <section id="grasp-vs-gof">
+            <div class="section-head">
+                <div class="section-num">03</div>
+                <div>
+                    <h2>GRASP vs. GoF</h2>
+                    <p>Dos preguntas distintas, dos formas complementarias de justificar el diseño.</p>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="card" style="border-left:4px solid var(--green);">
+                    <h4>GRASP · ¿Quién?</h4>
+                    <p>
+                        Los patrones GRASP ayudan a <strong>asignar responsabilidades</strong> a clases y
+                        objetos. Responden preguntas como: ¿quién debe calcular?, ¿quién debe crear?,
+                        ¿quién debe recibir la solicitud?, ¿cómo reducir el acoplamiento?
+                    </p>
+                    <p><span class="tag green">Responsabilidad</span><span class="tag green">Colaboración</span><span class="tag green">Principios</span></p>
+                </div>
+                <div class="card" style="border-left:4px solid var(--blue);">
+                    <h4>GoF · ¿Cómo?</h4>
+                    <p>
+                        Los patrones GoF proponen <strong>estructuras de colaboración</strong> entre
+                        objetos y clases para resolver problemas recurrentes de creación, composición o
+                        comportamiento. Responden: ¿cómo organizamos la solución?
+                    </p>
+                    <p><span class="tag blue">Estructura</span><span class="tag blue">Objetos</span><span class="tag blue">Soluciones clásicas</span></p>
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Aspecto</th><th>GRASP</th><th>GoF</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>Pregunta central</strong></td><td>¿Quién debe hacer este trabajo?</td><td>¿Cómo organizamos la solución?</td></tr>
+                        <tr><td><strong>Enfoque</strong></td><td>Asignación de responsabilidades.</td><td>Estructuras de colaboración entre objetos/clases.</td></tr>
+                        <tr><td><strong>Naturaleza</strong></td><td>Principios y patrones de asignación; no siempre exigen una estructura de clases nueva.</td><td>Catálogo de 23 soluciones con estructura, participantes y consecuencias.</td></tr>
+                        <tr><td><strong>Nivel</strong></td><td>Más cercano al diseño de responsabilidades y a la mantenibilidad.</td><td>Más cercano a la solución concreta y a la reutilización de estructuras.</td></tr>
+                        <tr><td><strong>Ejemplo en Viernes</strong></td><td>La propuesta calcula sus totales porque conoce sus detalles.</td><td>El adaptador de persistencia convierte dominio ↔ entidad detrás de un puerto.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="callout ok">
+                <span class="label">Relación</span>
+                No compiten. Un mismo diseño puede ser explicado con GRASP y con GoF desde ángulos
+                distintos. Por ejemplo, un <strong>Adapter</strong> GoF también materializa
+                <strong>Indirección</strong> y <strong>Bajo Acoplamiento</strong> GRASP. Lo importante
+                es no confundir la pregunta: GRASP justifica la responsabilidad; GoF describe la
+                estructura.
+            </div>
+
+            <div class="callout warn">
+                <span class="label">Error frecuente</span>
+                Decir “usamos Spring, entonces usamos Factory Method, Singleton y Proxy”. Spring
+                gestiona beans, inyección y proxies, pero eso no equivale automáticamente a los
+                patrones GoF. En este informe, esas características se clasifican como soporte de
+                framework, no como implementación propia.
+            </div>
+        </section>
+        <section id="grasp">
+            <div class="section-head">
+                <div class="section-num">04</div>
+                <div>
+                    <h2>Los 9 principios GRASP</h2>
+                    <p>Asignación de responsabilidades observada en el código real.</p>
+                </div>
+            </div>
+
+            <p>
+                Los nueve principios se evalúan con la misma pregunta: <strong>¿la responsabilidad está
+                en el lugar adecuado?</strong> En Viernes CRM V1 se observa una aplicación sólida en
+                siete de ellos y una aplicación parcial en dos: Alta Cohesión y Polimorfismo.
+            </p>
+
+            <div class="pattern-card a">
+                <h3>4.1. Experto en Información <span class="badge badge-a">A</span></h3>
+                <div class="pattern-question">¿Qué clase tiene la información necesaria para realizar la tarea?</div>
+                <p>
+                    El cálculo de importes está en las clases que conocen los datos: la propuesta conoce
+                    sus detalles y su descuento; el detalle conoce cantidad y precio; la oportunidad
+                    conoce valor y probabilidad.
+                </p>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Clase</th><th>Método</th><th>Información que posee</th><th>Ubicación</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Propuesta</strong></td><td><code>recalcularTotales()</code></td><td>Lista de detalles y descuento</td><td><span class="path">propuestas/domain/Propuesta.java:35-40</span></td></tr>
+                            <tr><td><strong>DetallePropuesta</strong></td><td><code>calcularSubtotal()</code></td><td>Cantidad y precio unitario</td><td><span class="path">propuestas/domain/DetallePropuesta.java:18-24</span></td></tr>
+                            <tr><td><strong>Oportunidad</strong></td><td><code>getValorPonderado()</code></td><td>Valor y probabilidad</td><td><span class="path">oportunidades/domain/Oportunidad.java:22-26</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>
+                    <strong>Justificación:</strong> no hay un servicio externo calculando lo que el
+                    dominio ya sabe. Esto evita duplicar fórmulas y mantiene la regla cerca del dato.
+                    Es el ejemplo más claro de Experto en Información del sistema.
+                </p>
+            </div>
+
+            <div class="pattern-card a">
+                <h3>4.2. Creador <span class="badge badge-a">A</span></h3>
+                <div class="pattern-question">¿Qué clase debería crear este objeto?</div>
+                <p>
+                    Los servicios de aplicación coordinan la creación de objetos complejos y de sus
+                    partes. No son entidades del mundo real: son fabricaciones puras que conocen el
+                    flujo de creación y las validaciones necesarias.
+                </p>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Creador</th><th>Objeto creado</th><th>Evidencia</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>PropuestaService</strong></td><td><code>Propuesta</code> y sus <code>DetallePropuesta</code></td><td><span class="path">PropuestaService.java:32-58</span> y <span class="path">toDetalleDomain()</span> en <span class="path">220-251</span></td></tr>
+                            <tr><td><strong>ClienteService</strong></td><td><code>Contacto</code> asociado al agregado <code>Cliente</code></td><td><span class="path">ClienteService.java:85-106</span></td></tr>
+                            <tr><td><strong>OportunidadService</strong></td><td><code>OportunidadContacto</code>, <code>OportunidadProducto</code>, <code>OportunidadColaborador</code></td><td><span class="path">OportunidadService.java:108-123</span>, <span class="path">159-172</span>, <span class="path">197-209</span></td></tr>
+                            <tr><td><strong>MensajeService</strong></td><td><code>Mensaje</code> con datos del usuario autenticado</td><td><span class="path">MensajeService.java:50-78</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>
+                    <strong>Justificación:</strong> el servicio tiene la información del caso de uso,
+                    las validaciones y los puertos necesarios para persistir. La entidad no debería
+                    conocer el repositorio ni el flujo completo de creación.
+                </p>
+            </div>
+
+            <div class="pattern-card a">
+                <h3>4.3. Controlador <span class="badge badge-a">A</span></h3>
+                <div class="pattern-question">¿Qué objeto debe recibir y coordinar esta solicitud?</div>
+                <p>
+                    Los controladores REST reciben la solicitud HTTP, validan el DTO y delegan en un
+                    contrato de caso de uso. No contienen lógica de negocio ni acceso directo a
+                    repositorios.
+                </p>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Controlador</th><th>Ruta base</th><th>Delegación</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>PropuestaController</strong></td><td><code>/api/v1/propuestas</code></td><td><code>ManagePropuestaUseCase</code></td></tr>
+                            <tr><td><strong>OportunidadController</strong></td><td><code>/api/v1/oportunidades</code></td><td><code>ManageOportunidadUseCase</code></td></tr>
+                            <tr><td><strong>ClienteController</strong></td><td><code>/api/v1/clientes</code></td><td><code>ManageClienteUseCase</code></td></tr>
+                            <tr><td><strong>ActividadController</strong></td><td><code>/api/v1/actividades</code></td><td><code>ManageActividadUseCase</code></td></tr>
+                            <tr><td><strong>LeadController</strong></td><td><code>/api/v1/leads</code></td><td><code>ManageLeadUseCase</code></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>
+                    <strong>Justificación:</strong> el controlador es un adaptador de entrada. Su
+                    responsabilidad es traducir HTTP a una llamada de aplicación, no decidir reglas de
+                    negocio. Esto mantiene la cohesión y permite probar el caso de uso sin levantar la
+                    capa web.
+                </p>
+            </div>
+
+            <div class="pattern-card a">
+                <h3>4.4. Bajo Acoplamiento <span class="badge badge-a">A</span></h3>
+                <div class="pattern-question">¿Cómo reducir dependencias innecesarias entre clases y módulos?</div>
+                <p>
+                    La aplicación depende de contratos, no de implementaciones concretas. Los servicios
+                    usan puertos de persistencia y de consulta; los módulos declaran dependencias
+                    permitidas con Spring Modulith; el módulo <code>usuarios</code> expone una API
+                    pública mínima.
+                </p>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Mecanismo</th><th>Evidencia</th><th>Beneficio</th></tr></thead>
+                        <tbody>
+                            <tr><td>Puerto de persistencia</td><td><span class="path">PropuestaPersistencePort.java:8-18</span>; <span class="path">PropuestaService.java:26</span></td><td>El servicio no conoce JPA ni Oracle.</td></tr>
+                            <tr><td>Puerto de consulta cruzada</td><td><span class="path">ContactoQueryPort.java:6-8</span>; <span class="path">UsuarioQueryPort.java:6-8</span></td><td>Oportunidades no depende de la implementación de Clientes o Usuarios.</td></tr>
+                            <tr><td>API pública de módulo</td><td><span class="path">UsuariosApi.java:10-18</span></td><td>Otros módulos consumen un contrato estable, no el dominio interno.</td></tr>
+                            <tr><td>Fronteras Modulith</td><td><span class="path">propuestas/package-info.java</span>, <span class="path">actividades/package-info.java</span></td><td>Las dependencias permitidas se declaran explícitamente.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>
+                    <strong>Observación:</strong> hay excepciones puntuales. Algunos adaptadores de
+                    validación acceden directamente a repositorios de otros módulos:
+                    <span class="path">RelacionValidationAdapter.java:3-8</span> y
+                    <span class="path">PropuestaRelacionValidationAdapter.java:3-5</span>. No invalidan
+                    la valoración general, pero son puntos de acoplamiento a vigilar.
+                </p>
+            </div>
+
+            <div class="pattern-card b">
+                <h3>4.5. Alta Cohesión <span class="badge badge-b">B</span></h3>
+                <div class="pattern-question">¿Las responsabilidades de esta clase están relacionadas entre sí?</div>
+                <p>
+                    A nivel de módulo, la cohesión es alta: cada paquete agrupa un dominio comercial
+                    claro. A nivel de clase, el panorama es mixto: hay servicios enfocados y otros que
+                    concentran demasiadas responsabilidades.
+                </p>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Clase</th><th>Tamaño</th><th>Responsabilidades observadas</th><th>Valoración</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>PropuestaService</strong></td><td>267 líneas</td><td>CRUD, transiciones de estado, validación de relaciones, numeración y mapeo</td><td>Cohesión razonable; todo gira alrededor de la propuesta.</td></tr>
+                            <tr><td><strong>ClienteService</strong></td><td>177 líneas</td><td>CRUD de cliente y gestión de contactos del agregado</td><td>Cohesión aceptable; contactos pertenecen al agregado Cliente.</td></tr>
+                            <tr><td><strong>LeadService</strong></td><td>112 líneas</td><td>CRUD de leads y validación de fuente</td><td>Enfocado.</td></tr>
+                            <tr><td><strong>ActividadService</strong></td><td>402 líneas</td><td>CRUD, etiquetas, participantes, filtros y mapeo</td><td>Cohesión parcial: mezcla varias responsabilidades.</td></tr>
+                            <tr><td><strong>RelationshipMapService</strong></td><td>741 líneas</td><td>Agregación de seis módulos, construcción de nodos/aristas y búsquedas cruzadas</td><td>Cohesión parcial: es un servicio de composición muy grande.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>
+                    <strong>Justificación de B:</strong> el principio se cumple en la mayoría de los
+                    servicios, pero no en todos. <code>ActividadService</code> y
+                    <code>RelationshipMapService</code> son evidencia de que la cohesión puede mejorar;
+                    no se usan como ejemplo perfecto.
+                </p>
+            </div>
+
+            <div class="pattern-card b">
+                <h3>4.6. Polimorfismo <span class="badge badge-b">B</span></h3>
+                <div class="pattern-question">¿Cómo manejar comportamientos variables según el tipo de objeto?</div>
+                <p>
+                    El sistema usa polimorfismo de interfaz en toda la arquitectura: los servicios
+                    implementan contratos de caso de uso, los adaptadores implementan puertos y el
+                    conversor de Keycloak implementa <code>Converter&lt;Jwt, AbstractAuthenticationToken&gt;</code>.
+                    Sin embargo, no hay una jerarquía de dominio con subtipos que cambien su
+                    comportamiento.
+                </p>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Contrato</th><th>Implementación</th><th>Tipo de polimorfismo</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>ManagePropuestaUseCase</code></td><td><code>PropuestaService</code></td><td>Interfaz de caso de uso</td></tr>
+                            <tr><td><code>PropuestaPersistencePort</code></td><td><code>PropuestaPersistenceAdapter</code></td><td>Puerto/adaptador</td></tr>
+                            <tr><td><code>UsuariosApi</code></td><td><code>UsuarioService</code></td><td>API pública de módulo</td></tr>
+                            <tr><td><code>Converter&lt;Jwt, AbstractAuthenticationToken&gt;</code></td><td><code>KeycloakJwtAuthenticationConverter</code></td><td>Adaptación de seguridad</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>
+                    <strong>Justificación de B:</strong> hay despacho polimórfico real, pero no se
+                    observa el uso de polimorfismo para variar el comportamiento de entidades del
+                    dominio. Si mañana se necesitaran distintos tipos de propuesta, actividad o cálculo,
+                    el diseño actual tendría que evolucionar hacia una abstracción con subtipos o
+                    estrategias.
+                </p>
+            </div>
+
+            <div class="pattern-card a">
+                <h3>4.7. Fabricación Pura <span class="badge badge-a">A</span></h3>
+                <div class="pattern-question">¿Conviene crear una clase de servicio para no sobrecargar una entidad del dominio?</div>
+                <p>
+                    Los servicios de aplicación no representan conceptos del mundo real: son clases
+                    creadas para coordinar casos de uso, validar reglas de aplicación y orquestar
+                    puertos. Eso es exactamente una Fabricación Pura.
+                </p>
+                <div class="grid-3">
+                    <div class="card"><h4>ClienteService</h4><p>Coordina clientes y contactos; no es una entidad del negocio.</p></div>
+                    <div class="card"><h4>PropuestaService</h4><p>Coordina creación, estados, detalles y validaciones.</p></div>
+                    <div class="card"><h4>DashboardService</h4><p>Compone métricas de varias fuentes en una respuesta.</p></div>
+                </div>
+                <p>
+                    <strong>Justificación:</strong> sin estos servicios, las entidades tendrían que
+                    conocer repositorios, transacciones y otros módulos. La fabricación pura protege al
+                    dominio y mantiene la lógica de aplicación separada.
+                </p>
+            </div>
+
+            <div class="pattern-card a">
+                <h3>4.8. Indirección <span class="badge badge-a">A</span></h3>
+                <div class="pattern-question">¿Qué intermediario puede reducir esta dependencia directa?</div>
+                <p>
+                    Los puertos y adaptadores son el mecanismo de indirección más claro. El servicio no
+                    llama a JPA ni a otro módulo directamente: llama a un contrato, y un adaptador
+                    resuelve la comunicación real.
+                </p>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Origen</th><th>Intermediario</th><th>Destino real</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>PropuestaService</code></td><td><code>PropuestaPersistencePort</code></td><td><code>PropuestaPersistenceAdapter</code> → Spring Data → Oracle</td></tr>
+                            <tr><td><code>OportunidadService</code></td><td><code>ContactoQueryPort</code></td><td><code>ContactoQueryAdapter</code> → <code>ManageClienteUseCase</code></td></tr>
+                            <tr><td><code>OportunidadService</code></td><td><code>UsuarioQueryPort</code></td><td><code>UsuarioQueryAdapter</code> → <code>UsuariosApi</code></td></tr>
+                            <tr><td><code>PropuestaService</code></td><td><code>PropuestaRelacionValidationPort</code></td><td><code>PropuestaRelacionValidationAdapter</code> → repositorios</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>
+                    <strong>Justificación:</strong> la indirección permite cambiar la implementación de
+                    persistencia o de consulta sin reescribir el caso de uso. También facilita pruebas
+                    con dobles de los puertos.
+                </p>
+            </div>
+
+            <div class="pattern-card a">
+                <h3>4.9. Variaciones Protegidas <span class="badge badge-a">A</span></h3>
+                <div class="pattern-question">¿Qué parte del sistema podría cambiar y cómo protegemos el resto?</div>
+                <p>
+                    El sistema protege las partes inestables con abstracciones: la base de datos cambia
+                    detrás de un puerto, Keycloak cambia detrás de la configuración de seguridad, y los
+                    errores internos se normalizan en un manejador global.
+                </p>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Punto de variación</th><th>Protección</th><th>Evidencia</th></tr></thead>
+                        <tbody>
+                            <tr><td>Persistencia / Oracle</td><td>Puertos de salida + adaptadores JPA</td><td><span class="path">PropuestaPersistencePort</span>, <span class="path">PropuestaPersistenceAdapter</span></td></tr>
+                            <tr><td>Comunicación entre módulos</td><td>Puertos de consulta y API pública</td><td><span class="path">ContactoQueryPort</span>, <span class="path">UsuariosApi</span></td></tr>
+                            <tr><td>Autenticación / roles</td><td>Configuración Keycloak y conversor JWT</td><td><span class="path">KeycloakSecurityConfig.java:83-149</span></td></tr>
+                            <tr><td>Contrato de errores HTTP</td><td>Manejador global de excepciones</td><td><span class="path">GlobalExceptionHandler.java:23-112</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>
+                    <strong>Justificación:</strong> los cambios previsibles (otra base de datos, otro
+                    proveedor de identidad, otro formato de error) quedan aislados en adaptadores o
+                    configuración. El núcleo del negocio no depende de ellos.
+                </p>
+            </div>
+
+            <h3>Resumen GRASP</h3>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>#</th><th>Principio</th><th>Estado</th><th>Evidencia principal</th><th>Observación</th></tr></thead>
+                    <tbody>
+                        <tr><td>1</td><td><strong>Experto en Información</strong></td><td><span class="badge badge-a">A</span></td><td><code>Propuesta.recalcularTotales()</code>, <code>DetallePropuesta.calcularSubtotal()</code></td><td>El cálculo está donde están los datos.</td></tr>
+                        <tr><td>2</td><td><strong>Creador</strong></td><td><span class="badge badge-a">A</span></td><td><code>PropuestaService.crear()</code>, <code>ClienteService.agregarContacto()</code></td><td>Los servicios coordinan la creación.</td></tr>
+                        <tr><td>3</td><td><strong>Controlador</strong></td><td><span class="badge badge-a">A</span></td><td>14 controladores REST</td><td>Reciben, validan y delegan.</td></tr>
+                        <tr><td>4</td><td><strong>Bajo Acoplamiento</strong></td><td><span class="badge badge-a">A</span></td><td>Puertos, <code>UsuariosApi</code>, <code>package-info.java</code></td><td>Con excepciones puntuales en adaptadores de validación.</td></tr>
+                        <tr><td>5</td><td><strong>Alta Cohesión</strong></td><td><span class="badge badge-b">B</span></td><td><code>PropuestaService</code> vs. <code>ActividadService</code></td><td>Buena a nivel de módulo; desigual a nivel de clase.</td></tr>
+                        <tr><td>6</td><td><strong>Polimorfismo</strong></td><td><span class="badge badge-b">B</span></td><td>Interfaces de casos de uso y puertos</td><td>Hay polimorfismo de interfaz; no de dominio.</td></tr>
+                        <tr><td>7</td><td><strong>Fabricación Pura</strong></td><td><span class="badge badge-a">A</span></td><td><code>ClienteService</code>, <code>PropuestaService</code>, <code>DashboardService</code></td><td>Servicios de aplicación que no son entidades.</td></tr>
+                        <tr><td>8</td><td><strong>Indirección</strong></td><td><span class="badge badge-a">A</span></td><td>Puertos y adaptadores</td><td>Desacopla persistencia y consultas cruzadas.</td></tr>
+                        <tr><td>9</td><td><strong>Variaciones Protegidas</strong></td><td><span class="badge badge-a">A</span></td><td>Puertos, Keycloak, <code>GlobalExceptionHandler</code></td><td>Aísla cambios previsibles.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <section id="gof">
+            <div class="section-head">
+                <div class="section-num">05</div>
+                <div>
+                    <h2>Los 23 patrones GoF</h2>
+                    <p>Catálogo completo con estado, evidencia y justificación.</p>
+                </div>
+            </div>
+
+            <p>
+                Se revisaron los 23 patrones, pero no se forzó su presencia. La tabla siguiente resume
+                el resultado y luego se justifica cada familia. Los patrones marcados como
+                <span class="badge badge-c">C</span> son oportunidades; los marcados como
+                <span class="badge badge-d">D</span> no tienen evidencia suficiente.
+            </p>
+
+            <div class="grid-2">
+                <div class="card">
+                    <h4>Creacionales · 5</h4>
+                    <p>Se enfocan en cómo se crean los objetos.</p>
+                    <p><span class="tag green">Builder A</span><span class="tag blue">Factory Method C</span><span class="tag">Abstract Factory D</span><span class="tag">Prototype D</span><span class="tag">Singleton D</span></p>
+                </div>
+                <div class="card">
+                    <h4>Estructurales · 7</h4>
+                    <p>Se enfocan en cómo se combinan clases y objetos.</p>
+                    <p><span class="tag green">Adapter A</span><span class="tag amber">Facade B</span><span class="tag blue">Bridge C</span><span class="tag blue">Proxy C</span><span class="tag">Composite D</span><span class="tag">Decorator D</span><span class="tag">Flyweight D</span></p>
+                </div>
+                <div class="card">
+                    <h4>De comportamiento · 11</h4>
+                    <p>Se enfocan en comunicación y distribución de responsabilidades.</p>
+                    <p><span class="tag amber">Chain B</span><span class="tag amber">Template Method B</span><span class="tag blue">Mediator C</span><span class="tag blue">Observer C</span><span class="tag blue">State C</span><span class="tag blue">Strategy C</span><span class="tag">Command D</span><span class="tag">Interpreter D</span><span class="tag">Iterator D</span><span class="tag">Memento D</span><span class="tag">Visitor D</span></p>
+                </div>
+                <div class="card">
+                    <h4>Resultado global</h4>
+                    <p><strong>2 A</strong>, <strong>3 B</strong>, <strong>7 C</strong> y <strong>11 D</strong>. El sistema no es “pobre en patrones”: es selectivo y evita estructuras innecesarias.</p>
+                </div>
+            </div>
+
+            <h3>5.1. Patrones creacionales</h3>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Patrón</th><th>Estado</th><th>Evidencia</th><th>Justificación</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Abstract Factory</strong></td>
+                            <td><span class="badge badge-d">D</span></td>
+                            <td>No hay una interfaz de fábrica que cree familias de productos relacionados.</td>
+                            <td>Spring crea beans, pero no hay una familia de objetos de negocio intercambiables. No se identificó.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Builder</strong></td>
+                            <td><span class="badge badge-a">A</span></td>
+                            <td><code>@Builder</code> en <span class="path">Propuesta.java:10</span>, <span class="path">Cliente.java:8</span>, <span class="path">Usuario.java</span>; uso en <span class="path">PropuestaService.java:36-49</span>.</td>
+                            <td>La construcción de objetos complejos se separa de su representación. Lombok genera el builder, pero el patrón se usa de forma directa.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Factory Method</strong></td>
+                            <td><span class="badge badge-c">C</span></td>
+                            <td><span class="path">PasswordEncoderConfig.java:11-14</span>: <code>@Bean PasswordEncoder passwordEncoder()</code>.</td>
+                            <td>Es un método fábrica de Spring, no el GoF Factory Method (no hay subclases que decidan el producto). Sería útil si se añadieran exportadores o documentos.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Prototype</strong></td>
+                            <td><span class="badge badge-d">D</span></td>
+                            <td>No hay <code>clone()</code>, copia profunda ni prototipos registrados.</td>
+                            <td>Los objetos se construyen con builders o constructores; no se clonan instancias existentes.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Singleton</strong></td>
+                            <td><span class="badge badge-d">D</span></td>
+                            <td>No hay constructor privado ni <code>getInstance()</code>. Los servicios son beans de Spring.</td>
+                            <td>El alcance singleton de Spring no es el Singleton GoF: no garantiza una única instancia por diseño de la clase ni ofrece acceso estático controlado.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="callout warn">
+                <span class="label">Cuidado con Lombok</span>
+                <code>@Builder</code> es una implementación real del patrón Builder, pero generada.
+                En la defensa conviene decir: “el patrón está presente a través de Lombok; no lo
+                escribimos a mano, pero su estructura y uso son verificables”.
+            </div>
+
+            <h3>5.2. Patrones estructurales</h3>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Patrón</th><th>Estado</th><th>Evidencia</th><th>Justificación</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Adapter</strong></td>
+                            <td><span class="badge badge-a">A</span></td>
+                            <td><span class="path">PropuestaPersistenceAdapter.java:18-143</span>; <span class="path">ContactoQueryAdapter.java:10-25</span>; <span class="path">KeycloakJwtAuthenticationConverter.java:30-44</span>.</td>
+                            <td>Convierte interfaces incompatibles: dominio ↔ entidad JPA, <code>ManageClienteUseCase</code> ↔ <code>ContactoQueryPort</code>, JWT ↔ token de Spring Security. Es el GoF más sólido del sistema.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Bridge</strong></td>
+                            <td><span class="badge badge-c">C</span></td>
+                            <td>Puertos y adaptadores: <span class="path">PropuestaPersistencePort</span> + <span class="path">PropuestaPersistenceAdapter</span>.</td>
+                            <td>La arquitectura hexagonal se aproxima a Bridge porque separa abstracción e implementación, pero no hay dos jerarquías independientes que evolucionen en paralelo. Se clasifica como posibilidad, no como Bridge clásico.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Composite</strong></td>
+                            <td><span class="badge badge-d">D</span></td>
+                            <td><code>Propuesta</code> contiene <code>List&lt;DetallePropuesta&gt;</code>, pero no hay estructura recursiva ni operación uniforme sobre hoja/contenedor.</td>
+                            <td>La composición es parte-todo simple, no el patrón Composite. No hay árbol de objetos ni tratamiento uniforme.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Decorator</strong></td>
+                            <td><span class="badge badge-d">D</span></td>
+                            <td>No hay clases que envuelvan a otras añadiendo responsabilidades dinámicamente.</td>
+                            <td><code>CorrelationIdFilter</code> participa en una cadena, pero no decora un objeto. No se identificó.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Facade</strong></td>
+                            <td><span class="badge badge-b">B</span></td>
+                            <td><span class="path">RelationshipMapService.java:37-99</span> agrega seis contratos; <span class="path">DashboardService.java:16-24</span> compone métricas.</td>
+                            <td>Ofrece una interfaz simplificada sobre un subsistema complejo, pero es un servicio de caso de uso, no una clase Facade clásica. La intención se cumple parcialmente.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Flyweight</strong></td>
+                            <td><span class="badge badge-d">D</span></td>
+                            <td>No hay caché de objetos compartidos ni separación de estado intrínseco/extrínseco.</td>
+                            <td>Los DTO y entidades se crean por operación. No se identificó.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Proxy</strong></td>
+                            <td><span class="badge badge-c">C</span></td>
+                            <td>Spring Data genera proxies para repositorios; <code>@Transactional</code> usa proxies de AOP.</td>
+                            <td>El soporte existe, pero es infraestructura del framework. No hay una clase Proxy propia que controle el acceso a otro objeto por una decisión de diseño explícita.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="callout">
+                <span class="label">Lectura de Adapter</span>
+                No todo <code>*Adapter</code> es automáticamente GoF Adapter. Aquí sí lo es porque hay
+                una interfaz objetivo (el puerto), un adaptado (repositorio/otro caso de uso) y una
+                conversión de datos verificable en el método.
+            </div>
+            <h3>5.3. Patrones de comportamiento</h3>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Patrón</th><th>Estado</th><th>Evidencia</th><th>Justificación</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Chain of Responsibility</strong></td>
+                            <td><span class="badge badge-b">B</span></td>
+                            <td><span class="path">KeycloakSecurityConfig.java:83-149</span> construye un <code>SecurityFilterChain</code>; <span class="path">CorrelationIdFilter.java:15-35</span> participa en la cadena de filtros.</td>
+                            <td>La solicitud atraviesa una cadena de filtros que pueden procesarla o delegar. Es una cadena real, pero provista por Spring Security; no hay manejadores propios encadenados con lógica de negocio.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Command</strong></td>
+                            <td><span class="badge badge-d">D</span></td>
+                            <td>No hay objetos comando con <code>execute()</code>, cola de operaciones ni undo.</td>
+                            <td>Los DTO transportan datos, pero no encapsulan una solicitud como objeto ejecutable. No se identificó.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Interpreter</strong></td>
+                            <td><span class="badge badge-d">D</span></td>
+                            <td>No hay gramática, AST ni evaluador de expresiones.</td>
+                            <td>No se identificó.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Iterator</strong></td>
+                            <td><span class="badge badge-d">D</span></td>
+                            <td>Se usan streams y colecciones de Java, pero no hay un iterador propio.</td>
+                            <td>Java usa iteradores internamente, pero eso es una característica del lenguaje, no una implementación de diseño del proyecto. No se identificó como patrón propio.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Mediator</strong></td>
+                            <td><span class="badge badge-c">C</span></td>
+                            <td><span class="path">RelationshipMapService</span> centraliza consultas de clientes, oportunidades, actividades, propuestas, productos y usuarios.</td>
+                            <td>Centraliza la comunicación, pero los módulos no interactúan a través de un mediador; el servicio consulta contratos. Es una fachada de consulta, no un mediador GoF completo.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Memento</strong></td>
+                            <td><span class="badge badge-d">D</span></td>
+                            <td>No hay snapshots, historial de estados ni restauración.</td>
+                            <td>No se identificó.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Observer</strong></td>
+                            <td><span class="badge badge-c">C</span></td>
+                            <td>No se encontraron <code>ApplicationEventPublisher</code>, <code>@EventListener</code> ni eventos de dominio.</td>
+                            <td>Sería útil para notificar aprobación de propuestas, asignación de actividades o cambios de etapa. Hoy no está implementado.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>State</strong></td>
+                            <td><span class="badge badge-c">C</span></td>
+                            <td><code>EstadoPropuesta</code>, <code>EstadoLead</code>, <code>EstadoActividad</code>; transiciones validadas en <span class="path">PropuestaService.java:116-153</span>.</td>
+                            <td>Hay estados y reglas de transición, pero no objetos Estado que deleguen comportamiento. El servicio decide y cambia el enum. Es una oportunidad, no State GoF.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Strategy</strong></td>
+                            <td><span class="badge badge-c">C</span></td>
+                            <td>Los cálculos son fijos en dominio: <code>Propuesta.recalcularTotales()</code>, <code>Oportunidad.getValorPonderado()</code>.</td>
+                            <td>No hay familia de algoritmos intercambiables. Podría aplicarse a descuentos, comisiones o cálculo de propuestas, pero hoy no existe.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Template Method</strong></td>
+                            <td><span class="badge badge-b">B</span></td>
+                            <td><span class="path">CorrelationIdFilter.java:15-35</span> extiende <code>OncePerRequestFilter</code> e implementa <code>doFilterInternal()</code>.</td>
+                            <td>La clase base define el algoritmo y la subclase implementa un paso. Es un Template Method real, pero provisto por Spring; no se escribió la plantilla completa.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Visitor</strong></td>
+                            <td><span class="badge badge-d">D</span></td>
+                            <td>No hay interfaces <code>Visitor</code> ni métodos <code>accept()</code>.</td>
+                            <td>No se identificó.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="callout warn">
+                <span class="label">State no es un enum</span>
+                Tener un enum de estados y validar transiciones en un servicio es una buena práctica
+                de modelado, pero no es el patrón State. Para ser State, el comportamiento debería
+                delegarse en objetos que representen cada estado. Aquí se clasifica como
+                <strong>C</strong>: oportunidad de evolución.
+            </div>
+            <h3>5.4. Resumen cuantitativo GoF</h3>
+            <div class="grid-2">
+                <div class="table-wrap" style="margin:0;">
+                    <table>
+                        <thead><tr><th>Familia</th><th>A</th><th>B</th><th>C</th><th>D</th><th>Total</th></tr></thead>
+                        <tbody>
+                            <tr><td>Creacionales</td><td>1</td><td>0</td><td>1</td><td>3</td><td><strong>5</strong></td></tr>
+                            <tr><td>Estructurales</td><td>1</td><td>1</td><td>2</td><td>3</td><td><strong>7</strong></td></tr>
+                            <tr><td>Comportamiento</td><td>0</td><td>2</td><td>4</td><td>5</td><td><strong>11</strong></td></tr>
+                            <tr><td><strong>Total</strong></td><td><strong>2</strong></td><td><strong>3</strong></td><td><strong>7</strong></td><td><strong>11</strong></td><td><strong>23</strong></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card">
+                    <h4>Lectura</h4>
+                    <p>
+                        Solo dos patrones se pueden defender como implementación directa:
+                        <strong>Builder</strong> y <strong>Adapter</strong>. Tres son parciales:
+                        <strong>Facade</strong>, <strong>Template Method</strong> y
+                        <strong>Chain of Responsibility</strong>. Siete son oportunidades y once no
+                        tienen evidencia.
+                    </p>
+                    <p>
+                        Esto es coherente con un CRM modular: la arquitectura ya resuelve creación,
+                        adaptación y composición sin necesidad de recurrir a estructuras más exóticas.
+                    </p>
+                </div>
+            </div>
+
+            <div class="callout ok">
+                <span class="label">Defensa académica</span>
+                Si el docente pregunta “¿por qué no implementaron los 23?”, la respuesta correcta no es
+                “faltó tiempo”. Es: “porque no todos resolvían un problema real en este sistema; forzar
+                su uso habría añadido complejidad sin beneficio verificable”.
+            </div>
+        </section>
+        <section id="mapa">
+            <div class="section-head">
+                <div class="section-num">06</div>
+                <div>
+                    <h2>Mapa de patrones por módulo</h2>
+                    <p>Dónde se concentra cada evidencia y qué módulos aportan más valor al análisis.</p>
+                </div>
+            </div>
+
+            <p>
+                La siguiente tabla no dice que cada módulo “implemente” todos los patrones listados;
+                indica dónde hay evidencia o una aplicación parcial. Es una guía de lectura para la
+                defensa y para ubicar rápidamente los archivos.
+            </p>
+
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Módulo</th><th>Clases principales</th><th>Patrones / principios evidenciados</th><th>Observación</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>clientes</strong></td>
+                            <td><code>ClienteService</code>, <code>ClientePersistenceAdapter</code>, <code>ClienteController</code></td>
+                            <td>Controller, Creator, Adapter, Pure Fabrication, Builder</td>
+                            <td><code>Contacto</code> vive aquí; no es un módulo aparte.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>oportunidades</strong></td>
+                            <td><code>OportunidadService</code>, <code>OportunidadPersistenceAdapter</code>, <code>ContactoQueryAdapter</code></td>
+                            <td>Controller, Information Expert, Creator, Adapter, Indirection, Builder</td>
+                            <td><code>getValorPonderado()</code> es un cálculo de dominio claro.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>propuestas</strong></td>
+                            <td><code>Propuesta</code>, <code>DetallePropuesta</code>, <code>PropuestaService</code>, <code>PropuestaPersistenceAdapter</code></td>
+                            <td>Controller, Information Expert, Creator, Adapter, Indirection, Builder, State (C)</td>
+                            <td>Módulo con la evidencia más completa de GRASP.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>actividades</strong></td>
+                            <td><code>ActividadService</code>, <code>ActividadPersistenceAdapter</code>, <code>ActividadController</code></td>
+                            <td>Controller, Creator, Adapter, Pure Fabrication</td>
+                            <td>Alta Cohesión parcial: 402 líneas y varias responsabilidades.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>leads</strong></td>
+                            <td><code>LeadService</code>, <code>FuenteService</code>, <code>LeadPersistenceAdapter</code></td>
+                            <td>Controller, Creator, Adapter, Builder</td>
+                            <td>Servicio enfocado; validación de fuente externa.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>productos</strong></td>
+                            <td><code>ProductoService</code>, <code>ProductoPersistenceAdapter</code></td>
+                            <td>Controller, Creator, Adapter, Builder</td>
+                            <td>Catálogo simple, sin cálculos complejos.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>equipos</strong></td>
+                            <td><code>EquipoService</code>, <code>EquipoPersistenceAdapter</code></td>
+                            <td>Controller, Creator, Adapter, Builder</td>
+                            <td>Gestión de miembros y validación de usuarios.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>etiquetas</strong></td>
+                            <td><code>EtiquetaService</code>, <code>EtiquetaPersistenceAdapter</code></td>
+                            <td>Controller, Creator, Adapter, Builder</td>
+                            <td>Catálogo de apoyo para actividades.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>marketing</strong></td>
+                            <td><code>CampaniaService</code>, <code>CampaniaPersistenceAdapter</code></td>
+                            <td>Controller, Creator, Adapter, Builder</td>
+                            <td>Asociación campaña–lead con integridad lógica.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>mensajeria</strong></td>
+                            <td><code>MensajeService</code>, <code>MensajePersistenceAdapter</code></td>
+                            <td>Controller, Creator, Adapter, Builder</td>
+                            <td>Servicio pequeño y enfocado.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>dashboard</strong></td>
+                            <td><code>DashboardService</code>, <code>DashboardPersistenceAdapter</code></td>
+                            <td>Controller, Facade (B), Pure Fabrication</td>
+                            <td>Compone KPIs de varias fuentes en una respuesta.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>relationshipmap</strong></td>
+                            <td><code>RelationshipMapService</code>, <code>RelationshipMapController</code></td>
+                            <td>Controller, Facade (B), Mediator (C)</td>
+                            <td>Servicio de 741 líneas; agrega seis módulos.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>usuarios</strong></td>
+                            <td><code>UsuarioService</code>, <code>UsuariosApi</code>, <code>UsuarioPersistenceAdapter</code></td>
+                            <td>Controller, Adapter, Builder, Protected Variations</td>
+                            <td>API pública mínima para otros módulos.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>auth</strong></td>
+                            <td><code>KeycloakSecurityConfig</code>, <code>KeycloakJwtAuthenticationConverter</code></td>
+                            <td>Protected Variations, Chain (B), Template Method (B), Factory Method (C)</td>
+                            <td>Integración con Keycloak; patrones apoyados en Spring.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>shared</strong></td>
+                            <td><code>GlobalExceptionHandler</code>, <code>CorrelationIdFilter</code></td>
+                            <td>Protected Variations, Template Method (B)</td>
+                            <td>Contrato de errores y trazabilidad transversal.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="grid-2">
+                <div class="card">
+                    <h4>Módulos con más evidencia GRASP</h4>
+                    <p><strong>propuestas</strong>, <strong>oportunidades</strong> y <strong>clientes</strong>. Allí se ven cálculo en dominio, creación coordinada, controladores delgados y adaptadores de persistencia.</p>
+                </div>
+                <div class="card">
+                    <h4>Módulos con más evidencia GoF</h4>
+                    <p><strong>propuestas</strong> y <strong>oportunidades</strong> por Adapter/Builder; <strong>relationshipmap</strong> y <strong>dashboard</strong> por Facade; <strong>auth</strong> y <strong>shared</strong> por Chain/Template Method.</p>
+                </div>
+            </div>
+        </section>
+        <section id="codigo">
+            <div class="section-head">
+                <div class="section-num">07</div>
+                <div>
+                    <h2>Evidencias de código</h2>
+                    <p>Fragmentos breves que sostienen las clasificaciones principales.</p>
+                </div>
+            </div>
+
+            <p>
+                Los fragmentos se presentan recortados para facilitar la lectura. No se alteró el
+                código original; solo se omitieron partes no esenciales y se conservaron las firmas y
+                llamadas que demuestran el patrón.
+            </p>
+
+            <div class="code-label"><span>Experto en Información · Propuesta.java</span><span>líneas 35-40</span></div>
+            <pre><code>public void recalcularTotales() {
+    this.subtotal = detalles.stream()
+            .map(DetallePropuesta::getSubtotal)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+    this.total = this.subtotal.subtract(
+            this.descuento != null ? this.descuento : BigDecimal.ZERO);
+}</code></pre>
+            <p style="font-size:12.5px;">
+                La clase que posee los detalles y el descuento es la que calcula. No hay un
+                <code>CalculadoraPropuestaService</code> externo; la regla está en el dominio.
+            </p>
+
+            <div class="code-label"><span>Creator · PropuestaService.java</span><span>líneas 32-58</span></div>
+            <pre><code>Propuesta propuesta = Propuesta.builder()
+        .numeroPropuesta(generarNumeroPropuesta())
+        .estado(EstadoPropuesta.BORRADOR)
+        .version(1)
+        .descuento(request.descuento() != null ? request.descuento() : BigDecimal.ZERO)
+        .build();
+
+List&lt;DetallePropuesta&gt; detalles = request.detalles().stream()
+        .map(this::toDetalleDomain)
+        .toList();
+propuesta.setDetalles(new ArrayList&lt;&gt;(detalles));
+propuesta.recalcularTotales();
+
+return toResponse(persistencePort.save(propuesta));</code></pre>
+            <p style="font-size:12.5px;">
+                El servicio conoce el flujo de creación, las validaciones y el puerto de persistencia.
+                La entidad no necesita saber cómo se guarda ni cómo se valida el contexto.
+            </p>
+
+            <div class="code-label"><span>Controlador · PropuestaController.java</span><span>líneas 17-29</span></div>
+            <pre><code>@RestController
+@RequestMapping("/api/v1/propuestas")
+public class PropuestaController {
+
+    private final ManagePropuestaUseCase useCase;
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public PropuestaResponse crear(@Valid @RequestBody PropuestaRequest request) {
+        return useCase.crear(request);
+    }
+}</code></pre>
+            <p style="font-size:12.5px;">
+                El controlador recibe, valida y delega. No hay lógica de negocio ni acceso a
+                repositorios, lo que confirma el GRASP Controlador.
+            </p>
+
+            <div class="code-label"><span>Adapter · PropuestaPersistenceAdapter.java</span><span>líneas 18-33</span></div>
+            <pre><code>@Component
+public class PropuestaPersistenceAdapter implements PropuestaPersistencePort {
+
+    private final PropuestaSpringDataRepository repository;
+
+    @Override
+    public Propuesta save(Propuesta propuesta) {
+        PropuestaEntity entity = toEntity(propuesta);
+        return toDomain(repository.save(entity));
+    }
+
+    @Override
+    public Optional&lt;Propuesta&gt; findById(Long id) {
+        return repository.findById(id).map(this::toDomain);
+    }
+}</code></pre>
+            <p style="font-size:12.5px;">
+                Hay una interfaz objetivo (<code>PropuestaPersistencePort</code>), un adaptado
+                (repositorio Spring Data) y una conversión explícita entre dominio y entidad. Es un
+                Adapter verificable.
+            </p>
+
+            <div class="code-label"><span>Facade · RelationshipMapService.java</span><span>líneas 37-48</span></div>
+            <pre><code>@Service
+public class RelationshipMapService implements ManageRelationshipMapUseCase {
+
+    private final ManageClienteUseCase clienteUseCase;
+    private final ManageOportunidadUseCase oportunidadUseCase;
+    private final ManageActividadUseCase actividadUseCase;
+    private final ManagePropuestaUseCase propuestaUseCase;
+    private final ManageProductoUseCase productoUseCase;
+    private final UsuariosApi usuariosApi;
+
+    @Override
+    public RelationshipMapResponse obtenerMapaCliente(Long clienteId) {
+        ClienteResponse cliente = clienteUseCase.obtener(clienteId);</code></pre>
+            <p style="font-size:12.5px;">
+                Un solo método de caso de uso simplifica el acceso a seis contratos y construye un
+                grafo. Es una fachada de consulta a nivel de servicio; por eso se clasifica B, no A.
+            </p>
+
+            <div class="code-label"><span>Template Method · CorrelationIdFilter.java</span><span>líneas 14-35</span></div>
+            <pre><code>@Component
+public class CorrelationIdFilter extends OncePerRequestFilter {
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                     HttpServletResponse response,
+                                     FilterChain filterChain) throws ServletException, IOException {
+        String traceId = request.getHeader(TRACE_ID_HEADER);
+        if (traceId == null || traceId.isBlank()) {
+            traceId = UUID.randomUUID().toString();
+        }
+        try {
+            MDC.put(MDC_KEY, traceId);
+            response.setHeader(TRACE_ID_HEADER, traceId);
+            filterChain.doFilter(request, response);
+        } finally {
+            MDC.remove(MDC_KEY);
+        }
+    }
+}</code></pre>
+            <p style="font-size:12.5px;">
+                <code>OncePerRequestFilter</code> define la plantilla; la subclase implementa el paso
+                variable. Es un Template Method real, aunque el algoritmo base pertenece a Spring.
+            </p>
+
+            <div class="code-label"><span>Puerto · PropuestaPersistencePort.java</span><span>líneas 8-18</span></div>
+            <pre><code>public interface PropuestaPersistencePort {
+    Propuesta save(Propuesta propuesta);
+    Optional&lt;Propuesta&gt; findById(Long id);
+    List&lt;Propuesta&gt; findAll();
+    List&lt;Propuesta&gt; findByIdOportunidad(Long idOportunidad);
+    List&lt;Propuesta&gt; findByIdCliente(Long idCliente);
+    List&lt;Propuesta&gt; findByEstado(EstadoPropuesta estado);
+    long countByIdOportunidad(Long idOportunidad);
+    long countByNumeroPropuestaStartsWith(String prefijo);
+    void deleteById(Long id);
+}</code></pre>
+            <p style="font-size:12.5px;">
+                El contrato permite que el servicio dependa de una abstracción. Es la base de
+                Indirección, Bajo Acoplamiento y Variaciones Protegidas.
+            </p>
+
+            <div class="callout">
+                <span class="label">Trazabilidad</span>
+                Todas las rutas de esta sección son relativas a
+                <span class="path">viernes-backend/src/main/java/com/viernes/</span>. Los números de
+                línea corresponden al estado del repositorio auditado en la fecha del informe.
+            </div>
+        </section>
+        <section id="discusion">
+            <div class="section-head">
+                <div class="section-num">08</div>
+                <div>
+                    <h2>Discusión y riesgos de interpretación</h2>
+                    <p>Qué se puede defender con solidez y qué conviene evitar en la exposición.</p>
+                </div>
+            </div>
+
+            <h3>8.1. Fortalezas de diseño observadas</h3>
+            <div class="grid-2">
+                <div class="card">
+                    <h4>Responsabilidades bien ubicadas</h4>
+                    <p>El dominio calcula, los servicios coordinan, los controladores delegan y los adaptadores traducen. Esa separación es coherente con GRASP y con la arquitectura hexagonal.</p>
+                </div>
+                <div class="card">
+                    <h4>Fronteras de módulo explícitas</h4>
+                    <p>Spring Modulith y los paquetes <code>application.port.in/out</code> hacen visible qué puede usar cada módulo. <code>UsuariosApi</code> es un ejemplo de contrato público mínimo.</p>
+                </div>
+                <div class="card">
+                    <h4>Persistencia aislada</h4>
+                    <p>Las entidades JPA no se filtran al dominio. Los adaptadores convierten dominio ↔ entidad y los servicios trabajan con objetos de negocio.</p>
+                </div>
+                <div class="card">
+                    <h4>Uso selectivo de GoF</h4>
+                    <p>Builder y Adapter resuelven problemas concretos. No se observa una colección de patrones decorativos o innecesarios.</p>
+                </div>
+            </div>
+
+            <h3>8.2. Riesgos de sobreinterpretación</h3>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Afirmación tentadora</th><th>Por qué no sostenerla</th><th>Clasificación correcta</th></tr></thead>
+                    <tbody>
+                        <tr><td>“Usamos Singleton porque Spring crea beans únicos.”</td><td>El Singleton GoF exige control de instancia desde la clase (constructor privado, acceso estático). Spring gestiona el ciclo de vida del bean, no la clase.</td><td><span class="badge badge-d">D</span> como patrón GoF; el bean singleton es una característica del contenedor.</td></tr>
+                        <tr><td>“Usamos Factory Method porque hay <code>@Bean</code>.”</td><td>Un método <code>@Bean</code> es una fábrica de Spring. El Factory Method GoF se basa en una jerarquía que decide qué producto concreto crear.</td><td><span class="badge badge-c">C</span> como posibilidad; no A.</td></tr>
+                        <tr><td>“Usamos Proxy porque Spring Data genera proxies.”</td><td>Los proxies de Spring Data/AOP son infraestructura del framework. No hay una clase Proxy propia que controle el acceso por diseño.</td><td><span class="badge badge-c">C</span>; soporte de framework.</td></tr>
+                        <tr><td>“Usamos State porque hay enums de estado.”</td><td>Un enum no delega comportamiento por estado. Las transiciones se validan en el servicio.</td><td><span class="badge badge-c">C</span>; oportunidad de evolución.</td></tr>
+                        <tr><td>“Usamos Observer porque Spring tiene eventos.”</td><td>No se encontraron publicaciones ni escuchas de eventos de dominio en el código auditado.</td><td><span class="badge badge-c">C</span>; no implementado.</td></tr>
+                        <tr><td>“Todos los <code>*Adapter</code> son Adapter GoF.”</td><td>El nombre no basta. Aquí sí hay conversión de interfaz y datos verificable; en otros proyectos podría ser solo un nombre.</td><td><span class="badge badge-a">A</span> en los adaptadores analizados, con justificación.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>8.3. Oportunidades de mejora (sin modificar código)</h3>
+            <p>
+                Las siguientes ideas explican por qué algunos patrones se clasifican como
+                <strong>C</strong>. No son obligaciones ni forman parte de una implementación realizada.
+            </p>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Oportunidad</th><th>Patrón posible</th><th>Problema que resolvería</th></tr></thead>
+                    <tbody>
+                        <tr><td>Notificar aprobación de propuesta, asignación de actividad o cambio de etapa</td><td><strong>Observer</strong></td><td>Desacoplar el emisor del conjunto de interesados y evitar llamadas directas.</td></tr>
+                        <tr><td>Permitir distintas fórmulas de descuento, comisión o cálculo comercial</td><td><strong>Strategy</strong></td><td>Intercambiar algoritmos sin llenar el dominio de condicionales.</td></tr>
+                        <tr><td>Modelar el ciclo de vida de propuestas con comportamiento por estado</td><td><strong>State</strong></td><td>Evitar que el servicio concentre todas las transiciones y validaciones.</td></tr>
+                        <tr><td>Reducir el tamaño de <code>ActividadService</code></td><td>Separación de responsabilidades (GRASP)</td><td>Extraer etiquetas y participantes a colaboradores especializados.</td></tr>
+                        <tr><td>Reducir el tamaño de <code>RelationshipMapService</code></td><td>Facade + colaboradores especializados</td><td>Separar la construcción de nodos, la resolución de relaciones y el mapeo de DTO.</td></tr>
+                        <tr><td>Evitar dependencias directas a repositorios de otros módulos</td><td>Indirección / Bajo Acoplamiento</td><td>Usar APIs públicas o puertos en lugar de repositorios concretos.</td></tr>
+                        <tr><td>Generar documentos o exportaciones con distintos formatos</td><td><strong>Factory Method</strong></td><td>Crear el exportador adecuado sin acoplar el caso de uso a cada formato.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="callout warn">
+                <span class="label">No confundir mejora con deuda</span>
+                Que exista una oportunidad no significa que el sistema esté mal. Un CRM puede ser
+                perfectamente mantenible sin Strategy, Observer o State. La decisión de incorporarlos
+                debe responder a un problema real, no a una lista académica.
+            </div>
+
+            <h3>8.4. Cómo defender el análisis</h3>
+            <ol>
+                <li><strong>Empieza por GRASP:</strong> explica quién calcula, quién crea, quién recibe y cómo se desacopla. Es la parte más sólida del sistema.</li>
+                <li><strong>Luego GoF:</strong> muestra Builder y Adapter con archivo y método; no afirmes que hay 23.</li>
+                <li><strong>Distingue framework de diseño:</strong> Spring DI, beans singleton, proxies y filtros no son automáticamente patrones GoF.</li>
+                <li><strong>Justifica las ausencias:</strong> los patrones no implementados no resuelven un problema actual o no fueron necesarios.</li>
+                <li><strong>Reconoce límites:</strong> cohesión de <code>ActividadService</code>/<code>RelationshipMapService</code> y acoplamiento puntual en validadores.</li>
+            </ol>
+        </section>
+        <section id="conclusiones">
+            <div class="section-head">
+                <div class="section-num">09</div>
+                <div>
+                    <h2>Conclusiones y anexos</h2>
+                    <p>Cierre académico, evidencias de referencia y glosario.</p>
+                </div>
+            </div>
+
+            <h3>9.1. Conclusiones</h3>
+            <div class="grid-2">
+                <div class="card">
+                    <h4>GRASP está aplicado con solidez</h4>
+                    <p>Siete de los nueve principios se pueden defender con evidencia directa. El dominio calcula, los servicios coordinan, los controladores delegan y los puertos aíslan infraestructura.</p>
+                </div>
+                <div class="card">
+                    <h4>GoF está presente de forma selectiva</h4>
+                    <p>Builder y Adapter son las implementaciones más claras. Facade, Template Method y Chain aparecen de forma parcial o apoyada por Spring.</p>
+                </div>
+                <div class="card">
+                    <h4>No forzar los 23 es una decisión correcta</h4>
+                    <p>Once patrones no tienen evidencia. Eso no empobrece el diseño: evita complejidad accidental y mantiene el foco en el problema del CRM.</p>
+                </div>
+                <div class="card">
+                    <h4>Hay oportunidades, no carencias</h4>
+                    <p>State, Strategy, Observer, Factory Method y Mediator podrían incorporarse si aparecen necesidades concretas. Hoy se documentan como C.</p>
+                </div>
+            </div>
+
+            <div class="callout ok">
+                <span class="label">Idea final</span>
+                Un buen diseño no se mide por la cantidad de patrones que enumera, sino por la calidad
+                de sus decisiones. Viernes CRM V1 demuestra una arquitectura modular coherente,
+                responsabilidades bien asignadas y un uso prudente de los patrones clásicos.
+            </div>
+
+            <h3>9.2. Anexo A · Archivos clave</h3>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Archivo</th><th>Rol en el análisis</th></tr></thead>
+                    <tbody>
+                        <tr><td><span class="path">propuestas/domain/Propuesta.java</span></td><td>Experto en Información; cálculo de totales.</td></tr>
+                        <tr><td><span class="path">propuestas/domain/DetallePropuesta.java</span></td><td>Experto en Información; cálculo de subtotal.</td></tr>
+                        <tr><td><span class="path">propuestas/application/service/PropuestaService.java</span></td><td>Creator, coordinación de casos de uso y transiciones.</td></tr>
+                        <tr><td><span class="path">propuestas/adapters/out/persistence/PropuestaPersistenceAdapter.java</span></td><td>Adapter y mapeo dominio ↔ entidad.</td></tr>
+                        <tr><td><span class="path">propuestas/adapters/in/web/PropuestaController.java</span></td><td>Controlador GRASP.</td></tr>
+                        <tr><td><span class="path">oportunidades/domain/Oportunidad.java</span></td><td>Experto en Información; valor ponderado.</td></tr>
+                        <tr><td><span class="path">oportunidades/application/service/OportunidadService.java</span></td><td>Creator, coordinación de asociaciones y consultas.</td></tr>
+                        <tr><td><span class="path">oportunidades/adapters/out/persistence/ContactoQueryAdapter.java</span></td><td>Adapter e Indirección entre módulos.</td></tr>
+                        <tr><td><span class="path">clientes/application/service/ClienteService.java</span></td><td>Creator de Contacto y gestión del agregado.</td></tr>
+                        <tr><td><span class="path">actividades/application/service/ActividadService.java</span></td><td>Evidencia de cohesión parcial y coordinación de participantes/etiquetas.</td></tr>
+                        <tr><td><span class="path">relationshipmap/application/service/RelationshipMapService.java</span></td><td>Facade/Mediator parcial; agregación de seis módulos.</td></tr>
+                        <tr><td><span class="path">shared/filter/CorrelationIdFilter.java</span></td><td>Template Method apoyado en Spring.</td></tr>
+                        <tr><td><span class="path">auth/keycloak/KeycloakSecurityConfig.java</span></td><td>Chain of Responsibility de Spring Security y Protected Variations.</td></tr>
+                        <tr><td><span class="path">auth/keycloak/KeycloakJwtAuthenticationConverter.java</span></td><td>Adapter JWT → token de Spring Security.</td></tr>
+                        <tr><td><span class="path">shared/exception/GlobalExceptionHandler.java</span></td><td>Protected Variations del contrato de errores.</td></tr>
+                        <tr><td><span class="path">usuarios/UsuariosApi.java</span></td><td>API pública de módulo y bajo acoplamiento.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>9.3. Anexo B · Glosario breve</h3>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Término</th><th>Definición aplicada</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>GRASP</strong></td><td>Principios para asignar responsabilidades a clases y objetos.</td></tr>
+                        <tr><td><strong>GoF</strong></td><td>Catálogo de 23 patrones clásicos de diseño, agrupados en creacionales, estructurales y de comportamiento.</td></tr>
+                        <tr><td><strong>Puerto</strong></td><td>Contrato de entrada o salida que define qué necesita la aplicación, sin depender de la infraestructura.</td></tr>
+                        <tr><td><strong>Adaptador</strong></td><td>Implementación de un puerto que traduce entre el contrato y una tecnología concreta.</td></tr>
+                        <tr><td><strong>Fabricación Pura</strong></td><td>Clase que no representa una entidad del dominio, pero existe para mantener cohesión y separación de responsabilidades.</td></tr>
+                        <tr><td><strong>Indirección</strong></td><td>Intermediario que evita una dependencia directa entre dos componentes.</td></tr>
+                        <tr><td><strong>Variaciones Protegidas</strong></td><td>Abstracción que aísla el impacto de cambios previsibles.</td></tr>
+                        <tr><td><strong>Agregado</strong></td><td>Grupo de objetos tratados como una unidad; por ejemplo, Cliente y sus Contactos.</td></tr>
+                        <tr><td><strong>DTO</strong></td><td>Objeto de transferencia de datos entre capas o a través de HTTP.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>9.4. Anexo C · Referencias</h3>
+            <ul>
+                <li>Gamma, E., Helm, R., Johnson, R. y Vlissides, J. (1994). <em>Design Patterns: Elements of Reusable Object-Oriented Software</em>. Addison-Wesley.</li>
+                <li>Larman, C. (2004). <em>Applying UML and Patterns: An Introduction to Object-Oriented Analysis and Design and Iterative Development</em>. Prentice Hall.</li>
+                <li>Evans, E. (2003). <em>Domain-Driven Design: Tackling Complexity in the Heart of Software</em>. Addison-Wesley.</li>
+                <li>Spring Modulith Reference Documentation. <em>Application Modules</em> y <em>Named Interfaces</em>.</li>
+                <li>Oracle Database 23c Documentation. <em>SQL and PL/SQL</em>; persistencia relacional utilizada por el sistema.</li>
+            </ul>
+
+            <h3>9.5. Declaración de verificación</h3>
+            <div class="callout">
+                <span class="label">Trazabilidad del informe</span>
+                <strong>Fecha de auditoría:</strong> 5 de noviembre de 2026.<br>
+                <strong>Repositorio:</strong> <span class="path">E:\Viernes\Viernes</span>.<br>
+                <strong>Método:</strong> inspección estática de archivos Java, configuración Maven, estructura de paquetes y manifiesto del frontend.<br>
+                <strong>Cambios realizados:</strong> ninguno sobre el código fuente. Este informe HTML es un documento de análisis.<br>
+                <strong>Limitación:</strong> las conclusiones describen el estado del repositorio en la fecha indicada; no sustituyen pruebas de ejecución ni una auditoría dinámica.
+            </div>
+
+            <p style="margin-top:18px;text-align:center;">
+                <a href="#contenido">↑ Volver al inicio del informe</a>
+            </p>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <span>Viernes CRM V1 · Sesión 5 · Informe de patrones GRASP y GoF</span>
+        <span>Documento generado a partir de inspección estática del repositorio. No modifica código fuente.</span>
+    </footer>
+
+</div>
+</body>
+</html>

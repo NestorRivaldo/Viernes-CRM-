@@ -1,21 +1,125 @@
-.form-container {
-  padding: 20px;
-  max-width: 800px;
-  margin: 0 auto;
+:host {
+  display: block;
 }
 
-.form-row {
-  display: flex;
-  gap: 20px;
+.usuario-dialog {
+  --entity-accent: #7c3aed;
+  --entity-accent-soft: #f5f3ff;
+  --entity-accent-border: #ede9fe;
+  --entity-accent-shadow: rgba(124, 58, 237, 0.28);
 }
 
-.full-width {
-  flex: 1;
+.role-field {
+  margin-top: 14px;
 }
 
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
+.role-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
-  margin-top: 20px;
+}
+
+.role-card {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 24px 12px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #ffffff;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.role-card:hover {
+  border-color: var(--entity-accent-border);
+  background: #fbfaff;
+  transform: translateY(-1px);
+}
+
+.role-card.selected {
+  border-color: var(--entity-accent);
+  background: var(--entity-accent-soft);
+  box-shadow: 0 8px 18px -12px var(--entity-accent-shadow);
+}
+
+.role-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  flex-shrink: 0;
+}
+
+.role-icon mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.role-icon.violet {
+  background: #f5f3ff;
+  color: #7c3aed;
+}
+
+.role-icon.blue {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.role-icon.emerald {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.role-copy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.25;
+}
+
+.role-copy strong {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.role-copy small {
+  margin-top: 2px;
+  font-size: 10.5px;
+  color: #94a3b8;
+}
+
+.role-card.selected .role-copy small {
+  color: var(--entity-accent);
+}
+
+.role-check {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  color: var(--entity-accent);
+  opacity: 0;
+  transform: scale(0.75);
+  transition: all 0.15s ease;
+}
+
+.role-card.selected .role-check {
+  opacity: 1;
+  transform: scale(1);
+}
+
+@media (max-width: 720px) {
+  .role-grid {
+    grid-template-columns: 1fr;
+  }
 }

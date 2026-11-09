@@ -1,72 +1,177 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatButtonModule } from '@angular/material/button';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { debounceTime } from 'rxjs';
+import { DraftService } from '../../../core/services/draft.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { UsuariosService } from '../usuarios.service';
 import { RolUsuario, UsuarioRequest } from '../usuarios.model';
+
+export interface UsuarioDialogData {
+  id?: number | null;
+}
+
+export interface UsuarioDialogResult {
+  saved: boolean;
+}
 
 @Component({
   selector: 'app-usuario-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatCardModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, MatIconModule, MatProgressSpinnerModule],
   templateUrl: './usuario-form.html',
-  styleUrl: './usuario-form.css'
+  styleUrls: ['./usuario-form.css', '../../../shared/styles/entity-dialog.css']
 })
 export class UsuarioForm implements OnInit {
+  private fb = inject(FormBuilder);
+  private usuariosService = inject(UsuariosService);
+  private cdr = inject(ChangeDetectorRef);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private dialogRef = inject<MatDialogRef<UsuarioForm, UsuarioDialogResult> | null>(MatDialogRef, {
+    optional: true,
+  });
+  private dialogData = inject<UsuarioDialogData | null>(MAT_DIALOG_DATA, { optional: true });
+  private draft = inject(DraftService);
+  private destroyRef = inject(DestroyRef);
+
+  readonly esDialogo = this.dialogRef !== null;
+
   form: FormGroup;
   isEdit = false;
   id!: number;
   loading = false;
-  roles = Object.values(RolUsuario);
+  cargandoUsuario = false;
+  mostrarPassword = false;
+  serverError = '';
 
-  constructor(
-    private fb: FormBuilder,
-    private usuariosService: UsuariosService,
-    private route: ActivatedRoute,
-    private router: Router
-  ) {
+  private submitted = false;
+
+  readonly rolesInfo: { value: RolUsuario; label: string; hint: string; icon: string; tone: string }[] = [
+    {
+      value: RolUsuario.ADMIN,
+      label: 'Administrador',
+      hint: 'Acceso total al CRM',
+      icon: 'shield',
+      tone: 'violet',
+    },
+    {
+      value: RolUsuario.JEFE,
+      label: 'Jefe de equipo',
+      hint: 'Supervisión y reportes',
+      icon: 'supervisor_account',
+      tone: 'blue',
+    },
+    {
+      value: RolUsuario.VENDEDOR,
+      label: 'Vendedor',
+      hint: 'Gestión comercial',
+      icon: 'point_of_sale',
+      tone: 'emerald',
+    },
+  ];
+
+  constructor() {
     this.form = this.fb.group({
       nombre: ['', [Validators.required, Validators.maxLength(100)]],
       apellido: ['', [Validators.required, Validators.maxLength(100)]],
       correo: ['', [Validators.required, Validators.email, Validators.maxLength(150)]],
       password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(100)]],
-      rol: [RolUsuario.VENDEDOR, Validators.required]
+      rol: [RolUsuario.VENDEDOR, Validators.required],
     });
   }
 
+  get draftKey(): string {
+    return `usuario:${this.isEdit ? this.id : 'nuevo'}`;
+  }
+
   ngOnInit() {
-    const idParam = this.route.snapshot.paramMap.get('id');
-    if (idParam) {
+    const id = this.dialogData?.id ?? this.idDeRuta();
+
+    if (id) {
       this.isEdit = true;
-      this.id = +idParam;
-      // En edición la contraseña es opcional: vacía = mantener la actual
+      this.id = id;
+      // En edición la contraseña es opcional: vacía = mantener la actual.
       this.form.get('password')?.setValidators([Validators.minLength(8), Validators.maxLength(100)]);
       this.form.get('password')?.updateValueAndValidity();
       this.cargarUsuario();
+    } else {
+      this.restaurarBorrador();
+    }
+
+    if (this.dialogRef) {
+      this.dialogRef.backdropClick().subscribe(() => {
+        if (this.form.dirty) this.draft.save(this.draftKey, this.form.getRawValue());
+      });
+    }
+
+    this.form.valueChanges
+      .pipe(debounceTime(600), takeUntilDestroyed(this.destroyRef))
+      .subscribe((v) => {
+        if (this.form.dirty) this.draft.save(this.draftKey, v);
+      });
+  }
+
+  private restaurarBorrador() {
+    const borrador = this.draft.load(this.draftKey);
+    if (borrador) {
+      const restaurar = confirm('Se encontró un borrador sin guardar. ¿Deseas restaurarlo?');
+      if (restaurar) {
+        this.form.patchValue(borrador);
+        this.form.markAsDirty();
+      } else {
+        this.draft.clear(this.draftKey);
+      }
     }
   }
 
+  private idDeRuta(): number | null {
+    const idParam = this.route.snapshot.paramMap.get('id');
+    if (!idParam) return null;
+
+    const id = Number(idParam);
+    return Number.isFinite(id) && id > 0 ? id : null;
+  }
+
   cargarUsuario() {
-    this.loading = true;
+    this.cargandoUsuario = true;
     this.usuariosService.obtener(this.id).subscribe({
       next: (usuario) => {
         this.form.patchValue(usuario);
-        this.loading = false;
+        this.cargandoUsuario = false;
+        this.cdr.markForCheck();
+        const borrador = this.draft.load(this.draftKey);
+        if (borrador) {
+          const restaurar = confirm('Se encontró un borrador sin guardar. ¿Deseas restaurarlo?');
+          if (restaurar) {
+            this.form.patchValue(borrador);
+            this.form.markAsDirty();
+          } else {
+            this.draft.clear(this.draftKey);
+          }
+        }
       },
       error: (err) => {
+        this.cargandoUsuario = false;
+        this.cdr.markForCheck();
         alert(err?.friendlyMessage || 'Error al cargar el usuario');
-        this.router.navigate(['/usuarios']);
-      }
+        this.cerrar(false);
+      },
     });
   }
 
   guardar() {
-    if (this.form.invalid) return;
+    this.submitted = true;
+    this.serverError = '';
+
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
 
     this.loading = true;
     const request: UsuarioRequest = { ...this.form.value };
@@ -80,12 +185,42 @@ export class UsuarioForm implements OnInit {
 
     req$.subscribe({
       next: () => {
-        this.router.navigate(['/usuarios']);
+        this.draft.clear(this.draftKey);
+        this.cerrar(true);
       },
       error: (err) => {
-        alert(err?.friendlyMessage || 'Error al guardar el usuario');
+        this.serverError = err?.friendlyMessage || 'Error al guardar el usuario.';
         this.loading = false;
-      }
+        this.cdr.markForCheck();
+      },
     });
+  }
+
+  seleccionarRol(rol: RolUsuario) {
+    this.form.patchValue({ rol });
+  }
+
+  mostrarError(campo: string): boolean {
+    const control = this.form.get(campo);
+    return !!control && control.invalid && (control.touched || this.submitted);
+  }
+
+  mensajeError(campo: string): string {
+    const errors = this.form.get(campo)?.errors;
+    if (!errors) return '';
+
+    if (errors['required']) return 'Este campo es obligatorio.';
+    if (errors['email']) return 'Ingresa un correo electrónico válido.';
+    if (errors['minlength']) return `Mínimo ${errors['minlength'].requiredLength} caracteres.`;
+    if (errors['maxlength']) return `Máximo ${errors['maxlength'].requiredLength} caracteres.`;
+    return 'Revisa este campo.';
+  }
+
+  cerrar(saved = false) {
+    if (this.dialogRef) {
+      this.dialogRef.close({ saved });
+      return;
+    }
+    this.router.navigate(['/usuarios']);
   }
 }

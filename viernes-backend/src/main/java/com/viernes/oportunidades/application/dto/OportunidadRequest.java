@@ -15,5 +15,6 @@ public record OportunidadRequest(
     @Min(0) @Max(100) Integer probabilidad,
     EtapaOportunidad etapa,
     @Size(max = 100) String responsable,
-    LocalDate fechaCierre
+    LocalDate fechaCierre,
+    @Size(max = 500) String descripcion
 ) {}

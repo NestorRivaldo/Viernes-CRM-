@@ -20,6 +20,47 @@
 
         <div class="form-row">
           <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Tipo de documento</mat-label>
+            <mat-select formControlName="tipoDocumento">
+              <mat-option [value]="null">Sin documento</mat-option>
+              <mat-option *ngFor="let tipo of tiposDocumento" [value]="tipo">{{ tipo }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Número de documento</mat-label>
+            <input matInput formControlName="numeroDocumento" inputmode="numeric">
+            <button
+              mat-icon-button
+              matSuffix
+              type="button"
+              (click)="consultarDocumento()"
+              [disabled]="consultandoDocumento || !form.get('tipoDocumento')?.value"
+              title="Consultar datos oficiales en RENIEC/SUNAT"
+            >
+              <mat-spinner *ngIf="consultandoDocumento" diameter="18"></mat-spinner>
+              <mat-icon *ngIf="!consultandoDocumento">search</mat-icon>
+            </button>
+            <mat-error *ngIf="form.get('numeroDocumento')?.hasError('pattern')">
+              El DNI debe tener 8 dígitos y el RUC 11 dígitos.
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="documento-feedback" *ngIf="errorDocumento || documentoConsultado">
+          <span class="documento-error" *ngIf="errorDocumento">{{ errorDocumento }}</span>
+          <span class="documento-ok" *ngIf="documentoConsultado">
+            <mat-icon>verified</mat-icon>
+            {{ documentoConsultado.tipoDocumento === 'RUC'
+              ? (documentoConsultado.razonSocial || 'RUC consultado')
+              : (documentoConsultado.nombreCompleto || 'DNI consultado') }}
+            <ng-container *ngIf="documentoConsultado.estado"> · {{ documentoConsultado.estado }}</ng-container>
+            <ng-container *ngIf="documentoConsultado.condicion"> · {{ documentoConsultado.condicion }}</ng-container>
+          </span>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
             <mat-label>Correo</mat-label>
             <input matInput formControlName="correo" type="email" required>
           </mat-form-field>

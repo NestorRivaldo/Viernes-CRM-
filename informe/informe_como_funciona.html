@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Informe técnico de cómo funciona Viernes CRM V1: flujo de datos, autenticación, API REST, ciclo de una petición, frontend Angular, seguridad y despliegue.">
+    <title>¿Cómo Funciona Viernes CRM? – Informe del Sistema V1</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #090d16;
+            --surface: #111726;
+            --surface2: #172033;
+            --surface3: #1c2740;
+            --border: #232f48;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --text-subtle: #64748b;
+            --accent: #3b82f6;
+            --accent-soft: rgba(59, 130, 246, 0.12);
+            --green: #10b981;
+            --green-soft: rgba(16, 185, 129, 0.12);
+            --purple: #a855f7;
+            --purple-soft: rgba(168, 85, 247, 0.12);
+            --amber: #f59e0b;
+            --amber-soft: rgba(245, 158, 11, 0.12);
+            --cyan: #06b6d4;
+            --cyan-soft: rgba(6, 182, 212, 0.12);
+            --rose: #f43f5e;
+            --rose-soft: rgba(244, 63, 94, 0.12);
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg); color: var(--text);
+            line-height: 1.7; padding: 34px 20px 70px;
+            background-image:
+                radial-gradient(circle at 5% 10%, rgba(6, 182, 212, 0.09) 0%, transparent 38%),
+                radial-gradient(circle at 90% 85%, rgba(245, 158, 11, 0.06) 0%, transparent 38%);
+            background-attachment: fixed;
+        }
+
+        .container { max-width: 1080px; margin: 0 auto; }
+        a { color: #60a5fa; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        .hero {
+            text-align: center; padding: 50px 0 40px;
+            border-bottom: 1px solid var(--border); margin-bottom: 40px;
+        }
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: var(--cyan-soft); color: #67e8f9;
+            border: 1px solid rgba(6, 182, 212, 0.35);
+            padding: 7px 16px; border-radius: 30px;
+            font-size: 13px; font-weight: 700;
+            letter-spacing: 0.03em; margin-bottom: 16px;
+            animation: pulse-cyan 3s ease-in-out infinite;
+        }
+        @keyframes pulse-cyan {
+            0%, 100% { box-shadow: 0 0 8px rgba(6, 182, 212, 0.15); }
+            50% { box-shadow: 0 0 22px rgba(6, 182, 212, 0.3); }
+        }
+        .hero h1 {
+            font-size: 38px; font-weight: 800; letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #ffffff 20%, #67e8f9 60%, #fde68a 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin-bottom: 12px;
+        }
+        .hero .subtitle { font-size: 16px; color: var(--text-muted); max-width: 700px; margin: 0 auto; }
+        .stats-row {
+            display: flex; justify-content: center; gap: 16px;
+            margin: 28px 0 0; flex-wrap: wrap;
+        }
+        .stat-pill {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 10px; padding: 8px 16px;
+            font-size: 13px; display: flex; align-items: center; gap: 6px;
+        }
+        .stat-pill strong { font-family: var(--mono); color: #67e8f9; }
+        .stat-pill.amber strong { color: #fde68a; }
+        .stat-pill.green strong { color: #6ee7b7; }
+        .stat-pill.purple strong { color: #c084fc; }
+
+        .toc {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius-md); padding: 22px 28px; margin-bottom: 40px;
+        }
+        .toc h3 { font-size: 15px; font-weight: 700; margin-bottom: 12px; color: #e2e8f0; }
+        .toc ol { padding-left: 20px; }
+        .toc li { margin-bottom: 6px; }
+        .toc a { font-size: 14px; font-weight: 500; }
+
+        .section { margin-bottom: 50px; padding-top: 10px; }
+        .section-header {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 18px; padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+        .section-num {
+            background: linear-gradient(135deg, #0e7490, #06b6d4);
+            color: #fff; font-size: 13px; font-weight: 800;
+            min-width: 32px; height: 32px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .section-title { font-size: 22px; font-weight: 700; }
+
+        .card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius-md); padding: 22px 26px;
+            margin-bottom: 20px; transition: border-color 0.3s;
+        }
+        .card:hover { border-color: rgba(6, 182, 212, 0.4); }
+        .card h4 { font-size: 16px; font-weight: 700; margin-bottom: 10px; color: #e2e8f0; }
+        .card p, .card li { font-size: 14px; color: var(--text-muted); }
+        .card ul, .card ol { margin: 8px 0 0 18px; }
+        .card li { margin-bottom: 5px; }
+
+        .highlight-box {
+            background: var(--surface2); border: 1px solid var(--border);
+            border-radius: var(--radius-md); padding: 24px 28px;
+            margin-bottom: 24px; position: relative; overflow: hidden;
+        }
+        .highlight-box::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+        }
+        .highlight-box h3 {
+            font-size: 18px; font-weight: 700; margin-bottom: 14px;
+            display: flex; align-items: center; gap: 10px;
+        }
+
+        .code-block {
+            background: #0c1222; border: 1px solid var(--border);
+            border-radius: var(--radius-sm); padding: 18px 20px;
+            margin: 14px 0; overflow-x: auto;
+            font-family: var(--mono); font-size: 12.5px;
+            line-height: 1.7; color: #cbd5e1;
+        }
+        .code-block .kw { color: #c084fc; }
+        .code-block .str { color: #fde68a; }
+        .code-block .ann { color: #67e8f9; }
+        .code-block .type { color: #6ee7b7; }
+        .code-block .comment { color: #64748b; font-style: italic; }
+        .code-block .field { color: #f1f5f9; }
+
+        .data-table {
+            width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 13px;
+        }
+        .data-table th {
+            background: var(--surface2); color: #e2e8f0; font-weight: 700;
+            text-align: left; padding: 10px 14px;
+            border-bottom: 2px solid var(--border);
+            font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em;
+        }
+        .data-table td {
+            padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--text-muted);
+        }
+        .data-table tr:hover td { background: rgba(6, 182, 212, 0.04); }
+        .data-table code {
+            font-family: var(--mono); font-size: 12px;
+            background: var(--surface2); padding: 2px 6px; border-radius: 4px; color: #67e8f9;
+        }
+
+        .chip {
+            display: inline-block; font-size: 11px; font-weight: 600;
+            padding: 2px 8px; border-radius: 5px; margin-right: 4px;
+        }
+        .chip-blue { background: var(--accent-soft); color: #60a5fa; }
+        .chip-green { background: var(--green-soft); color: #6ee7b7; }
+        .chip-purple { background: var(--purple-soft); color: #c084fc; }
+        .chip-cyan { background: var(--cyan-soft); color: #67e8f9; }
+        .chip-amber { background: var(--amber-soft); color: #fde68a; }
+        .chip-rose { background: var(--rose-soft); color: #fda4af; }
+
+        .alert {
+            border-radius: var(--radius-sm); padding: 14px 18px;
+            margin: 14px 0; font-size: 13.5px; display: flex; gap: 10px; align-items: flex-start;
+        }
+        .alert-icon { font-size: 18px; flex-shrink: 0; }
+        .alert-info { background: var(--accent-soft); border: 1px solid rgba(59,130,246,0.3); color: #93c5fd; }
+        .alert-success { background: var(--green-soft); border: 1px solid rgba(16,185,129,0.3); color: #6ee7b7; }
+        .alert-warning { background: var(--amber-soft); border: 1px solid rgba(245,158,11,0.3); color: #fde68a; }
+        .alert-tip { background: var(--purple-soft); border: 1px solid rgba(168,85,247,0.3); color: #d8b4fe; }
+
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+
+        /* Flow steps */
+        .flow-h {
+            display: flex; align-items: stretch; gap: 0;
+            margin: 20px 0; flex-wrap: wrap; justify-content: center;
+        }
+        .flow-h-step {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 12px; padding: 16px 14px;
+            text-align: center; min-width: 120px; flex: 1; max-width: 180px;
+        }
+        .flow-h-step .step-num {
+            font-size: 20px; font-weight: 800; margin-bottom: 6px;
+        }
+        .flow-h-step .step-title {
+            font-size: 12px; font-weight: 700; color: #e2e8f0; margin-bottom: 4px;
+        }
+        .flow-h-step .step-desc {
+            font-size: 11px; color: var(--text-muted);
+        }
+        .flow-h-arrow { display: flex; align-items: center; padding: 0 4px; font-size: 18px; color: var(--text-subtle); }
+
+        .back-link {
+            display: inline-flex; align-items: center; gap: 6px;
+            color: var(--text-muted); font-size: 13px; font-weight: 500;
+            margin-bottom: 16px; transition: color 0.2s;
+        }
+        .back-link:hover { color: #60a5fa; text-decoration: none; }
+
+        footer {
+            text-align: center; padding: 40px 0 10px;
+            color: var(--text-subtle); font-size: 13px;
+            border-top: 1px solid var(--border); margin-top: 50px;
+        }
+
+        @media (max-width: 600px) {
+            .hero h1 { font-size: 26px; }
+            .flow-h { flex-direction: column; align-items: center; }
+            .flow-h-arrow { transform: rotate(90deg); }
+            .flow-h-step { max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- ENTRADA MINIMALISTA -->
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0 25px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #2563eb, #3b82f6); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; color: white;">V</div>
+            <span style="font-weight: 700; font-size: 16px; color: #f8fafc; letter-spacing: -0.01em;">Viernes</span>
+            <span style="font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 12px; background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3);">CRM · V1</span>
+        </div>
+        <a href="index.html" class="back-link" style="margin-bottom: 0;">← Volver al Portal</a>
+    </div>
+
+    <header style="padding: 10px 0 35px; border-bottom: 1px solid var(--border); margin-bottom: 35px;">
+        <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(59, 130, 246, 0.12); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.25); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; margin-bottom: 16px; text-transform: uppercase;">
+            • ARQUITECTURA Y FLUJO
+        </div>
+        <h1 style="font-size: 38px; font-weight: 800; letter-spacing: -0.03em; color: #ffffff; margin-bottom: 12px; line-height: 1.2;">
+            ¿Cómo funciona el sistema?
+        </h1>
+        <p style="font-size: 16px; color: var(--text-muted); max-width: 650px; line-height: 1.6; margin: 0;">
+            Flujo de datos de extremo a extremo: desde la interacción del usuario en Angular hasta la persistencia transaccional en Oracle 23c.
+        </p>
+    </header>
+
+    <!-- TOC -->
+    <nav class="toc">
+        <h3>📋 Índice de Contenidos</h3>
+        <ol>
+            <li><a href="#vision">Visión general de los 4 servicios</a></li>
+            <li><a href="#arranque">Cómo se arranca el sistema</a></li>
+            <li><a href="#login">Flujo de autenticación (Login con Keycloak)</a></li>
+            <li><a href="#peticion">Ciclo de vida de una petición HTTP</a></li>
+            <li><a href="#seguridad">Cómo funciona la seguridad (RBAC)</a></li>
+            <li><a href="#frontend">Cómo funciona el frontend Angular</a></li>
+            <li><a href="#backend">Cómo funciona el backend Spring Boot</a></li>
+            <li><a href="#persistencia">Cómo se persisten los datos en Oracle</a></li>
+            <li><a href="#nm-flujo">Cómo funciona una relación N:M</a></li>
+            <li><a href="#mensajeria">Cómo funciona la mensajería interna</a></li>
+            <li><a href="#dashboard">Cómo funciona el dashboard</a></li>
+            <li><a href="#urls">URLs y puertos del sistema</a></li>
+        </ol>
+    </nav>
+
+    <!-- 1. Visión general -->
+    <section class="section" id="vision">
+        <div class="section-header">
+            <span class="section-num">1</span>
+            <h2 class="section-title">Visión general de los 4 servicios</h2>
+        </div>
+
+        <div class="highlight-box" style="--before-bg: linear-gradient(90deg, #06b6d4, #3b82f6, #a855f7, #f59e0b);">
+            <h3 style="margin-bottom: 20px;">🏗️ Topología de servicios en ejecución</h3>
+
+            <div class="flow-h">
+                <div class="flow-h-step" style="border-color: rgba(59, 130, 246, 0.5);">
+                    <div class="step-num" style="color: #60a5fa;">🌐</div>
+                    <div class="step-title">Frontend Angular</div>
+                    <div class="step-desc">Puerto 4200<br>SPA en navegador</div>
+                </div>
+                <div class="flow-h-arrow">→</div>
+                <div class="flow-h-step" style="border-color: rgba(6, 182, 212, 0.5);">
+                    <div class="step-num" style="color: #67e8f9;">☕</div>
+                    <div class="step-title">Backend Spring</div>
+                    <div class="step-desc">Puerto 8080<br>API REST + JWT</div>
+                </div>
+                <div class="flow-h-arrow">→</div>
+                <div class="flow-h-step" style="border-color: rgba(168, 85, 247, 0.5);">
+                    <div class="step-num" style="color: #c084fc;">🗄️</div>
+                    <div class="step-title">Oracle 23c</div>
+                    <div class="step-desc">Puerto 1521<br>21 tablas CRM</div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin: 12px 0;">
+                <span style="font-size: 20px; color: var(--text-subtle);">↕ Validación de tokens</span>
+            </div>
+
+            <div style="display: flex; justify-content: center;">
+                <div class="flow-h-step" style="border-color: rgba(245, 158, 11, 0.5); max-width: 200px;">
+                    <div class="step-num" style="color: #fde68a;">🔐</div>
+                    <div class="step-title">Keycloak IAM</div>
+                    <div class="step-desc">Puerto 8180 (Docker)<br>OAuth2 OIDC + PKCE</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="alert alert-info">
+            <span class="alert-icon">💡</span>
+            <div>
+                Los 4 servicios deben estar corriendo simultáneamente para que el sistema funcione.
+                El archivo <code>activar-sistema.bat</code> automatiza el arranque de Docker (Keycloak), 
+                el backend Spring Boot y el frontend Angular en un solo clic.
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. Arranque -->
+    <section class="section" id="arranque">
+        <div class="section-header">
+            <span class="section-num">2</span>
+            <h2 class="section-title">Cómo se arranca el sistema</h2>
+        </div>
+
+        <div class="card">
+            <h4>🚀 Secuencia de arranque (activar-sistema.bat)</h4>
+            <ol>
+                <li><strong>Docker Desktop</strong> — Se verifica que Docker esté corriendo</li>
+                <li><strong>Keycloak</strong> — <code>docker compose -f compose-keycloak.yml up -d</code> → Puerto 8180</li>
+                <li><strong>Oracle 23c</strong> — Ya debe estar corriendo como servicio local → Puerto 1521</li>
+                <li><strong>Backend Spring Boot</strong> — <code>mvnw spring-boot:run --spring.profiles.active=dev,keycloak</code> → Puerto 8080</li>
+                <li><strong>Frontend Angular</strong> — <code>npm run start</code> → Puerto 4200</li>
+            </ol>
+        </div>
+
+        <div class="card">
+            <h4>⚙️ Perfiles de configuración del backend</h4>
+            <table class="data-table">
+                <thead><tr><th>Perfil</th><th>¿Qué activa?</th></tr></thead>
+                <tbody>
+                    <tr><td><code>dev</code></td><td>Base de datos Oracle 23c local, Hibernate ddl-auto: update, CORS abierto</td></tr>
+                    <tr><td><code>keycloak</code></td><td>Spring Security OAuth2 Resource Server, validación JWT contra Keycloak, matriz de roles</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- 3. Login -->
+    <section class="section" id="login">
+        <div class="section-header">
+            <span class="section-num">3</span>
+            <h2 class="section-title">Flujo de autenticación (Login con Keycloak)</h2>
+        </div>
+
+        <div class="highlight-box">
+            <h3>🔐 Flujo OAuth2 OIDC + PKCE</h3>
+
+            <div class="flow-h">
+                <div class="flow-h-step">
+                    <div class="step-num">1️⃣</div>
+                    <div class="step-title">Usuario abre la app</div>
+                    <div class="step-desc">Angular detecta que no hay token</div>
+                </div>
+                <div class="flow-h-arrow">→</div>
+                <div class="flow-h-step">
+                    <div class="step-num">2️⃣</div>
+                    <div class="step-title">Redirect a Keycloak</div>
+                    <div class="step-desc">Pantalla de login de Keycloak</div>
+                </div>
+                <div class="flow-h-arrow">→</div>
+                <div class="flow-h-step">
+                    <div class="step-num">3️⃣</div>
+                    <div class="step-title">Usuario ingresa credenciales</div>
+                    <div class="step-desc">admin@viernes.com o vendedor@viernes.com</div>
+                </div>
+                <div class="flow-h-arrow">→</div>
+                <div class="flow-h-step">
+                    <div class="step-num">4️⃣</div>
+                    <div class="step-title">Keycloak retorna JWT</div>
+                    <div class="step-desc">Token con roles del usuario</div>
+                </div>
+                <div class="flow-h-arrow">→</div>
+                <div class="flow-h-step">
+                    <div class="step-num">5️⃣</div>
+                    <div class="step-title">Angular guarda token</div>
+                    <div class="step-desc">Lo envía en cada petición HTTP</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h4>👤 Usuarios de prueba pre-configurados en Keycloak</h4>
+            <table class="data-table">
+                <thead><tr><th>Usuario</th><th>Contraseña</th><th>Rol</th></tr></thead>
+                <tbody>
+                    <tr><td><code>admin@viernes.com</code></td><td><code>admin123</code></td><td><span class="chip chip-rose">ADMIN</span></td></tr>
+                    <tr><td><code>vendedor@viernes.com</code></td><td><code>vendedor123</code></td><td><span class="chip chip-blue">VENDEDOR</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="alert alert-success">
+            <span class="alert-icon">✅</span>
+            <div>
+                <strong>Silent SSO:</strong> Cuando el usuario presiona F5, Angular verifica silenciosamente con 
+                Keycloak si la sesión sigue activa mediante un iframe invisible. Si el token expiró, se renueva 
+                automáticamente sin mostrar la pantalla de login.
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. Ciclo de petición -->
+    <section class="section" id="peticion">
+        <div class="section-header">
+            <span class="section-num">4</span>
+            <h2 class="section-title">Ciclo de vida de una petición HTTP</h2>
+        </div>
+
+        <div class="highlight-box">
+            <h3>🔄 Ejemplo: El usuario crea un nuevo cliente</h3>
+
+            <div class="card" style="background: #0c1222; font-family: var(--mono); font-size: 12px; line-height: 2; color: #cbd5e1; margin: 16px 0;">
+<span style="color: #64748b;">// PASO 1 — Frontend Angular: El usuario llena el formulario y hace clic en "Guardar"</span>
+<span style="color: #60a5fa;">this.http.post</span>(<span style="color: #fde68a;">'/api/v1/clientes'</span>, clienteData, {
+  headers: { <span style="color: #fde68a;">'Authorization'</span>: <span style="color: #fde68a;">'Bearer '</span> + <span style="color: #6ee7b7;">this.keycloak.token</span> }
+});
+
+<span style="color: #64748b;">// PASO 2 — Spring Security: Intercepta la petición, extrae el JWT</span>
+<span style="color: #c084fc;">SecurityFilterChain</span> → <span style="color: #67e8f9;">KeycloakJwtAuthenticationConverter</span> → valida firma + roles
+
+<span style="color: #64748b;">// PASO 3 — Controller: Recibe la petición ya autenticada</span>
+<span style="color: #67e8f9;">@PostMapping</span>
+<span style="color: #c084fc;">public</span> <span style="color: #6ee7b7;">ClienteResponse</span> crear(<span style="color: #67e8f9;">@Valid @RequestBody</span> <span style="color: #6ee7b7;">ClienteRequest</span> request)
+
+<span style="color: #64748b;">// PASO 4 — Service (Use Case): Ejecuta la lógica de negocio</span>
+<span style="color: #6ee7b7;">ClienteService</span>.crear(request) → valida datos → convierte DTO → dominio
+
+<span style="color: #64748b;">// PASO 5 — Adapter de persistencia: Guarda en Oracle</span>
+<span style="color: #6ee7b7;">ClientePersistenceAdapter</span>.guardar(cliente) → <span style="color: #6ee7b7;">ClienteSpringDataRepository</span>.save()
+
+<span style="color: #64748b;">// PASO 6 — Respuesta: Oracle genera el ID, Spring retorna HTTP 201</span>
+→ <span style="color: #6ee7b7;">ClienteResponse</span> { id: 42, nombre: <span style="color: #fde68a;">"Acme Corp"</span>, ... }
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div class="card">
+                <h4>📤 Petición HTTP (Request)</h4>
+                <div class="code-block">
+<span class="ann">POST</span> /api/v1/clientes
+<span class="field">Authorization:</span> <span class="str">Bearer eyJhbGciOi...</span>
+<span class="field">Content-Type:</span> <span class="str">application/json</span>
+
+{
+  <span class="str">"nombre"</span>: <span class="str">"Acme Corp"</span>,
+  <span class="str">"email"</span>: <span class="str">"info@acme.com"</span>,
+  <span class="str">"industria"</span>: <span class="str">"Tecnología"</span>
+}
+                </div>
+            </div>
+            <div class="card">
+                <h4>📥 Respuesta HTTP (Response)</h4>
+                <div class="code-block">
+<span class="ann">HTTP 201 Created</span>
+<span class="field">Content-Type:</span> <span class="str">application/json</span>
+
+{
+  <span class="str">"id"</span>: <span class="type">42</span>,
+  <span class="str">"nombre"</span>: <span class="str">"Acme Corp"</span>,
+  <span class="str">"email"</span>: <span class="str">"info@acme.com"</span>,
+  <span class="str">"industria"</span>: <span class="str">"Tecnología"</span>,
+  <span class="str">"creadoEn"</span>: <span class="str">"2026-10-24T22:30:00"</span>
+}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. Seguridad RBAC -->
+    <section class="section" id="seguridad">
+        <div class="section-header">
+            <span class="section-num">5</span>
+            <h2 class="section-title">Cómo funciona la seguridad (RBAC)</h2>
+        </div>
+
+        <div class="card">
+            <h4>🛡️ Flujo de autorización en el backend</h4>
+            <p>Cuando llega una petición HTTP al backend, Spring Security sigue este proceso:</p>
+            <ol>
+                <li><strong>Extrae el token JWT</strong> del header <code>Authorization: Bearer ...</code></li>
+                <li><strong>Valida la firma</strong> del token contra la clave pública de Keycloak</li>
+                <li><strong>Extrae los roles</strong> del claim <code>realm_access.roles</code> del JWT</li>
+                <li><strong>Verifica la autorización</strong> según las reglas definidas en <code>KeycloakSecurityConfig.java</code></li>
+                <li>Si el usuario <strong>no tiene el rol requerido</strong>, Spring devuelve <strong>HTTP 403 Forbidden</strong></li>
+            </ol>
+        </div>
+
+        <div class="card">
+            <h4>📝 Reglas de autorización (KeycloakSecurityConfig.java)</h4>
+            <div class="code-block">
+<span class="comment">// Gestión de usuarios — solo ADMIN</span>
+.requestMatchers(HttpMethod.<span class="field">POST</span>, <span class="str">"/api/v1/usuarios/**"</span>).hasRole(<span class="str">"ADMIN"</span>)
+.requestMatchers(HttpMethod.<span class="field">DELETE</span>, <span class="str">"/api/v1/usuarios/**"</span>).hasRole(<span class="str">"ADMIN"</span>)
+
+<span class="comment">// Transiciones críticas de propuestas — solo ADMIN y JEFE</span>
+.requestMatchers(HttpMethod.<span class="field">PATCH</span>, <span class="str">"/api/v1/propuestas/*/aprobar"</span>).hasAnyRole(<span class="str">"ADMIN"</span>, <span class="str">"JEFE"</span>)
+.requestMatchers(HttpMethod.<span class="field">PATCH</span>, <span class="str">"/api/v1/propuestas/*/rechazar"</span>).hasAnyRole(<span class="str">"ADMIN"</span>, <span class="str">"JEFE"</span>)
+.requestMatchers(HttpMethod.<span class="field">PATCH</span>, <span class="str">"/api/v1/propuestas/*/cancelar"</span>).hasAnyRole(<span class="str">"ADMIN"</span>, <span class="str">"JEFE"</span>)
+
+<span class="comment">// Eliminación de registros de negocio — solo ADMIN</span>
+.requestMatchers(HttpMethod.<span class="field">DELETE</span>, ENTIDADES_NEGOCIO).hasRole(<span class="str">"ADMIN"</span>)
+
+<span class="comment">// Catálogos — escritura solo ADMIN y JEFE</span>
+.requestMatchers(HttpMethod.<span class="field">POST</span>, GESTION_COMERCIAL).hasAnyRole(<span class="str">"ADMIN"</span>, <span class="str">"JEFE"</span>)
+
+<span class="comment">// Todo lo demás — cualquier usuario autenticado</span>
+.anyRequest().authenticated()
+            </div>
+        </div>
+
+        <div class="card" style="border-left: 3px solid #f43f5e;">
+            <h4>🚫 Ejemplo de 403 Forbidden real</h4>
+            <p style="margin-bottom: 10px;">Cuando un VENDEDOR intenta eliminar un cliente:</p>
+            <div class="code-block">
+<span class="ann">DELETE</span> /api/v1/clientes/5
+<span class="field">Authorization:</span> <span class="str">Bearer {token-de-vendedor}</span>
+
+<span class="comment">// Respuesta del servidor:</span>
+<span class="ann">HTTP 403 Forbidden</span>
+{
+  <span class="str">"timestamp"</span>: <span class="str">"2026-10-24T22:35:00Z"</span>,
+  <span class="str">"status"</span>: <span class="type">403</span>,
+  <span class="str">"error"</span>: <span class="str">"Forbidden"</span>,
+  <span class="str">"message"</span>: <span class="str">"Acceso denegado: no cuenta con los roles requeridos..."</span>,
+  <span class="str">"path"</span>: <span class="str">"/api/v1/clientes/5"</span>
+}
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. Frontend -->
+    <section class="section" id="frontend">
+        <div class="section-header">
+            <span class="section-num">6</span>
+            <h2 class="section-title">Cómo funciona el frontend Angular</h2>
+        </div>
+
+        <div class="card">
+            <h4>🅰️ Características técnicas del frontend</h4>
+            <table class="data-table">
+                <thead><tr><th>Característica</th><th>Implementación</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Framework</strong></td><td>Angular 22 con Standalone Components (sin NgModules)</td></tr>
+                    <tr><td><strong>Build tool</strong></td><td>Vite (reemplaza webpack, build en ~5 segundos)</td></tr>
+                    <tr><td><strong>UI Library</strong></td><td>Angular Material (tablas, formularios, diálogos, snackbars)</td></tr>
+                    <tr><td><strong>Routing</strong></td><td>Lazy loading por módulo funcional</td></tr>
+                    <tr><td><strong>Signals</strong></td><td>Reactividad con <code>signal()</code> y <code>computed()</code> (Zoneless-ready)</td></tr>
+                    <tr><td><strong>Auth</strong></td><td>keycloak-angular + AuthGuard para rutas protegidas</td></tr>
+                    <tr><td><strong>HTTP</strong></td><td>Interceptor agrega token JWT automáticamente a cada petición</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h4>📁 Estructura del frontend</h4>
+            <div class="code-block">
+<span style="color: #6ee7b7;">viernes-frontend/src/app/</span>
+├── <span style="color: #60a5fa;">core/</span>
+│   ├── <span style="color: #60a5fa;">auth/</span>          → AuthService, AuthGuard, KeycloakInit
+│   └── <span style="color: #60a5fa;">layout/</span>        → Shell, Header, Sidebar, Navigation
+├── <span style="color: #c084fc;">features/</span>
+│   ├── <span style="color: #c084fc;">clientes/</span>      → ClienteList, ClienteForm, ClienteService
+│   ├── <span style="color: #c084fc;">leads/</span>         → LeadList, LeadForm, LeadService
+│   ├── <span style="color: #c084fc;">oportunidades/</span> → OportunidadList, OportunidadForm + tabs N:M
+│   ├── <span style="color: #c084fc;">propuestas/</span>    → PropuestaList, PropuestaForm + detalles
+│   ├── <span style="color: #c084fc;">actividades/</span>   → ActividadList, ActividadForm
+│   ├── <span style="color: #c084fc;">dashboard/</span>     → Dashboard con métricas reales de Oracle
+│   ├── <span style="color: #c084fc;">productos/</span>     → ProductoList, ProductoForm
+│   ├── <span style="color: #c084fc;">equipos/</span>       → EquipoList, EquipoForm + miembros
+│   ├── <span style="color: #c084fc;">mensajeria/</span>    → Chat panel + polling 5s
+│   ├── <span style="color: #c084fc;">etiquetas/</span>     → EtiquetaList, EtiquetaForm
+│   ├── <span style="color: #c084fc;">usuarios/</span>      → UsuarioList, UsuarioForm
+│   └── <span style="color: #c084fc;">configuracion/</span> → Panel de configuración
+└── <span style="color: #fde68a;">shared/</span>
+    ├── <span style="color: #fde68a;">components/</span>    → ConfirmDialog, EmptyState, LoadingSpinner
+    ├── <span style="color: #fde68a;">models/</span>        → Interfaces TypeScript compartidas
+    └── <span style="color: #fde68a;">styles/</span>        → Variables CSS globales, tema
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. Backend -->
+    <section class="section" id="backend">
+        <div class="section-header">
+            <span class="section-num">7</span>
+            <h2 class="section-title">Cómo funciona el backend Spring Boot</h2>
+        </div>
+
+        <div class="card">
+            <h4>☕ Arquitectura Hexagonal por módulo</h4>
+            <p>
+                Cada módulo de negocio sigue la <strong>Arquitectura Hexagonal (Ports & Adapters)</strong>. 
+                La lógica de negocio está aislada en el centro, los adaptadores externos (REST, JPA) 
+                se conectan a través de interfaces (puertos).
+            </p>
+        </div>
+
+        <div class="grid-2">
+            <div class="card" style="border-left: 3px solid #60a5fa;">
+                <h4>📥 Puerto de entrada (in)</h4>
+                <p>
+                    Interface <code>ManageXxxUseCase</code> que define las operaciones de negocio. 
+                    El Controller llama a este puerto. Ejemplo:
+                </p>
+                <div class="code-block" style="font-size: 11.5px;">
+<span class="kw">public interface</span> <span class="type">ManageClienteUseCase</span> {
+  <span class="type">ClienteResponse</span> crear(<span class="type">ClienteRequest</span> req);
+  <span class="type">ClienteResponse</span> actualizar(<span class="type">Long</span> id, <span class="type">ClienteRequest</span> req);
+  <span class="type">List</span>&lt;<span class="type">ClienteResponse</span>&gt; listar();
+  <span class="kw">void</span> eliminar(<span class="type">Long</span> id);
+}
+                </div>
+            </div>
+            <div class="card" style="border-left: 3px solid #c084fc;">
+                <h4>📤 Puerto de salida (out)</h4>
+                <p>
+                    Interface <code>XxxPersistencePort</code> que define las operaciones de persistencia. 
+                    El Service llama a este puerto. Ejemplo:
+                </p>
+                <div class="code-block" style="font-size: 11.5px;">
+<span class="kw">public interface</span> <span class="type">ClientePersistencePort</span> {
+  <span class="type">Cliente</span> guardar(<span class="type">Cliente</span> cliente);
+  <span class="type">Optional</span>&lt;<span class="type">Cliente</span>&gt; buscarPorId(<span class="type">Long</span> id);
+  <span class="type">List</span>&lt;<span class="type">Cliente</span>&gt; listarTodos();
+  <span class="kw">void</span> eliminarPorId(<span class="type">Long</span> id);
+}
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h4>🧩 Spring Modulith</h4>
+            <p>
+                El backend usa <strong>Spring Modulith</strong> para garantizar que los módulos sean independientes. 
+                El test <code>ModularityTests</code> verifica que no existan dependencias cíclicas entre módulos 
+                y que cada módulo solo acceda a las APIs públicas de otros módulos.
+            </p>
+        </div>
+    </section>
+
+    <!-- 8. Persistencia -->
+    <section class="section" id="persistencia">
+        <div class="section-header">
+            <span class="section-num">8</span>
+            <h2 class="section-title">Cómo se persisten los datos en Oracle</h2>
+        </div>
+
+        <div class="card">
+            <h4>🗄️ Flujo de persistencia</h4>
+            <ol>
+                <li><strong>Service</strong> recibe la entidad de dominio del Use Case</li>
+                <li><strong>PersistenceAdapter</strong> convierte la entidad de dominio a entidad JPA</li>
+                <li><strong>JpaRepository</strong> (Spring Data) ejecuta la operación SQL via Hibernate</li>
+                <li><strong>Oracle 23c</strong> almacena el registro en la tabla correspondiente (CRM_CLIENTES, etc.)</li>
+                <li>El Adapter convierte la entidad JPA de vuelta a entidad de dominio</li>
+                <li>El Service retorna el resultado como DTO Response</li>
+            </ol>
+        </div>
+
+        <div class="card">
+            <h4>⚙️ Configuración de Hibernate/JPA</h4>
+            <table class="data-table">
+                <thead><tr><th>Propiedad</th><th>Valor</th><th>Efecto</th></tr></thead>
+                <tbody>
+                    <tr><td><code>ddl-auto</code></td><td><code>update</code></td><td>Hibernate crea/modifica tablas automáticamente al arrancar</td></tr>
+                    <tr><td><code>open-in-view</code></td><td><code>false</code></td><td>Sin lazy loading en la capa web — previene N+1 queries</td></tr>
+                    <tr><td><code>dialect</code></td><td><code>Oracle23cDialect</code></td><td>SQL optimizado para Oracle 23c</td></tr>
+                    <tr><td><code>show-sql</code></td><td><code>true</code> (dev)</td><td>Imprime cada SQL ejecutado en la consola</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- 9. Flujo N:M -->
+    <section class="section" id="nm-flujo">
+        <div class="section-header">
+            <span class="section-num">9</span>
+            <h2 class="section-title">Cómo funciona una relación N:M</h2>
+        </div>
+
+        <div class="highlight-box">
+            <h3>🔗 Ejemplo: Asociar un contacto a una oportunidad</h3>
+            <div class="flow-h">
+                <div class="flow-h-step">
+                    <div class="step-num">1️⃣</div>
+                    <div class="step-title">Frontend</div>
+                    <div class="step-desc">Usuario selecciona contacto en dropdown</div>
+                </div>
+                <div class="flow-h-arrow">→</div>
+                <div class="flow-h-step">
+                    <div class="step-num">2️⃣</div>
+                    <div class="step-title">POST</div>
+                    <div class="step-desc">/oportunidades/5/contactos</div>
+                </div>
+                <div class="flow-h-arrow">→</div>
+                <div class="flow-h-step">
+                    <div class="step-num">3️⃣</div>
+                    <div class="step-title">Service</div>
+                    <div class="step-desc">Valida que no exista duplicado</div>
+                </div>
+                <div class="flow-h-arrow">→</div>
+                <div class="flow-h-step">
+                    <div class="step-num">4️⃣</div>
+                    <div class="step-title">INSERT</div>
+                    <div class="step-desc">CRM_OPORTUNIDAD_CONTACTOS</div>
+                </div>
+                <div class="flow-h-arrow">→</div>
+                <div class="flow-h-step">
+                    <div class="step-num">5️⃣</div>
+                    <div class="step-title">Response</div>
+                    <div class="step-desc">201 Created + datos del vínculo</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="alert alert-tip">
+            <span class="alert-icon">📄</span>
+            <div>
+                Para documentación completa de las 7 relaciones N:M con código, tablas y diagramas, consulta el 
+                <a href="informe_relaciones_nm.html"><strong>Informe de Relaciones N:M</strong></a>.
+            </div>
+        </div>
+    </section>
+
+    <!-- 10. Mensajería -->
+    <section class="section" id="mensajeria">
+        <div class="section-header">
+            <span class="section-num">10</span>
+            <h2 class="section-title">Cómo funciona la mensajería interna</h2>
+        </div>
+
+        <div class="card">
+            <h4>💬 Arquitectura de la mensajería</h4>
+            <ol>
+                <li>El usuario escribe un mensaje en el panel de chat del frontend</li>
+                <li>Angular envía <code>POST /api/v1/mensajes</code> con el contenido y el JWT</li>
+                <li>El backend extrae el nombre del usuario del token JWT y guarda el mensaje en <code>CRM_MENSAJES</code></li>
+                <li>El frontend hace <strong>polling cada 5 segundos</strong> con <code>GET /api/v1/mensajes?desde={timestamp}</code></li>
+                <li>Los mensajes nuevos aparecen automáticamente en el chat</li>
+                <li>Un <strong>badge de no leídos</strong> muestra el conteo de mensajes nuevos en la barra lateral</li>
+            </ol>
+        </div>
+    </section>
+
+    <!-- 11. Dashboard -->
+    <section class="section" id="dashboard">
+        <div class="section-header">
+            <span class="section-num">11</span>
+            <h2 class="section-title">Cómo funciona el dashboard</h2>
+        </div>
+
+        <div class="card">
+            <h4>📊 Métricas en tiempo real</h4>
+            <p>
+                El dashboard llama a <code>GET /api/v1/dashboard/resumen</code> al cargar. El backend ejecuta 
+                queries de conteo (COUNT) sobre las tablas de Oracle y retorna:
+            </p>
+            <ul>
+                <li>Total de clientes, leads, oportunidades y propuestas</li>
+                <li>Valor total del pipeline de ventas (SUM de oportunidades)</li>
+                <li>Oportunidades por etapa (para el embudo de ventas)</li>
+            </ul>
+            <p style="margin-top: 8px;">
+                Adicionalmente, el frontend consulta <code>GET /api/v1/actividades</code> para mostrar las 
+                próximas actividades y la actividad reciente — <strong>todo con datos reales de Oracle, sin mocks</strong>.
+            </p>
+        </div>
+    </section>
+
+    <!-- 12. URLs -->
+    <section class="section" id="urls">
+        <div class="section-header">
+            <span class="section-num">12</span>
+            <h2 class="section-title">URLs y puertos del sistema</h2>
+        </div>
+
+        <div class="card" style="overflow-x: auto;">
+            <table class="data-table">
+                <thead><tr><th>Servicio</th><th>URL</th><th>Puerto</th><th>Descripción</th></tr></thead>
+                <tbody>
+                    <tr><td>🌐 Frontend Angular</td><td><code>http://localhost:4200</code></td><td>4200</td><td>Aplicación web del CRM</td></tr>
+                    <tr><td>☕ Backend API</td><td><code>http://localhost:8080/api/v1/</code></td><td>8080</td><td>API REST del backend</td></tr>
+                    <tr><td>📖 Swagger UI</td><td><code>http://localhost:8080/swagger-ui.html</code></td><td>8080</td><td>Documentación interactiva de la API</td></tr>
+                    <tr><td>💚 Health Check</td><td><code>http://localhost:8080/actuator/health</code></td><td>8080</td><td>Estado del backend</td></tr>
+                    <tr><td>🔐 Keycloak</td><td><code>http://localhost:8180</code></td><td>8180</td><td>Consola admin de Keycloak</td></tr>
+                    <tr><td>🗄️ Oracle 23c</td><td><code>localhost:1521/FREEPDB1</code></td><td>1521</td><td>Base de datos Oracle</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <footer>
+        <p>VIERNES CRM V1.0 • ¿Cómo Funciona el Sistema?</p>
+        <p style="margin-top: 4px; font-size: 12px; color: #475569;">
+            Lenguaje de Programación II (LP2) • BomERP – Viernes CRM V1
+        </p>
+    </footer>
+
+</div>
+
+</body>
+</html>

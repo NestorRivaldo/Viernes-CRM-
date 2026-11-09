@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estructura del Código V1 — Guía para entender y modificar Viernes CRM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#090d16; --surface:#111726; --surface2:#172033; --surface-hover:#1e2942;
+  --border:#232f48; --border-highlight:#3b82f6; --text:#f1f5f9; --text-muted:#94a3b8; --text-subtle:#64748b;
+  --accent:#3b82f6; --accent-soft:rgba(59,130,246,.12); --green:#10b981; --green-soft:rgba(16,185,129,.12);
+  --purple:#a855f7; --purple-soft:rgba(168,85,247,.12); --amber:#f59e0b; --amber-soft:rgba(245,158,11,.12);
+  --cyan:#06b6d4; --cyan-soft:rgba(6,182,212,.12); --rose:#f43f5e; --rose-soft:rgba(244,63,94,.12);
+  --radius-sm:8px; --radius-md:14px; --radius-lg:20px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background:var(--bg); color:var(--text); line-height:1.7; padding:40px 20px 80px;
+  background-image:radial-gradient(circle at 10% 10%,rgba(59,130,246,.08)0%,transparent 45%),radial-gradient(circle at 90% 90%,rgba(168,85,247,.06)0%,transparent 45%);
+  background-attachment:fixed;
+}
+.container{max-width:1200px;margin:0 auto}
+code,.mono{font-family:'JetBrains Mono','Cascadia Code',Consolas,monospace}
+.top-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;padding-bottom:20px;border-bottom:1px solid var(--border);gap:12px;flex-wrap:wrap}
+.back-link{display:inline-flex;align-items:center;gap:8px;color:#60a5fa;text-decoration:none;font-size:13.5px;font-weight:600}
+.back-link:hover{color:#93c5fd}
+.nav-tag{font-size:12.5px;color:var(--text-subtle);font-weight:600;letter-spacing:.04em}
+header{text-align:center;margin-bottom:40px}
+.brand-badge{display:inline-flex;align-items:center;gap:8px;background:var(--accent-soft);color:#60a5fa;border:1px solid rgba(59,130,246,.3);padding:6px 16px;border-radius:30px;font-size:13px;font-weight:700;margin-bottom:18px;letter-spacing:.04em}
+h1{font-size:40px;font-weight:800;letter-spacing:-.025em;background:linear-gradient(135deg,#fff 30%,#93c5fd 80%,#38bdf8 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:14px;line-height:1.2}
+.subtitle{font-size:17px;color:var(--text-muted);max-width:860px;margin:0 auto 24px}
+.status-pill-group{display:flex;justify-content:center;flex-wrap:wrap;gap:10px}
+.status-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;font-size:12.5px;font-weight:600}
+.pill-green{background:var(--green-soft);color:#34d399;border:1px solid rgba(16,185,129,.3)}
+.pill-blue{background:var(--accent-soft);color:#93c5fd;border:1px solid rgba(59,130,246,.3)}
+.pill-purple{background:var(--purple-soft);color:#c084fc;border:1px solid rgba(168,85,247,.3)}
+.pill-amber{background:var(--amber-soft);color:#fbbf24;border:1px solid rgba(245,158,11,.3)}
+.pill-cyan{background:var(--cyan-soft);color:#67e8f9;border:1px solid rgba(6,182,212,.3)}
+h2{font-size:24px;font-weight:700;color:#fff;margin:54px 0 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);padding-bottom:12px;scroll-margin-top:20px}
+h2 .num{display:flex;align-items:center;justify-content:center;min-width:38px;height:38px;border-radius:10px;background:var(--accent-soft);color:#60a5fa;font-size:16px;font-weight:800;border:1px solid rgba(59,130,246,.25)}
+h3{font-size:17px;font-weight:600;color:#e2e8f0;margin:26px 0 12px}
+h4{font-size:14.5px;font-weight:700;color:#cbd5e1;margin:18px 0 8px;text-transform:uppercase;letter-spacing:.03em}
+p{margin:10px 0;color:#cbd5e1}
+.lead{font-size:15.5px;color:var(--text-muted)}
+ul,ol{margin:10px 0 10px 22px;color:#cbd5e1}
+li{margin:6px 0}
+a{color:#60a5fa}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:22px 24px;margin:16px 0}
+.card.accent{border-left:3px solid var(--accent)}
+.grid{display:grid;gap:16px}
+.grid-2{grid-template-columns:repeat(2,1fr)}
+.grid-3{grid-template-columns:repeat(3,1fr)}
+@media(max-width:820px){.grid-2,.grid-3{grid-template-columns:1fr}}
+.mini{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 18px}
+.mini .k{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-subtle);font-weight:700;margin-bottom:6px}
+.mini .v{font-size:15px;color:#e2e8f0;font-weight:600}
+.anchor{font-family:'JetBrains Mono',Consolas,monospace;font-size:12px;background:rgba(59,130,246,.1);color:#93c5fd;border:1px solid rgba(59,130,246,.2);padding:1px 7px;border-radius:6px;white-space:nowrap;display:inline-block;margin:1px 0}
+.anchor.fe{background:rgba(168,85,247,.1);color:#c084fc;border-color:rgba(168,85,247,.2)}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13.5px;background:var(--surface);border-radius:var(--radius-sm);overflow:hidden}
+th,td{text-align:left;padding:11px 13px;border-bottom:1px solid var(--border);vertical-align:top}
+th{background:var(--surface2);color:#93c5fd;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.03em}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(30,41,66,.5)}
+td .anchor{font-size:11px}
+.badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;letter-spacing:.02em}
+.b-open{background:var(--green-soft);color:#34d399;border:1px solid rgba(16,185,129,.3)}
+.b-closed{background:var(--amber-soft);color:#fbbf24;border:1px solid rgba(245,158,11,.3)}
+.b-gap{background:var(--rose-soft);color:#fb7185;border:1px solid rgba(244,63,94,.3)}
+.b-info{background:var(--cyan-soft);color:#67e8f9;border:1px solid rgba(6,182,212,.3)}
+.note{border-radius:var(--radius-sm);padding:14px 18px;margin:14px 0;font-size:14px;border:1px solid}
+.note.warn{background:var(--amber-soft);border-color:rgba(245,158,11,.3);color:#fcd34d}
+.note.danger{background:var(--rose-soft);border-color:rgba(244,63,94,.3);color:#fda4af}
+.note.info{background:var(--cyan-soft);border-color:rgba(6,182,212,.3);color:#a5f3fc}
+.note.ok{background:var(--green-soft);border-color:rgba(16,185,129,.3);color:#6ee7b7}
+.note b{color:#fff}
+.toc{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:20px 24px;margin:24px 0}
+.toc-title{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-subtle);font-weight:700;margin-bottom:12px}
+.toc ol{list-style:none;margin:0;display:grid;grid-template-columns:repeat(2,1fr);gap:8px 24px}
+@media(max-width:820px){.toc ol{grid-template-columns:1fr}}
+.toc a{display:flex;gap:10px;align-items:baseline;text-decoration:none;color:#cbd5e1;font-size:14px;padding:4px 0}
+.toc a:hover{color:#93c5fd}
+.toc .n{font-family:'JetBrains Mono',monospace;color:var(--accent);font-weight:700;font-size:12px;min-width:22px}
+.flow{counter-reset:step;margin:18px 0}
+.flow-step{display:flex;gap:16px;padding:14px 0;border-bottom:1px dashed var(--border)}
+.flow-step:last-child{border-bottom:none}
+.flow-step .sn{counter-increment:step;flex:0 0 auto;width:34px;height:34px;border-radius:50%;background:var(--accent-soft);border:1px solid rgba(59,130,246,.3);color:#60a5fa;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px}
+.flow-step .sn::before{content:counter(step)}
+.flow-step .sb{flex:1}
+.flow-step .st{font-weight:700;color:#e2e8f0;font-size:14.5px;margin-bottom:3px}
+.flow-step .sd{font-size:13.5px;color:var(--text-muted)}
+.tree{font-family:'JetBrains Mono',Consolas,monospace;font-size:12.5px;background:#0b1120;border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px 20px;color:#94a3b8;overflow-x:auto;line-height:1.85;white-space:pre}
+.tree .dir{color:#93c5fd;font-weight:600}
+.tree .cm{color:#64748b}
+.tree .hl{color:#6ee7b7}
+.svg-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:20px;margin:18px 0;text-align:center;overflow-x:auto}
+.svg-wrap svg{max-width:100%;height:auto}
+figcaption{font-size:12.5px;color:var(--text-subtle);margin-top:10px;text-align:center}
+.copy-bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-md);padding:18px 22px;margin:20px 0}
+.btn{background:var(--accent);color:#fff;border:none;padding:10px 18px;border-radius:var(--radius-sm);font-weight:700;font-size:13.5px;cursor:pointer;font-family:inherit;transition:background .2s}
+.btn:hover{background:#2563eb}
+.btn.ok{background:var(--green)}
+.copy-hint{font-size:13px;color:var(--text-muted)}
+footer{margin-top:60px;padding-top:24px;border-top:1px solid var(--border);text-align:center;color:var(--text-subtle);font-size:12.5px}
+.kbd{font-family:'JetBrains Mono',monospace;font-size:12px;background:#0b1120;border:1px solid var(--border);border-bottom-width:2px;border-radius:5px;padding:1px 6px;color:#e2e8f0}
+.sec-intro{color:var(--text-muted);font-size:15px;margin-bottom:8px}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <nav class="top-nav">
+    <a class="back-link" href="index.html">← Portal Central de Informes</a>
+    <span class="nav-tag">V1 · ESTRUCTURA DEL CÓDIGO · 2026-11-07</span>
+  </nav>
+
+  <header>
+    <div class="brand-badge">◆ VIERNES CRM V1</div>
+    <h1>Estructura del Código V1</h1>
+    <p class="subtitle">Guía paso a paso para entender el sistema completo —módulos, arquitectura y flujo de una petición— y poder <b>modificarlo o ampliarlo</b> con seguridad. Empieza por lo primero que debes saber y avanza hasta el mapa de "dónde cambio X".</p>
+    <div class="status-pill-group">
+      <span class="status-pill pill-blue">Spring Boot 4.0.7</span>
+      <span class="status-pill pill-green">Java 21</span>
+      <span class="status-pill pill-purple">Angular 22 · Zoneless</span>
+      <span class="status-pill pill-cyan">Spring Modulith 2.0.7</span>
+      <span class="status-pill pill-amber">Hexagonal · Ports &amp; Adapters</span>
+      <span class="status-pill pill-blue">Oracle 23 · Keycloak OIDC</span>
+    </div>
+  </header>
+
+  <div class="note info">
+    <b>Cómo leer este informe.</b> Cada afirmación técnica lleva un anclaje <span class="anchor">archivo:línea</span> verificado sobre el código real. Convención de rutas: las de backend son relativas a <code>viernes-backend/src/main/java/com/viernes/</code> y las de frontend (anclajes morados) a <code>viernes-frontend/src/app/</code>. Si vas a <b>tocar código</b>, lee primero §01–§04 y luego §10 (dónde cambio X) y §11 (ruta de aprendizaje).
+  </div>
+
+  <div class="toc">
+    <div class="toc-title">Contenido — ruta guiada</div>
+    <ol>
+      <li><a href="#s01"><span class="n">01</span> Lo primero: el mapa mental</a></li>
+      <li><a href="#s02"><span class="n">02</span> Arrancar y verificar</a></li>
+      <li><a href="#s03"><span class="n">03</span> Arquitectura backend (hexagonal + Modulith)</a></li>
+      <li><a href="#s04"><span class="n">04</span> El flujo de una petición, paso a paso</a></li>
+      <li><a href="#s05"><span class="n">05</span> Inventario de módulos</a></li>
+      <li><a href="#s06"><span class="n">06</span> Anatomía de un módulo (plantilla)</a></li>
+      <li><a href="#s07"><span class="n">07</span> Frontend: cómo está armado</a></li>
+      <li><a href="#s08"><span class="n">08</span> El contrato front ↔ back</a></li>
+      <li><a href="#s09"><span class="n">09</span> Transversal: caché, errores, seguridad</a></li>
+      <li><a href="#s10"><span class="n">10</span> Dónde cambio X (mapa práctico)</a></li>
+      <li><a href="#s11"><span class="n">11</span> Ruta de aprendizaje paso a paso</a></li>
+      <li><a href="#s12"><span class="n">12</span> Huecos y advertencias</a></li>
+    </ol>
+  </div>
+
+  <!-- ============ 01 ============ -->
+  <h2 id="s01"><span class="num">01</span> Lo primero: el mapa mental</h2>
+  <p class="sec-intro">Antes de leer una sola línea de lógica, ubica <b>qué hay y dónde</b>. Viernes CRM V1 son dos proyectos que se hablan por HTTP, más dos servicios de infraestructura en Docker.</p>
+
+  <div class="grid grid-2">
+    <div class="mini"><div class="k">Backend · API REST</div><div class="v">viernes-backend/</div><p style="font-size:13px;margin:6px 0 0">Spring Boot 4.0.7 · Java 21 · paquete raíz <code>com.viernes</code> · puerto <b>8080</b>. Punto de entrada: <span class="anchor">ViernesApplication.java:6</span></p></div>
+    <div class="mini"><div class="k">Frontend · SPA</div><div class="v">viernes-frontend/</div><p style="font-size:13px;margin:6px 0 0">Angular 22 standalone · zoneless · puerto <b>4200</b>. Arranque: <span class="anchor fe">main.ts:5</span> → <span class="anchor fe">app.config.ts:13</span></p></div>
+    <div class="mini"><div class="k">Base de datos</div><div class="v">Oracle 23 (Docker)</div><p style="font-size:13px;margin:6px 0 0"><code>localhost:1521/FREEPDB1</code> · esquema/usario <b>BOM_VENTAS</b> · 21 tablas <code>CRM_*</code> · sin Flyway (<code>ddl-auto: update</code>).</p></div>
+    <div class="mini"><div class="k">Identidad · OIDC</div><div class="v">Keycloak 25 (Docker)</div><p style="font-size:13px;margin:6px 0 0"><code>localhost:8180</code> · realm <b>viernes-realm</b> · clientId <code>viernes-frontend</code> · PKCE S256. El login lo hace Keycloak, no el backend.</p></div>
+  </div>
+
+  <h3>Dónde vive el código</h3>
+  <div class="tree"><span class="dir">E:\Viernes\Viernes\</span>              <span class="cm">← árbol canónico de Viernes CRM V1</span>
+├─ <span class="dir">viernes-backend/</span>
+│  └─ src/main/java/com/viernes/
+│     ├─ <span class="dir">&lt;modulo&gt;/</span>              <span class="cm">clientes, leads, oportunidades, ... (15)</span>
+│     │  ├─ <span class="dir">adapters/</span>in/web/        <span class="cm">controllers REST</span>
+│     │  ├─ <span class="dir">adapters/</span>out/persistence/ <span class="cm">JPA: adapter + repository + entity</span>
+│     │  ├─ <span class="dir">adapters/</span>out/external/     <span class="cm">APIsPERU (solo clientes)</span>
+│     │  ├─ <span class="dir">application/</span>port/in|out/ <span class="cm">interfaces (puertos)</span>
+│     │  ├─ <span class="dir">application/</span>service/     <span class="cm">casos de uso + reglas de negocio</span>
+│     │  ├─ <span class="dir">domain/</span>                 <span class="cm">POJOs, enums, records (sin JPA)</span>
+│     │  └─ package-info.java         <span class="cm">@ApplicationModule (Modulith)</span>
+│     └─ <span class="dir">shared/</span>                 <span class="cm">cache, exception, filter, ratelimit</span>
+├─ <span class="dir">viernes-frontend/</span>
+│  └─ src/
+│     ├─ <span class="dir">app/</span>
+│     │  ├─ <span class="dir">features/&lt;modulo&gt;/</span>    <span class="cm">list / form / dialog / service / model (14)</span>
+│     │  ├─ <span class="dir">core/</span>                <span class="cm">auth/keycloak, interceptors, services, layout</span>
+│     │  ├─ <span class="dir">shared/</span>              <span class="cm">table-sort.ts, styles/ (models y components VACÍOS)</span>
+│     │  └─ app.config.ts · app.routes.ts
+│     └─ <span class="dir">environments/</span>environment.ts  <span class="cm">apiBaseUrl (fuera de app/)</span>
+├─ activar-sistema.bat              <span class="cm">lanzador (ahora carga .env.local)</span>
+└─ <span class="dir">informe/</span>                       <span class="cm">este y los demás informes</span></div>
+
+  <div class="note danger"><b>Árbol canónico — no te confundas.</b> Este informe describe <code>E:\Viernes\Viernes</code> (<code>com.viernes</code>, 21 entidades, DNI/RUC). Existe otro árbol divergente (<code>E:\LPII</code>, con Flyway y 26 entidades) que <b>no</b> es este sistema. Verifica siempre la ruta antes de editar.</div>
+  <div class="note warn"><b>README.md y CLAUDE.md de la raíz están desactualizados:</b> describen <i>BomERP / LP2</i> (<code>pe.edu.upeu.bomerp</code>, rutas <code>lp2/</code> que ni existen). Son docs heredados de otra asignatura. La sección DNI/RUC del README sí es correcta; el resto no coincide con Viernes. <span class="badge b-gap">BRECHA DOC</span></div>
+
+  <!-- ============ 02 ============ -->
+  <h2 id="s02"><span class="num">02</span> Arrancar y verificar (para experimentar)</h2>
+  <p class="sec-intro">No puedes modificar lo que no puedes correr. Este es el ciclo mínimo para levantar el sistema y comprobar que tus cambios funcionan.</p>
+
+  <div class="card accent">
+    <h4>Opción A — Lanzador automático (Windows)</h4>
+    <p>Ejecuta <span class="kbd">activar-sistema.bat</span>. Verifica Java 21 y Docker, levanta Oracle + Keycloak, arranca backend y frontend, y <b>carga <code>viernes-backend\.env.local</code></b> al entorno antes de <code>mvnw spring-boot:run</code> (arreglo reciente: <span class="anchor" style="background:rgba(16,185,129,.1);color:#6ee7b7;border-color:rgba(16,185,129,.25)">activar-sistema.bat:63</span>).</p>
+    <h4 style="margin-top:18px">Opción B — Manual, por terminal</h4>
+    <div class="tree"><span class="cm"># 1) Infra (Oracle + Keycloak)</span>
+docker compose -f viernes-backend/compose-dev.yml up -d
+docker compose -f compose-keycloak.yml up -d
+
+<span class="cm"># 2) Backend  (NO hay mvn global: usa el wrapper)</span>
+cd viernes-backend
+mvnw.cmd spring-boot:run        <span class="cm"># PowerShell / cmd</span>
+./mvnw spring-boot:run          <span class="cm"># Git Bash / macOS / Linux</span>
+
+<span class="cm"># 3) Frontend  (en PowerShell usa npm.cmd, no npm)</span>
+cd viernes-frontend
+npm.cmd install                 <span class="cm"># solo la primera vez</span>
+npm.cmd start                   <span class="cm"># ng serve → :4200</span></div>
+  </div>
+
+  <table>
+    <thead><tr><th>Qué</th><th>URL / comando</th><th>Para qué sirve</th></tr></thead>
+    <tbody>
+      <tr><td>Frontend</td><td><code>http://localhost:4200</code></td><td>La SPA. Login demo: <code>admin@viernes.com</code> / <code>Admin12345</code> (ADMIN, JEFE, VENDEDOR).</td></tr>
+      <tr><td>Swagger / OpenAPI</td><td><code>http://localhost:8080/swagger-ui.html</code></td><td>Probar endpoints a mano; botón <i>Authorize</i> para el JWT.</td></tr>
+      <tr><td>Health</td><td><code>http://localhost:8080/actuator/health</code></td><td>Confirmar que el backend y Oracle están <code>UP</code>.</td></tr>
+      <tr><td>Keycloak</td><td><code>http://localhost:8180</code></td><td>Admin del realm <code>viernes-realm</code> (usuarios/roles).</td></tr>
+      <tr><td>Tests backend</td><td><code>mvnw.cmd test</code></td><td>32 archivos de test; incluye <code>ModularityTests</code> (verifica la arquitectura).</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note info"><b>Consulta DNI/RUC:</b> necesita <code>APISPERU_TOKEN</code> en <code>viernes-backend\.env.local</code> (git-ignored). Sin token, <b>todo lo demás funciona</b>; solo el botón <i>Consultar</i> devuelve "no está configurada". Plantilla versionable: <code>.env.local.example</code>. Cada quien debe usar su propio token (cuota 1.000/mes).</div>
+
+  <!-- ============ 03 ============ -->
+  <h2 id="s03"><span class="num">03</span> Arquitectura backend: hexagonal + Spring Modulith</h2>
+  <p class="sec-intro">Dos ideas gobiernan todo el backend. Entenderlas es entender el 80% del código.</p>
+
+  <h3>Idea 1 — Hexagonal (Ports &amp; Adapters): la dependencia apunta hacia adentro</h3>
+  <div class="svg-wrap">
+    <svg viewBox="0 0 760 380" role="img" aria-label="Diagrama hexagonal: adapters fuera, application en medio, domain dentro">
+      <defs>
+        <marker id="arr" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#60a5fa"/></marker>
+      </defs>
+      <polygon points="380,30 690,105 690,275 380,350 70,275 70,105" fill="#111726" stroke="#232f48" stroke-width="2"/>
+      <polygon points="380,80 620,135 620,245 380,300 140,245 140,135" fill="#172033" stroke="#3b82f6" stroke-width="2" stroke-opacity=".5"/>
+      <polygon points="380,130 540,165 540,215 380,250 220,215 220,165" fill="rgba(16,185,129,.1)" stroke="#10b981" stroke-width="2"/>
+      <text x="380" y="185" text-anchor="middle" fill="#6ee7b7" font-size="17" font-weight="700" font-family="Inter,sans-serif">DOMAIN</text>
+      <text x="380" y="207" text-anchor="middle" fill="#94a3b8" font-size="11.5" font-family="Inter,sans-serif">Cliente · TipoDocumento · records</text>
+      <text x="380" y="207" text-anchor="middle" fill="#94a3b8" font-size="11.5" font-family="Inter,sans-serif" dy="18">sin JPA, sin Spring</text>
+      <text x="380" y="118" text-anchor="middle" fill="#93c5fd" font-size="14" font-weight="700" font-family="Inter,sans-serif">APPLICATION</text>
+      <text x="380" y="138" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="Inter,sans-serif">puertos (interfaces) + servicios / casos de uso</text>
+      <text x="380" y="285" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="Inter,sans-serif">@Transactional · reglas de negocio · DTOs</text>
+      <text x="380" y="62" text-anchor="middle" fill="#c084fc" font-size="14" font-weight="700" font-family="Inter,sans-serif">ADAPTERS</text>
+      <text x="120" y="195" text-anchor="middle" fill="#c084fc" font-size="12" font-weight="600" font-family="Inter,sans-serif">IN</text>
+      <text x="120" y="213" text-anchor="middle" fill="#94a3b8" font-size="10.5" font-family="Inter,sans-serif">web / REST</text>
+      <text x="648" y="180" text-anchor="middle" fill="#c084fc" font-size="12" font-weight="600" font-family="Inter,sans-serif">OUT</text>
+      <text x="648" y="198" text-anchor="middle" fill="#94a3b8" font-size="10.5" font-family="Inter,sans-serif">persistence</text>
+      <text x="648" y="214" text-anchor="middle" fill="#94a3b8" font-size="10.5" font-family="Inter,sans-serif">external</text>
+      <line x1="160" y1="160" x2="230" y2="170" stroke="#60a5fa" stroke-width="2" marker-end="url(#arr)"/>
+      <line x1="600" y1="170" x2="540" y2="178" stroke="#60a5fa" stroke-width="2" marker-end="url(#arr)"/>
+      <text x="380" y="368" text-anchor="middle" fill="#64748b" font-size="11.5" font-family="Inter,sans-serif">Los adapters dependen de los puertos; application depende de domain. Domain no depende de nada.</text>
+    </svg>
+    <figcaption>Hexágono de un módulo. Spring inyecta las implementaciones (adapters) en los puertos que define application.</figcaption>
+  </div>
+
+  <table>
+    <thead><tr><th>Capa / carpeta</th><th>Qué contiene</th><th>Ejemplo real (clientes)</th></tr></thead>
+    <tbody>
+      <tr><td><b>adapters/in/web</b></td><td>Controllers REST. Traducen HTTP ↔ DTOs. No tienen lógica de negocio.</td><td><span class="anchor">clientes/adapters/in/web/ClienteController.java:24</span> <code>/api/v1/clientes</code></td></tr>
+      <tr><td><b>application/port/in</b></td><td>Interfaz del caso de uso (lo que el controller invoca).</td><td><span class="anchor">clientes/application/port/in/ManageClienteUseCase.java:12</span></td></tr>
+      <tr><td><b>application/port/out</b></td><td>Interfaces que el negocio necesita (persistencia, servicios externos).</td><td><span class="anchor">clientes/application/port/out/ClientePersistencePort.java:8</span> · <span class="anchor">DocumentoLookupPort.java:10</span></td></tr>
+      <tr><td><b>application/service</b></td><td>Implementa el caso de uso. Reglas, validaciones, <code>@Transactional</code>, mapeo a DTO.</td><td><span class="anchor">clientes/application/service/ClienteService.java:23</span></td></tr>
+      <tr><td><b>adapters/out/persistence</b></td><td>Implementa el puerto out con JPA: adapter + repository + entity.</td><td><span class="anchor">ClientePersistenceAdapter.java:19</span> · <span class="anchor">entity/ClienteEntity.java:11</span> (<code>CRM_CLIENTES</code>)</td></tr>
+      <tr><td><b>adapters/out/external</b></td><td>Implementa un puerto out contra un sistema externo.</td><td><span class="anchor">ApisPeruDocumentoAdapter.java:28</span> (APIsPERU)</td></tr>
+      <tr><td><b>domain</b></td><td>Modelo puro: POJOs Lombok, enums, records. Sin anotaciones JPA ni Spring.</td><td><span class="anchor">clientes/domain/Cliente.java:8</span> · <span class="anchor">TipoDocumento.java:3</span> · <span class="anchor">DocumentoConsultado.java:9</span></td></tr>
+      <tr><td><b>mapper/</b></td><td><span class="badge b-gap">VACÍO</span> MapStruct está declarado en el pom pero <b>no se usa</b>; el mapeo es manual en services/adapters.</td><td><span class="anchor">clientes/mapper/</span> (0 archivos)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Idea 2 — Spring Modulith: módulos con fronteras verificadas</h3>
+  <p>Cada módulo es un <b>subpaquete directo</b> de <code>com.viernes</code> con un <code>package-info.java</code> que lo declara. Hay <b>16</b> package-info. El tipo controla cuánto puede ver el resto del sistema:</p>
+  <ul>
+    <li><span class="badge b-open">OPEN</span> internals accesibles desde otros módulos. Ej.: <span class="anchor">clientes/package-info.java:1</span> → <code>@ApplicationModule(type = Type.OPEN)</code>. También oportunidades, actividades, propuestas, relationshipmap.</li>
+    <li><span class="badge b-closed">CLOSED</span> (por defecto) solo expone su API pública raíz; declara <code>allowedDependencies</code>. Ej.: <span class="anchor">auth/package-info.java:1</span> → <code>allowedDependencies = {"usuarios"}</code>. También usuarios, equipos, mensajeria. <code>usuarios</code> solo expone <span class="anchor">usuarios/UsuariosApi.java:10</span> + <code>UsuarioResumen</code>.</li>
+  </ul>
+  <p>La regla "un módulo solo llama al <i>Service</i> público de otro, nunca a su Repository/Entity" se verifica sola con <span class="anchor">src/test/java/com/viernes/ModularityTests.java:12</span> (<code>ApplicationModules.of(ViernesApplication.class).verify()</code>). Si la violas en un módulo CLOSED, el test falla. <code>shared</code> no tiene package-info propio (raíz abierta); <code>shared/exception</code> y <code>shared/ratelimit</code> son submódulos OPEN.</p>
+  <div class="note ok"><b>Regla de oro para modificar:</b> la dependencia siempre apunta hacia adentro (adapters → application → domain). Si necesitas una capacidad nueva, define primero el <b>puerto</b> en application y luego el <b>adapter</b> que lo implementa. Nunca importes un adapter desde application.</div>
+
+  <!-- ============ 04 ============ -->
+  <h2 id="s04"><span class="num">04</span> El flujo de una petición, paso a paso</h2>
+  <p class="sec-intro">Este es el corazón de "cómo funciona". Seguimos una petición real ya probada: <code>GET /api/v1/clientes/documento/DNI/75876353</code> (el botón <i>Consultar</i>). Cada paso cita el archivo exacto.</p>
+
+  <div class="flow">
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">UI — el usuario pulsa Consultar</div><div class="sd">El diálogo valida DNI=8 / RUC=11 dígitos antes de llamar. <span class="anchor fe">features/clientes/cliente-dialog/cliente-dialog.ts:403</span> (validator) y <span class="anchor fe">:235</span> (handler <code>consultarDocumento()</code>).</div></div></div>
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">Service Angular — construye la URL</div><div class="sd"><span class="anchor fe">features/clientes/clientes.service.ts:28</span> → <code>GET {apiBaseUrl}/clientes/documento/{tipo}/{numero}</code>. La base sale de <span class="anchor fe">core/services/api-service.ts:5</span> + <span class="anchor fe">../environments/environment.ts:1</span> (<code>http://localhost:8080/api/v1</code>).</div></div></div>
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">Interceptores — token + traza</div><div class="sd"><span class="anchor fe">core/interceptors/jwt.interceptor.ts:31</span> añade <code>Authorization: Bearer</code>; <span class="anchor fe">trace-id-interceptor.ts:3</span> añade <code>X-Trace-ID</code>. Timeout de 15 s.</div></div></div>
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">Backend — filtro de correlación</div><div class="sd"><span class="anchor">shared/filter/CorrelationIdFilter.java:15</span> toma/genera el <code>X-Trace-ID</code> y lo pone en MDC (<code>traceId</code>) para que cada log lleve <code>[traceId]</code>.</div></div></div>
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">Seguridad — valida el JWT</div><div class="sd"><span class="anchor">auth/keycloak/KeycloakSecurityConfig.java:144</span> resource server JWT; <span class="anchor">KeycloakJwtAuthenticationConverter.java:37</span> extrae <code>preferred_username</code> y roles de <code>realm_access.roles</code> → <code>ROLE_ADMIN/JEFE/VENDEDOR</code>.</div></div></div>
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">Controller — rate-limit + delega</div><div class="sd"><span class="anchor">clientes/adapters/in/web/ClienteController.java:44</span> recibe la petición; <span class="anchor">:49</span> <code>rateLimiter.verificar(authentication.getName())</code> (20 consultas/60 s por usuario); luego llama al caso de uso.</div></div></div>
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">Caso de uso — reglas de negocio</div><div class="sd">Puerto in <span class="anchor">ManageClienteUseCase</span> → <span class="anchor">clientes/application/service/ClienteService.java:67</span> <code>consultarDocumento</code> (<code>@Transactional(readOnly=true)</code> :66). Valida formato DNI/RUC en <span class="anchor">:216</span>.</div></div></div>
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">Puerto out → Adapter externo</div><div class="sd"><span class="anchor">DocumentoLookupPort.java:10</span> → <span class="anchor">ApisPeruDocumentoAdapter.java:55</span>. Revisa caché positiva (<code>@Cacheable</code> documentos, 24 h :51) y negativa (:59); si no está, llama a APIsPERU con <code>RestClient</code> (:85), token como query param.</div></div></div>
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">Respuesta — domain → DTO → JSON</div><div class="sd">APIsPERU responde → <code>DocumentoConsultado</code> (record de domain) → <code>DocumentoConsultaResponse</code> (DTO) → <b>HTTP 200 JSON</b>. Si algo falla, <span class="anchor">shared/exception/GlobalExceptionHandler.java:24</span> mapea la excepción al status correcto.</div></div></div>
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">UI — autocompleta</div><div class="sd">De vuelta, <span class="anchor fe">cliente-dialog.ts:262</span> hace <code>patchValue({nombre})</code> para DNI (o empresa/teléfono para RUC :265). Si hubo error, <span class="anchor fe">jwt.interceptor.ts:110</span> <code>buildFriendlyMessage</code> muestra el <code>body.message</code> del backend.</div></div></div>
+  </div>
+
+  <div class="card">
+    <h4>El otro flujo clásico: crear un cliente (POST)</h4>
+    <p style="font-size:14px"><span class="anchor fe">cliente-dialog.ts:188</span> <code>guardar()</code> → <span class="anchor fe">clientes.service.ts:38</span> <code>POST /clientes</code> → <span class="anchor">ClienteController.java:60</span> (<code>@Valid</code>, 201) → <span class="anchor">ClienteService.java:78</span> (<code>@Transactional</code>, valida documento único :225) → puerto out <code>ClientePersistencePort.save</code> → <span class="anchor">ClientePersistenceAdapter.java:68</span> → repository JPA → Oracle <code>CRM_CLIENTES</code>. La entidad se mapea a mano a domain y de vuelta a DTO.</p>
+  </div>
+
+  <!-- ============ 05 ============ -->
+  <h2 id="s05"><span class="num">05</span> Inventario de módulos</h2>
+  <p class="sec-intro">15 paquetes de backend y 14 features de frontend. Casi todos espejo 1:1. Las excepciones están marcadas.</p>
+  <table>
+    <thead><tr><th>Módulo</th><th>Archivos</th><th>Propósito</th><th>REST base</th><th>Frontend</th></tr></thead>
+    <tbody>
+      <tr><td><b>clientes</b></td><td>24</td><td>Clientes + contactos + consulta DNI/RUC</td><td><code>/api/v1/clientes</code></td><td>clientes ✓</td></tr>
+      <tr><td><b>leads</b></td><td>22</td><td>Prospectos + fuentes</td><td><code>/api/v1/leads</code> · <code>/fuentes</code></td><td>leads ✓</td></tr>
+      <tr><td><b>oportunidades</b></td><td><b>40</b></td><td>Deals/pipeline: etapas, contactos, productos, colaboradores, valor ponderado</td><td><code>/api/v1/oportunidades</code></td><td>oportunidades ✓</td></tr>
+      <tr><td><b>actividades</b></td><td>29</td><td>Tareas con participantes, etiquetas y relación a cliente/lead/oportunidad</td><td><code>/api/v1/actividades</code></td><td>actividades ✓</td></tr>
+      <tr><td><b>propuestas</b></td><td>18</td><td>Cotizaciones con detalles; máquina de estados (enviar/aprobar/rechazar/cancelar)</td><td><code>/api/v1/propuestas</code></td><td>propuestas ✓</td></tr>
+      <tr><td><b>equipos</b></td><td>21</td><td>Equipos de venta + miembros</td><td><code>/api/v1/equipos</code></td><td>equipos ✓</td></tr>
+      <tr><td><b>usuarios</b></td><td>16</td><td>Usuarios CRM (ADMIN/JEFE/VENDEDOR); API pública <code>UsuariosApi</code></td><td><code>/api/v1/usuarios</code></td><td>usuarios ✓</td></tr>
+      <tr><td><b>marketing</b></td><td>19</td><td>Campañas + asociación campaña-leads</td><td><code>/api/v1/campanias</code></td><td><span class="badge b-gap">sin feature</span> (campanas→dashboard)</td></tr>
+      <tr><td><b>productos</b></td><td>12</td><td>Catálogo de productos (cacheado)</td><td><code>/api/v1/productos</code></td><td>productos ✓</td></tr>
+      <tr><td><b>etiquetas</b></td><td>11</td><td>Catálogo de etiquetas (cacheado)</td><td><code>/api/v1/etiquetas</code></td><td><span class="badge b-info">sin ruta</span> (selector embebido)</td></tr>
+      <tr><td><b>mensajeria</b></td><td>12</td><td>Chat interno "sala general" (polling 5 s)</td><td><code>/api/v1/mensajeria</code></td><td>mensajeria ✓</td></tr>
+      <tr><td><b>dashboard</b></td><td>11</td><td>KPIs agregados (JPQL en <code>DashboardQueryRepository</code>)</td><td><code>/api/v1/dashboard</code></td><td>dashboard ✓</td></tr>
+      <tr><td><b>relationshipmap</b></td><td>9</td><td>Grafo de relaciones (nodos/aristas); servicio de 741 líneas</td><td><code>/api/v1/relationship-map</code></td><td>relationship-map ✓ (cytoscape)</td></tr>
+      <tr><td><b>auth</b></td><td>4</td><td>Seguridad Keycloak (config + converter + BCrypt)</td><td><span class="badge b-info">sin REST</span></td><td>auth (solo login)</td></tr>
+      <tr><td><b>shared</b></td><td>10</td><td>Transversal: cache, exception, filter, ratelimit, OpenAPI</td><td><span class="badge b-info">sin REST</span></td><td>core/ + shared/</td></tr>
+      <tr><td colspan="5" style="background:var(--surface2)"><b>configuracion</b> (solo frontend): placeholder vacío, sin módulo backend. <span class="anchor fe">features/configuracion/configuracion.ts:11</span></td></tr>
+    </tbody>
+  </table>
+  <p class="lead">Tamaño ≠ importancia: <b>oportunidades</b> (40) es el más grande por sus sub-recursos; <b>relationshipmap</b> tiene el servicio más largo. Para aprender, empieza por uno pequeño (productos/etiquetas), no por estos.</p>
+
+  <!-- ============ 06 ============ -->
+  <h2 id="s06"><span class="num">06</span> Anatomía de un módulo (plantilla para agregar)</h2>
+  <p class="sec-intro">Si quieres <b>crear un módulo nuevo</b> o entender uno existente, todos siguen el mismo esqueleto. Replica esta estructura y respeta la dirección de dependencia.</p>
+  <div class="tree"><span class="dir">com/viernes/&lt;modulo&gt;/</span>
+├─ package-info.java                <span class="hl">@ApplicationModule(type=OPEN)</span> <span class="cm">o allowedDependencies={...}</span>
+├─ <span class="dir">domain/</span>
+│  ├─ &lt;Entidad&gt;.java                 <span class="cm">POJO Lombok, sin JPA</span>
+│  └─ &lt;Enum / ValueObject&gt;.java
+├─ <span class="dir">application/</span>
+│  ├─ <span class="dir">port/in/</span>Manage&lt;Modulo&gt;UseCase.java   <span class="cm">interfaz: lo que entra</span>
+│  ├─ <span class="dir">port/out/</span>&lt;Modulo&gt;PersistencePort.java <span class="cm">interfaz: lo que sale</span>
+│  ├─ <span class="dir">dto/</span>&lt;Modulo&gt;Request/Response.java     <span class="cm">records o clases Lombok</span>
+│  └─ <span class="dir">service/</span>&lt;Modulo&gt;Service.java          <span class="hl">implements UseCase, @Transactional</span>
+└─ <span class="dir">adapters/</span>
+   ├─ <span class="dir">in/web/</span>&lt;Modulo&gt;Controller.java         <span class="cm">@RequestMapping /api/v1/&lt;modulo&gt;</span>
+   └─ <span class="dir">out/persistence/</span>
+      ├─ &lt;Modulo&gt;PersistenceAdapter.java     <span class="hl">implements PersistencePort</span>
+      ├─ <span class="dir">repository/</span>&lt;Modulo&gt;SpringDataRepository.java  <span class="cm">extends JpaRepository</span>
+      └─ <span class="dir">entity/</span>&lt;Modulo&gt;Entity.java              <span class="cm">@Table CRM_&lt;MODULO&gt;</span></div>
+  <div class="card accent">
+    <h4>Pasos para agregar un módulo (checklist)</h4>
+    <ol style="font-size:14px">
+      <li>Crea el paquete <code>com.viernes.&lt;modulo&gt;</code> + <code>package-info.java</code> con <code>@ApplicationModule</code> (OPEN si otros lo usarán libre; CLOSED con <code>allowedDependencies</code> si quieres frontera estricta).</li>
+      <li>Define <b>domain</b> puro, luego los <b>puertos</b> (in/out) en application, luego el <b>service</b> que implementa el caso de uso.</li>
+      <li>Implementa los <b>adapters</b>: controller (in/web) y persistencia JPA (out). El mapeo entity↔domain↔DTO es <b>manual</b> (no hay MapStruct activo).</li>
+      <li>Expón el REST bajo <code>/api/v1/&lt;modulo&gt;</code>; ajusta roles en <span class="anchor">auth/keycloak/KeycloakSecurityConfig.java</span> si requiere permisos especiales.</li>
+      <li>En frontend: crea <code>features/&lt;modulo&gt;/</code> (model, service, list, dialog/form) y registra la ruta lazy en <span class="anchor fe">app.routes.ts</span>.</li>
+      <li>Corre <code>mvnw.cmd test</code>: <b>ModularityTests</b> debe seguir en verde (verifica que no rompiste fronteras).</li>
+    </ol>
+  </div>
+
+  <!-- ============ 07 ============ -->
+  <h2 id="s07"><span class="num">07</span> Frontend: cómo está armado</h2>
+  <p class="sec-intro">Angular 22 standalone, <b>zoneless</b> (signals, sin Zone.js), Material 3, keycloak-js. Todo se carga perezosamente por ruta.</p>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h4>Bootstrap</h4>
+      <p style="font-size:13.5px"><span class="anchor fe">main.ts:5</span> → <span class="anchor fe">app.config.ts:13</span>. Providers: <code>provideZonelessChangeDetection()</code> (:16), <code>provideKeycloak()</code> (:17, app initializer), <code>provideRouter(routes)</code> (:18), <code>provideHttpClient(withInterceptors([traceId, jwt]))</code> (:19). <b>No</b> hay provider de animaciones.</p>
+    </div>
+    <div class="card">
+      <h4>Rutas</h4>
+      <p style="font-size:13.5px"><span class="anchor fe">app.routes.ts</span>: lazy con <code>loadComponent</code> (no <code>loadChildren</code>). <code>''</code> → <code>Layout</code> con <code>canActivate:[authGuard]</code> (:10); hijo por defecto → <code>dashboard</code> (:15). Rutas admin con <code>roleGuard</code> + <code>data.roles</code> (usuarios <code>['ADMIN']</code> :118, productos/equipos <code>['ADMIN','JEFE']</code>).</p>
+    </div>
+    <div class="card">
+      <h4>Sesión (Keycloak)</h4>
+      <p style="font-size:13.5px"><span class="anchor fe">core/auth/keycloak/keycloak.config.ts:8</span>: url :8180, realm <code>viernes-realm</code>, clientId <code>viernes-frontend</code>, <code>onLoad:'check-sso'</code>, <code>pkceMethod:'S256'</code>. <span class="anchor fe">keycloak-auth.service.ts</span>: tokens <b>solo en memoria</b> (nunca localStorage), refresh cada 20 s / <code>updateToken(30)</code>, rol primario ADMIN&gt;JEFE&gt;VENDEDOR.</p>
+    </div>
+    <div class="card">
+      <h4>HTTP e interceptores</h4>
+      <p style="font-size:13.5px"><span class="anchor fe">core/interceptors/jwt.interceptor.ts</span>: Bearer, timeout 15 s, 401→refresh+retry, 403→alert, y <code>buildFriendlyMessage</code> (:110) que surfacea <code>body.message</code> y <code>fieldErrors</code>. <span class="anchor fe">trace-id-interceptor.ts:3</span>: <code>X-Trace-ID</code>. URLs vía <span class="anchor fe">core/services/api-service.ts:5</span>.</p>
+    </div>
+  </div>
+
+  <h3>Anatomía de una feature — ejemplo clientes</h3>
+  <table>
+    <thead><tr><th>Pieza</th><th>Rol</th><th>Anclaje</th></tr></thead>
+    <tbody>
+      <tr><td><code>clientes.model.ts</code></td><td>Interfaces/DTOs espejo del backend (ClienteResponse/Request, DocumentoConsultaResponse, enums).</td><td><span class="anchor fe">features/clientes/clientes.model.ts:11</span></td></tr>
+      <tr><td><code>clientes.service.ts</code></td><td>HttpClient + ApiService. listar/crear/actualizar/eliminar/desactivar/consultarDocumento/contactos.</td><td><span class="anchor fe">features/clientes/clientes.service.ts:11</span></td></tr>
+      <tr><td><code>cliente-list/</code></td><td>Tabla (MatTable+MatSort), signals, filtro client-side, abre el diálogo con MatDialog.</td><td><span class="anchor fe">cliente-list.ts:37</span> · <span class="anchor fe">:124</span></td></tr>
+      <tr><td><code>cliente-dialog/</code></td><td>Form reactivo, validator DNI/RUC, autosave de borrador (DraftService), botón Consultar, pestaña contactos.</td><td><span class="anchor fe">cliente-dialog.ts:71</span> · <span class="anchor fe">:235</span></td></tr>
+      <tr><td><code>cliente-form/</code></td><td>Alternativa de página completa (rutas <code>clientes/nuevo</code>, <code>/:id/editar</code>). <span class="badge b-gap">duplica</span> la lógica DNI/RUC del dialog.</td><td><span class="anchor fe">cliente-form.ts:119</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="note warn"><b>Lo "shared" está casi vacío:</b> <code>shared/models/</code> y <code>shared/components/</code> existen pero <b>no tienen archivos</b>. Los modelos son por-feature (<code>*.model.ts</code>). Lo único compartido real es <span class="anchor fe">shared/table-sort.ts:10</span> (orden genérico) y <span class="anchor fe">shared/styles/entity-dialog.css</span>. <span class="badge b-gap">BRECHA</span></div>
+  <p class="lead"><b>Stack frontend:</b> Angular ^22.1, Material/CDK ^22.2, keycloak-js ^26.2, cytoscape ^3.34 (mapa de relaciones), rxjs ~7.8, vitest (tests). Builder esbuild/Vite (<code>@angular/build:application</code>). Dev server :4200. <span class="anchor fe">package.json:4</span></p>
+
+  <!-- ============ 08 ============ -->
+  <h2 id="s08"><span class="num">08</span> El contrato front ↔ back</h2>
+  <p class="sec-intro">Para modificar sin romper, entiende el "acuerdo" entre ambos lados. Si cambias un DTO en el backend, su espejo en el frontend debe cambiar también.</p>
+  <div class="grid grid-2">
+    <div class="mini"><div class="k">Transporte</div><div class="v">REST /api/v1/* + JSON</div><p style="font-size:13px;margin:6px 0 0">Frontend resuelve la base con <code>ApiService.buildUrl</code> + <code>environment.apiBaseUrl</code>. No hay proxy dev; el CORS lo resuelve el backend (<span class="anchor">KeycloakSecurityConfig.java:71</span>, orígenes :4200/:8080).</p></div>
+    <div class="mini"><div class="k">Auth</div><div class="v">Bearer JWT (Keycloak)</div><p style="font-size:13px;margin:6px 0 0">El interceptor adjunta el token; el backend lo valida como resource server. Roles <code>ROLE_ADMIN/JEFE/VENDEDOR</code> desde <code>realm_access.roles</code>.</p></div>
+    <div class="mini"><div class="k">DTOs espejo</div><div class="v">*.model.ts ↔ Request/Response</div><p style="font-size:13px;margin:6px 0 0">Ej.: <span class="anchor fe">clientes.model.ts:57</span> <code>DocumentoConsultaResponse</code> ↔ record DTO del backend. Campos: nombreCompleto, razonSocial, nombreComercial, estado, condicion, direccion, telefonos.</p></div>
+    <div class="mini"><div class="k">Errores</div><div class="v">body.message → friendlyMessage</div><p style="font-size:13px;margin:6px 0 0">El backend devuelve <code>{timestamp,status,error,message,fieldErrors}</code> (<span class="anchor">GlobalExceptionHandler.java:112</span>); el frontend lo muestra tal cual (<span class="anchor fe">jwt.interceptor.ts:119</span>). Por eso un 429/404 se ve inline sin tocar el frontend.</p></div>
+  </div>
+  <div class="note ok"><b>Traza de extremo a extremo:</b> el <code>X-Trace-ID</code> que genera el frontend viaja al backend y aparece en cada log (<code>[traceId]</code>, <span class="anchor">src/main/resources/logback-spring.xml:6</span>). Sirve para correlacionar un clic con sus logs y queries.</div>
+
+  <!-- ============ 09 ============ -->
+  <h2 id="s09"><span class="num">09</span> Transversal: caché, errores y seguridad</h2>
+  <p class="sec-intro">El paquete <code>shared</code> y <code>auth</code> aplican a todos los módulos. Son los "gotchas" que debes conocer antes de modificar.</p>
+
+  <h3>Caché (Caffeine) — <span class="anchor">shared/cache/CacheConfig.java:25</span></h3>
+  <table>
+    <thead><tr><th>Cache</th><th>Máx.</th><th>TTL</th><th>Uso</th></tr></thead>
+    <tbody>
+      <tr><td><code>productos</code> · <code>etiquetas</code> · <code>fuentes</code></td><td>1.000</td><td>5 min</td><td>Catálogos de lectura frecuente (:38). Un job los invalida cada 10 min (:<code>CacheRefreshJob</code>).</td></tr>
+      <tr><td><code>dashboard</code></td><td>20</td><td>30 s</td><td>KPIs volátiles (:44).</td></tr>
+      <tr><td><code>documentos</code></td><td>5.000</td><td>24 h</td><td>Consultas DNI/RUC exitosas (:52). Ahorra cuota APIsPERU.</td></tr>
+      <tr><td><code>documentos-negativos</code></td><td>5.000</td><td>10 min</td><td>Resultados "no encontrado" (:62). <code>@Cacheable</code> no cachea excepciones → caché manual.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Mapa de excepciones → HTTP — <span class="anchor">shared/exception/GlobalExceptionHandler.java:24</span></h3>
+  <table>
+    <thead><tr><th>Excepción</th><th>HTTP</th><th>Cuándo</th></tr></thead>
+    <tbody>
+      <tr><td><code>ResourceNotFoundException</code></td><td><b>404</b></td><td>Recurso inexistente (:27).</td></tr>
+      <tr><td><code>MethodArgumentNotValid</code> / <code>IllegalArgumentException</code> / <code>TypeMismatch</code></td><td><b>400</b></td><td>Validación de entrada; 400 incluye <code>fieldErrors</code> (:32–58).</td></tr>
+      <tr><td><code>IllegalStateException</code> / <code>DataIntegrityViolation</code></td><td><b>409</b></td><td>Conflicto de estado / integridad (:60, :65). <span class="badge b-gap">OJO</span> el "token no configurado" y errores de APIsPERU caen aquí → 409.</td></tr>
+      <tr><td><code>BadCredentials</code></td><td><b>401</b></td><td>No autenticado (:71).</td></tr>
+      <tr><td><code>Disabled</code> / <code>AccessDenied</code></td><td><b>403</b></td><td>Sin permiso (:76).</td></tr>
+      <tr><td><code>RateLimitExceededException</code></td><td><b>429</b></td><td>Límite por usuario; añade <code>Retry-After</code> (:86).</td></tr>
+      <tr><td><code>Exception</code> (genérica)</td><td><b>500</b></td><td>Error no controlado (:103).</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Seguridad / RBAC — <span class="anchor">auth/keycloak/KeycloakSecurityConfig.java:84</span></h3>
+  <table>
+    <thead><tr><th>Regla</th><th>Quién</th></tr></thead>
+    <tbody>
+      <tr><td>Swagger, <code>/actuator/**</code>, estáticos, <code>/</code></td><td>Público (:117)</td></tr>
+      <tr><td>Usuarios: POST/PUT/PATCH/DELETE</td><td>ADMIN (:122)</td></tr>
+      <tr><td>Propuestas: aprobar/rechazar/cancelar</td><td>ADMIN | JEFE (:128)</td></tr>
+      <tr><td>DELETE de clientes/leads/oportunidades/propuestas/actividades</td><td>ADMIN (:133)</td></tr>
+      <tr><td>Escrituras en productos/campanias/fuentes/equipos/etiquetas</td><td>ADMIN | JEFE (:136)</td></tr>
+      <tr><td>Todo lo demás</td><td>Cualquier autenticado (:142)</td></tr>
+    </tbody>
+  </table>
+  <p class="lead"><b>Rate-limit DNI/RUC:</b> <span class="anchor">shared/ratelimit/ConsultaDocumentoRateLimiter.java:27</span> — contadores Caffeine por usuario, 20 consultas / 60 s (configurable en <span class="anchor">src/main/resources/application.yml:13</span>). Protege la cuota del plan externo.</p>
+
+  <!-- ============ 10 ============ -->
+  <h2 id="s10"><span class="num">10</span> Dónde cambio X (mapa práctico)</h2>
+  <p class="sec-intro">Tu objetivo es poder modificar. Esta tabla te dice exactamente qué archivos tocar para cada tipo de cambio. Backend relativo a <code>com/viernes/</code>; frontend (morado) a <code>src/app/</code>.</p>
+  <table>
+    <thead><tr><th>Quiero…</th><th>Toca estos archivos (en orden)</th></tr></thead>
+    <tbody>
+      <tr><td><b>Agregar un campo a Cliente</b></td><td><span class="anchor">clientes/domain/Cliente.java</span> → <span class="anchor">clientes/adapters/out/persistence/entity/ClienteEntity.java</span> → DTOs Request/Response → mapeo manual en <span class="anchor">ClienteService.java</span> y <span class="anchor">ClientePersistenceAdapter.java</span> → <span class="anchor fe">features/clientes/clientes.model.ts</span> → <span class="anchor fe">cliente-dialog.ts</span>/<span class="anchor fe">cliente-form.ts</span>. <code>ddl-auto:update</code> añade la columna al arrancar.</td></tr>
+      <tr><td><b>Cambiar una regla de negocio</b></td><td><span class="anchor">&lt;modulo&gt;/application/service/&lt;Modulo&gt;Service.java</span> (ahí viven validaciones y <code>@Transactional</code>). Ej. dígitos DNI/RUC: <span class="anchor">ClienteService.java:216</span>.</td></tr>
+      <tr><td><b>Agregar un endpoint</b></td><td><span class="anchor">&lt;modulo&gt;/adapters/in/web/&lt;Modulo&gt;Controller.java</span> + método en el puerto in <span class="anchor">Manage&lt;Modulo&gt;UseCase.java</span> + implementación en el service.</td></tr>
+      <tr><td><b>Crear un módulo nuevo</b></td><td>Replica la plantilla de §06 + <code>package-info.java</code> + ruta/feature en frontend + corre <code>ModularityTests</code>.</td></tr>
+      <tr><td><b>Cambiar roles / permisos</b></td><td>Backend: <span class="anchor">auth/keycloak/KeycloakSecurityConfig.java:122</span>. Frontend: <span class="anchor fe">core/auth/role.guard.ts</span> + <code>data.roles</code> en <span class="anchor fe">app.routes.ts</span>. Los roles reales se gestionan en Keycloak.</td></tr>
+      <tr><td><b>Integrar otra API externa</b></td><td>Define un puerto out en <span class="anchor">&lt;modulo&gt;/application/port/out/</span> + impl en <span class="anchor">&lt;modulo&gt;/adapters/out/external/</span> + properties. Patrón a copiar: <span class="anchor">ApisPeruDocumentoAdapter.java</span>.</td></tr>
+      <tr><td><b>Cambiar caché / TTL</b></td><td><span class="anchor">shared/cache/CacheConfig.java:34</span> (nombres, máximo, TTL). Job de refresco: <span class="anchor">shared/cache/CacheRefreshJob.java</span>.</td></tr>
+      <tr><td><b>Cambiar el mapeo de errores</b></td><td><span class="anchor">shared/exception/GlobalExceptionHandler.java</span> (status por excepción). Cuerpo uniforme en :112.</td></tr>
+      <tr><td><b>Cambiar la URL del backend</b></td><td><span class="anchor fe">../environments/environment.ts:1</span> (<code>apiBaseUrl</code>). No hay proxy; recuerda el CORS en <span class="anchor">KeycloakSecurityConfig.java:71</span>.</td></tr>
+      <tr><td><b>Agregar una pantalla / ruta</b></td><td><span class="anchor fe">app.routes.ts</span> (lazy <code>loadComponent</code>) + componente en <span class="anchor fe">features/&lt;modulo&gt;/</span> + entrada en el sidebar <span class="anchor fe">core/layout/layout.html</span>.</td></tr>
+      <tr><td><b>Agregar validación de formulario</b></td><td>Frontend: validators reactivos (ej. <span class="anchor fe">cliente-dialog.ts:403</span>). Backend: <code>@Valid</code> en el DTO + regla en el service. Ambos lados, para seguridad.</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ============ 11 ============ -->
+  <h2 id="s11"><span class="num">11</span> Ruta de aprendizaje paso a paso</h2>
+  <p class="sec-intro">El orden en que conviene leer el código para construir el modelo mental sin abrumarte. De lo simple a lo complejo.</p>
+  <div class="flow">
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">Entrada y configuración</div><div class="sd"><span class="anchor">ViernesApplication.java:6</span> + <span class="anchor">src/main/resources/application.yml</span> (perfiles dev,keycloak) + <code>application-dev.yml</code> (Oracle, ddl-auto) + <code>application-keycloak.yml</code>. <i>Por qué: saber qué arranca y con qué config.</i></div></div></div>
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">Un módulo pequeño, completo</div><div class="sd"><b>productos</b> o <b>etiquetas</b>: recorre domain → port/in → port/out → service → adapter persistence → controller. <i>Por qué: ves el esqueleto hexagonal sin sub-recursos que distraigan.</i></div></div></div>
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">El flujo de clientes (ya probado)</div><div class="sd"><span class="anchor">ClienteController.java</span> → <span class="anchor">ClienteService.java</span> → puertos → <span class="anchor">ClientePersistenceAdapter.java</span> y <span class="anchor">ApisPeruDocumentoAdapter.java</span>. <i>Por qué: integrar persistencia + servicio externo + caché + rate-limit en un solo ejemplo.</i></div></div></div>
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">Transversal de backend</div><div class="sd"><span class="anchor">shared/exception/GlobalExceptionHandler.java</span> + <span class="anchor">auth/keycloak/KeycloakSecurityConfig.java</span> + <span class="anchor">shared/cache/CacheConfig.java</span>. <i>Por qué: errores, seguridad y caché aplican a todo lo que modifiques.</i></div></div></div>
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">Bootstrap y rutas del frontend</div><div class="sd"><span class="anchor fe">app.config.ts:13</span> + <span class="anchor fe">app.routes.ts</span>. <i>Por qué: cómo se monta la SPA, lazy loading y guards.</i></div></div></div>
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">Sesión y HTTP del frontend</div><div class="sd"><span class="anchor fe">core/auth/keycloak/</span> + <span class="anchor fe">core/interceptors/jwt.interceptor.ts</span> + <span class="anchor fe">core/services/api-service.ts</span>. <i>Por qué: cómo viaja el token y cómo se llaman los endpoints.</i></div></div></div>
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">Una feature completa</div><div class="sd"><span class="anchor fe">features/clientes/</span> (model, service, list, dialog). <i>Por qué: el patrón que replicarás al agregar features.</i></div></div></div>
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">Los módulos complejos</div><div class="sd"><b>oportunidades</b> (40 archivos: etapas, valor ponderado, sub-recursos) y <b>relationshipmap</b> (grafo + cytoscape). <i>Por qué: ya con la base, entiendes la lógica rica.</i></div></div></div>
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">Cómo se prueba</div><div class="sd"><span class="anchor">src/test/java/com/viernes/ModularityTests.java</span> + <code>ClienteControllerTest</code> (MockMvc) + <code>ClienteServiceTest</code> (Mockito) + <code>ApisPeruDocumentoAdapterTest</code> (HttpServer stub). <i>Por qué: para que tus cambios no rompan nada.</i></div></div></div>
+  </div>
+
+  <!-- ============ 12 ============ -->
+  <h2 id="s12"><span class="num">12</span> Huecos y advertencias (brechas honestas)</h2>
+  <p class="sec-intro">Cosas que no son "errores" pero que debes saber antes de modificar, para no llevarte sorpresas. Todas verificadas en el código.</p>
+  <div class="grid grid-2">
+    <div class="note warn"><span class="badge b-gap">MAPEO</span> <b>MapStruct declarado pero sin uso.</b> El pom lo incluye y hay carpetas <code>mapper/</code>, pero están vacías (0 usos de <code>@Mapper</code>). Todo el mapeo entity↔domain↔DTO es <b>manual</b>. Si agregas campos, actualiza los mapeos a mano.</div>
+    <div class="note warn"><span class="badge b-gap">BD</span> <b><code>ddl-auto: update</code>, sin Flyway/Liquibase.</b> Hibernate altera el esquema dev al arrancar (p.ej. añadió columnas DNI/RUC a <code>CRM_CLIENTES</code>). En una BD compartida, ten cuidado: los cambios de entidad se aplican solos.</div>
+    <div class="note warn"><span class="badge b-gap">DOC</span> <b>README/CLAUDE raíz = BomERP/LP2.</b> Describen otro proyecto (<code>pe.edu.upeu.bomerp</code>). No los uses como guía de Viernes; este informe sí es fiel al código actual.</div>
+    <div class="note warn"><span class="badge b-gap">FRONT</span> <b>shared/models y shared/components vacíos.</b> Los modelos viven por-feature. Las notificaciones del topbar son <b>demo hardcodeado</b> (<span class="anchor fe">core/layout/layout.html:159</span>), no datos reales.</div>
+    <div class="note warn"><span class="badge b-gap">DUPLICACIÓN</span> <b>Lógica DNI/RUC duplicada</b> en <span class="anchor fe">cliente-dialog.ts:235</span> y <span class="anchor fe">cliente-form.ts:119</span>. Si cambias la consulta, cambia ambos (o unifica).</div>
+    <div class="note warn"><span class="badge b-gap">ACOPLAMIENTO</span> <b>DashboardQueryRepository</b> referencia entidades de otros módulos <b>por nombre en strings JPQL</b> (<span class="anchor">dashboard/adapters/out/persistence/DashboardQueryRepository.java:22</span>): acoplamiento que ModularityTests no detecta (no es import Java).</div>
+    <div class="note info"><span class="badge b-info">MÓDULOS</span> <b>marketing</b> solo existe en backend (campanas→dashboard en front). <b>configuracion</b> es un placeholder vacío solo-front. <b>etiquetas</b> no tiene ruta propia (selector embebido en actividades).</div>
+    <div class="note info"><span class="badge b-info">BACKLOG</span> Pendientes conocidos de la integración DNI/RUC: unificar el mapeo 404/409 (hoy el primer 404 externo → 409, el replay cacheado → 404) y separar el I/O externo de la transacción. No bloquean el uso actual.</div>
+  </div>
+
+  <!-- ============ MIRO ============ -->
+  <h2 id="miro"><span class="num">✦</span> Copiar estructura a Miro</h2>
+  <p class="sec-intro">Resumen en texto plano (generado desde un objeto JS) para pegar como notas/índice en un board de Miro.</p>
+  <div class="copy-bar">
+    <button class="btn" id="copyMiroBtn" type="button">Copiar para Miro</button>
+    <span class="copy-hint" id="copyMiroHint">Copia el outline de la estructura (módulos, capas, flujo y ruta de aprendizaje).</span>
+  </div>
+
+  <footer>
+    Informe Estructura del Código V1 · Viernes CRM V1 · Generado 2026-11-07<br>
+    Evidencia con anclajes archivo:línea verificados sobre <code>E:\Viernes\Viernes</code> · HTML self-contained (CSS/JS inline) · Companion de <code>informe_estructura_sistema.html</code>
+  </footer>
+
+</div>
+
+<script>
+const miroEstructura = {
+  titulo: "VIERNES CRM V1 — Estructura del Código (V1)",
+  secciones: [
+    "MAPA: 2 proyectos (viernes-backend Spring Boot 4.0.7 / Java 21 / com.viernes :8080 ; viernes-frontend Angular 22 zoneless :4200) + Oracle 23 (:1521/FREEPDB1, BOM_VENTAS) + Keycloak (:8180, viernes-realm).",
+    "ARQUITECTURA BACKEND: Hexagonal (adapters -> application -> domain) + Spring Modulith (16 package-info; OPEN vs CLOSED; ModularityTests.verify()).",
+    "CAPAS POR MODULO: adapters/in/web (controllers) | application/port/in (use case) + port/out (interfaces) + service (@Transactional, reglas) | adapters/out/persistence (JPA) + out/external (APIsPERU) | domain (POJO/enum/record sin JPA) | mapper VACIO (mapeo manual).",
+    "MODULOS (15): clientes, leads, oportunidades(40), actividades, propuestas, equipos, usuarios, marketing(solo back), productos, etiquetas, mensajeria, dashboard, relationshipmap, auth(sin REST), shared. Front: 14 features (+configuracion placeholder).",
+    "FLUJO PETICION (DNI/RUC): UI cliente-dialog -> clientes.service -> ApiService(environment.apiBaseUrl) -> jwt+trace-id interceptors -> CorrelationIdFilter -> KeycloakSecurity(JWT) -> ClienteController:44 + rateLimiter:49 -> ClienteService:67 -> DocumentoLookupPort -> ApisPeruDocumentoAdapter:55 (cache 24h/10min + RestClient) -> DTO -> 200 JSON -> patchValue nombre.",
+    "FRONTEND: main.ts -> app.config(zoneless, provideKeycloak, router, http+interceptors). Rutas lazy loadComponent, Layout+authGuard, roleGuard. Keycloak PKCE S256, tokens en memoria, refresh 20s. Feature = model+service+list+dialog(+form). shared/models y components VACIOS.",
+    "CONTRATO: REST /api/v1/*, Bearer JWT, X-Trace-ID, CORS server-side. DTOs *.model.ts <-> Request/Response. Errores body.message -> buildFriendlyMessage.",
+    "TRANSVERSAL: Cache Caffeine (catalogos 5min, dashboard 30s, documentos 24h, negativos 10min). GlobalExceptionHandler (404/400/409/401/403/429/500). RBAC (DELETE negocio=ADMIN; escrituras catalogos=ADMIN|JEFE). Rate-limit 20/60s por usuario.",
+    "DONDE CAMBIO X: campo -> domain+entity+DTOs+mapeo manual+model.ts+dialog/form | regla -> service | endpoint -> controller+usecase | modulo nuevo -> plantilla+package-info+ModularityTests | roles -> KeycloakSecurityConfig+role.guard | API externa -> port/out+adapter/out/external | cache -> CacheConfig | URL back -> environment.ts.",
+    "RUTA APRENDIZAJE: 1 ViernesApplication+yml | 2 modulo pequeno (productos/etiquetas) | 3 flujo clientes | 4 shared/exception+security+cache | 5 app.config+routes | 6 core/auth+interceptors | 7 feature clientes | 8 oportunidades+relationshipmap | 9 tests.",
+    "BRECHAS: MapStruct sin uso (mapeo manual) | ddl-auto:update sin Flyway | README/CLAUDE=BomERP desactualizado | shared/models+components vacios | notificaciones demo | DNI/RUC duplicado dialog+form | DashboardQueryRepository JPQL cross-modulo | marketing solo back | configuracion placeholder | arbol canonico E:\\Viernes\\Viernes (no E:\\LPII)."
+  ]
+};
+(function(){
+  var btn = document.getElementById('copyMiroBtn');
+  var hint = document.getElementById('copyMiroHint');
+  if(!btn) return;
+  function textoPlano(){
+    return miroEstructura.titulo + "\n" + "=".repeat(miroEstructura.titulo.length) + "\n\n" +
+      miroEstructura.secciones.map(function(s,i){ return (i+1) + ". " + s; }).join("\n\n");
+  }
+  btn.addEventListener('click', async function(){
+    var texto = textoPlano();
+    try{
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        await navigator.clipboard.writeText(texto);
+      } else {
+        var ta = document.createElement('textarea');
+        ta.value = texto; ta.style.position='fixed'; ta.style.opacity='0';
+        document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+      }
+      btn.textContent='✓ Copiado'; btn.classList.add('ok');
+      hint.textContent='Pégalo en Miro como nota de texto o índice del board.';
+      setTimeout(function(){ btn.textContent='Copiar para Miro'; btn.classList.remove('ok'); hint.textContent='Copia el outline de la estructura (módulos, capas, flujo y ruta de aprendizaje).'; }, 2600);
+    }catch(e){
+      hint.textContent='No se pudo copiar automáticamente. Selecciona el texto del outline manualmente.';
+    }
+  });
+  window.__miroEstructura = miroEstructura;
+  window.__miroTextoPlano = textoPlano;
+})();
+</script>
+</body>
+</html>

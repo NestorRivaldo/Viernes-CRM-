@@ -40,6 +40,9 @@ public class OportunidadEntity {
     @Column(name = "FECHA_CIERRE")
     private LocalDate fechaCierre;
 
+    @Column(name = "DESCRIPCION", length = 500)
+    private String descripcion;
+
     @Column(name = "CREADO_EN", nullable = false)
     @Builder.Default
     private LocalDateTime creadoEn = LocalDateTime.now();

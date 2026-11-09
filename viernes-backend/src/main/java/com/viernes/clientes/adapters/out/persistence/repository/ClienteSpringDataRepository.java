@@ -8,7 +8,11 @@ import java.util.List;
 
 @Repository
 public interface ClienteSpringDataRepository extends JpaRepository<ClienteEntity, Long> {
-    List<ClienteEntity> findByNombreContainingIgnoreCaseOrEmpresaContainingIgnoreCase(String nombre, String empresa);
+    List<ClienteEntity> findByNombreContainingIgnoreCaseOrEmpresaContainingIgnoreCaseOrNumeroDocumentoContainingIgnoreCase(
+            String nombre, String empresa, String numeroDocumento);
+    List<ClienteEntity> findByNumeroDocumento(String numeroDocumento);
+    boolean existsByNumeroDocumento(String numeroDocumento);
+    boolean existsByNumeroDocumentoAndIdNot(String numeroDocumento, Long id);
     List<ClienteEntity> findByEstado(EstadoCliente estado);
     long countByEstado(EstadoCliente estado);
 }

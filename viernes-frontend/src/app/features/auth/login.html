@@ -1,115 +1,69 @@
-<div class="login-wrapper">
-  
-  <!-- Subtle decorative ambient lights -->
-  <div class="ambient-glow top-left"></div>
-  <div class="ambient-glow bottom-right"></div>
+<div class="login-page">
+  <div class="login-glow" aria-hidden="true"></div>
 
-  <!-- Login Card (Glassmorphic) -->
-  <div class="login-glass-card">
-    
-    <!-- Brand Header -->
-    <div class="login-brand-header">
-      <div class="login-brand-logo">
-        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M6 8L16 26L26 8" stroke="url(#loginBrandGrad)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
-          <defs>
-            <linearGradient id="loginBrandGrad" x1="6" y1="8" x2="26" y2="26" gradientUnits="userSpaceOnUse">
-              <stop stop-color="#38BDF8"/>
-              <stop offset="0.5" stop-color="#3B82F6"/>
-              <stop offset="1" stop-color="#818CF8"/>
-            </linearGradient>
-          </defs>
+  <main class="login-card">
+    <header class="login-header">
+      <div class="brand-badge">
+        <div class="brand-logo">
+          <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M6 8L16 26L26 8" stroke="url(#vBrandGrad)" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <defs>
+              <linearGradient id="vBrandGrad" x1="6" y1="8" x2="26" y2="26" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#38BDF8"/>
+                <stop offset="0.5" stop-color="#3B82F6"/>
+                <stop offset="1" stop-color="#818CF8"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <span class="brand-name">Viernes <span class="brand-tag">CRM</span></span>
+      </div>
+
+      <h1>Accede a tu espacio de trabajo</h1>
+      <p class="login-subtitle">
+        Gestiona tus clientes, oportunidades y actividades comerciales en un solo lugar.
+      </p>
+    </header>
+
+    @if (error()) {
+      <div class="login-error" role="alert">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M12 8v5M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         </svg>
+        <span>{{ error() }}</span>
       </div>
-      <div class="login-brand-text">
-        <span class="brand-title">Viernes</span>
-        <span class="brand-v1-tag">V1</span>
-      </div>
-      <p class="login-tagline">CRM híbrido • Seguridad Keycloak OIDC</p>
+    }
+
+    <div class="login-action-box">
+      <button
+        type="button"
+        class="login-btn"
+        [disabled]="loading()"
+        (click)="entrar()"
+      >
+        @if (loading()) {
+          <span class="spinner" aria-hidden="true"></span>
+          <span>Conectando con Keycloak...</span>
+        } @else {
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 3 4.5 6v5.2c0 4.6 3.1 8.9 7.5 9.8 4.4-.9 7.5-5.2 7.5-9.8V6L12 3Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+            <path d="m9.2 12 1.9 1.9 3.8-3.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Continuar con Keycloak</span>
+          <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        }
+      </button>
     </div>
 
-    <!-- Login Form -->
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-inner-form">
-      
-      <div class="login-field-group">
-        <label class="field-label">Correo electrónico</label>
-        <div class="input-with-icon">
-          <span class="input-icon-glyph">@</span>
-          <input 
-            type="email" 
-            formControlName="correo" 
-            placeholder="admin@viernes.com" 
-            class="mac-input"
-            required
-          />
-        </div>
+    <footer class="login-footer">
+      <div class="security-meta">
+        <span class="status-dot"></span>
+        <span>Autenticación segura con Keycloak (OIDC)</span>
       </div>
-      
-      <div class="login-field-group">
-        <label class="field-label">Contraseña</label>
-        <div class="input-with-icon">
-          <span class="input-icon-glyph">🔒</span>
-          <input 
-            type="password" 
-            formControlName="password" 
-            placeholder="••••••••" 
-            class="mac-input"
-            required
-          />
-        </div>
-      </div>
-
-      @if (error) {
-        <div class="login-error-pill">
-          {{ error }}
-        </div>
-      }
-
-      <button 
-        type="submit" 
-        [disabled]="loginForm.invalid || loading" 
-        class="login-btn-primary"
-      >
-        {{ loading ? 'Autenticando en Keycloak...' : 'Iniciar sesión' }}
-      </button>
-
-      <button 
-        type="button" 
-        class="login-btn-sso" 
-        (click)="loginWithKeycloakSSO()"
-      >
-        <span class="sso-shield">🛡️</span> Iniciar con Keycloak SSO
-      </button>
-
-      <!-- Keycloak Credentials Note -->
-      <div class="credentials-helper-box">
-        <div class="helper-badge">🛡️ Credenciales Keycloak (Acceso Total)</div>
-        <div class="helper-text">
-          <div class="helper-row">
-            <span class="helper-label">Correo:</span>
-            <strong class="helper-value">admin&#64;viernes.com</strong>
-          </div>
-          <div class="helper-row">
-            <span class="helper-label">Contraseña:</span>
-            <strong class="helper-value">Admin12345</strong>
-          </div>
-          <div class="helper-row roles-row">
-            <span class="helper-label">Roles:</span>
-            <span class="roles-chips">
-              <span class="badge-role">ADMIN</span>
-              <span class="badge-role">JEFE</span>
-              <span class="badge-role">VENDEDOR</span>
-            </span>
-          </div>
-        </div>
-      </div>
-
-    </form>
-
-  </div>
-
-  <div class="login-footer-copy">
-    Viernes CRM V1.0 • Autenticación OAuth2 / OIDC con Keycloak
-  </div>
-
+      <p class="copyright">© {{ year }} Viernes CRM · V1.0</p>
+    </footer>
+  </main>
 </div>

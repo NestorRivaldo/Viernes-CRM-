@@ -10,6 +10,8 @@ public class Cliente {
     private Long id;
     private String nombre;
     private String empresa;
+    private TipoDocumento tipoDocumento;
+    private String numeroDocumento;
     private String correo;
     private String telefono;
     private EstadoCliente estado;

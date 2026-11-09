@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Informe técnico exhaustivo de las relaciones Muchos-a-Muchos (N:M) implementadas en Viernes CRM V1 con tablas intermedias, código real y diagramas de flujo.">
+    <title>Informe de Relaciones N:M – VIERNES CRM V1</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #090d16;
+            --surface: #111726;
+            --surface2: #172033;
+            --surface3: #1c2740;
+            --border: #232f48;
+            --border-strong: #31415f;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --text-subtle: #64748b;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.25);
+            --accent-soft: rgba(59, 130, 246, 0.12);
+            --green: #10b981;
+            --green-soft: rgba(16, 185, 129, 0.12);
+            --purple: #a855f7;
+            --purple-soft: rgba(168, 85, 247, 0.12);
+            --amber: #f59e0b;
+            --amber-soft: rgba(245, 158, 11, 0.12);
+            --cyan: #06b6d4;
+            --cyan-soft: rgba(6, 182, 212, 0.12);
+            --rose: #f43f5e;
+            --rose-soft: rgba(244, 63, 94, 0.12);
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            padding: 34px 20px 70px;
+            background-image:
+                radial-gradient(circle at 10% 2%, rgba(16, 185, 129, 0.10) 0%, transparent 38%),
+                radial-gradient(circle at 85% 95%, rgba(168, 85, 247, 0.07) 0%, transparent 38%);
+            background-attachment: fixed;
+        }
+
+        .container { max-width: 1080px; margin: 0 auto; }
+        a { color: #60a5fa; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        /* Header */
+        .hero {
+            text-align: center;
+            padding: 50px 0 40px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 40px;
+        }
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: var(--green-soft); color: #6ee7b7;
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            padding: 7px 16px; border-radius: 30px;
+            font-size: 13px; font-weight: 700;
+            letter-spacing: 0.03em; margin-bottom: 16px;
+            animation: glow-green 3s ease-in-out infinite;
+        }
+        @keyframes glow-green {
+            0%, 100% { box-shadow: 0 0 8px rgba(16, 185, 129, 0.15); }
+            50% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.3); }
+        }
+        .hero h1 {
+            font-size: 38px; font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #ffffff 20%, #6ee7b7 60%, #a855f7 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin-bottom: 12px;
+        }
+        .hero .subtitle { font-size: 16px; color: var(--text-muted); max-width: 700px; margin: 0 auto; }
+
+        /* Stats row */
+        .stats-row {
+            display: flex; justify-content: center; gap: 16px;
+            margin: 28px 0 0; flex-wrap: wrap;
+        }
+        .stat-pill {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 10px; padding: 8px 16px;
+            font-size: 13px; display: flex; align-items: center; gap: 6px;
+        }
+        .stat-pill strong { font-family: var(--mono); color: #6ee7b7; }
+        .stat-pill.purple strong { color: #c084fc; }
+        .stat-pill.cyan strong { color: #67e8f9; }
+        .stat-pill.amber strong { color: #fde68a; }
+
+        /* TOC */
+        .toc {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius-md); padding: 22px 28px;
+            margin-bottom: 40px;
+        }
+        .toc h3 { font-size: 15px; font-weight: 700; margin-bottom: 12px; color: #e2e8f0; }
+        .toc ol { padding-left: 20px; }
+        .toc li { margin-bottom: 6px; }
+        .toc a { font-size: 14px; font-weight: 500; }
+        .toc a:hover { color: #93c5fd; }
+
+        /* Sections */
+        .section {
+            margin-bottom: 50px;
+            padding-top: 10px;
+        }
+        .section-header {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 18px; padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+        .section-num {
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: #fff; font-size: 13px; font-weight: 800;
+            min-width: 32px; height: 32px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .section-title { font-size: 22px; font-weight: 700; }
+
+        /* Cards */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 22px 26px;
+            margin-bottom: 20px;
+            transition: border-color 0.3s;
+        }
+        .card:hover { border-color: rgba(16, 185, 129, 0.4); }
+        .card h4 { font-size: 16px; font-weight: 700; margin-bottom: 10px; color: #e2e8f0; }
+        .card p { font-size: 14px; color: var(--text-muted); }
+
+        /* NM Diagram Card */
+        .nm-diagram {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 28px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+        .nm-diagram::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, #10b981, #06b6d4, #a855f7);
+        }
+        .nm-diagram h3 {
+            font-size: 18px; font-weight: 700; margin-bottom: 16px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .nm-diagram .badge-nm {
+            background: var(--green-soft); color: #6ee7b7;
+            font-size: 11px; font-weight: 800; padding: 3px 8px;
+            border-radius: 5px; letter-spacing: 0.04em;
+        }
+
+        /* Visual relationship diagram */
+        .rel-visual {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .rel-entity {
+            background: var(--surface);
+            border: 2px solid;
+            border-radius: 12px;
+            padding: 14px 18px;
+            min-width: 140px;
+            text-align: center;
+        }
+        .rel-entity.left { border-color: #3b82f6; }
+        .rel-entity.right { border-color: #a855f7; }
+        .rel-entity.center { border-color: #10b981; min-width: 180px; }
+        .rel-entity .ent-name {
+            font-size: 13px; font-weight: 800;
+            font-family: var(--mono); letter-spacing: 0.02em;
+        }
+        .rel-entity .ent-label {
+            font-size: 11px; color: var(--text-muted); margin-top: 2px;
+        }
+        .rel-entity.left .ent-name { color: #60a5fa; }
+        .rel-entity.right .ent-name { color: #c084fc; }
+        .rel-entity.center .ent-name { color: #6ee7b7; }
+
+        .rel-arrow {
+            font-size: 22px; color: var(--text-subtle);
+            padding: 0 8px; line-height: 1;
+        }
+
+        /* Code blocks */
+        .code-block {
+            background: #0c1222;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 18px 20px;
+            margin: 14px 0;
+            overflow-x: auto;
+            font-family: var(--mono);
+            font-size: 12.5px;
+            line-height: 1.6;
+            color: #cbd5e1;
+        }
+        .code-block .kw { color: #c084fc; }
+        .code-block .str { color: #fde68a; }
+        .code-block .ann { color: #67e8f9; }
+        .code-block .type { color: #6ee7b7; }
+        .code-block .comment { color: #64748b; font-style: italic; }
+        .code-block .field { color: #f1f5f9; }
+
+        /* Data tables */
+        .data-table {
+            width: 100%; border-collapse: collapse;
+            margin: 14px 0; font-size: 13px;
+        }
+        .data-table th {
+            background: var(--surface2);
+            color: #e2e8f0; font-weight: 700;
+            text-align: left; padding: 10px 14px;
+            border-bottom: 2px solid var(--border);
+            font-size: 12px; text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .data-table td {
+            padding: 10px 14px; border-bottom: 1px solid var(--border);
+            color: var(--text-muted);
+        }
+        .data-table tr:hover td { background: rgba(16, 185, 129, 0.04); }
+        .data-table code {
+            font-family: var(--mono); font-size: 12px;
+            background: var(--surface2); padding: 2px 6px;
+            border-radius: 4px; color: #6ee7b7;
+        }
+
+        /* Chips */
+        .chip {
+            display: inline-block; font-size: 11px; font-weight: 600;
+            padding: 2px 8px; border-radius: 5px; margin-right: 4px;
+        }
+        .chip-green { background: var(--green-soft); color: #6ee7b7; }
+        .chip-blue { background: var(--accent-soft); color: #60a5fa; }
+        .chip-purple { background: var(--purple-soft); color: #c084fc; }
+        .chip-cyan { background: var(--cyan-soft); color: #67e8f9; }
+        .chip-amber { background: var(--amber-soft); color: #fde68a; }
+
+        /* Alert boxes */
+        .alert {
+            border-radius: var(--radius-sm); padding: 14px 18px;
+            margin: 14px 0; font-size: 13.5px;
+            display: flex; gap: 10px; align-items: flex-start;
+        }
+        .alert-icon { font-size: 18px; flex-shrink: 0; }
+        .alert-info { background: var(--accent-soft); border: 1px solid rgba(59,130,246,0.3); color: #93c5fd; }
+        .alert-success { background: var(--green-soft); border: 1px solid rgba(16,185,129,0.3); color: #6ee7b7; }
+        .alert-warning { background: var(--amber-soft); border: 1px solid rgba(245,158,11,0.3); color: #fde68a; }
+        .alert-tip { background: var(--purple-soft); border: 1px solid rgba(168,85,247,0.3); color: #d8b4fe; }
+
+        /* Grid layout */
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+
+        /* Flow diagram */
+        .flow-container {
+            display: flex; flex-direction: column; align-items: center; gap: 0;
+            margin: 20px 0;
+        }
+        .flow-step {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 10px; padding: 12px 20px;
+            font-size: 13px; text-align: center; min-width: 280px;
+        }
+        .flow-step strong { color: #e2e8f0; }
+        .flow-arrow-down { font-size: 20px; color: var(--text-subtle); padding: 4px 0; }
+
+        /* Back link */
+        .back-link {
+            display: inline-flex; align-items: center; gap: 6px;
+            color: var(--text-muted); font-size: 13px; font-weight: 500;
+            margin-bottom: 16px; transition: color 0.2s;
+        }
+        .back-link:hover { color: #60a5fa; text-decoration: none; }
+
+        /* Footer */
+        footer {
+            text-align: center; padding: 40px 0 10px;
+            color: var(--text-subtle); font-size: 13px;
+            border-top: 1px solid var(--border); margin-top: 50px;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .hero h1 { font-size: 26px; }
+            .rel-visual { flex-direction: column; }
+            .rel-arrow { transform: rotate(90deg); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- ENTRADA MINIMALISTA -->
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0 25px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #059669, #10b981); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; color: white;">V</div>
+            <span style="font-weight: 700; font-size: 16px; color: #f8fafc; letter-spacing: -0.01em;">Viernes</span>
+            <span style="font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 12px; background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3);">CRM · V1</span>
+        </div>
+        <a href="index.html" class="back-link" style="margin-bottom: 0;">← Volver al Portal</a>
+    </div>
+
+    <header style="padding: 10px 0 35px; border-bottom: 1px solid var(--border); margin-bottom: 35px;">
+        <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(16, 185, 129, 0.12); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.25); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; margin-bottom: 16px; text-transform: uppercase;">
+            • MODELADO RELACIONAL
+        </div>
+        <h1 style="font-size: 38px; font-weight: 800; letter-spacing: -0.03em; color: #ffffff; margin-bottom: 12px; line-height: 1.2;">
+            Relaciones Muchos a Muchos (N:M)
+        </h1>
+        <p style="font-size: 16px; color: var(--text-muted); max-width: 650px; line-height: 1.6; margin: 0;">
+            Diseño e implementación de 7 relaciones N:M mediante tablas intermedias explícitas, entidades JPA y persistencia en Oracle 23c.
+        </p>
+    </header>
+
+    <!-- TOC -->
+    <nav class="toc">
+        <h3>📋 Índice de Contenidos</h3>
+        <ol>
+            <li><a href="#concepto">¿Qué es una relación N:M y por qué es importante?</a></li>
+            <li><a href="#estrategia">Estrategia arquitectónica: Agregados DDD por ID</a></li>
+            <li><a href="#catalogo">Catálogo completo de relaciones N:M</a></li>
+            <li><a href="#oportunidad-contactos">N:M Detallada: Oportunidad ↔ Contactos</a></li>
+            <li><a href="#oportunidad-productos">N:M Detallada: Oportunidad ↔ Productos</a></li>
+            <li><a href="#oportunidad-colaboradores">N:M Detallada: Oportunidad ↔ Colaboradores</a></li>
+            <li><a href="#actividad-participantes">N:M Detallada: Actividad ↔ Participantes</a></li>
+            <li><a href="#actividad-etiquetas">N:M Detallada: Actividad ↔ Etiquetas</a></li>
+            <li><a href="#equipo-miembros">N:M Detallada: Equipo ↔ Miembros</a></li>
+            <li><a href="#campania-leads">N:M Detallada: Campaña ↔ Leads</a></li>
+            <li><a href="#propuesta-detalles">Relación 1:N complementaria: Propuesta → Detalles</a></li>
+            <li><a href="#api-endpoints">API REST completa para relaciones N:M</a></li>
+            <li><a href="#modelo-er">Modelo Entidad-Relación (Diagrama Visual)</a></li>
+            <li><a href="#conclusiones">Conclusiones y ventajas de la arquitectura</a></li>
+        </ol>
+    </nav>
+
+    <!-- SECCIÓN 1: Concepto -->
+    <section class="section" id="concepto">
+        <div class="section-header">
+            <span class="section-num">1</span>
+            <h2 class="section-title">¿Qué es una relación N:M y por qué es importante?</h2>
+        </div>
+
+        <div class="card">
+            <h4>📖 Definición técnica</h4>
+            <p>
+                Una <strong>relación Muchos-a-Muchos (N:M)</strong> es un tipo de asociación entre dos entidades donde 
+                <em>múltiples registros de la primera tabla</em> pueden estar relacionados con <em>múltiples registros de la segunda tabla</em>, 
+                y viceversa. En bases de datos relacionales, esta relación se implementa mediante una <strong>tabla intermedia</strong> 
+                (también llamada tabla pivote o tabla de unión) que contiene las claves foráneas de ambas tablas principales.
+            </p>
+        </div>
+
+        <div class="alert alert-info">
+            <span class="alert-icon">💡</span>
+            <div>
+                <strong>Ejemplo real en Viernes CRM:</strong> Una <em>Oportunidad de Venta</em> puede tener asociados múltiples 
+                <em>Contactos</em>, y un mismo <em>Contacto</em> puede participar en múltiples <em>Oportunidades</em>. 
+                Para modelar esto, se usa la tabla intermedia <code>CRM_OPORTUNIDAD_CONTACTOS</code>.
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div class="card">
+                <h4>🔑 ¿Por qué no usar @ManyToMany de JPA?</h4>
+                <p>
+                    Viernes CRM <strong>no utiliza</strong> <code>@ManyToMany</code> de JPA. En su lugar, implementa 
+                    <strong>tablas intermedias como entidades independientes</strong>. Esto permite:
+                </p>
+                <ul style="margin: 10px 0 0 20px; font-size: 13px; color: var(--text-muted);">
+                    <li>Agregar <strong>atributos extra</strong> a la relación (rol, cantidad, esDecisor)</li>
+                    <li>Control total sobre <strong>cascadas y orphan removal</strong></li>
+                    <li>Respetar los <strong>límites de módulo</strong> (Spring Modulith)</li>
+                    <li>Evitar <strong>foreign keys físicas</strong> entre módulos distintos</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h4>🏛️ Principio DDD: Agregados por ID</h4>
+                <p>
+                    Siguiendo el patrón <strong>Domain-Driven Design</strong>, las relaciones entre módulos distintos se 
+                    manejan por <strong>referencia lógica de ID</strong> (sin <code>@ManyToOne</code> ni <code>@JoinColumn</code> 
+                    entre módulos). Cada módulo es dueño de sus propias tablas y consulta los IDs de otros módulos sin 
+                    generar dependencia física en la base de datos.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 2: Estrategia -->
+    <section class="section" id="estrategia">
+        <div class="section-header">
+            <span class="section-num">2</span>
+            <h2 class="section-title">Estrategia arquitectónica: Agregados DDD por ID</h2>
+        </div>
+
+        <div class="nm-diagram">
+            <h3>🧩 Patrón de referencia lógica entre módulos</h3>
+            
+            <div class="flow-container">
+                <div class="flow-step" style="border-color: #3b82f6;">
+                    <strong>Módulo A</strong> (ej: Oportunidades)<br>
+                    <span style="font-size: 12px; color: var(--text-muted);">Define la entidad principal y la tabla intermedia</span>
+                </div>
+                <div class="flow-arrow-down">↕</div>
+                <div class="flow-step" style="border-color: #10b981; background: var(--green-soft);">
+                    <strong>Tabla Intermedia</strong> (ej: CRM_OPORTUNIDAD_CONTACTOS)<br>
+                    <span style="font-size: 12px; color: var(--text-muted);">Almacena ID_OPORTUNIDAD + ID_CONTACTO + atributos extra</span>
+                </div>
+                <div class="flow-arrow-down">↕</div>
+                <div class="flow-step" style="border-color: #a855f7;">
+                    <strong>Módulo B</strong> (ej: Clientes/Contactos)<br>
+                    <span style="font-size: 12px; color: var(--text-muted);">Solo almacena ID como referencia lógica — SIN @JoinColumn</span>
+                </div>
+            </div>
+
+            <div class="alert alert-success" style="margin-top: 16px;">
+                <span class="alert-icon">✅</span>
+                <div>
+                    <strong>Ventaja clave:</strong> Cada módulo es independiente y testeable de forma aislada. 
+                    El <code>ModularityTests</code> de Spring Modulith valida que no existan dependencias cíclicas.
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h4>📐 Reglas de implementación</h4>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Regla</th>
+                        <th>Implementación en Viernes CRM</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>FK físicas solo intra-módulo</strong></td>
+                        <td>Solo entre tablas del mismo módulo (ej: <code>CRM_CONTACTOS</code> → <code>CRM_CLIENTES</code>)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Referencias lógicas inter-módulo</strong></td>
+                        <td>Columna <code>Long idContacto</code> sin <code>@ManyToOne</code> ni <code>@JoinColumn</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>UniqueConstraint en tabla intermedia</strong></td>
+                        <td>Evita duplicados: <code>@UniqueConstraint(columnNames = {"ID_OPORTUNIDAD", "ID_CONTACTO"})</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Entidad independiente para la relación</strong></td>
+                        <td>Clase <code>@Entity</code> propia con <code>@Id</code> autogenerado y campos extra</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Repository propio para la tabla intermedia</strong></td>
+                        <td>Cada tabla intermedia tiene su propio <code>JpaRepository</code></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 3: Catálogo completo -->
+    <section class="section" id="catalogo">
+        <div class="section-header">
+            <span class="section-num">3</span>
+            <h2 class="section-title">Catálogo completo de relaciones N:M</h2>
+        </div>
+
+        <div class="card" style="overflow-x: auto;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Entidad A</th>
+                        <th>Tabla Intermedia</th>
+                        <th>Entidad B</th>
+                        <th>Atributos Extra</th>
+                        <th>Módulo Dueño</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>1</strong></td>
+                        <td><code>CRM_OPORTUNIDADES</code></td>
+                        <td><code>CRM_OPORTUNIDAD_CONTACTOS</code></td>
+                        <td><code>CRM_CONTACTOS</code></td>
+                        <td><span class="chip chip-green">rol</span><span class="chip chip-cyan">esDecisor</span></td>
+                        <td><span class="chip chip-blue">oportunidades</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>2</strong></td>
+                        <td><code>CRM_OPORTUNIDADES</code></td>
+                        <td><code>CRM_OPORTUNIDAD_PRODUCTOS</code></td>
+                        <td><code>CRM_PRODUCTOS</code></td>
+                        <td><span class="chip chip-amber">cantidad</span></td>
+                        <td><span class="chip chip-blue">oportunidades</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>3</strong></td>
+                        <td><code>CRM_OPORTUNIDADES</code></td>
+                        <td><code>CRM_OPORTUNIDAD_COLABORADORES</code></td>
+                        <td><code>CRM_USUARIOS</code></td>
+                        <td>—</td>
+                        <td><span class="chip chip-blue">oportunidades</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>4</strong></td>
+                        <td><code>CRM_ACTIVIDADES</code></td>
+                        <td><code>CRM_ACTIVIDAD_PARTICIPANTES</code></td>
+                        <td><code>CRM_CONTACTOS</code></td>
+                        <td>—</td>
+                        <td><span class="chip chip-purple">actividades</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>5</strong></td>
+                        <td><code>CRM_ACTIVIDADES</code></td>
+                        <td><code>CRM_ACTIVIDAD_ETIQUETAS</code></td>
+                        <td><code>CRM_ETIQUETAS</code></td>
+                        <td><span class="chip chip-amber">orden</span></td>
+                        <td><span class="chip chip-purple">actividades</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>6</strong></td>
+                        <td><code>CRM_EQUIPOS</code></td>
+                        <td><code>CRM_EQUIPO_MIEMBROS</code></td>
+                        <td><code>CRM_USUARIOS</code></td>
+                        <td>—</td>
+                        <td><span class="chip chip-cyan">equipos</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>7</strong></td>
+                        <td><code>CRM_CAMPANIAS</code></td>
+                        <td><code>CRM_CAMPANIA_LEADS</code></td>
+                        <td><code>CRM_LEADS</code></td>
+                        <td>—</td>
+                        <td><span class="chip chip-amber">marketing</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="alert alert-tip">
+            <span class="alert-icon">🎯</span>
+            <div>
+                Todas las tablas intermedias incluyen: <code>ID</code> (PK autogenerada), las dos columnas de referencia con <code>@UniqueConstraint</code>, 
+                y un campo <code>CREADO_EN</code> (timestamp de auditoría).
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 4: Oportunidad ↔ Contactos -->
+    <section class="section" id="oportunidad-contactos">
+        <div class="section-header">
+            <span class="section-num">4</span>
+            <h2 class="section-title">N:M Detallada: Oportunidad ↔ Contactos</h2>
+        </div>
+
+        <div class="nm-diagram">
+            <h3><span class="badge-nm">N:M</span> Oportunidad — Contactos</h3>
+            <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 16px;">
+                Una oportunidad de venta puede involucrar a múltiples contactos del cliente, y un contacto 
+                puede participar en múltiples oportunidades. La relación incluye atributos de contexto.
+            </p>
+
+            <div class="rel-visual">
+                <div class="rel-entity left">
+                    <div class="ent-name">CRM_OPORTUNIDADES</div>
+                    <div class="ent-label">Módulo: oportunidades</div>
+                </div>
+                <div class="rel-arrow">◄── N:M ──►</div>
+                <div class="rel-entity center">
+                    <div class="ent-name">CRM_OPORTUNIDAD_CONTACTOS</div>
+                    <div class="ent-label">Tabla intermedia</div>
+                    <div style="margin-top: 6px;">
+                        <span class="chip chip-green">rol</span>
+                        <span class="chip chip-cyan">esDecisor</span>
+                    </div>
+                </div>
+                <div class="rel-arrow">◄── N:M ──►</div>
+                <div class="rel-entity right">
+                    <div class="ent-name">CRM_CONTACTOS</div>
+                    <div class="ent-label">Módulo: clientes</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h4>📝 Entidad JPA: OportunidadContactoEntity.java</h4>
+            <div class="code-block">
+<span class="ann">@Entity</span>
+<span class="ann">@Table</span>(<span class="field">name</span> = <span class="str">"CRM_OPORTUNIDAD_CONTACTOS"</span>, <span class="field">uniqueConstraints</span> = {
+    <span class="ann">@UniqueConstraint</span>(<span class="field">name</span> = <span class="str">"uk_oportunidad_contacto"</span>,
+                     <span class="field">columnNames</span> = {<span class="str">"ID_OPORTUNIDAD"</span>, <span class="str">"ID_CONTACTO"</span>})
+})
+<span class="kw">public class</span> <span class="type">OportunidadContactoEntity</span> {
+
+    <span class="ann">@Id</span> <span class="ann">@GeneratedValue</span>(<span class="field">strategy</span> = GenerationType.IDENTITY)
+    <span class="kw">private</span> <span class="type">Long</span> <span class="field">id</span>;
+
+    <span class="ann">@Column</span>(<span class="field">name</span> = <span class="str">"ID_OPORTUNIDAD"</span>, <span class="field">nullable</span> = <span class="kw">false</span>)
+    <span class="kw">private</span> <span class="type">Long</span> <span class="field">idOportunidad</span>;
+
+    <span class="comment">// Referencia lógica a CRM_CONTACTOS (módulo clientes), sin foreign key física</span>
+    <span class="ann">@Column</span>(<span class="field">name</span> = <span class="str">"ID_CONTACTO"</span>, <span class="field">nullable</span> = <span class="kw">false</span>)
+    <span class="kw">private</span> <span class="type">Long</span> <span class="field">idContacto</span>;
+
+    <span class="ann">@Column</span>(<span class="field">name</span> = <span class="str">"ROL"</span>, <span class="field">length</span> = 100)    <span class="comment">// Atributo extra de la relación</span>
+    <span class="kw">private</span> <span class="type">String</span> <span class="field">rol</span>;
+
+    <span class="ann">@Column</span>(<span class="field">name</span> = <span class="str">"ES_DECISOR"</span>)              <span class="comment">// Atributo extra: ¿es el decisor?</span>
+    <span class="kw">private</span> <span class="type">Boolean</span> <span class="field">esDecisor</span> = <span class="kw">false</span>;
+
+    <span class="ann">@Column</span>(<span class="field">name</span> = <span class="str">"CREADO_EN"</span>)               <span class="comment">// Auditoría temporal</span>
+    <span class="kw">private</span> <span class="type">LocalDateTime</span> <span class="field">creadoEn</span> = LocalDateTime.now();
+}
+            </div>
+        </div>
+
+        <div class="card">
+            <h4>📡 Endpoints REST para esta relación</h4>
+            <table class="data-table">
+                <thead><tr><th>Método</th><th>Ruta</th><th>Descripción</th></tr></thead>
+                <tbody>
+                    <tr><td><span class="chip chip-blue">GET</span></td><td><code>/api/v1/oportunidades/{id}/contactos</code></td><td>Listar contactos asociados</td></tr>
+                    <tr><td><span class="chip chip-green">POST</span></td><td><code>/api/v1/oportunidades/{id}/contactos</code></td><td>Asociar un contacto</td></tr>
+                    <tr><td><span class="chip chip-amber">PUT</span></td><td><code>/api/v1/oportunidades/{id}/contactos/{contactoId}</code></td><td>Actualizar rol/decisor</td></tr>
+                    <tr><td><span class="chip chip-purple">DELETE</span></td><td><code>/api/v1/oportunidades/{id}/contactos/{contactoId}</code></td><td>Quitar contacto</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 5: Oportunidad ↔ Productos -->
+    <section class="section" id="oportunidad-productos">
+        <div class="section-header">
+            <span class="section-num">5</span>
+            <h2 class="section-title">N:M Detallada: Oportunidad ↔ Productos</h2>
+        </div>
+
+        <div class="nm-diagram">
+            <h3><span class="badge-nm">N:M</span> Oportunidad — Productos</h3>
+            <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 16px;">
+                Cada oportunidad puede incluir múltiples productos del catálogo, y un producto puede aparecer en 
+                múltiples oportunidades con diferentes cantidades.
+            </p>
+
+            <div class="rel-visual">
+                <div class="rel-entity left">
+                    <div class="ent-name">CRM_OPORTUNIDADES</div>
+                    <div class="ent-label">Módulo: oportunidades</div>
+                </div>
+                <div class="rel-arrow">◄── N:M ──►</div>
+                <div class="rel-entity center">
+                    <div class="ent-name">CRM_OPORTUNIDAD_PRODUCTOS</div>
+                    <div class="ent-label">Tabla intermedia</div>
+                    <div style="margin-top: 6px;">
+                        <span class="chip chip-amber">cantidad</span>
+                    </div>
+                </div>
+                <div class="rel-arrow">◄── N:M ──►</div>
+                <div class="rel-entity right">
+                    <div class="ent-name">CRM_PRODUCTOS</div>
+                    <div class="ent-label">Módulo: productos</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h4>📝 Entidad JPA: OportunidadProductoEntity.java</h4>
+            <div class="code-block">
+<span class="ann">@Entity</span>
+<span class="ann">@Table</span>(<span class="field">name</span> = <span class="str">"CRM_OPORTUNIDAD_PRODUCTOS"</span>, <span class="field">uniqueConstraints</span> = {
+    <span class="ann">@UniqueConstraint</span>(<span class="field">name</span> = <span class="str">"uk_oportunidad_producto"</span>,
+                     <span class="field">columnNames</span> = {<span class="str">"ID_OPORTUNIDAD"</span>, <span class="str">"ID_PRODUCTO"</span>})
+})
+<span class="kw">public class</span> <span class="type">OportunidadProductoEntity</span> {
+
+    <span class="ann">@Id</span> <span class="ann">@GeneratedValue</span>(<span class="field">strategy</span> = GenerationType.IDENTITY)
+    <span class="kw">private</span> <span class="type">Long</span> <span class="field">id</span>;
+
+    <span class="ann">@Column</span>(<span class="field">name</span> = <span class="str">"ID_OPORTUNIDAD"</span>, <span class="field">nullable</span> = <span class="kw">false</span>)
+    <span class="kw">private</span> <span class="type">Long</span> <span class="field">idOportunidad</span>;
+
+    <span class="comment">// Referencia lógica a CRM_PRODUCTOS (módulo productos), sin FK física</span>
+    <span class="ann">@Column</span>(<span class="field">name</span> = <span class="str">"ID_PRODUCTO"</span>, <span class="field">nullable</span> = <span class="kw">false</span>)
+    <span class="kw">private</span> <span class="type">Long</span> <span class="field">idProducto</span>;
+
+    <span class="ann">@Column</span>(<span class="field">name</span> = <span class="str">"CANTIDAD"</span>)            <span class="comment">// Atributo extra: cantidad del producto</span>
+    <span class="kw">private</span> <span class="type">Integer</span> <span class="field">cantidad</span>;
+}
+            </div>
+        </div>
+
+        <div class="card">
+            <h4>📡 Endpoints REST</h4>
+            <table class="data-table">
+                <thead><tr><th>Método</th><th>Ruta</th><th>Descripción</th></tr></thead>
+                <tbody>
+                    <tr><td><span class="chip chip-blue">GET</span></td><td><code>/api/v1/oportunidades/{id}/productos</code></td><td>Listar productos asociados</td></tr>
+                    <tr><td><span class="chip chip-green">POST</span></td><td><code>/api/v1/oportunidades/{id}/productos</code></td><td>Asociar un producto con cantidad</td></tr>
+                    <tr><td><span class="chip chip-purple">DELETE</span></td><td><code>/api/v1/oportunidades/{id}/productos/{productoId}</code></td><td>Quitar producto</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 6: Oportunidad ↔ Colaboradores -->
+    <section class="section" id="oportunidad-colaboradores">
+        <div class="section-header">
+            <span class="section-num">6</span>
+            <h2 class="section-title">N:M Detallada: Oportunidad ↔ Colaboradores</h2>
+        </div>
+
+        <div class="nm-diagram">
+            <h3><span class="badge-nm">N:M</span> Oportunidad — Colaboradores (Usuarios)</h3>
+            <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 16px;">
+                Múltiples usuarios del CRM pueden colaborar en la misma oportunidad de venta, 
+                y un usuario puede ser colaborador de múltiples oportunidades simultáneamente.
+            </p>
+
+            <div class="rel-visual">
+                <div class="rel-entity left">
+                    <div class="ent-name">CRM_OPORTUNIDADES</div>
+                    <div class="ent-label">Módulo: oportunidades</div>
+                </div>
+                <div class="rel-arrow">◄── N:M ──►</div>
+                <div class="rel-entity center">
+                    <div class="ent-name">CRM_OPORTUNIDAD_COLABORADORES</div>
+                    <div class="ent-label">Tabla intermedia</div>
+                </div>
+                <div class="rel-arrow">◄── N:M ──►</div>
+                <div class="rel-entity right">
+                    <div class="ent-name">CRM_USUARIOS</div>
+                    <div class="ent-label">Módulo: usuarios</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h4>📝 Entidad JPA: OportunidadColaboradorEntity.java</h4>
+            <div class="code-block">
+<span class="ann">@Entity</span>
+<span class="ann">@Table</span>(<span class="field">name</span> = <span class="str">"CRM_OPORTUNIDAD_COLABORADORES"</span>, <span class="field">uniqueConstraints</span> = {
+    <span class="ann">@UniqueConstraint</span>(<span class="field">name</span> = <span class="str">"uk_oportunidad_colaborador"</span>,
+                     <span class="field">columnNames</span> = {<span class="str">"ID_OPORTUNIDAD"</span>, <span class="str">"ID_USUARIO"</span>})
+})
+<span class="kw">public class</span> <span class="type">OportunidadColaboradorEntity</span> {
+
+    <span class="ann">@Id</span> <span class="ann">@GeneratedValue</span>(<span class="field">strategy</span> = GenerationType.IDENTITY)
+    <span class="kw">private</span> <span class="type">Long</span> <span class="field">id</span>;
+
+    <span class="ann">@Column</span>(<span class="field">name</span> = <span class="str">"ID_OPORTUNIDAD"</span>, <span class="field">nullable</span> = <span class="kw">false</span>)
+    <span class="kw">private</span> <span class="type">Long</span> <span class="field">idOportunidad</span>;
+
+    <span class="comment">// Referencia lógica a CRM_USUARIOS (módulo usuarios), sin FK física</span>
+    <span class="ann">@Column</span>(<span class="field">name</span> = <span class="str">"ID_USUARIO"</span>, <span class="field">nullable</span> = <span class="kw">false</span>)
+    <span class="kw">private</span> <span class="type">Long</span> <span class="field">idUsuario</span>;
+}
+            </div>
+        </div>
+
+        <div class="card">
+            <h4>📡 Endpoints REST</h4>
+            <table class="data-table">
+                <thead><tr><th>Método</th><th>Ruta</th><th>Descripción</th></tr></thead>
+                <tbody>
+                    <tr><td><span class="chip chip-blue">GET</span></td><td><code>/api/v1/oportunidades/{id}/colaboradores</code></td><td>Listar colaboradores</td></tr>
+                    <tr><td><span class="chip chip-green">POST</span></td><td><code>/api/v1/oportunidades/{id}/colaboradores</code></td><td>Agregar colaborador</td></tr>
+                    <tr><td><span class="chip chip-purple">DELETE</span></td><td><code>/api/v1/oportunidades/{id}/colaboradores/{usuarioId}</code></td><td>Quitar colaborador</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 7: Actividad ↔ Participantes -->
+    <section class="section" id="actividad-participantes">
+        <div class="section-header">
+            <span class="section-num">7</span>
+            <h2 class="section-title">N:M Detallada: Actividad ↔ Participantes</h2>
+        </div>
+
+        <div class="nm-diagram">
+            <h3><span class="badge-nm">N:M</span> Actividad — Participantes (Contactos)</h3>
+
+            <div class="rel-visual">
+                <div class="rel-entity left">
+                    <div class="ent-name">CRM_ACTIVIDADES</div>
+                    <div class="ent-label">Módulo: actividades</div>
+                </div>
+                <div class="rel-arrow">◄── N:M ──►</div>
+                <div class="rel-entity center">
+                    <div class="ent-name">CRM_ACTIVIDAD_PARTICIPANTES</div>
+                    <div class="ent-label">Tabla intermedia</div>
+                </div>
+                <div class="rel-arrow">◄── N:M ──►</div>
+                <div class="rel-entity right">
+                    <div class="ent-name">CRM_CONTACTOS</div>
+                    <div class="ent-label">Módulo: clientes</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h4>📝 Entidad JPA: ActividadParticipanteEntity.java</h4>
+            <div class="code-block">
+<span class="ann">@Entity</span>
+<span class="ann">@Table</span>(<span class="field">name</span> = <span class="str">"CRM_ACTIVIDAD_PARTICIPANTES"</span>, <span class="field">uniqueConstraints</span> = {
+    <span class="ann">@UniqueConstraint</span>(<span class="field">name</span> = <span class="str">"uk_actividad_contacto"</span>,
+                     <span class="field">columnNames</span> = {<span class="str">"id_actividad"</span>, <span class="str">"id_contacto"</span>})
+})
+<span class="kw">public class</span> <span class="type">ActividadParticipanteEntity</span> {
+
+    <span class="ann">@Id</span> <span class="ann">@GeneratedValue</span>(<span class="field">strategy</span> = GenerationType.IDENTITY)
+    <span class="kw">private</span> <span class="type">Long</span> <span class="field">id</span>;
+
+    <span class="ann">@Column</span>(<span class="field">name</span> = <span class="str">"id_actividad"</span>, <span class="field">nullable</span> = <span class="kw">false</span>)
+    <span class="kw">private</span> <span class="type">Long</span> <span class="field">idActividad</span>;
+
+    <span class="comment">// Referencia lógica a CRM_CONTACTOS (módulo clientes)</span>
+    <span class="ann">@Column</span>(<span class="field">name</span> = <span class="str">"id_contacto"</span>, <span class="field">nullable</span> = <span class="kw">false</span>)
+    <span class="kw">private</span> <span class="type">Long</span> <span class="field">idContacto</span>;
+}
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 8: Actividad ↔ Etiquetas -->
+    <section class="section" id="actividad-etiquetas">
+        <div class="section-header">
+            <span class="section-num">8</span>
+            <h2 class="section-title">N:M Detallada: Actividad ↔ Etiquetas</h2>
+        </div>
+
+        <div class="nm-diagram">
+            <h3><span class="badge-nm">N:M</span> Actividad — Etiquetas</h3>
+
+            <div class="rel-visual">
+                <div class="rel-entity left">
+                    <div class="ent-name">CRM_ACTIVIDADES</div>
+                    <div class="ent-label">Módulo: actividades</div>
+                </div>
+                <div class="rel-arrow">◄── N:M ──►</div>
+                <div class="rel-entity center">
+                    <div class="ent-name">CRM_ACTIVIDAD_ETIQUETAS</div>
+                    <div class="ent-label">Tabla intermedia</div>
+                    <div style="margin-top: 6px;">
+                        <span class="chip chip-amber">orden</span>
+                    </div>
+                </div>
+                <div class="rel-arrow">◄── N:M ──►</div>
+                <div class="rel-entity right">
+                    <div class="ent-name">CRM_ETIQUETAS</div>
+                    <div class="ent-label">Módulo: etiquetas</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h4>📝 Entidad JPA: ActividadEtiquetaEntity.java</h4>
+            <div class="code-block">
+<span class="ann">@Entity</span>
+<span class="ann">@Table</span>(<span class="field">name</span> = <span class="str">"CRM_ACTIVIDAD_ETIQUETAS"</span>, <span class="field">uniqueConstraints</span> = {
+    <span class="ann">@UniqueConstraint</span>(<span class="field">name</span> = <span class="str">"uk_actividad_etiqueta"</span>,
+                     <span class="field">columnNames</span> = {<span class="str">"id_actividad"</span>, <span class="str">"id_etiqueta"</span>})
+})
+<span class="kw">public class</span> <span class="type">ActividadEtiquetaEntity</span> {
+
+    <span class="ann">@Id</span> <span class="ann">@GeneratedValue</span>(<span class="field">strategy</span> = GenerationType.IDENTITY)
+    <span class="kw">private</span> <span class="type">Long</span> <span class="field">id</span>;
+
+    <span class="ann">@Column</span>(<span class="field">name</span> = <span class="str">"id_actividad"</span>, <span class="field">nullable</span> = <span class="kw">false</span>)
+    <span class="kw">private</span> <span class="type">Long</span> <span class="field">idActividad</span>;
+
+    <span class="ann">@Column</span>(<span class="field">name</span> = <span class="str">"id_etiqueta"</span>, <span class="field">nullable</span> = <span class="kw">false</span>)
+    <span class="kw">private</span> <span class="type">Long</span> <span class="field">idEtiqueta</span>;
+
+    <span class="ann">@Column</span>(<span class="field">name</span> = <span class="str">"orden"</span>)                 <span class="comment">// Atributo extra: orden de visualización</span>
+    <span class="kw">private</span> <span class="type">Integer</span> <span class="field">orden</span>;
+}
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 9: Equipo ↔ Miembros -->
+    <section class="section" id="equipo-miembros">
+        <div class="section-header">
+            <span class="section-num">9</span>
+            <h2 class="section-title">N:M Detallada: Equipo ↔ Miembros</h2>
+        </div>
+
+        <div class="nm-diagram">
+            <h3><span class="badge-nm">N:M</span> Equipo — Miembros (Usuarios)</h3>
+
+            <div class="rel-visual">
+                <div class="rel-entity left">
+                    <div class="ent-name">CRM_EQUIPOS</div>
+                    <div class="ent-label">Módulo: equipos</div>
+                </div>
+                <div class="rel-arrow">◄── N:M ──►</div>
+                <div class="rel-entity center">
+                    <div class="ent-name">CRM_EQUIPO_MIEMBROS</div>
+                    <div class="ent-label">Tabla intermedia</div>
+                </div>
+                <div class="rel-arrow">◄── N:M ──►</div>
+                <div class="rel-entity right">
+                    <div class="ent-name">CRM_USUARIOS</div>
+                    <div class="ent-label">Módulo: usuarios</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h4>📝 Entidad JPA: EquipoMiembroEntity.java</h4>
+            <div class="code-block">
+<span class="ann">@Entity</span>
+<span class="ann">@Table</span>(<span class="field">name</span> = <span class="str">"CRM_EQUIPO_MIEMBROS"</span>, <span class="field">uniqueConstraints</span> =
+    <span class="ann">@UniqueConstraint</span>(<span class="field">name</span> = <span class="str">"UK_EQUIPO_MIEMBRO"</span>,
+                     <span class="field">columnNames</span> = {<span class="str">"EQUIPO_ID"</span>, <span class="str">"USUARIO_ID"</span>}))
+<span class="kw">public class</span> <span class="type">EquipoMiembroEntity</span> {
+
+    <span class="ann">@Id</span> <span class="ann">@GeneratedValue</span>(<span class="field">strategy</span> = GenerationType.IDENTITY)
+    <span class="kw">private</span> <span class="type">Long</span> <span class="field">id</span>;
+
+    <span class="ann">@Column</span>(<span class="field">name</span> = <span class="str">"EQUIPO_ID"</span>, <span class="field">nullable</span> = <span class="kw">false</span>)
+    <span class="kw">private</span> <span class="type">Long</span> <span class="field">equipoId</span>;
+
+    <span class="ann">@Column</span>(<span class="field">name</span> = <span class="str">"USUARIO_ID"</span>, <span class="field">nullable</span> = <span class="kw">false</span>)
+    <span class="kw">private</span> <span class="type">Long</span> <span class="field">usuarioId</span>;
+}
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 10: Campaña ↔ Leads -->
+    <section class="section" id="campania-leads">
+        <div class="section-header">
+            <span class="section-num">10</span>
+            <h2 class="section-title">N:M Detallada: Campaña ↔ Leads</h2>
+        </div>
+
+        <div class="nm-diagram">
+            <h3><span class="badge-nm">N:M</span> Campaña — Leads</h3>
+
+            <div class="rel-visual">
+                <div class="rel-entity left">
+                    <div class="ent-name">CRM_CAMPANIAS</div>
+                    <div class="ent-label">Módulo: marketing</div>
+                </div>
+                <div class="rel-arrow">◄── N:M ──►</div>
+                <div class="rel-entity center">
+                    <div class="ent-name">CRM_CAMPANIA_LEADS</div>
+                    <div class="ent-label">Tabla intermedia</div>
+                </div>
+                <div class="rel-arrow">◄── N:M ──►</div>
+                <div class="rel-entity right">
+                    <div class="ent-name">CRM_LEADS</div>
+                    <div class="ent-label">Módulo: leads</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h4>📝 Entidad JPA: CampaniaLeadEntity.java</h4>
+            <div class="code-block">
+<span class="ann">@Entity</span>
+<span class="ann">@Table</span>(<span class="field">name</span> = <span class="str">"CRM_CAMPANIA_LEADS"</span>, <span class="field">uniqueConstraints</span> =
+    <span class="ann">@UniqueConstraint</span>(<span class="field">name</span> = <span class="str">"UK_CAMPANIA_LEAD"</span>,
+                     <span class="field">columnNames</span> = {<span class="str">"CAMPANIA_ID"</span>, <span class="str">"LEAD_ID"</span>}))
+<span class="kw">public class</span> <span class="type">CampaniaLeadEntity</span> {
+
+    <span class="ann">@Id</span> <span class="ann">@GeneratedValue</span>(<span class="field">strategy</span> = GenerationType.IDENTITY)
+    <span class="kw">private</span> <span class="type">Long</span> <span class="field">id</span>;
+
+    <span class="ann">@Column</span>(<span class="field">name</span> = <span class="str">"CAMPANIA_ID"</span>, <span class="field">nullable</span> = <span class="kw">false</span>)
+    <span class="kw">private</span> <span class="type">Long</span> <span class="field">campaniaId</span>;
+
+    <span class="ann">@Column</span>(<span class="field">name</span> = <span class="str">"LEAD_ID"</span>, <span class="field">nullable</span> = <span class="kw">false</span>)
+    <span class="kw">private</span> <span class="type">Long</span> <span class="field">leadId</span>;
+}
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 11: Propuesta → Detalles (1:N complementaria) -->
+    <section class="section" id="propuesta-detalles">
+        <div class="section-header">
+            <span class="section-num">11</span>
+            <h2 class="section-title">Relación 1:N complementaria: Propuesta → Detalles</h2>
+        </div>
+
+        <div class="card">
+            <h4>📋 Diferencia con N:M</h4>
+            <p>
+                La relación entre <code>CRM_PROPUESTAS</code> y <code>CRM_PROPUESTA_DETALLES</code> es una <strong>1:N</strong> 
+                (un propuesta tiene muchos detalles/líneas de cotización). A diferencia de las N:M, aquí sí se usa 
+                <code>@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)</code> porque ambas entidades 
+                pertenecen al <strong>mismo módulo</strong> (propuestas) y los detalles no tienen sentido sin su propuesta padre.
+            </p>
+        </div>
+
+        <div class="nm-diagram" style="border-left: 3px solid #f59e0b;">
+            <h3>📎 Propuesta → Detalles (1:N con cascade)</h3>
+            <div class="rel-visual">
+                <div class="rel-entity left" style="border-color: #f59e0b;">
+                    <div class="ent-name" style="color: #fde68a;">CRM_PROPUESTAS</div>
+                    <div class="ent-label">Entidad padre</div>
+                </div>
+                <div class="rel-arrow">── 1:N ──►</div>
+                <div class="rel-entity right" style="border-color: #f59e0b;">
+                    <div class="ent-name" style="color: #fde68a;">CRM_PROPUESTA_DETALLES</div>
+                    <div class="ent-label">Líneas de cotización</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="alert alert-warning">
+            <span class="alert-icon">⚠️</span>
+            <div>
+                <strong>Diferencia clave:</strong> En las relaciones N:M del sistema, las tablas intermedias NO usan 
+                <code>cascade</code> ni <code>orphanRemoval</code> porque los registros referenciados pertenecen a otros módulos.
+                En la 1:N (Propuesta → Detalles), sí se usa cascade porque todo está dentro del mismo módulo.
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 12: API Endpoints completa -->
+    <section class="section" id="api-endpoints">
+        <div class="section-header">
+            <span class="section-num">12</span>
+            <h2 class="section-title">API REST completa para relaciones N:M</h2>
+        </div>
+
+        <div class="card" style="overflow-x: auto;">
+            <h4>📡 Todos los endpoints de relaciones N:M</h4>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Relación</th>
+                        <th>GET (listar)</th>
+                        <th>POST (crear)</th>
+                        <th>PUT (editar)</th>
+                        <th>DELETE (quitar)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Oport. ↔ Contactos</strong></td>
+                        <td>✅</td><td>✅</td><td>✅</td><td>✅</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Oport. ↔ Productos</strong></td>
+                        <td>✅</td><td>✅</td><td>—</td><td>✅</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Oport. ↔ Colaboradores</strong></td>
+                        <td>✅</td><td>✅</td><td>—</td><td>✅</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Actividad ↔ Participantes</strong></td>
+                        <td>✅</td><td>✅</td><td>—</td><td>✅</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Actividad ↔ Etiquetas</strong></td>
+                        <td>✅</td><td>✅</td><td>—</td><td>✅</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Equipo ↔ Miembros</strong></td>
+                        <td>✅</td><td>✅</td><td>—</td><td>✅</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Campaña ↔ Leads</strong></td>
+                        <td>✅</td><td>✅</td><td>—</td><td>✅</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="alert alert-success">
+            <span class="alert-icon">✅</span>
+            <div>
+                <strong>Patrón REST consistente:</strong> Todas las relaciones N:M siguen el patrón 
+                <code>/api/v1/{entidad}/{id}/{subrecurso}</code> para gestión de sub-recursos RESTful.
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 13: Modelo E-R Visual -->
+    <section class="section" id="modelo-er">
+        <div class="section-header">
+            <span class="section-num">13</span>
+            <h2 class="section-title">Modelo Entidad-Relación (Diagrama Visual)</h2>
+        </div>
+
+        <div class="nm-diagram">
+            <h3>🗺️ Mapa completo de tablas y relaciones N:M</h3>
+            <div class="code-block" style="font-size: 12px; line-height: 1.8; text-align: center;">
+<span class="type">┌─────────────────┐</span>        <span class="type">┌──────────────────────────────┐</span>        <span class="type">┌─────────────────┐</span>
+<span class="type">│</span> <span class="field">CRM_OPORTUNIDADES</span><span class="type">│</span>◄──N:M──<span class="type">│</span> <span class="ann">CRM_OPORTUNIDAD_CONTACTOS</span>    <span class="type">│</span>──N:M──►<span class="type">│</span> <span class="field">CRM_CONTACTOS</span>   <span class="type">│</span>
+<span class="type">│</span>                 <span class="type">│</span>        <span class="type">│</span>  <span class="str">+ rol, esDecisor</span>             <span class="type">│</span>        <span class="type">│</span>                 <span class="type">│</span>
+<span class="type">│</span>                 <span class="type">│</span>◄──N:M──<span class="type">│</span> <span class="ann">CRM_OPORTUNIDAD_PRODUCTOS</span>    <span class="type">│</span>──N:M──►<span class="type">│</span> <span class="field">CRM_PRODUCTOS</span>   <span class="type">│</span>
+<span class="type">│</span>                 <span class="type">│</span>        <span class="type">│</span>  <span class="str">+ cantidad</span>                   <span class="type">│</span>        <span class="type">│</span>                 <span class="type">│</span>
+<span class="type">│</span>                 <span class="type">│</span>◄──N:M──<span class="type">│</span> <span class="ann">CRM_OPORTUNIDAD_COLABORADORES</span><span class="type">│</span>──N:M──►<span class="type">│</span> <span class="field">CRM_USUARIOS</span>    <span class="type">│</span>
+<span class="type">└─────────────────┘</span>        <span class="type">└──────────────────────────────┘</span>        <span class="type">└─────────────────┘</span>
+
+<span class="type">┌─────────────────┐</span>        <span class="type">┌──────────────────────────────┐</span>        <span class="type">┌─────────────────┐</span>
+<span class="type">│</span> <span class="field">CRM_ACTIVIDADES</span>  <span class="type">│</span>◄──N:M──<span class="type">│</span> <span class="ann">CRM_ACTIVIDAD_PARTICIPANTES</span>  <span class="type">│</span>──N:M──►<span class="type">│</span> <span class="field">CRM_CONTACTOS</span>   <span class="type">│</span>
+<span class="type">│</span>                 <span class="type">│</span>◄──N:M──<span class="type">│</span> <span class="ann">CRM_ACTIVIDAD_ETIQUETAS</span>      <span class="type">│</span>──N:M──►<span class="type">│</span> <span class="field">CRM_ETIQUETAS</span>   <span class="type">│</span>
+<span class="type">│</span>                 <span class="type">│</span>        <span class="type">│</span>  <span class="str">+ orden</span>                      <span class="type">│</span>        <span class="type">│</span>                 <span class="type">│</span>
+<span class="type">└─────────────────┘</span>        <span class="type">└──────────────────────────────┘</span>        <span class="type">└─────────────────┘</span>
+
+<span class="type">┌─────────────────┐</span>        <span class="type">┌──────────────────────────────┐</span>        <span class="type">┌─────────────────┐</span>
+<span class="type">│</span> <span class="field">CRM_EQUIPOS</span>      <span class="type">│</span>◄──N:M──<span class="type">│</span> <span class="ann">CRM_EQUIPO_MIEMBROS</span>          <span class="type">│</span>──N:M──►<span class="type">│</span> <span class="field">CRM_USUARIOS</span>    <span class="type">│</span>
+<span class="type">└─────────────────┘</span>        <span class="type">└──────────────────────────────┘</span>        <span class="type">└─────────────────┘</span>
+
+<span class="type">┌─────────────────┐</span>        <span class="type">┌──────────────────────────────┐</span>        <span class="type">┌─────────────────┐</span>
+<span class="type">│</span> <span class="field">CRM_CAMPANIAS</span>    <span class="type">│</span>◄──N:M──<span class="type">│</span> <span class="ann">CRM_CAMPANIA_LEADS</span>           <span class="type">│</span>──N:M──►<span class="type">│</span> <span class="field">CRM_LEADS</span>       <span class="type">│</span>
+<span class="type">└─────────────────┘</span>        <span class="type">└──────────────────────────────┘</span>        <span class="type">└─────────────────┘</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 14: Conclusiones -->
+    <section class="section" id="conclusiones">
+        <div class="section-header">
+            <span class="section-num">14</span>
+            <h2 class="section-title">Conclusiones y ventajas de la arquitectura</h2>
+        </div>
+
+        <div class="grid-2">
+            <div class="card" style="border-color: rgba(16, 185, 129, 0.4);">
+                <h4>✅ Ventajas del enfoque actual</h4>
+                <ul style="margin: 8px 0 0 18px; font-size: 13.5px; color: var(--text-muted);">
+                    <li><strong>Modularidad real</strong> — Cada módulo es independiente y autónomo</li>
+                    <li><strong>Atributos extra</strong> en la relación (rol, cantidad, esDecisor, orden)</li>
+                    <li><strong>No hay foreign keys físicas</strong> entre módulos (respeta Spring Modulith)</li>
+                    <li><strong>CRUD completo</strong> por REST sub-resources</li>
+                    <li><strong>UniqueConstraint</strong> en todas las tablas intermedias</li>
+                    <li><strong>Auditoría temporal</strong> con campo creadoEn</li>
+                </ul>
+            </div>
+            <div class="card" style="border-color: rgba(59, 130, 246, 0.4);">
+                <h4>📊 Cifras clave</h4>
+                <ul style="margin: 8px 0 0 18px; font-size: 13.5px; color: var(--text-muted);">
+                    <li><strong>7 relaciones N:M</strong> implementadas en el sistema</li>
+                    <li><strong>7 tablas intermedias</strong> con entidades JPA independientes</li>
+                    <li><strong>21 tablas Oracle 23c</strong> en total (14 maestras + 7 intermedias)</li>
+                    <li><strong>5 módulos</strong> involucrados en relaciones N:M</li>
+                    <li><strong>18+ endpoints REST</strong> dedicados a gestión de relaciones</li>
+                    <li><strong>0 @ManyToMany JPA</strong> — todas implementadas manualmente</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="alert alert-tip" style="margin-top: 20px;">
+            <span class="alert-icon">🎓</span>
+            <div>
+                <strong>Para la sustentación:</strong> La implementación manual de N:M con entidades intermedias demuestra 
+                comprensión profunda de modelado relacional, patrones DDD, y arquitectura modular. Es más compleja que 
+                usar <code>@ManyToMany</code> de JPA, pero ofrece control total, extensibilidad y respeto por los 
+                límites de módulo de Spring Modulith.
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>VIERNES CRM V1.0 • Informe de Relaciones N:M</p>
+        <p style="margin-top: 4px; font-size: 12px; color: #475569;">
+            Lenguaje de Programación II (LP2) • BomERP – Viernes CRM V1 • 7 relaciones N:M con tablas intermedias
+        </p>
+    </footer>
+
+</div>
+
+</body>
+</html>

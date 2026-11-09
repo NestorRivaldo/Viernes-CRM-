@@ -6,6 +6,7 @@ import com.viernes.productos.application.port.out.ProductoPersistencePort;
 import com.viernes.productos.domain.EstadoProducto;
 import com.viernes.productos.domain.Producto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
@@ -18,7 +19,7 @@ public class ProductoPersistenceAdapter implements ProductoPersistencePort {
 
     @Override
     public List<Producto> findAll() {
-        return repository.findAll().stream().map(this::toDomain).toList();
+        return repository.findAll(Sort.by(Sort.Direction.ASC, "id")).stream().map(this::toDomain).toList();
     }
 
     @Override

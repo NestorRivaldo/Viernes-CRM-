@@ -17,6 +17,7 @@ export class ActividadesService {
       if (filtros.idCliente) params = params.set('idCliente', filtros.idCliente);
       if (filtros.idLead) params = params.set('idLead', filtros.idLead);
       if (filtros.idOportunidad) params = params.set('idOportunidad', filtros.idOportunidad);
+      if (filtros.etiquetaId) params = params.set('etiquetaId', filtros.etiquetaId);
       if (filtros.vencidas) params = params.set('vencidas', true);
     }
     return this.http.get<ActividadResponse[]>(this.apiService.buildUrl(this.path), { params });

@@ -42,6 +42,11 @@
           <span class="nav-label">Clientes</span>
         </a>
 
+        <a routerLink="/relaciones" routerLinkActive="active" class="nav-item">
+          <mat-icon class="nav-icon">hub</mat-icon>
+          <span class="nav-label">Mapa de Relaciones</span>
+        </a>
+
         <a routerLink="/leads" routerLinkActive="active" class="nav-item">
           <mat-icon class="nav-icon">adjust</mat-icon>
           <span class="nav-label">Leads</span>
@@ -73,22 +78,31 @@
         </a>
       </div>
 
-      <!-- Section: ADMINISTRACIÓN -->
-      <div class="nav-section">
-        <div class="nav-section-title">ADMINISTRACIÓN</div>
+      <!-- Section: ADMINISTRACIÓN (solo ADMIN y JEFE) -->
+      @if (puedeVerAdministracion) {
+        <div class="nav-section">
+          <div class="nav-section-title">ADMINISTRACIÓN</div>
 
-        @if (esAdmin) {
-          <a routerLink="/usuarios" routerLinkActive="active" class="nav-item">
-            <mat-icon class="nav-icon">manage_accounts</mat-icon>
-            <span class="nav-label">Usuarios y roles</span>
+          @if (esAdmin) {
+            <a routerLink="/usuarios" routerLinkActive="active" class="nav-item">
+              <mat-icon class="nav-icon">manage_accounts</mat-icon>
+              <span class="nav-label">Usuarios y roles</span>
+            </a>
+          }
+
+          <a routerLink="/equipos" routerLinkActive="active" class="nav-item">
+            <mat-icon class="nav-icon">groups</mat-icon>
+            <span class="nav-label">Equipos</span>
           </a>
-        }
 
-        <a routerLink="/configuracion" routerLinkActive="active" class="nav-item" title="Configuración del CRM">
-          <mat-icon class="nav-icon">settings</mat-icon>
-          <span class="nav-label">Configuración</span>
-        </a>
-      </div>
+          @if (esAdmin) {
+            <a routerLink="/configuracion" routerLinkActive="active" class="nav-item" title="Configuración del CRM">
+              <mat-icon class="nav-icon">settings</mat-icon>
+              <span class="nav-label">Configuración</span>
+            </a>
+          }
+        </div>
+      }
 
     </nav>
 
@@ -102,7 +116,7 @@
   <!-- MAIN WRAPPER (Header + View Content) -->
   <div class="app-main-wrapper">
     
-    <!-- HEADER (Reference: macOS Monterey Sunset Subtle Gradient + Search Pill + User Capsule) -->
+    <!-- HEADER (Reference: macOS Monterey Sunset Subtle Gradient + Messages Pill + User Capsule) -->
     <header class="app-header">
       
       <!-- Mobile sidebar toggle -->
@@ -110,16 +124,27 @@
         <mat-icon>menu</mat-icon>
       </button>
 
-      <!-- Broad Search Pill Input -->
-      <div class="header-search-container">
-        <mat-icon class="search-icon">search</mat-icon>
-        <input 
-          type="text" 
-          class="header-search-input" 
-          placeholder="Buscar clientes, oportunidades, leads, actividades..."
-          (keyup.enter)="onSearch($event)"
-        />
-      </div>
+      <!-- Internal Messaging -->
+      <button
+        type="button"
+        class="header-messages-btn"
+        [class.active]="mensajeria.panelAbierto()"
+        (click)="mensajeria.alternarPanel()"
+        title="Abrir mensajes internos"
+      >
+        <span class="messages-icon">
+          <mat-icon>forum</mat-icon>
+        </span>
+        <span class="messages-copy">
+          <strong>Mensajes</strong>
+          <small>Sala general del equipo</small>
+        </span>
+        @if (mensajeria.noLeidos() > 0) {
+          <span class="messages-unread">
+            {{ mensajeria.noLeidos() > 99 ? '99+' : mensajeria.noLeidos() }}
+          </span>
+        }
+      </button>
 
       <!-- Header Actions: Notifications & User Profile -->
       <div class="header-actions">
@@ -210,4 +235,8 @@
     </main>
 
   </div>
+
+  @if (mensajeria.panelAbierto()) {
+    <app-chat-panel />
+  }
 </div>

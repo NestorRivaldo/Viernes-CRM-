@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe - API REST N:M de Oportunidades (Wave 2 Backend) – VIERNES CRM</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #090d16;
+            --surface: #111726;
+            --surface2: #172033;
+            --border: #232f48;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --text-subtle: #64748b;
+            --accent: #3b82f6;
+            --accent-soft: rgba(59, 130, 246, 0.12);
+            --green: #10b981;
+            --green-soft: rgba(16, 185, 129, 0.12);
+            --purple: #a855f7;
+            --purple-soft: rgba(168, 85, 247, 0.12);
+            --amber: #f59e0b;
+            --amber-soft: rgba(245, 158, 11, 0.12);
+            --red: #ef4444;
+            --red-soft: rgba(239, 68, 68, 0.12);
+            --radius-md: 14px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            padding: 40px 20px;
+            background-image:
+                radial-gradient(circle at 15% 10%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 90%, rgba(168, 85, 247, 0.06) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+        .container { max-width: 1000px; margin: 0 auto; }
+        header { text-align: center; margin-bottom: 44px; padding-bottom: 28px; border-bottom: 1px solid var(--border); }
+        .brand-badge {
+            display: inline-block; background: var(--accent-soft); color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.3); padding: 6px 14px;
+            border-radius: 30px; font-size: 13px; font-weight: 600; margin-bottom: 16px;
+        }
+        h1 { font-size: 30px; font-weight: 800; margin-bottom: 10px; }
+        .subtitle { color: var(--text-muted); font-size: 15px; }
+        .meta { color: var(--text-subtle); font-size: 13px; margin-top: 12px; font-family: 'JetBrains Mono', monospace; }
+        h2 {
+            font-size: 20px; font-weight: 700; margin: 36px 0 16px;
+            padding-left: 14px; border-left: 3px solid var(--accent);
+        }
+        .card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius-md); padding: 22px 26px; margin-bottom: 18px;
+        }
+        .card p, .card li { color: var(--text-muted); font-size: 14.5px; }
+        .card ul { padding-left: 20px; }
+        .card li { margin-bottom: 6px; }
+        .card strong { color: var(--text); }
+        code {
+            font-family: 'JetBrains Mono', monospace; font-size: 13px;
+            background: var(--surface2); padding: 2px 7px; border-radius: 6px;
+            color: #7dd3fc; border: 1px solid var(--border);
+        }
+        table { width: 100%; border-collapse: collapse; font-size: 13.5px; margin-top: 8px; }
+        th, td { padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { color: var(--text); font-weight: 600; background: var(--surface2); font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.4px; }
+        td { color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size: 12.5px; }
+        .pill { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; font-family: 'Inter', sans-serif; }
+        .pill-green { background: var(--green-soft); color: var(--green); }
+        .pill-blue { background: var(--accent-soft); color: #60a5fa; }
+        .pill-amber { background: var(--amber-soft); color: var(--amber); }
+        .pill-red { background: var(--red-soft); color: var(--red); }
+        .pill-purple { background: var(--purple-soft); color: var(--purple); }
+        .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 18px; }
+        .kpi { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 18px; text-align: center; }
+        .kpi .num { font-size: 28px; font-weight: 800; color: var(--green); }
+        .kpi .num.blue { color: #60a5fa; }
+        .kpi .num.amber { color: var(--amber); }
+        .kpi .lbl { font-size: 12.5px; color: var(--text-subtle); margin-top: 4px; }
+        .alert { border-left: 3px solid var(--amber); background: var(--amber-soft); }
+        .alert strong { color: var(--amber); }
+        .ok { border-left: 3px solid var(--green); }
+        footer { text-align: center; color: var(--text-subtle); font-size: 12.5px; margin-top: 44px; padding-top: 20px; border-top: 1px solid var(--border); }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <header>
+        <div class="brand-badge">VIERNES CRM · Backend</div>
+        <h1>Activación de la API REST N:M de Oportunidades</h1>
+        <div class="subtitle">Cierre de la Wave 2 (backend): los servicios de relaciones N:M quedan expuestos por REST y verificados end-to-end</div>
+        <div class="meta">Fecha: 19–20 de octubre de 2026 · Rama: main · Alcance ejecutado: solo backend</div>
+    </header>
+
+    <div class="kpi-row">
+        <div class="kpi"><div class="num blue">1</div><div class="lbl">Archivo modificado</div></div>
+        <div class="kpi"><div class="num blue">10</div><div class="lbl">Endpoints REST agregados</div></div>
+        <div class="kpi"><div class="num">246</div><div class="lbl">Tests en verde</div></div>
+        <div class="kpi"><div class="num">22</div><div class="lbl">Llamadas E2E exitosas</div></div>
+        <div class="kpi"><div class="num amber">0</div><div class="lbl">Errores pendientes</div></div>
+    </div>
+
+    <h2>1. Resumen</h2>
+    <div class="card ok">
+        <p>La Wave 2 (relaciones N:M de oportunidades con <strong>contactos</strong>, <strong>productos</strong> y <strong>colaboradores</strong>) quedó cortada a mitad: toda la lógica existía (dominio, puertos, adapters, servicio con 10 métodos, tablas en Oracle) pero <strong>no había forma de invocarla</strong> porque el controller no exponía los endpoints. En esta sesión se agregaron los 10 endpoints REST y se verificó el flujo completo contra Oracle y Keycloak reales. <strong>El backend N:M queda 100% operativo vía API.</strong></p>
+    </div>
+
+    <h2>2. Punto de partida (diagnóstico previo)</h2>
+    <div class="card">
+        <ul>
+            <li>Los "~400 errores" reportados <strong>no existían en el código</strong>: eran artefactos corruptos que el language server del IDE (Antigravity, extensión redhat.java sobre JRE 25) escribía en <code>target/classes</code>, la misma carpeta que usa Maven.</li>
+            <li>Estado de la Wave 2 al iniciar la sesión: servicio completo pero sin endpoints; frontend sin UI de detalle; tablas junction creadas pero vacías; todo el trabajo sin commitear.</li>
+            <li>Un bug real ya estaba corregido en el working tree: el choque de nombre del bean <code>contactoQueryAdapter</code> entre los módulos actividades y oportunidades (resuelto con <code>@Component("oportunidadContactoQueryAdapter")</code>).</li>
+        </ul>
+    </div>
+
+    <h2>3. Cambio realizado</h2>
+    <div class="card">
+        <p><strong>Único archivo modificado:</strong> <code>viernes-backend/.../oportunidades/adapters/in/web/OportunidadController.java</code> (+79 líneas: 7 imports y 10 métodos). Ningún otro archivo fue tocado.</p>
+        <table>
+            <tr><th>Recurso</th><th>Método</th><th>Ruta</th><th>Caso de uso</th></tr>
+            <tr><td rowspan="4">Contactos</td><td>GET</td><td>/api/v1/oportunidades/{id}/contactos</td><td>listarContactos</td></tr>
+            <tr><td>POST</td><td>/api/v1/oportunidades/{id}/contactos</td><td>agregarContacto (201)</td></tr>
+            <tr><td>PUT</td><td>/api/v1/oportunidades/{id}/contactos/{contactoId}</td><td>actualizarContacto (rol / esDecisor)</td></tr>
+            <tr><td>DELETE</td><td>/api/v1/oportunidades/{id}/contactos/{contactoId}</td><td>quitarContacto (204)</td></tr>
+            <tr><td rowspan="3">Productos</td><td>GET</td><td>/api/v1/oportunidades/{id}/productos</td><td>listarProductos</td></tr>
+            <tr><td>POST</td><td>/api/v1/oportunidades/{id}/productos</td><td>agregarProducto con cantidad (201)</td></tr>
+            <tr><td>DELETE</td><td>/api/v1/oportunidades/{id}/productos/{productoId}</td><td>quitarProducto (204)</td></tr>
+            <tr><td rowspan="3">Colaboradores</td><td>GET</td><td>/api/v1/oportunidades/{id}/colaboradores</td><td>listarColaboradores</td></tr>
+            <tr><td>POST</td><td>/api/v1/oportunidades/{id}/colaboradores</td><td>agregarColaborador (201)</td></tr>
+            <tr><td>DELETE</td><td>/api/v1/oportunidades/{id}/colaboradores/{usuarioId}</td><td>quitarColaborador (204)</td></tr>
+        </table>
+        <p style="margin-top:12px">Las respuestas van <strong>enriquecidas cross-módulo</strong>: cada asociación devuelve nombre y correo del contacto (módulo clientes), código/nombre/precioBase del producto (módulo productos) y nombre completo/correo del colaborador (módulo usuarios), vía los query adapters creados en la Wave 2.</p>
+    </div>
+
+    <h2>4. Verificación end-to-end</h2>
+    <div class="card">
+        <p>Entorno real: backend en <code>:8080</code>, Keycloak en <code>:8180</code> (token JWT de <code>admin@viernes.com</code>), Oracle 23c en <code>:1521</code>. Suite Maven previa: <strong>246/246 tests en verde</strong> (<code>./mvnw clean test</code>).</p>
+        <table>
+            <tr><th>Escenario</th><th>Esperado</th><th>Obtenido</th></tr>
+            <tr><td>Asociar contacto / producto / colaborador</td><td>201 + JSON enriquecido</td><td><span class="pill pill-green">201 OK</span></td></tr>
+            <tr><td>Listar cada sub-recurso</td><td>200 con 1 ítem</td><td><span class="pill pill-green">200 OK</span></td></tr>
+            <tr><td>Asociación duplicada (los 3 recursos)</td><td>400</td><td><span class="pill pill-green">400 OK</span></td></tr>
+            <tr><td>Cantidad = 0 en producto (bean validation)</td><td>400</td><td><span class="pill pill-green">400 OK</span></td></tr>
+            <tr><td>Actualizar rol y esDecisor de contacto</td><td>200 con valores nuevos</td><td><span class="pill pill-green">200 OK</span></td></tr>
+            <tr><td>Contacto / usuario inexistente (id 99999)</td><td>404</td><td><span class="pill pill-green">404 OK</span></td></tr>
+            <tr><td>Quitar asociación (los 3 recursos)</td><td>204</td><td><span class="pill pill-green">204 OK</span></td></tr>
+            <tr><td>Quitar dos veces la misma asociación</td><td>404</td><td><span class="pill pill-green">404 OK</span></td></tr>
+            <tr><td>Listas finales tras quitar todo</td><td>[]</td><td><span class="pill pill-green">[] OK</span></td></tr>
+            <tr><td>Sin token JWT</td><td>401</td><td><span class="pill pill-green">401 OK</span></td></tr>
+        </table>
+        <p style="margin-top:12px"><strong>Limpieza:</strong> las tablas <code>CRM_OPORTUNIDAD_CONTACTOS / _PRODUCTOS / _COLABORADORES</code> quedaron en 0 filas y el producto temporal de prueba fue eliminado — la base quedó exactamente como se encontró. Log del backend sin errores tras el reinicio.</p>
+    </div>
+
+    <h2>5. Incidente durante la sesión (misma causa raíz de los "400 errores")</h2>
+    <div class="card alert">
+        <p><strong>El problema del IDE volvió a ocurrir en vivo.</strong> Al guardar la edición del controller, el language server compiló el archivo con su ECJ y escribió una clase rota en <code>target/classes</code> (<code>java.lang.Error: Unresolved compilation problem — 'Flexible Constructor Bodies' is only available with source level 25</code>). El primer <code>mvn test</code> falló por ese artefacto, no por el código fuente. Se resolvió con <code>./mvnw clean test</code> (full rebuild con javac).</p>
+        <p style="margin-top:10px"><strong>Recomendación permanente:</strong> ejecutar en el IDE "Java: Clean Java Language Server Workspace", o desactivar su auto-build para este proyecto; y usar siempre <code>./mvnw clean</code> antes de <code>test</code>/<code>run</code> mientras conviva con el IDE.</p>
+    </div>
+
+    <h2>6. Estado final del sistema</h2>
+    <div class="card">
+        <table>
+            <tr><th>Componente</th><th>Estado</th><th>Detalle</th></tr>
+            <tr><td>Oracle 23c (Docker :1521)</td><td><span class="pill pill-green">UP</span></td><td>healthy, tablas junction creadas</td></tr>
+            <tr><td>Keycloak (:8180) + PostgreSQL</td><td><span class="pill pill-green">UP</span></td><td>realm viernes-realm operativo</td></tr>
+            <tr><td>Backend Spring Boot (:8080)</td><td><span class="pill pill-green">UP</span></td><td>actuator UP, 0 errores en log, API N:M activa y documentada en Swagger</td></tr>
+            <tr><td>Frontend Angular (:4200)</td><td><span class="pill pill-green">UP</span></td><td>build sin errores</td></tr>
+        </table>
+    </div>
+
+    <h2>7. Pendientes para la próxima sesión</h2>
+    <div class="card">
+        <ul>
+            <li><span class="pill pill-amber">Pendiente</span> <strong>Commit de todo el trabajo</strong>: wave 2 completa + este cambio (17 archivos modificados, ~30 nuevos) sigue solo en el working tree — riesgo de pérdida.</li>
+            <li><span class="pill pill-amber">Pendiente</span> <strong>Frontend</strong>: pantalla de detalle de oportunidad con las 3 secciones N:M (service, modelos, componente, ruta).</li>
+            <li><span class="pill pill-amber">Pendiente</span> <strong>Frontend propuestas</strong>: cargar productos en el form, <code>mat-select</code> en el template y preservar <code>productoId</code> al editar (el backend de ese flujo ya funciona).</li>
+            <li><span class="pill pill-amber">Pendiente</span> <strong>Tests unitarios</strong> de los 10 métodos N:M de <code>OportunidadService</code> (hoy solo tienen verificación E2E).</li>
+            <li><span class="pill pill-purple">Mejora</span> Optimizar <code>ContactoQueryAdapter</code> (hoy recorre todos los clientes en memoria para resolver un contacto).</li>
+        </ul>
+    </div>
+
+    <footer>
+        Informe generado al cierre de la sesión · VIERNES CRM V1 · Verificado contra entorno DEV real (Oracle + Keycloak)
+    </footer>
+
+</div>
+</body>
+</html>

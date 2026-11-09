@@ -1,13 +1,17 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
+import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ProductosService } from '../productos.service';
 import { ProductoResponse, EstadoProducto } from '../producto.model';
+import { ProductoDialogResult, ProductoForm } from '../producto-form/producto-form';
+import { sortRows } from '../../../shared/table-sort';
 
 @Component({
   selector: 'app-producto-list',
@@ -16,16 +20,19 @@ import { ProductoResponse, EstadoProducto } from '../producto.model';
     CommonModule,
     FormsModule,
     MatTableModule,
+    MatSortModule,
     MatButtonModule,
     MatIconModule,
-    RouterLink,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatDialogModule
   ],
   templateUrl: './producto-list.html',
   styleUrl: './producto-list.css'
 })
 export class ProductoList implements OnInit {
   private productosService = inject(ProductosService);
+  private dialog = inject(MatDialog);
+  private route = inject(ActivatedRoute);
   private router = inject(Router);
 
   productos = signal<ProductoResponse[]>([]);
@@ -36,6 +43,7 @@ export class ProductoList implements OnInit {
 
   estados = Object.values(EstadoProducto);
   displayedColumns: string[] = ['id', 'codigo', 'nombre', 'categoria', 'precioBase', 'estado', 'acciones'];
+  sortState = signal<Sort>({ active: 'id', direction: 'asc' });
 
   productosFiltrados = computed(() => {
     const q = this.filtroTexto().toLowerCase().trim();
@@ -50,11 +58,34 @@ export class ProductoList implements OnInit {
     });
   });
 
+  productosOrdenados = computed(() => sortRows(this.productosFiltrados(), this.sortState()));
+
+
+  onSortChange(sort: Sort) {
+
+    this.sortState.set(sort);
+
+  }
+
+
   hasProductos = computed(() => this.productosFiltrados().length > 0 && !this.loading());
   isEmpty = computed(() => !this.loading() && this.productosFiltrados().length === 0 && !this.error());
 
   ngOnInit() {
     this.cargarProductos();
+
+    if (this.route.snapshot.data['abrirNuevoProducto']) {
+      this.abrirDialogo();
+      return;
+    }
+
+    const idParam = this.route.snapshot.paramMap.get('id');
+    if (this.route.snapshot.data['abrirEdicionProducto'] && idParam) {
+      const id = Number(idParam);
+      if (Number.isFinite(id) && id > 0) {
+        this.abrirDialogo(id);
+      }
+    }
   }
 
   cargarProductos() {
@@ -94,7 +125,38 @@ export class ProductoList implements OnInit {
     }
   }
 
+  nuevoProducto() {
+    this.abrirDialogo();
+  }
+
   editar(id: number) {
-    this.router.navigate(['/productos', id, 'editar']);
+    this.abrirDialogo(id);
+  }
+
+  private abrirDialogo(id?: number) {
+    const enRutaDirecta = !!(
+      this.route.snapshot.data['abrirNuevoProducto'] || this.route.snapshot.data['abrirEdicionProducto']
+    );
+
+    this.dialog
+      .open(ProductoForm, {
+        data: { id: id ?? null },
+        panelClass: 'entity-dialog-panel',
+        backdropClass: 'entity-dialog-backdrop',
+        width: '820px',
+        maxWidth: '95vw',
+        disableClose: false,
+        autoFocus: false,
+      })
+      .afterClosed()
+      .subscribe((result: ProductoDialogResult | undefined) => {
+        if (result?.saved) {
+          this.cargarProductos();
+        }
+
+        if (enRutaDirecta) {
+          this.router.navigate(['/productos'], { replaceUrl: true });
+        }
+      });
   }
 }

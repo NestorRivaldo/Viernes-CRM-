@@ -41,8 +41,3 @@ management:
 viernes:
   cors:
     allowed-origins: http://localhost:4200,http://localhost:8080,http://localhost:3000
-
-jwt:
-  # Clave en Base64 — 256 bits mínimo para HS256. Generar con: openssl rand -base64 32
-  secret: dGhpcy1pcy1hLXNlY3JldC1rZXktZm9yLXZpZXJuZXMtdjEtY3Jt
-  expiration: 28800000  # 8 horas en milisegundos

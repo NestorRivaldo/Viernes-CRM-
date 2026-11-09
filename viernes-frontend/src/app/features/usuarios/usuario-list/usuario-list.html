@@ -25,7 +25,7 @@
       </div>
 
       <!-- New Button -->
-      <button class="btn-primary-mac" routerLink="/usuarios/nuevo">
+      <button class="btn-primary-mac" (click)="nuevoUsuario()">
         <mat-icon>add</mat-icon> Nuevo Usuario
       </button>
     </div>
@@ -49,7 +49,7 @@
       <mat-icon>manage_accounts</mat-icon>
       <h3>No hay usuarios registrados</h3>
       <p>Registra a los colaboradores del equipo de ventas o administradores.</p>
-      <button class="btn-primary-mac" routerLink="/usuarios/nuevo" style="margin-top: 16px;">
+      <button class="btn-primary-mac" (click)="nuevoUsuario()" style="margin-top: 16px;">
         <mat-icon>add</mat-icon> Crear Usuario
       </button>
     </div>
@@ -57,17 +57,19 @@
 
   @if (hasUsuarios()) {
     <div class="mac-table-card">
-      <table mat-table [dataSource]="usuariosFiltrados()">
+      <table mat-table [dataSource]="usuariosOrdenados()" matSort matSortDisableClear
+             [matSortActive]="sortState().active" [matSortDirection]="sortState().direction"
+             (matSortChange)="onSortChange($event)">
 
         <!-- ID Column -->
         <ng-container matColumnDef="id">
-          <th mat-header-cell *matHeaderCellDef> ID </th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="id"> ID </th>
           <td mat-cell *matCellDef="let u" class="id-cell"> #{{ u.id }} </td>
         </ng-container>
 
         <!-- Nombre Column -->
         <ng-container matColumnDef="nombre">
-          <th mat-header-cell *matHeaderCellDef> Usuario </th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="nombre"> Usuario </th>
           <td mat-cell *matCellDef="let u">
             <div class="user-row-avatar">
               <div class="user-mini-bubble">{{ (u.nombre || 'U').charAt(0).toUpperCase() }}</div>
@@ -81,7 +83,7 @@
 
         <!-- Correo Column -->
         <ng-container matColumnDef="correo">
-          <th mat-header-cell *matHeaderCellDef> Correo </th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="correo"> Correo </th>
           <td mat-cell *matCellDef="let u">
             <span class="correo-text">{{ u.correo }}</span>
           </td>
@@ -89,7 +91,7 @@
 
         <!-- Rol Column -->
         <ng-container matColumnDef="rol">
-          <th mat-header-cell *matHeaderCellDef> Rol </th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="rol"> Rol </th>
           <td mat-cell *matCellDef="let u">
             <span class="status-pill {{ getRolBadgeClass(u.rol) }}">
               {{ u.rol }}
@@ -99,7 +101,7 @@
 
         <!-- Estado Column -->
         <ng-container matColumnDef="estado">
-          <th mat-header-cell *matHeaderCellDef> Estado </th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="estado"> Estado </th>
           <td mat-cell *matCellDef="let u">
             <span class="status-pill {{ u.estado === 'ACTIVO' ? 'success' : 'danger' }}">
               {{ u.estado }}

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiService } from '../../core/services/api-service';
-import { ClienteRequest, ClienteResponse, ContactoRequest, ContactoResponse, EstadoCliente } from './clientes.model';
+import { ClienteRequest, ClienteResponse, ContactoRequest, ContactoResponse, DocumentoConsultaResponse, EstadoCliente, TipoDocumento } from './clientes.model';
 
 @Injectable({ providedIn: 'root' })
 export class ClientesService {
@@ -10,12 +10,25 @@ export class ClientesService {
 
   constructor(private http: HttpClient, private apiService: ApiService) {}
 
-  listar(q?: string, estado?: EstadoCliente): Observable<ClienteResponse[]> {
+  listar(q?: string, estado?: EstadoCliente, documento?: string): Observable<ClienteResponse[]> {
     let params = new HttpParams();
     if (q) params = params.set('q', q);
     if (estado) params = params.set('estado', estado);
+    if (documento) params = params.set('documento', documento);
     
     return this.http.get<ClienteResponse[]>(this.apiService.buildUrl(this.path), { params });
+  }
+
+  buscarPorDocumento(documento: string): Observable<ClienteResponse[]> {
+    return this.http.get<ClienteResponse[]>(this.apiService.buildUrl(this.path), {
+      params: new HttpParams().set('documento', documento),
+    });
+  }
+
+  consultarDocumento(tipo: TipoDocumento, numero: string): Observable<DocumentoConsultaResponse> {
+    return this.http.get<DocumentoConsultaResponse>(
+      this.apiService.buildUrl(`${this.path}/documento/${tipo}/${numero}`)
+    );
   }
 
   obtener(id: number): Observable<ClienteResponse> {

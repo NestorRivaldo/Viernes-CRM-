@@ -1,21 +1,10 @@
-.form-container {
-  padding: 20px;
-  max-width: 800px;
-  margin: 0 auto;
+:host {
+  display: block;
 }
 
-.form-row {
-  display: flex;
-  gap: 20px;
-}
-
-.full-width {
-  flex: 1;
-}
-
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 20px;
+.lead-dialog {
+  --entity-accent: #2563eb;
+  --entity-accent-soft: #eff6ff;
+  --entity-accent-border: #dbeafe;
+  --entity-accent-shadow: rgba(37, 99, 235, 0.28);
 }

@@ -7,9 +7,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.time.Duration;
 import java.util.List;
 
 @Tag(name = "Fuentes", description = "Catalogo de fuentes de captacion de leads")
@@ -18,18 +20,21 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FuenteController {
 
+    private static final CacheControl CACHE_300S =
+            CacheControl.maxAge(Duration.ofSeconds(300)).cachePrivate();
+
     private final ManageFuenteUseCase useCase;
 
     @Operation(summary = "Listar fuentes con filtro opcional por estado activa")
     @GetMapping
     public ResponseEntity<List<FuenteResponse>> listar(@RequestParam(required = false) Boolean activa) {
-        return ResponseEntity.ok(useCase.listar(activa));
+        return ResponseEntity.ok().cacheControl(CACHE_300S).body(useCase.listar(activa));
     }
 
     @Operation(summary = "Obtener fuente por ID")
     @GetMapping("/{id}")
     public ResponseEntity<FuenteResponse> obtener(@PathVariable Long id) {
-        return ResponseEntity.ok(useCase.obtener(id));
+        return ResponseEntity.ok().cacheControl(CACHE_300S).body(useCase.obtener(id));
     }
 
     @Operation(summary = "Crear nueva fuente")

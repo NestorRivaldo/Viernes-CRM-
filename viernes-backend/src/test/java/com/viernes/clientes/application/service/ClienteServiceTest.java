@@ -4,10 +4,14 @@ import com.viernes.clientes.application.dto.ClienteRequest;
 import com.viernes.clientes.application.dto.ClienteResponse;
 import com.viernes.clientes.application.dto.ContactoRequest;
 import com.viernes.clientes.application.dto.ContactoResponse;
+import com.viernes.clientes.application.dto.DocumentoConsultaResponse;
 import com.viernes.clientes.application.port.out.ClientePersistencePort;
+import com.viernes.clientes.application.port.out.DocumentoLookupPort;
 import com.viernes.clientes.domain.Cliente;
 import com.viernes.clientes.domain.Contacto;
+import com.viernes.clientes.domain.DocumentoConsultado;
 import com.viernes.clientes.domain.EstadoCliente;
+import com.viernes.clientes.domain.TipoDocumento;
 import com.viernes.shared.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,6 +35,9 @@ class ClienteServiceTest {
     @Mock
     private ClientePersistencePort persistencePort;
 
+    @Mock
+    private DocumentoLookupPort documentoLookupPort;
+
     @InjectMocks
     private ClienteService servicio;
 
@@ -41,7 +48,7 @@ class ClienteServiceTest {
     @BeforeEach
     void setUp() {
         validRequest = new ClienteRequest(
-                "Juan Perez", "Empresa SA", "juan@mail.com", "555-1234", null, "Maria"
+                "Juan Perez", "Empresa SA", TipoDocumento.DNI, "12345678", "juan@mail.com", "555-1234", null, "Maria"
         );
 
         contactoRequest = new ContactoRequest(
@@ -52,6 +59,8 @@ class ClienteServiceTest {
                 .id(1L)
                 .nombre("Juan Perez")
                 .empresa("Empresa SA")
+                .tipoDocumento(TipoDocumento.DNI)
+                .numeroDocumento("12345678")
                 .correo("juan@mail.com")
                 .telefono("555-1234")
                 .estado(EstadoCliente.ACTIVO)
@@ -79,6 +88,72 @@ class ClienteServiceTest {
 
         assertEquals(1, resultado.size());
         assertEquals(1L, resultado.get(0).id());
+    }
+
+    @Test
+    void buscarPorDocumento_retornaCoincidencias() {
+        when(persistencePort.findByNumeroDocumento("12345678")).thenReturn(List.of(entidadGuardada));
+
+        List<ClienteResponse> resultado = servicio.buscarPorDocumento("12345678");
+
+        assertEquals(1, resultado.size());
+        assertEquals(TipoDocumento.DNI, resultado.get(0).tipoDocumento());
+        assertEquals("12345678", resultado.get(0).numeroDocumento());
+    }
+
+    @Test
+    void consultarDocumento_dni_retornaDatosOficiales() {
+        DocumentoConsultado documento = new DocumentoConsultado(
+                TipoDocumento.DNI,
+                "12345678",
+                "Juan Perez Lopez",
+                null,
+                null,
+                null,
+                null,
+                null,
+                List.of()
+        );
+        when(documentoLookupPort.consultar(TipoDocumento.DNI, "12345678")).thenReturn(documento);
+
+        DocumentoConsultaResponse response = servicio.consultarDocumento(TipoDocumento.DNI, " 12345678 ");
+
+        assertEquals(TipoDocumento.DNI, response.tipoDocumento());
+        assertEquals("12345678", response.numeroDocumento());
+        assertEquals("Juan Perez Lopez", response.nombreCompleto());
+        verify(documentoLookupPort).consultar(TipoDocumento.DNI, "12345678");
+    }
+
+    @Test
+    void consultarDocumento_ruc_retornaDatosOficiales() {
+        DocumentoConsultado documento = new DocumentoConsultado(
+                TipoDocumento.RUC,
+                "20123456789",
+                null,
+                "Empresa SAC",
+                "Empresa",
+                "ACTIVO",
+                "HABIDO",
+                "Av. Lima 123",
+                List.of("01-1234567")
+        );
+        when(documentoLookupPort.consultar(TipoDocumento.RUC, "20123456789")).thenReturn(documento);
+
+        DocumentoConsultaResponse response = servicio.consultarDocumento(TipoDocumento.RUC, "20123456789");
+
+        assertEquals(TipoDocumento.RUC, response.tipoDocumento());
+        assertEquals("Empresa SAC", response.razonSocial());
+        assertEquals("ACTIVO", response.estado());
+        assertEquals("HABIDO", response.condicion());
+        assertEquals("Av. Lima 123", response.direccion());
+        assertEquals(List.of("01-1234567"), response.telefonos());
+    }
+
+    @Test
+    void consultarDocumento_conNumeroInvalido_lanzaIllegalArgument() {
+        assertThrows(IllegalArgumentException.class,
+                () -> servicio.consultarDocumento(TipoDocumento.DNI, "123"));
+        verifyNoInteractions(documentoLookupPort);
     }
 
     @Test
@@ -121,12 +196,45 @@ class ClienteServiceTest {
         assertNotNull(response.creadoEn());
         assertEquals("Juan Perez", response.nombre());
         assertEquals("Empresa SA", response.empresa());
+        assertEquals(TipoDocumento.DNI, response.tipoDocumento());
+        assertEquals("12345678", response.numeroDocumento());
+    }
+
+    @Test
+    void crear_conDocumentoDuplicado_lanzaIllegalArgument() {
+        when(persistencePort.existsByNumeroDocumento("12345678")).thenReturn(true);
+
+        assertThrows(IllegalArgumentException.class, () -> servicio.crear(validRequest));
+        verify(persistencePort, never()).save(any());
+    }
+
+    @Test
+    void crear_conDniInvalido_lanzaIllegalArgument() {
+        ClienteRequest invalido = new ClienteRequest(
+                "Juan Perez", "Empresa SA", TipoDocumento.DNI, "1234",
+                "juan@mail.com", "555-1234", null, "Maria"
+        );
+
+        assertThrows(IllegalArgumentException.class, () -> servicio.crear(invalido));
+        verify(persistencePort, never()).save(any());
+    }
+
+    @Test
+    void crear_conRucInvalido_lanzaIllegalArgument() {
+        ClienteRequest invalido = new ClienteRequest(
+                "Empresa SA", "Empresa SA", TipoDocumento.RUC, "12345678",
+                "empresa@mail.com", "555-1234", null, "Maria"
+        );
+
+        assertThrows(IllegalArgumentException.class, () -> servicio.crear(invalido));
+        verify(persistencePort, never()).save(any());
     }
 
     @Test
     void actualizar_clienteExistente_retornaActualizado() {
         ClienteRequest cambios = new ClienteRequest(
-                "Juan Actualizado", "Nueva Empresa", "nuevo@mail.com", "555-9999", EstadoCliente.INACTIVO, "Pedro"
+                "Juan Actualizado", "Nueva Empresa", TipoDocumento.DNI, "87654321",
+                "nuevo@mail.com", "555-9999", EstadoCliente.INACTIVO, "Pedro"
         );
         when(persistencePort.findById(1L)).thenReturn(Optional.of(entidadGuardada));
         when(persistencePort.save(any(Cliente.class))).thenAnswer(i -> i.getArgument(0));

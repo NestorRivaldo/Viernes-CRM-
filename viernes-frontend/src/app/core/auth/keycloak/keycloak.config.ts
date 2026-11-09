@@ -1,20 +1,21 @@
 /**
- * Configuración de conexión con el servidor Keycloak para Viernes V1.
- * 
- * En desarrollo local:
- * - Puerto de Keycloak: 8180 (para no colisionar con Spring Boot en 8080)
- * - Realm: viernes-realm
- * - Client ID público: viernes-frontend
+ * Configuración de conexión con Keycloak para Viernes V1.
+ *
+ * Flujo: Authorization Code + PKCE (S256).
+ * Keycloak no recibe contraseñas desde la SPA: el usuario autentica
+ * directamente en el portal de identidad.
  */
 export const KEYCLOAK_CONFIG = {
   url: 'http://localhost:8180',
   realm: 'viernes-realm',
   clientId: 'viernes-frontend',
-  minTokenValiditySeconds: 30, // Renovación automática si expira en < 30s
+  minTokenValiditySeconds: 30,
   initOptions: {
-    onLoad: 'check-sso' as const, // 'check-sso' no fuerza login si no tiene sesión; 'login-required' fuerza login directo
+    onLoad: 'check-sso' as const,
     checkLoginIframe: false,
     pkceMethod: 'S256' as const,
-    enableLogging: true
+    flow: 'standard' as const,
+    scope: 'openid profile email',
+    enableLogging: false
   }
 };

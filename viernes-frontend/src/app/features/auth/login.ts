@@ -1,54 +1,42 @@
-import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatCardModule, MatFormFieldModule, MatInputModule, MatButtonModule],
+  imports: [],
   templateUrl: './login.html',
   styleUrl: './login.css'
 })
-export class Login {
-  loginForm: FormGroup;
-  error: string = '';
-  loading: boolean = false;
+export class Login implements OnInit {
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
 
-  constructor(
-    private fb: FormBuilder,
-    private authService: AuthService,
-    private router: Router
-  ) {
-    this.loginForm = this.fb.group({
-      correo: ['admin@viernes.com', [Validators.required, Validators.email]],
-      password: ['Admin12345', Validators.required]
-    });
+  readonly loading = signal(false);
+  readonly error = signal('');
+  readonly year = new Date().getFullYear();
+
+  ngOnInit(): void {
+    if (this.authService.hasToken()) {
+      void this.router.navigate(['/dashboard']);
+    }
   }
 
-  onSubmit() {
-    if (this.loginForm.invalid) return;
+  async entrar(): Promise<void> {
+    if (this.loading()) return;
 
-    this.loading = true;
-    this.error = '';
+    this.loading.set(true);
+    this.error.set('');
 
-    this.authService.login(this.loginForm.value).subscribe({
-      next: () => {
-        this.router.navigate(['/dashboard']);
-      },
-      error: (err) => {
-        this.error = err?.friendlyMessage || 'Credenciales inválidas en Keycloak';
-        this.loading = false;
-      }
-    });
-  }
-
-  loginWithKeycloakSSO() {
-    this.authService.loginWithKeycloakSSO();
+    try {
+      await this.authService.login();
+    } catch (error) {
+      console.error('[Login] No se pudo iniciar el flujo de Keycloak:', error);
+      this.error.set(
+        'No pudimos conectar con el servicio de identidad. Verifica que Keycloak esté disponible e inténtalo nuevamente.'
+      );
+      this.loading.set(false);
+    }
   }
 }

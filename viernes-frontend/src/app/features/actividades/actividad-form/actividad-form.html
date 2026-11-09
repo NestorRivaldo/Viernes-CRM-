@@ -1,306 +1,268 @@
-<div class="form-page-wrapper">
-  
-  <!-- Header / Breadcrumb -->
-  <div class="form-header-bar">
-    <div class="breadcrumb-trail">
-      <a routerLink="/actividades" class="breadcrumb-back-link">
-        <mat-icon>arrow_back</mat-icon> Actividades
-      </a>
-      <span class="breadcrumb-separator">/</span>
-      <span class="breadcrumb-current">{{ isEdit ? 'Editar Actividad' : 'Nueva Actividad' }}</span>
-    </div>
-    <div class="form-title-group">
-      <h2>{{ isEdit ? 'Modificar Actividad Comercial' : 'Programar Nueva Actividad' }}</h2>
-      <p>Registra compromisos, llamadas, reuniones y tareas de seguimiento con clientes o prospectos.</p>
-    </div>
-  </div>
-
-  <!-- Form Main Card -->
-  <div class="form-card-container">
-    <form [formGroup]="form" (ngSubmit)="guardar()" class="activity-smart-form">
-
-      <!-- SECTION 1: DETALLES DE LA ACTIVIDAD -->
-      <div class="form-card-section">
-        <div class="section-badge-header">
-          <span class="step-num">1</span>
-          <div>
-            <h3>Detalles de la Actividad</h3>
-            <p>Define el objetivo y tipo de interacción comercial</p>
-          </div>
-        </div>
-
-        <!-- Tipo de Actividad Selector Pills -->
-        <div class="type-selector-container">
-          <label class="field-label">Tipo de Actividad *</label>
-          <div class="type-pills-grid">
-            <button 
-              type="button" 
-              class="type-pill" 
-              [class.selected]="form.get('tipo')?.value === 'LLAMADA'"
-              (click)="setTipo(tipos[0])">
-              <mat-icon class="icon-llamada">phone</mat-icon>
-              <span>Llamada</span>
-            </button>
-            <button 
-              type="button" 
-              class="type-pill" 
-              [class.selected]="form.get('tipo')?.value === 'REUNION'"
-              (click)="setTipo(tipos[1])">
-              <mat-icon class="icon-reunion">groups</mat-icon>
-              <span>Reunión</span>
-            </button>
-            <button 
-              type="button" 
-              class="type-pill" 
-              [class.selected]="form.get('tipo')?.value === 'TAREA'"
-              (click)="setTipo(tipos[2])">
-              <mat-icon class="icon-tarea">task_alt</mat-icon>
-              <span>Tarea</span>
-            </button>
-            <button 
-              type="button" 
-              class="type-pill" 
-              [class.selected]="form.get('tipo')?.value === 'SEGUIMIENTO'"
-              (click)="setTipo(tipos[3])">
-              <mat-icon class="icon-seguimiento">sync</mat-icon>
-              <span>Seguimiento</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Título -->
-        <div class="input-group">
-          <label class="field-label" for="tituloInput">Título o Asunto *</label>
-          <input 
-            id="tituloInput"
-            type="text" 
-            class="mac-input" 
-            placeholder="Ej: Llamada de seguimiento de propuesta comercial con TechNova" 
-            formControlName="titulo"
-            required
-          />
-          @if (form.get('titulo')?.invalid && form.get('titulo')?.touched) {
-            <span class="error-hint">El título de la actividad es obligatorio</span>
-          }
-        </div>
-
-        <!-- Descripción -->
-        <div class="input-group">
-          <label class="field-label" for="descInput">Descripción y Puntos a Tratar</label>
-          <textarea 
-            id="descInput"
-            class="mac-textarea" 
-            rows="3" 
-            placeholder="Añade notas, acuerdos previos, agenda de la reunión o detalles importantes..."
-            formControlName="descripcion">
-          </textarea>
-        </div>
-
-        <!-- Estado -->
-        <div class="input-group">
-          <label class="field-label">Estado Inicial</label>
-          <div class="status-pills-row">
-            @for (est of estados; track est) {
-              <button 
-                type="button" 
-                class="status-pill"
-                [class.selected]="form.get('estado')?.value === est"
-                (click)="setEstado(est)">
-                {{ est }}
-              </button>
-            }
-          </div>
-        </div>
-
+<div class="actividad-page" [class.en-dialogo]="esDialogo">
+  <section class="actividad-dialog">
+    <header class="dialog-header">
+      <div class="dialog-icon">
+        <mat-icon>{{ getTipoIcon(form.get('tipo')?.value) }}</mat-icon>
       </div>
+      <div class="dialog-heading">
+        <span class="dialog-eyebrow">{{ isEdit ? 'Agenda · Edición' : 'Agenda · Nueva actividad' }}</span>
+        <h2>{{ isEdit ? 'Editar actividad' : 'Nueva actividad' }}</h2>
+        <p>{{ isEdit ? 'Actualiza los datos de la actividad.' : 'Programa una actividad en pocos pasos.' }}</p>
+      </div>
+      <button type="button" class="dialog-close" (click)="cancelar()" title="Cerrar">
+        <mat-icon>close</mat-icon>
+      </button>
+    </header>
 
-      <!-- SECTION 2: PROGRAMACIÓN DE FECHA Y HORA -->
-      <div class="form-card-section">
-        <div class="section-badge-header">
-          <span class="step-num">2</span>
-          <div>
-            <h3>Fecha y Horario Programado</h3>
-            <p>Selección ágil sin dificultades con el calendario y horarios sugeridos</p>
-          </div>
+    <form id="actividadForm" [formGroup]="form" (ngSubmit)="guardar()" class="dialog-body">
+
+      @if (errorGuardado) {
+        <div class="form-error-banner" role="alert">
+          <mat-icon>error_outline</mat-icon>
+          <span>{{ errorGuardado }}</span>
+          <button type="button" class="form-error-close" (click)="errorGuardado = ''" title="Cerrar aviso">
+            <mat-icon>close</mat-icon>
+          </button>
         </div>
+      }
 
-        <div class="datetime-columns-grid">
-          
-          <!-- Columna Día -->
-          <div class="datetime-col">
-            <label class="field-label" for="fechaDiaInput">
-              <mat-icon class="col-icon">calendar_month</mat-icon> Fecha Programada *
-            </label>
-            <input 
-              id="fechaDiaInput"
-              type="date" 
-              class="mac-input date-input"
-              formControlName="fechaDia"
-              required
-            />
-
-            <!-- Atajos rápidos para la fecha -->
-            <div class="quick-presets-box">
-              <span class="quick-presets-label">Atajos de fecha:</span>
-              <div class="quick-chips-row">
-                <button type="button" class="quick-chip" (click)="setDatePreset('hoy')">
-                  Hoy
-                </button>
-                <button type="button" class="quick-chip" (click)="setDatePreset('manana')">
-                  Mañana
-                </button>
-                <button type="button" class="quick-chip" (click)="setDatePreset('en_2dias')">
-                  En 2 días
-                </button>
-                <button type="button" class="quick-chip" (click)="setDatePreset('proxima_semana')">
-                  Próx. lunes
-                </button>
+      <div class="form-layout">
+        <!-- Columna principal: la actividad -->
+        <div class="form-column form-column-actividad">
+          <section class="form-section">
+            <div class="section-heading">
+              <div class="section-copy">
+                <h3>Actividad</h3>
               </div>
             </div>
-          </div>
 
-          <!-- Columna Hora -->
-          <div class="datetime-col">
-            <label class="field-label" for="fechaHoraInput">
-              <mat-icon class="col-icon">schedule</mat-icon> Hora *
-            </label>
-            <input 
-              id="fechaHoraInput"
-              type="time" 
-              class="mac-input time-input"
-              formControlName="fechaHora"
-              required
-            />
+            <div class="field-stack">
+              <div class="field">
+                <span class="field-label">Tipo de actividad <span class="req">*</span></span>
+                <div class="type-picker">
+                  @for (tipo of tipos; track tipo) {
+                    <button
+                      type="button"
+                      class="type-option"
+                      [class.selected]="form.get('tipo')?.value === tipo"
+                      [attr.aria-pressed]="form.get('tipo')?.value === tipo"
+                      [title]="getTipoHint(tipo)"
+                      (click)="seleccionarTipo(tipo)"
+                    >
+                      <span class="type-option-icon"><mat-icon>{{ getTipoIcon(tipo) }}</mat-icon></span>
+                      <span class="type-option-copy">
+                        <strong>{{ getTipoLabel(tipo) }}</strong>
+                      </span>
+                      <mat-icon class="type-option-check">check_circle</mat-icon>
+                    </button>
+                  }
+                </div>
+              </div>
 
-            <!-- Atajos de horarios de oficina -->
-            <div class="quick-presets-box">
-              <span class="quick-presets-label">Horarios sugeridos:</span>
-              <div class="quick-chips-row">
-                <button type="button" class="quick-chip" (click)="setTimePreset('09:00')">
-                  09:00 AM
-                </button>
-                <button type="button" class="quick-chip" (click)="setTimePreset('11:00')">
-                  11:00 AM
-                </button>
-                <button type="button" class="quick-chip" (click)="setTimePreset('15:00')">
-                  03:00 PM
-                </button>
-                <button type="button" class="quick-chip" (click)="setTimePreset('17:00')">
-                  05:00 PM
-                </button>
+              <div class="field">
+                <label class="field-label" for="actTitulo">
+                  Título o asunto <span class="req">*</span>
+                </label>
+                <div class="input-with-left-icon">
+                  <mat-icon class="field-icon-left static">subject</mat-icon>
+                  <input
+                    id="actTitulo"
+                    class="mac-input has-left-icon"
+                    [class.invalid]="mostrarError('titulo')"
+                    formControlName="titulo"
+                    placeholder="Ej. Llamada de seguimiento con TechNova"
+                  />
+                </div>
+                @if (mostrarError('titulo')) {
+                  <span class="field-error">{{ mensajeError('titulo') }}</span>
+                }
+              </div>
+
+              <div class="field">
+                <label class="field-label" for="actEstado">
+                  Estado <span class="req">*</span>
+                </label>
+                <div class="select-wrap">
+                  <select id="actEstado" class="mac-input" formControlName="estado">
+                    @for (estado of estados; track estado) {
+                      <option [value]="estado">{{ getEstadoLabel(estado) }}</option>
+                    }
+                  </select>
+                  <mat-icon class="select-chevron">expand_more</mat-icon>
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="field-label" for="actDescripcion">Descripción</label>
+                <div class="textarea-wrap">
+                  <textarea
+                    id="actDescripcion"
+                    class="mac-input mac-textarea"
+                    formControlName="descripcion"
+                    rows="2"
+                    maxlength="500"
+                    placeholder="Notas o detalles importantes..."
+                  ></textarea>
+                  <span class="char-count">{{ form.get('descripcion')?.value?.length || 0 }}/500</span>
+                </div>
               </div>
             </div>
-          </div>
+          </section>
+        </div>
 
+        <!-- Columna lateral: agenda, vínculo y etiquetas -->
+        <div class="form-column form-column-agenda">
+          <section class="form-section">
+            <div class="section-heading">
+              <div class="section-copy">
+                <h3>Agenda</h3>
+              </div>
+            </div>
+
+            <div class="field-stack">
+              <div class="field">
+                <label class="field-label" for="actFechaHora">
+                  Fecha y hora <span class="req">*</span>
+                </label>
+                <div class="input-with-left-icon">
+                  <mat-icon class="field-icon-left" (click)="abrirSelector(fechaHoraInput)">event</mat-icon>
+                  <input
+                    #fechaHoraInput
+                    id="actFechaHora"
+                    type="datetime-local"
+                    class="mac-input has-left-icon"
+                    [class.invalid]="mostrarError('fechaHora')"
+                    formControlName="fechaHora"
+                  />
+                </div>
+                @if (mostrarError('fechaHora')) {
+                  <span class="field-error">{{ mensajeError('fechaHora') }}</span>
+                }
+              </div>
+
+              <div class="field">
+                <span class="field-label">Vinculación</span>
+                <div class="link-panel">
+                  <div class="link-options">
+                    @for (vinculo of vinculos; track vinculo.value) {
+                      <button
+                        type="button"
+                        class="link-option"
+                        [class.selected]="form.get('vinculacionTipo')?.value === vinculo.value"
+                        [attr.aria-pressed]="form.get('vinculacionTipo')?.value === vinculo.value"
+                        (click)="seleccionarVinculo(vinculo.value)"
+                      >
+                        <span class="link-option-icon"><mat-icon>{{ vinculo.icon }}</mat-icon></span>
+                        <span>{{ vinculo.label }}</span>
+                      </button>
+                    }
+                  </div>
+
+                  @if (form.get('vinculacionTipo')?.value === 'CLIENTE') {
+                    <div class="link-target">
+                      <label class="field-label" for="actCliente">Cliente específico</label>
+                      <div class="select-wrap">
+                        <select id="actCliente" class="mac-input" formControlName="idCliente">
+                          <option [ngValue]="null">Seleccionar cliente</option>
+                          @for (cliente of clientes; track cliente.id) {
+                            <option [ngValue]="cliente.id">
+                              {{ cliente.nombre }}{{ cliente.empresa ? ' (' + cliente.empresa + ')' : '' }}
+                            </option>
+                          }
+                        </select>
+                        <mat-icon class="select-chevron">expand_more</mat-icon>
+                      </div>
+                    </div>
+                  }
+
+                  @if (form.get('vinculacionTipo')?.value === 'LEAD') {
+                    <div class="link-target">
+                      <label class="field-label" for="actLead">Lead específico</label>
+                      <div class="select-wrap">
+                        <select id="actLead" class="mac-input" formControlName="idLead">
+                          <option [ngValue]="null">Seleccionar lead</option>
+                          @for (lead of leads; track lead.id) {
+                            <option [ngValue]="lead.id">
+                              {{ lead.nombre }}{{ lead.empresa ? ' (' + lead.empresa + ')' : '' }} - [{{ lead.estado }}]
+                            </option>
+                          }
+                        </select>
+                        <mat-icon class="select-chevron">expand_more</mat-icon>
+                      </div>
+                    </div>
+                  }
+
+                  @if (form.get('vinculacionTipo')?.value === 'OPORTUNIDAD') {
+                    <div class="link-target">
+                      <label class="field-label" for="actOportunidad">Oportunidad específica</label>
+                      <div class="select-wrap">
+                        <select id="actOportunidad" class="mac-input" formControlName="idOportunidad">
+                          <option [ngValue]="null">Seleccionar oportunidad</option>
+                          @for (oportunidad of oportunidades; track oportunidad.id) {
+                            <option [ngValue]="oportunidad.id">
+                              {{ oportunidad.nombre }} ({{ oportunidad.clienteNombre || 'Sin cliente' }}) - S/ {{ oportunidad.valor || 0 }}
+                            </option>
+                          }
+                        </select>
+                        <mat-icon class="select-chevron">expand_more</mat-icon>
+                      </div>
+                    </div>
+                  }
+
+                  @if (form.get('vinculacionTipo')?.value === 'NINGUNO') {
+                    <div class="link-note">
+                      <mat-icon>info</mat-icon>
+                      <span>Esta actividad quedará en tu agenda sin un registro asociado.</span>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="form-section">
+            <div class="section-heading">
+              <div class="section-copy">
+                <h3>Etiquetas</h3>
+              </div>
+            </div>
+
+            <div class="field tags-field">
+              <app-etiqueta-selector
+                [catalogo]="etiquetasCatalogo"
+                [seleccionadas]="etiquetasSeleccionadas"
+                [max]="maxEtiquetas"
+                [disabled]="loading"
+                [cargando]="cargandoEtiquetas"
+                [errorCarga]="errorEtiquetas"
+                (seleccionadasChange)="onEtiquetasChange($event)"
+                (etiquetaCreada)="onEtiquetaCreada($event)"
+              ></app-etiqueta-selector>
+            </div>
+          </section>
         </div>
       </div>
+    </form>
 
-      <!-- SECTION 3: VINCULACIÓN COMERCIAL -->
-      <div class="form-card-section">
-        <div class="section-badge-header">
-          <span class="step-num">3</span>
-          <div>
-            <h3>Vinculación Comercial</h3>
-            <p>Asocia esta actividad a una cuenta, prospecto o negociación para mantener trazabilidad</p>
-          </div>
-        </div>
-
-        <!-- Selector de Tipo de Vinculación -->
-        <div class="vinculacion-selector-bar">
-          <button 
-            type="button" 
-            class="vinculacion-tab" 
-            [class.active]="form.get('vinculacionTipo')?.value === 'NINGUNO'"
-            (click)="setVinculacionTipo('NINGUNO')">
-            <mat-icon>cancel</mat-icon> Sin Vincular
-          </button>
-          <button 
-            type="button" 
-            class="vinculacion-tab" 
-            [class.active]="form.get('vinculacionTipo')?.value === 'CLIENTE'"
-            (click)="setVinculacionTipo('CLIENTE')">
-            <mat-icon>business</mat-icon> Cliente
-          </button>
-          <button 
-            type="button" 
-            class="vinculacion-tab" 
-            [class.active]="form.get('vinculacionTipo')?.value === 'LEAD'"
-            (click)="setVinculacionTipo('LEAD')">
-            <mat-icon>adjust</mat-icon> Lead
-          </button>
-          <button 
-            type="button" 
-            class="vinculacion-tab" 
-            [class.active]="form.get('vinculacionTipo')?.value === 'OPORTUNIDAD'"
-            (click)="setVinculacionTipo('OPORTUNIDAD')">
-            <mat-icon>paid</mat-icon> Oportunidad
-          </button>
-        </div>
-
-        <!-- Dropdowns Dinámicos según la selección -->
-        @if (form.get('vinculacionTipo')?.value === 'CLIENTE') {
-          <div class="entity-select-box">
-            <label class="field-label" for="clienteSelect">Seleccionar Cliente de la Cartera:</label>
-            <select id="clienteSelect" class="mac-select" formControlName="idCliente">
-              <option [ngValue]="null">-- Elige un Cliente --</option>
-              @for (c of clientes; track c.id) {
-                <option [ngValue]="c.id">
-                  {{ c.nombre }} {{ c.empresa ? '(' + c.empresa + ')' : '' }}
-                </option>
-              }
-            </select>
-          </div>
-        }
-
-        @if (form.get('vinculacionTipo')?.value === 'LEAD') {
-          <div class="entity-select-box">
-            <label class="field-label" for="leadSelect">Seleccionar Lead / Prospecto:</label>
-            <select id="leadSelect" class="mac-select" formControlName="idLead">
-              <option [ngValue]="null">-- Elige un Lead --</option>
-              @for (l of leads; track l.id) {
-                <option [ngValue]="l.id">
-                  {{ l.nombre }} {{ l.empresa ? '(' + l.empresa + ')' : '' }} - [{{ l.estado }}]
-                </option>
-              }
-            </select>
-          </div>
-        }
-
-        @if (form.get('vinculacionTipo')?.value === 'OPORTUNIDAD') {
-          <div class="entity-select-box">
-            <label class="field-label" for="oportunidadSelect">Seleccionar Oportunidad de Negocio:</label>
-            <select id="oportunidadSelect" class="mac-select" formControlName="idOportunidad">
-              <option [ngValue]="null">-- Elige una Oportunidad --</option>
-              @for (o of oportunidades; track o.id) {
-                <option [ngValue]="o.id">
-                  {{ o.nombre }} ({{ o.clienteNombre || 'Sin cliente' }}) - S/ {{ o.valor || 0 }}
-                </option>
-              }
-            </select>
-          </div>
-        }
-
-        @if (form.get('vinculacionTipo')?.value === 'NINGUNO') {
-          <div class="vinculacion-info-hint">
-            <mat-icon>info</mat-icon>
-            <span>Actividad general de agenda interna (no asociada directamente a una cuenta específica).</span>
-          </div>
-        }
-
-      </div>
-
-      <!-- Action Buttons -->
-      <div class="form-actions-footer">
-        <button type="button" class="btn-cancel" routerLink="/actividades">
+    <footer class="dialog-footer">
+      <span class="footer-hint">
+        <mat-icon>info</mat-icon>
+        Los campos con <strong>*</strong> son obligatorios
+      </span>
+      <div class="footer-actions">
+        <button type="button" class="btn-ghost" (click)="cancelar()" [disabled]="loading">
           Cancelar
         </button>
-        <button type="submit" class="btn-submit" [disabled]="form.invalid || loading">
-          <mat-icon>{{ isEdit ? 'check' : 'add_task' }}</mat-icon>
-          <span>{{ loading ? 'Guardando actividad...' : (isEdit ? 'Actualizar Actividad' : 'Guardar Actividad') }}</span>
+        <button type="submit" form="actividadForm" class="btn-primary" [disabled]="loading">
+          @if (loading) {
+            <span class="btn-spinner"></span>
+            Guardando...
+          } @else {
+            <mat-icon>save</mat-icon>
+            {{ isEdit ? 'Guardar cambios' : 'Crear actividad' }}
+          }
         </button>
       </div>
-
-    </form>
-  </div>
-
+    </footer>
+  </section>
 </div>
