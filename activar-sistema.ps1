@@ -1,4 +1,4 @@
-# ==============================================================================
+﻿# ==============================================================================
 # VIERNES CRM V1 - LANZADOR AUTOMATICO MULTI-PC (VERSION ROBUSTA)
 # Maneja: puerto ocupado, volumen corrupto, contenedor colgado, primera vez.
 # ==============================================================================
@@ -12,7 +12,8 @@ Write-Host "             VIERNES CRM V1 - LANZADOR AUTOMATICO DE SERVICIOS      
 Write-Host "==============================================================================" -ForegroundColor Cyan
 Write-Host ""
 
-$RootDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$RootDir = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Path }
+if (-not $RootDir) { $RootDir = (Get-Location).Path }
 Set-Location -Path $RootDir
 
 # Detectar compose de BD
@@ -119,7 +120,7 @@ $OcupantId = docker ps -q --filter "publish=1521" 2>$null
 if ($OcupantId) {
     $OcupantName = docker inspect --format "{{.Name}}" $OcupantId 2>$null
     if ($OcupantName -notlike "*viernes-oracle*") {
-        Write-Host "      Puerto 1521 ocupado por: $OcupantName — parando..." -ForegroundColor Yellow
+        Write-Host "      Puerto 1521 ocupado por: $OcupantName - parando..." -ForegroundColor Yellow
         docker stop $OcupantId | Out-Null
         Write-Host "      [OK] Puerto 1521 liberado." -ForegroundColor Green
     }
@@ -211,8 +212,8 @@ if (-not (Test-Path "$RootDir\viernes-backend\.env.local") -and
     Write-Host "      [OK] .env.local creado desde plantilla." -ForegroundColor Gray
 }
 
-$BackendCmd = "chcp 65001 >nul && set `"JAVA_HOME=$JavaHome`" && set `"PATH=$JavaHome\bin;%PATH%`" && cd /d `"$RootDir\viernes-backend`" && mvnw.cmd spring-boot:run"
-Start-Process cmd.exe -ArgumentList "/k `"$BackendCmd`""
+$BackendCmd = "chcp 65001 >nul && set `"JAVA_HOME=$JavaHome`" && set `"PATH=$JavaHome\bin;%PATH%`" && mvnw.cmd spring-boot:run"
+Start-Process cmd.exe -WorkingDirectory "$RootDir\viernes-backend" -ArgumentList "/k `"$BackendCmd`""
 Write-Host "      [OK] Backend ejecutandose en su consola (puerto 8080)." -ForegroundColor Green
 
 # ==============================================================================
@@ -229,8 +230,8 @@ if (-not (Test-Path "$RootDir\viernes-frontend\node_modules")) {
     Write-Host "      [OK] Dependencias instaladas." -ForegroundColor Green
 }
 
-$FrontendCmd = "chcp 65001 >nul && cd /d `"$RootDir\viernes-frontend`" && npm start"
-Start-Process cmd.exe -ArgumentList "/k `"$FrontendCmd`""
+$FrontendCmd = "chcp 65001 >nul && npm start"
+Start-Process cmd.exe -WorkingDirectory "$RootDir\viernes-frontend" -ArgumentList "/k `"$FrontendCmd`""
 Write-Host "      [OK] Frontend ejecutandose en su consola (puerto 4200)." -ForegroundColor Green
 
 # ==============================================================================
