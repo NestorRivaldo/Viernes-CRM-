@@ -1,0 +1,744 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guía de Desarrollo de un Módulo V7 — Viernes CRM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#090d16; --surface:#111726; --surface2:#172033; --border:#232f48;
+  --text:#f1f5f9; --muted:#94a3b8; --subtle:#64748b;
+  --accent:#3b82f6; --accent-soft:rgba(59,130,246,.12);
+  --green:#10b981; --green-soft:rgba(16,185,129,.12);
+  --purple:#a855f7; --purple-soft:rgba(168,85,247,.12);
+  --amber:#f59e0b; --amber-soft:rgba(245,158,11,.12);
+  --cyan:#06b6d4; --cyan-soft:rgba(6,182,212,.12);
+  --rose:#f43f5e; --rose-soft:rgba(244,63,94,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;padding:40px 20px 80px;
+  background-image:radial-gradient(circle at 10% 10%,rgba(59,130,246,.08) 0%,transparent 45%),radial-gradient(circle at 90% 90%,rgba(168,85,247,.06) 0%,transparent 45%);background-attachment:fixed}
+.container{max-width:1200px;margin:0 auto}
+.top-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+.back-link{display:inline-flex;align-items:center;gap:8px;color:#60a5fa;text-decoration:none;font-size:13.5px;font-weight:600}
+header{text-align:center;margin-bottom:44px}
+.brand-badge{display:inline-flex;align-items:center;gap:8px;background:var(--accent-soft);color:#60a5fa;border:1px solid rgba(59,130,246,.3);padding:6px 16px;border-radius:30px;font-size:13px;font-weight:700;margin-bottom:18px;letter-spacing:.04em}
+h1{font-size:38px;font-weight:800;letter-spacing:-.025em;background:linear-gradient(135deg,#fff 30%,#93c5fd 80%,#38bdf8 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:14px;line-height:1.2}
+.subtitle{font-size:16.5px;color:var(--muted);max-width:860px;margin:0 auto 26px}
+.pills{display:flex;justify-content:center;flex-wrap:wrap;gap:10px}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;font-size:12.5px;font-weight:600}
+.p-green{background:var(--green-soft);color:#34d399;border:1px solid rgba(16,185,129,.3)}
+.p-blue{background:var(--accent-soft);color:#93c5fd;border:1px solid rgba(59,130,246,.3)}
+.p-purple{background:var(--purple-soft);color:#c084fc;border:1px solid rgba(168,85,247,.3)}
+.p-amber{background:var(--amber-soft);color:#fbbf24;border:1px solid rgba(245,158,11,.3)}
+.p-cyan{background:var(--cyan-soft);color:#67e8f9;border:1px solid rgba(6,182,212,.3)}
+.banner{display:flex;gap:14px;align-items:flex-start;background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:12px;padding:16px 18px;margin:0 0 30px;font-size:14px}
+.banner .bi{font-size:20px;line-height:1}
+.banner b{color:#93c5fd}
+h2{font-size:23px;font-weight:700;color:#fff;margin:48px 0 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);padding-bottom:12px}
+h2 .num{display:flex;align-items:center;justify-content:center;min-width:34px;height:34px;border-radius:8px;background:var(--accent-soft);color:#60a5fa;font-size:15px;font-family:'JetBrains Mono',monospace}
+h3{font-size:16.5px;font-weight:600;color:#e2e8f0;margin:24px 0 10px}
+p{margin:10px 0;color:#cbd5e1;font-size:14.5px}
+.sec-intro{color:var(--muted);font-size:14.5px;margin-bottom:16px}
+.lead{font-size:15px;color:#e2e8f0}
+code{font-family:'JetBrains Mono',Consolas,monospace;font-size:12.5px;background:var(--surface2);border:1px solid var(--border);padding:1px 6px;border-radius:5px;color:#a5f3fc}
+.anchor{font-family:'JetBrains Mono',Consolas,monospace;font-size:12px;background:rgba(59,130,246,.1);color:#93c5fd;border:1px solid rgba(59,130,246,.2);padding:1px 7px;border-radius:6px;white-space:nowrap;display:inline-block;margin:1px 0}
+.note{border-radius:10px;padding:13px 16px;margin:16px 0;font-size:13.5px;border:1px solid}
+.note.info{background:var(--accent-soft);border-color:rgba(59,130,246,.3);color:#bfdbfe}
+.note.warn{background:var(--amber-soft);border-color:rgba(245,158,11,.3);color:#fde68a}
+.note.danger{background:var(--rose-soft);border-color:rgba(244,63,94,.3);color:#fecdd3}
+.note.ok{background:var(--green-soft);border-color:rgba(16,185,129,.3);color:#a7f3d0}
+.badge{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.05em;padding:2px 8px;border-radius:5px;vertical-align:middle}
+.b-gap{background:var(--rose-soft);color:#fda4af;border:1px solid rgba(244,63,94,.35)}
+.b-ok{background:var(--green-soft);color:#6ee7b7;border:1px solid rgba(16,185,129,.35)}
+.b-tip{background:var(--cyan-soft);color:#67e8f9;border:1px solid rgba(6,182,212,.35)}
+.tree{font-family:'JetBrains Mono',Consolas,monospace;font-size:12.5px;line-height:1.75;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;overflow-x:auto;white-space:pre;color:#cbd5e1}
+.tree .dir{color:#60a5fa;font-weight:600}
+.tree .cm{color:var(--subtle)}
+.tree .f{color:#a5f3fc}
+.code-block{font-family:'JetBrains Mono',Consolas,monospace;font-size:12.5px;line-height:1.75;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;overflow-x:auto;white-space:pre;color:#cbd5e1}
+.code-block .kw{color:#c084fc}
+.code-block .str{color:#6ee7b7}
+.code-block .cm{color:var(--subtle)}
+.code-block .ann{color:#fbbf24}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13.5px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+th{background:var(--surface2);color:#e2e8f0;text-align:left;padding:10px 14px;font-weight:600;font-size:12.5px;letter-spacing:.03em;text-transform:uppercase;border-bottom:1px solid var(--border)}
+td{padding:10px 14px;border-bottom:1px solid var(--border);color:#cbd5e1;vertical-align:top}
+tr:last-child td{border-bottom:none}
+td .anchor{font-size:11px}
+.flow{margin:18px 0;position:relative;padding-left:8px;counter-reset:step}
+.flow-step{display:flex;gap:14px;margin:0 0 14px;position:relative}
+.flow-step .sn{flex:0 0 30px;height:30px;border-radius:50%;background:var(--accent-soft);border:1px solid rgba(59,130,246,.4);color:#60a5fa;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;counter-increment:step}
+.flow-step .sn::before{content:counter(step)}
+.flow-step .sb{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;flex:1}
+.flow-step .st{font-weight:600;color:#e2e8f0;font-size:14px;margin-bottom:4px}
+.flow-step .sd{color:var(--muted);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:16px 0}
+.mini{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+.mini .k{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--subtle)}
+.mini .v{font-size:15px;font-weight:600;color:#e2e8f0;margin:4px 0}
+.mini p{font-size:13px;margin:6px 0 0}
+.toc{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin:0 0 10px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:6px 22px}
+.toc a{color:#93c5fd;text-decoration:none;font-size:13.5px;display:flex;gap:8px;align-items:baseline}
+.toc a:hover{color:#bfdbfe}
+.toc a .n{font-family:'JetBrains Mono',monospace;color:var(--subtle);font-size:12px}
+.svgwrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin:16px 0;overflow-x:auto}
+.svgwrap svg{display:block;margin:0 auto;max-width:100%}
+.legend{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:10px;font-size:12px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.dot{width:10px;height:10px;border-radius:3px;display:inline-block}
+.checklist{list-style:none;display:flex;flex-direction:column;gap:10px;margin:16px 0}
+.checklist li{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px}
+.checklist li .box{flex:0 0 22px;height:22px;border-radius:5px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--green);margin-top:1px}
+.checklist li .ct{font-weight:600;color:#e2e8f0;font-size:14px}
+.checklist li .cd{color:var(--muted);font-size:13px;margin-top:2px}
+.checklist li .ca{margin-top:4px}
+footer{margin-top:50px;padding-top:20px;border-top:1px solid var(--border);color:var(--subtle);font-size:12.5px;text-align:center}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="top-nav">
+    <a class="back-link" href="index.html">&#8592; Portal de informes</a>
+    <span style="color:var(--subtle);font-size:12.5px;font-family:'JetBrains Mono',monospace">VIERNES CRM · V7</span>
+  </div>
+
+  <header>
+    <div class="brand-badge">&#9670; VIERNES CRM V7</div>
+    <h1>Guía de Desarrollo de un Módulo</h1>
+    <p class="subtitle">Qué es un módulo, cómo se estructuran sus partes y qué se necesita para desarrollar uno nuevo. Una guía práctica basada en el código real del proyecto, con el módulo <code>etiquetas</code> como ejemplo mínimo y <code>actividades</code> como ejemplo completo.</p>
+    <div class="pills">
+      <span class="pill p-blue">Arquitectura hexagonal</span>
+      <span class="pill p-purple">Spring Modulith</span>
+      <span class="pill p-green">Ejemplo: etiquetas</span>
+      <span class="pill p-amber">Checklist incluido</span>
+      <span class="pill p-cyan">Oracle + JPA</span>
+    </div>
+  </header>
+
+  <div class="banner">
+    <span class="bi">&#128736;</span>
+    <div><b>Esta guía responde a tres preguntas:</b> ¿Qué es un módulo en Viernes CRM? ¿Cuáles son sus partes y cómo se relacionan? ¿Qué necesitas crear para desarrollar uno nuevo? Cada sección cita archivos reales del código para que no tengas que adivinar &mdash; puedes abrir cada archivo y verificar.</div>
+  </div>
+
+  <div class="note info"><b>Cómo leer las rutas.</b> Todos los anclajes son relativos a <code>viernes-backend/src/main/java/com/viernes/</code>. Ejemplo: <span class="anchor">etiquetas/domain/Etiqueta.java</span> = ese archivo dentro del backend. El árbol canónico del proyecto es <code>E:\Viernes\Viernes</code>.</div>
+
+  <nav class="toc">
+    <a href="#s01"><span class="n">01</span> Qué es un módulo</a>
+    <a href="#s02"><span class="n">02</span> Las tres capas del hexágono</a>
+    <a href="#s03"><span class="n">03</span> Estructura de carpetas</a>
+    <a href="#s04"><span class="n">04</span> package-info.java (Modulith)</a>
+    <a href="#s05"><span class="n">05</span> El dominio (domain)</a>
+    <a href="#s06"><span class="n">06</span> Los puertos (port in / port out)</a>
+    <a href="#s07"><span class="n">07</span> El servicio (service)</a>
+    <a href="#s08"><span class="n">08</span> Los DTOs</a>
+    <a href="#s09"><span class="n">09</span> El controller (adapter in)</a>
+    <a href="#s10"><span class="n">10</span> El persistence adapter (adapter out)</a>
+    <a href="#s11"><span class="n">11</span> La base de datos (Oracle)</a>
+    <a href="#s12"><span class="n">12</span> Comunicación entre módulos</a>
+    <a href="#s13"><span class="n">13</span> Flujo completo de una petición</a>
+    <a href="#s14"><span class="n">14</span> Checklist para crear un módulo</a>
+    <a href="#s15"><span class="n">15</span> Errores comunes</a>
+    <a href="#s16"><span class="n">16</span> Los 16 módulos del sistema</a>
+  </nav>
+
+  <!-- ============ 01 ============ -->
+  <h2 id="s01"><span class="num">01</span> Qué es un módulo</h2>
+  <p class="sec-intro">Un módulo es una capacidad de negocio completa (clientes, actividades, oportunidades, etiquetas…) empaquetada con el mismo esqueleto de arquitectura hexagonal. No es una carpeta arbitraria: Spring Modulith la reconoce por su <code>package-info.java</code>.</p>
+  <p>La idea central es simple: cada módulo encapsula todo lo relacionado con una capacidad de negocio &mdash; su lógica, sus datos, su API &mdash; y se comunica con los demás a través de interfaces bien definidas (puertos). Cambias un módulo sin romper los demás.</p>
+  <div class="grid">
+    <div class="mini"><div class="k">Encapsulamiento</div><div class="v">Cada módulo se aisla</div><p>Su lógica de negocio no se filtra a otros módulos. El contacto entre módulos es por interfaces (puertos), nunca por acceso directo a repositorios ajenos.</p></div>
+    <div class="mini"><div class="k">Mismo esqueleto</div><div class="v">Todos se navegan igual</div><p>Las carpetas se repiten: <code>domain</code>, <code>application</code>, <code>adapters</code>. Aprende uno, sabes navegar todos.</p></div>
+    <div class="mini"><div class="k">Independencia tecnológica</div><div class="v">El núcleo no sabe de BD</div><p>El dominio y los casos de uso no conocen JPA, Oracle ni HTTP. Solo los adapters tocan tecnología.</p></div>
+  </div>
+  <div class="note ok"><b>Regla de dependencia:</b> <code>adapters &#8594; application &#8594; domain</code>. El núcleo nunca importa a los adapters. Spring inyecta las implementaciones en runtime.</div>
+
+  <!-- ============ 02 ============ -->
+  <h2 id="s02"><span class="num">02</span> Las tres capas del hexágono</h2>
+  <p class="sec-intro">Cada módulo tiene tres capas con una dirección de dependencia estricta: de afuera hacia adentro, nunca al revés.</p>
+  <div class="svgwrap">
+  <svg viewBox="0 0 860 380" width="860" height="380" role="img" aria-label="Diagrama de las tres capas hexagonales">
+    <defs>
+      <marker id="arr1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#60a5fa"/>
+      </marker>
+    </defs>
+    <rect x="8" y="8" width="844" height="364" rx="16" fill="#111726" stroke="#232f48"/>
+    <text x="26" y="34" fill="#64748b" font-size="13" font-family="JetBrains Mono,monospace">adapters/ (tecnología: REST, JPA, APIs externas)</text>
+    <rect x="228" y="52" width="404" height="300" rx="14" fill="#172033" stroke="#3b82f6" stroke-opacity=".5"/>
+    <text x="246" y="76" fill="#93c5fd" font-size="13" font-family="JetBrains Mono,monospace">application/ (casos de uso, puertos, DTOs)</text>
+    <rect x="318" y="232" width="224" height="86" rx="12" fill="#0b1220" stroke="#10b981" stroke-opacity=".6"/>
+    <text x="336" y="260" fill="#6ee7b7" font-size="13" font-family="JetBrains Mono,monospace">domain/</text>
+    <text x="336" y="282" fill="#94a3b8" font-size="11.5">Entidades puras + enums</text>
+    <text x="336" y="300" fill="#64748b" font-size="11">Sin framework</text>
+    <rect x="300" y="96" width="260" height="58" rx="10" fill="#1e2942" stroke="#3b82f6" stroke-opacity=".4"/>
+    <text x="316" y="120" fill="#e2e8f0" font-size="13" font-weight="600">service/ &mdash; casos de uso</text>
+    <text x="316" y="140" fill="#94a3b8" font-size="11.5">implementa port/in, usa port/out</text>
+    <rect x="300" y="166" width="260" height="48" rx="10" fill="#1e2942" stroke="#232f48"/>
+    <text x="316" y="188" fill="#e2e8f0" font-size="12.5">port/in · port/out (interfaces)</text>
+    <text x="316" y="204" fill="#94a3b8" font-size="11">costuras: lo que entra y lo que sale</text>
+    <rect x="34" y="130" width="150" height="86" rx="10" fill="#1e2942" stroke="#06b6d4" stroke-opacity=".6"/>
+    <text x="50" y="158" fill="#67e8f9" font-size="12.5" font-weight="600">in/web/</text>
+    <text x="50" y="178" fill="#94a3b8" font-size="11.5">Controller (REST)</text>
+    <text x="50" y="196" fill="#64748b" font-size="11">recibe HTTP</text>
+    <rect x="676" y="100" width="150" height="76" rx="10" fill="#1e2942" stroke="#f59e0b" stroke-opacity=".6"/>
+    <text x="692" y="126" fill="#fbbf24" font-size="12" font-weight="600">out/persistence/</text>
+    <text x="692" y="146" fill="#94a3b8" font-size="11">Entity + Repository</text>
+    <text x="692" y="164" fill="#64748b" font-size="11">&#8594; Oracle (JPA)</text>
+    <rect x="676" y="200" width="150" height="76" rx="10" fill="#1e2942" stroke="#f43f5e" stroke-opacity=".6"/>
+    <text x="692" y="226" fill="#fda4af" font-size="12" font-weight="600">out/external/</text>
+    <text x="692" y="246" fill="#94a3b8" font-size="11">APIs externas</text>
+    <text x="692" y="264" fill="#64748b" font-size="11">&#8594; RestClient</text>
+    <line x1="184" y1="173" x2="219" y2="125" stroke="#60a5fa" stroke-width="2" marker-end="url(#arr1)"/>
+    <line x1="237" y1="125" x2="298" y2="125" stroke="#60a5fa" stroke-width="2" marker-end="url(#arr1)"/>
+    <line x1="560" y1="120" x2="623" y2="120" stroke="#60a5fa" stroke-width="2" marker-end="url(#arr1)"/>
+    <line x1="641" y1="120" x2="674" y2="120" stroke="#60a5fa" stroke-width="2" marker-end="url(#arr1)"/>
+    <line x1="430" y1="154" x2="430" y2="230" stroke="#10b981" stroke-width="2" marker-end="url(#arr1)"/>
+    <text x="438" y="210" fill="#6ee7b7" font-size="11">usa</text>
+  </svg>
+  <div class="legend">
+    <span><span class="dot" style="background:#06b6d4"></span> adapter in (entra HTTP)</span>
+    <span><span class="dot" style="background:#f59e0b"></span> adapter out persistence (sale a Oracle)</span>
+    <span><span class="dot" style="background:#f43f5e"></span> adapter out external (sale a APIs)</span>
+    <span><span class="dot" style="background:#a855f7"></span> puertos (costuras)</span>
+    <span><span class="dot" style="background:#10b981"></span> domain (núcleo puro)</span>
+  </div>
+  </div>
+
+  <!-- ============ 03 ============ -->
+  <h2 id="s03"><span class="num">03</span> Estructura de carpetas</h2>
+  <p class="sec-intro">El módulo <code>etiquetas</code> es el más pequeño (14 archivos) y sirve como plantilla mínima. El módulo <code>actividades</code> es el más completo (29 archivos). Ambos comparten el mismo esqueleto.</p>
+  <h3>Plantilla mínima (ejemplo: etiquetas)</h3>
+  <div class="tree"><span class="dir">etiquetas/</span>
+├─ <span class="f">package-info.java</span>                          <span class="cm">@ApplicationModule</span>
+├─ <span class="dir">adapters/</span>
+│  ├─ <span class="dir">in/web/</span>EtiquetaController               <span class="cm">@RestController &mdash; REST</span>
+│  └─ <span class="dir">out/persistence/</span>
+│     ├─ EtiquetaPersistenceAdapter                 <span class="cm">implementa EtiquetaPersistencePort</span>
+│     ├─ <span class="dir">entity/</span>EtiquetaEntity              <span class="cm">@Entity JPA</span>
+│     └─ <span class="dir">repository/</span>EtiquetaSpringDataRepository <span class="cm">Spring Data</span>
+├─ <span class="dir">application/</span>
+│  ├─ <span class="dir">dto/</span>EtiquetaRequest · EtiquetaResponse    <span class="cm">contratos entrada/salida</span>
+│  ├─ <span class="dir">port/in/</span>ManageEtiquetaUseCase          <span class="cm">interfaz: qué se puede hacer</span>
+│  ├─ <span class="dir">port/out/</span>EtiquetaPersistencePort       <span class="cm">interfaz: qué necesita el núcleo</span>
+│  └─ <span class="dir">service/</span>EtiquetaService               <span class="cm">implementa port/in, usa port/out</span>
+└─ <span class="dir">domain/</span>Etiqueta                           <span class="cm">POJO puro, sin framework</span></div>
+
+  <h3>Plantilla completa (ejemplo: actividades)</h3>
+  <div class="tree"><span class="dir">actividades/</span>
+├─ <span class="f">package-info.java</span>                          <span class="cm">@ApplicationModule OPEN + allowedDependencies</span>
+├─ <span class="dir">adapters/</span>
+│  ├─ <span class="dir">in/web/</span>ActividadController               <span class="cm">@RestController</span>
+│  └─ <span class="dir">out/persistence/</span>
+│     ├─ ActividadPersistenceAdapter                 <span class="cm">guarda/recupera actividades</span>
+│     ├─ ActividadEtiquetaPersistenceAdapter         <span class="cm">gestiona relaci&oacute;n N:M con etiquetas</span>
+│     ├─ ActividadParticipantePersistenceAdapter     <span class="cm">gestiona relaci&oacute;n N:M con contactos</span>
+│     ├─ ContactoQueryAdapter                        <span class="cm">consulta contactos de clientes (cruce de m&oacute;dulo)</span>
+│     ├─ RelacionValidationAdapter                   <span class="cm">valida que cliente/lead/op. existan</span>
+│     ├─ <span class="dir">entity/</span>ActividadEntity · EtiquetaEntity · ParticipanteEntity
+│     └─ <span class="dir">repository/</span>3 SpringDataRepository
+├─ <span class="dir">application/</span>
+│  ├─ <span class="dir">dto/</span>ActividadRequest · Response · ParticipanteRequest · Response
+│  ├─ <span class="dir">port/in/</span>ManageActividadUseCase          <span class="cm">15 m&eacute;todos</span>
+│  ├─ <span class="dir">port/out/</span>5 puertos (persistence, etiqueta, participante, contacto, validaci&oacute;n)
+│  └─ <span class="dir">service/</span>ActividadService               <span class="cm">@Transactional, 400+ l&iacute;neas</span>
+└─ <span class="dir">domain/</span>Actividad · ActividadEtiqueta · Participante · EstadoActividad · TipoActividad</div>
+
+  <table>
+    <thead><tr><th>Carpeta</th><th>Funci&oacute;n</th><th>Ejemplo</th></tr></thead>
+    <tbody>
+      <tr><td><code>domain/</code></td><td>N&uacute;cleo de negocio: POJOs y enums. Sin JPA, sin Spring.</td><td><span class="anchor">etiquetas/domain/Etiqueta.java</span></td></tr>
+      <tr><td><code>application/port/in/</code></td><td>Interfaz de casos de uso. La implementa el service; la llama el controller.</td><td><span class="anchor">etiquetas/application/port/in/ManageEtiquetaUseCase.java</span></td></tr>
+      <tr><td><code>application/port/out/</code></td><td>Interfaces de lo que el n&uacute;cleo necesita de fuera (BD, otros m&oacute;dulos, APIs).</td><td><span class="anchor">etiquetas/application/port/out/EtiquetaPersistencePort.java</span></td></tr>
+      <tr><td><code>application/dto/</code></td><td>Records de entrada/salida. Lo que viaja por HTTP.</td><td><span class="anchor">etiquetas/application/dto/EtiquetaRequest.java</span></td></tr>
+      <tr><td><code>application/service/</code></td><td>Implementa port/in, orquesta port/out, aplica reglas, <code>@Transactional</code>.</td><td><span class="anchor">etiquetas/application/service/EtiquetaService.java</span></td></tr>
+      <tr><td><code>adapters/in/web/</code></td><td>Adapter de entrada: recibe HTTP y delega al caso de uso. Cero reglas de negocio.</td><td><span class="anchor">etiquetas/adapters/in/web/EtiquetaController.java</span></td></tr>
+      <tr><td><code>adapters/out/persistence/</code></td><td>Adapter de salida: implementa port/out con JPA.</td><td><span class="anchor">etiquetas/adapters/out/persistence/EtiquetaPersistenceAdapter.java</span></td></tr>
+      <tr><td><code>…/entity/</code></td><td>Objeto JPA que mapea la tabla (<code>@Entity</code>, <code>@Table</code>).</td><td><span class="anchor">etiquetas/adapters/out/persistence/entity/EtiquetaEntity.java</span></td></tr>
+      <tr><td><code>…/repository/</code></td><td>Interfaz Spring Data; consultas por nombre de m&eacute;todo. Sin implementaci&oacute;n.</td><td><span class="anchor">etiquetas/adapters/out/persistence/repository/EtiquetaSpringDataRepository.java</span></td></tr>
+      <tr><td><code>package-info.java</code></td><td>Carnet del m&oacute;dulo ante Modulith: tipo OPEN/CLOSED + dependencias permitidas.</td><td><span class="anchor">etiquetas/package-info.java</span></td></tr>
+    </tbody>
+  </table>
+
+  <!-- ============ 04 ============ -->
+  <h2 id="s04"><span class="num">04</span> package-info.java &mdash; el carnet del módulo</h2>
+  <p class="sec-intro">Cada módulo tiene un <code>package-info.java</code> que lo registra ante Spring Modulith. Define su tipo (OPEN o CLOSED por defecto) y a qu&eacute; m&oacute;dulos puede depender.</p>
+  <h3>Módulo OPEN (permite que otros módulos accedan a sus internals)</h3>
+  <div class="code-block"><span class="kw">@org.springframework.modulith.ApplicationModule</span>(
+    type = org.springframework.modulith.ApplicationModule.Type.<span class="ann">OPEN</span>,
+    allowedDependencies = {<span class="str">"clientes"</span>, <span class="str">"oportunidades"</span>, <span class="str">"leads"</span>, <span class="str">"etiquetas"</span>, <span class="str">"usuarios"</span>, <span class="str">"shared"</span>}
+)
+<span class="kw">package</span> com.viernes.actividades;
+<span class="cm">// actividades necesita leer datos de clientes, leads, oportunidades, etiquetas y usuarios</span></div>
+  <h3>Módulo CLOSED (solo expone su API pública, sin allowedDependencies)</h3>
+  <div class="code-block"><span class="kw">@org.springframework.modulith.ApplicationModule</span>(
+    allowedDependencies = {<span class="str">"shared"</span>, <span class="str">"shared.exception"</span>}
+)
+<span class="kw">package</span> com.viernes.usuarios;
+<span class="cm">// usuarios es CLOSED por defecto: otros módulos solo pueden usar UsuariosApi, no sus repos</span></div>
+  <div class="note info"><b>OPEN vs CLOSED:</b> OPEN deja que otros módulos accedan a tus clases internas (repositorios, adapters). CLOSED obliga a consumir solo la API p&uacute;blica (puertos <code>port/in</code>). Usa CLOSED por defecto; abre solo cuando hay cruce de datos leg&iacute;timo.</div>
+
+  <!-- ============ 05 ============ -->
+  <h2 id="s05"><span class="num">05</span> El dominio (domain)</h2>
+  <p class="sec-intro">El dominio es el n&uacute;cleo puro del m&oacute;dulo: clases POJO y enums que representan el negocio. No dependen de JPA, Spring ni ninguna tecnolog&iacute;a. Si quitas Spring, el dominio compila igual.</p>
+  <div class="code-block"><span class="kw">package</span> com.viernes.actividades.domain;
+
+<span class="kw">import</span> java.time.LocalDateTime;
+
+<span class="kw">public class</span> Actividad {
+    <span class="kw">private</span> Long id;
+    <span class="kw">private</span> String idUsuario;
+    <span class="kw">private</span> Long idCliente;
+    <span class="kw">private</span> TipoActividad tipo;
+    <span class="kw">private</span> String titulo;
+    <span class="kw">private</span> EstadoActividad estado;
+    <span class="kw">private</span> LocalDateTime fecha;
+    <span class="kw">private</span> LocalDateTime creadoEn;
+    <span class="cm">// ... getters y setters</span>
+}</div>
+  <div class="grid">
+    <div class="mini"><div class="k">POJO</div><div class="v">Clase simple</div><p>Campos privados + getters/setters. Constructor vacío y con todos los parámetros. Sin anotaciones de framework.</p></div>
+    <div class="mini"><div class="k">Enums</div><div class="v">Estados y tipos</div><p><code>EstadoActividad</code> (PENDIENTE, EN_PROGRESO, COMPLETADA, CANCELADA). <code>TipoActividad</code> (LLAMADA, EMAIL, REUNION...).</p></div>
+    <div class="mini"><div class="k">Sin dependencias</div><div class="v">Puro Java</div><p>No importa JPA, Spring, ni nada. Solo <code>java.time</code> y <code>java.util</code>.</p></div>
+  </div>
+
+  <!-- ============ 06 ============ -->
+  <h2 id="s06"><span class="num">06</span> Los puertos (port in / port out)</h2>
+  <p class="sec-intro">Los puertos son interfaces en <code>application</code>. Son la <b>costura</b> que permite cambiar la tecnolog&iacute;a sin tocar el n&uacute;cleo.</p>
+  <h3>Port IN &mdash; lo que el mundo puede pedirle al módulo</h3>
+  <div class="code-block"><span class="kw">package</span> com.viernes.actividades.application.port.in;
+
+<span class="kw">public interface</span> ManageActividadUseCase {
+    ActividadResponse crear(ActividadRequest request);
+    ActividadResponse obtener(Long id);
+    List&lt;ActividadResponse&gt; listarTodos();
+    ActividadResponse cambiarEstado(Long id, EstadoActividad estado);
+    <span class="cm">// ... 15 métodos en total</span>
+}</div>
+  <h3>Port OUT &mdash; lo que el núcleo necesita de fuera</h3>
+  <div class="code-block"><span class="kw">package</span> com.viernes.actividades.application.port.out;
+
+<span class="kw">public interface</span> ActividadPersistencePort {
+    Actividad save(Actividad actividad);
+    Optional&lt;Actividad&gt; findById(Long id);
+    List&lt;Actividad&gt; findAll();
+    void deleteById(Long id);
+}
+
+<span class="kw">public interface</span> ContactoQueryPort {
+    Optional&lt;ContactoInfo&gt; buscarPorId(Long contactoId);
+}</div>
+  <table>
+    <thead><tr><th>Puerto</th><th>Quién lo DEFINE</th><th>Quién lo IMPLEMENTA</th><th>Quién lo LLAMA</th></tr></thead>
+    <tbody>
+      <tr><td><code>port/in</code></td><td>application</td><td>application/service</td><td>adapters/in/web (controller)</td></tr>
+      <tr><td><code>port/out</code></td><td>application</td><td>adapters/out (persistence, external)</td><td>application/service</td></tr>
+    </tbody>
+  </table>
+  <div class="note ok"><b>Inversión de dependencia:</b> el n&uacute;cleo define la interfaz <code>port/out</code> y el adapter de tecnolog&iacute;a la implementa. Por eso <code>application</code> no importa Oracle ni APIsPERU. El service puede testearse con mocks de los puertos, sin BD ni red.</div>
+
+  <!-- ============ 07 ============ -->
+  <h2 id="s07"><span class="num">07</span> El servicio (service)</h2>
+  <p class="sec-intro">El service es el coraz&oacute;n del m&oacute;dulo: implementa <code>port/in</code>, orquesta <code>port/out</code> y aplica las reglas de negocio. Lleva <code>@Transactional</code>.</p>
+  <div class="code-block"><span class="kw">@Service</span>
+<span class="kw">@Transactional</span>
+<span class="kw">public class</span> ActividadService <span class="kw">implements</span> ManageActividadUseCase {
+
+    <span class="kw">private final</span> ActividadPersistencePort persistencePort;
+    <span class="kw">private final</span> RelacionValidationPort validationPort;
+    <span class="kw">private final</span> ActividadEtiquetaPersistencePort etiquetaPort;
+
+    <span class="kw">public</span> ActividadService(ActividadPersistencePort persistencePort, ...) {
+        <span class="kw">this</span>.persistencePort = persistencePort;
+        <span class="cm">// ... inyección por constructor (sin @Autowired)</span>
+    }
+
+    <span class="kw">@Override</span>
+    <span class="kw">public</span> ActividadResponse crear(ActividadRequest request) {
+        validarRelaciones(request);           <span class="cm">// usa port/out</span>
+        etiquetaIdsValidos(request);           <span class="cm">// regla: máx 8 etiquetas</span>
+        Actividad actividad = <span class="kw">new</span> Actividad(...);  <span class="cm">// construye dominio</span>
+        persistencePort.save(actividad);       <span class="cm">// usa port/out</span>
+        sincronizarEtiquetas(actividad, request.etiquetaIds());
+        <span class="kw">return</span> toResponse(actividad);          <span class="cm">// convierte a DTO</span>
+    }
+}</div>
+  <div class="note warn"><b>El service NO debe:</b> conocer HTTP (sin <code>HttpServletRequest</code>), conocer JPA (sin <code>EntityManager</code>), ni devolver entidades JPA. Trabaja con el dominio y devuelve DTOs.</div>
+
+  <!-- ============ 08 ============ -->
+  <h2 id="s08"><span class="num">08</span> Los DTOs (Data Transfer Objects)</h2>
+  <p class="sec-intro">Los DTOs son los contratos de entrada y salida. Lo que viaja por HTTP. Se definen como records en <code>application/dto/</code>.</p>
+  <div class="code-block"><span class="kw">public record</span> ActividadRequest(
+    String titulo,
+    String tipo,
+    Long idCliente,
+    Long idLead,
+    Long idOportunidad,
+    String idUsuario,
+    List&lt;Long&gt; etiquetaIds
+) {}
+
+<span class="kw">public record</span> ActividadResponse(
+    Long id,
+    String titulo,
+    String tipo,
+    String estado,
+    LocalDateTime fecha,
+    <span class="kw">boolean</span> esVencida,
+    List&lt;ParticipanteResponse&gt; participantes,
+    List&lt;EtiquetaResponse&gt; etiquetas
+) {}</div>
+  <div class="grid">
+    <div class="mini"><div class="k">Request</div><div class="v">Entrada</div><p>Lo que el cliente envía. Campos con validación <code>@NotBlank</code>, <code>@NotNull</code> si se anota con Jakarta Validation.</p></div>
+    <div class="mini"><div class="k">Response</div><div class="v">Salida</div><p>Lo que el m&oacute;dulo devuelve. Puede incluir campos calculados (<code>esVencida</code>) que no existen en la entidad.</p></div>
+    <div class="mini"><div class="k">Records</div><div class="v">Inmutables</div><p>Se usan Java records: compactos, inmutables, con getters autom&aacute;ticos. No llevan l&oacute;gica.</p></div>
+  </div>
+
+  <!-- ============ 09 ============ -->
+  <h2 id="s09"><span class="num">09</span> El controller (adapter in/web)</h2>
+  <p class="sec-intro">El controller es el &uacute;nico punto de entrada HTTP del m&oacute;dulo. Recibe la petici&oacute;n, la delega al caso de uso y arma la respuesta. Cero l&oacute;gica de negocio.</p>
+  <div class="code-block"><span class="kw">@RestController</span>
+<span class="kw">@RequestMapping</span>(<span class="str">"/api/v1/actividades"</span>)
+<span class="kw">public class</span> ActividadController {
+
+    <span class="kw">private final</span> ManageActividadUseCase useCase;
+
+    <span class="kw">public</span> ActividadController(ManageActividadUseCase useCase) {
+        <span class="kw">this</span>.useCase = useCase;
+    }
+
+    <span class="kw">@PostMapping</span>
+    <span class="kw">public</span> ResponseEntity&lt;ActividadResponse&gt; crear(<span class="kw">@Valid @RequestBody</span> ActividadRequest request) {
+        ActividadResponse response = useCase.crear(request);
+        <span class="kw">return new</span> ResponseEntity&lt;&gt;(response, HttpStatus.CREATED);
+    }
+
+    <span class="kw">@GetMapping</span>(<span class="str">"/{id}"</span>)
+    <span class="kw">public</span> ResponseEntity&lt;ActividadResponse&gt; obtener(<span class="kw">@PathVariable</span> Long id) {
+        <span class="kw">return</span> ResponseEntity.ok(useCase.obtener(id));
+    }
+}</div>
+  <div class="note info"><b>El controller depende de la interfaz</b> <code>ManageActividadUseCase</code>, no de <code>ActividadService</code>. Spring inyecta la implementaci&oacute;n en runtime. Esto es la inversi&oacute;n de dependencia en acci&oacute;n.</div>
+
+  <!-- ============ 10 ============ -->
+  <h2 id="s10"><span class="num">10</span> El persistence adapter (adapter out)</h2>
+  <p class="sec-intro">El adapter de salida implementa <code>port/out</code> usando JPA. Es la &uacute;nica capa que toca Oracle. Convierte entre el dominio y la entidad JPA.</p>
+  <h3>La entidad JPA</h3>
+  <div class="code-block"><span class="kw">@Entity</span>
+<span class="kw">@Table</span>(name = <span class="str">"CRM_ACTIVIDADES"</span>)
+<span class="kw">public class</span> ActividadEntity {
+
+    <span class="kw">@Id</span>
+    <span class="kw">@GeneratedValue</span>(strategy = GenerationType.IDENTITY)
+    <span class="kw">private</span> Long id;
+
+    <span class="kw">@Column</span>(name = <span class="str">"TITULO"</span>, nullable = <span class="kw">false</span>)
+    <span class="kw">private</span> String titulo;
+
+    <span class="kw">@Column</span>(name = <span class="str">"ESTADO"</span>, nullable = <span class="kw">false</span>)
+    <span class="kw">private</span> String estado;
+
+    <span class="kw">@Column</span>(name = <span class="str">"FECHA"</span>, nullable = <span class="kw">false</span>)
+    <span class="kw">private</span> LocalDateTime fecha;
+    <span class="cm">// ... resto de campos</span>
+}</div>
+  <h3>El repository Spring Data</h3>
+  <div class="code-block"><span class="kw">public interface</span> ActividadSpringDataRepository
+        <span class="kw">extends</span> JpaRepository&lt;ActividadEntity, Long&gt; {
+
+    List&lt;ActividadEntity&gt; findByEstado(String estado);
+    List&lt;ActividadEntity&gt; findByIdCliente(Long idCliente);
+}</div>
+  <h3>El adapter que une todo</h3>
+  <div class="code-block"><span class="kw">@Component</span>
+<span class="kw">public class</span> ActividadPersistenceAdapter <span class="kw">implements</span> ActividadPersistencePort {
+
+    <span class="kw">private final</span> ActividadSpringDataRepository repository;
+
+    <span class="kw">@Override</span>
+    <span class="kw">public</span> Actividad save(Actividad actividad) {
+        ActividadEntity entity = toEntity(actividad);
+        ActividadEntity saved = repository.save(entity);
+        <span class="kw">return</span> toDomain(saved);
+    }
+
+    <span class="kw">@Override</span>
+    <span class="kw">public</span> Optional&lt;Actividad&gt; findById(Long id) {
+        <span class="kw">return</span> repository.findById(id).map(<span class="kw">this</span>::toDomain);
+    }
+}</div>
+  <div class="note warn"><b>Mapeo manual:</b> la conversi&oacute;n entre dominio y entidad se hace a mano (m&eacute;todos <code>toEntity</code> / <code>toDomain</code>). MapStruct est&aacute; declarado en el <code>pom.xml</code> pero sin uso real. La carpeta <code>mapper/</code> que existe en algunos m&oacute;dulos est&aacute; vac&iacute;a.</div>
+
+  <!-- ============ 11 ============ -->
+  <h2 id="s11"><span class="num">11</span> La base de datos (Oracle)</h2>
+  <p class="sec-intro">Cada m&oacute;dulo tiene su(s) tabla(s) en Oracle, definidas en <code>base de datos/03_tablas/</code>. El esquema es <code>BOM_VENTAS</code> y las tablas siguen el prefijo <code>CRM_</code>.</p>
+  <div class="code-block"><span class="cm">-- Tabla principal del módulo etiquetas</span>
+<span class="kw">CREATE TABLE</span> CRM_ETIQUETAS (
+    ID_ETIQUETA   <span class="kw">NUMBER</span>(19,0) <span class="kw">GENERATED BY DEFAULT AS IDENTITY</span>,
+    NOMBRE        <span class="kw">VARCHAR2</span>(100 CHAR) <span class="kw">NOT NULL</span>,
+    COLOR         <span class="kw">VARCHAR2</span>(50 CHAR),
+    CREADO_EN     <span class="kw">TIMESTAMP</span>(6) <span class="kw">NOT NULL</span>,
+    <span class="kw">CONSTRAINT</span> PK_CRM_ETIQUETAS <span class="kw">PRIMARY KEY</span> (ID_ETIQUETA)
+) <span class="kw">TABLESPACE</span> VIERNES_ETIQUETAS;
+
+<span class="cm">-- Tabla principal del módulo actividades</span>
+<span class="kw">CREATE TABLE</span> CRM_ACTIVIDADES (
+    ID_ACTIVIDAD   <span class="kw">NUMBER</span>(19,0) <span class="kw">GENERATED BY DEFAULT AS IDENTITY</span>,
+    ID_USUARIO     <span class="kw">VARCHAR2</span>(255 CHAR),
+    ID_CLIENTE     <span class="kw">NUMBER</span>(19,0),
+    TIPO           <span class="kw">VARCHAR2</span>(255 CHAR) <span class="kw">NOT NULL</span>,
+    TITULO         <span class="kw">VARCHAR2</span>(255 CHAR) <span class="kw">NOT NULL</span>,
+    ESTADO         <span class="kw">VARCHAR2</span>(255 CHAR) <span class="kw">NOT NULL</span>,
+    FECHA          <span class="kw">TIMESTAMP</span>(6) <span class="kw">NOT NULL</span>,
+    CREADO_EN      <span class="kw">TIMESTAMP</span>(6) <span class="kw">NOT NULL</span>,
+    <span class="kw">CONSTRAINT</span> PK_CRM_ACTIVIDADES <span class="kw">PRIMARY KEY</span> (ID_ACTIVIDAD)
+) <span class="kw">TABLESPACE</span> VIERNES_ACTIVIDADES;</div>
+  <table>
+    <thead><tr><th>Convenci&oacute;n</th><th>Regla</th><th>Ejemplo</th></tr></thead>
+    <tbody>
+      <tr><td>Prefijo de tabla</td><td><code>CRM_</code> + nombre del m&oacute;dulo en plural/may&uacute;sculas</td><td><code>CRM_ACTIVIDADES</code></td></tr>
+      <tr><td>Primary key</td><td><code>ID_</code> + entidad, <code>NUMBER(19,0)</code>, <code>GENERATED BY DEFAULT AS IDENTITY</code></td><td><code>ID_ACTIVIDAD</code></td></tr>
+      <tr><td>Tablespace</td><td>Uno por m&oacute;dulo: <code>VIERNES_</code> + nombre</td><td><code>VIERNES_ACTIVIDADES</code></td></tr>
+      <tr><td>Relaciones N:M</td><td>Tabla intermedia con <code>UK_</code> unique constraint</td><td><code>CRM_ACTIVIDAD_ETIQUETAS</code></td></tr>
+      <tr><td>&Iacute;ndices</td><td><code>IX_</code> + tabla + campo, en tablespace del m&oacute;dulo</td><td><code>IX_CRM_ACTIVIDADES_ESTADO</code></td></tr>
+      <tr><td>Esquema</td><td><code>BOM_VENTAS</code></td><td>Todos los m&oacute;dulos</td></tr>
+    </tbody>
+  </table>
+  <div class="note info"><b>ddl-auto:</b> el proyecto usa <code>spring.jpa.hibernate.ddl-auto=update</code>, lo que significa que Hibernate puede crear/modificar tablas seg&uacute;n las entidades. Las tablas SQL en <code>base de datos/03_tablas/</code> son la fuente de verdad del esquema inicial.</div>
+
+  <!-- ============ 12 ============ -->
+  <h2 id="s12"><span class="num">12</span> Comunicación entre módulos</h2>
+  <p class="sec-intro">Un módulo no llama a otro directamente: usa puertos <code>out</code> cuyos adapters consumen la API pública del otro módulo (o sus internals si es OPEN).</p>
+  <div class="svgwrap">
+  <svg viewBox="0 0 860 280" width="860" height="280" role="img" aria-label="Comunicación entre módulos">
+    <defs><marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c084fc"/></marker></defs>
+    <rect x="330" y="100" width="200" height="80" rx="12" fill="#1e2942" stroke="#3b82f6"/>
+    <text x="352" y="132" fill="#e2e8f0" font-size="14" font-weight="600">actividades</text>
+    <text x="352" y="154" fill="#94a3b8" font-size="11.5">Service + ports out</text>
+    <rect x="40" y="30" width="180" height="60" rx="10" fill="#172033" stroke="#10b981"/>
+    <text x="60" y="56" fill="#6ee7b7" font-size="13" font-weight="600">clientes (OPEN)</text>
+    <text x="60" y="76" fill="#94a3b8" font-size="11">ManageClienteUseCase</text>
+    <rect x="40" y="190" width="180" height="60" rx="10" fill="#172033" stroke="#10b981"/>
+    <text x="60" y="216" fill="#6ee7b7" font-size="13" font-weight="600">etiquetas (OPEN)</text>
+    <text x="60" y="236" fill="#94a3b8" font-size="11">EtiquetaPersistencePort</text>
+    <rect x="640" y="30" width="180" height="60" rx="10" fill="#172033" stroke="#10b981"/>
+    <text x="660" y="56" fill="#6ee7b7" font-size="13" font-weight="600">leads / oportunidades</text>
+    <text x="660" y="76" fill="#94a3b8" font-size="11">OPEN: repositorios</text>
+    <rect x="640" y="190" width="180" height="60" rx="10" fill="#172033" stroke="#f59e0b"/>
+    <text x="660" y="216" fill="#fbbf24" font-size="13" font-weight="600">usuarios (CLOSED)</text>
+    <text x="660" y="236" fill="#94a3b8" font-size="11">solo UsuariosApi pública</text>
+    <line x1="330" y1="120" x2="222" y2="62" stroke="#c084fc" stroke-width="2" marker-end="url(#arr2)"/>
+    <line x1="330" y1="160" x2="222" y2="218" stroke="#c084fc" stroke-width="2" marker-end="url(#arr2)"/>
+    <line x1="530" y1="120" x2="638" y2="62" stroke="#c084fc" stroke-width="2" marker-end="url(#arr2)"/>
+    <line x1="530" y1="160" x2="638" y2="218" stroke="#c084fc" stroke-width="2" marker-end="url(#arr2)"/>
+  </svg>
+  </div>
+  <p>El módulo <code>actividades</code> declara en su <code>package-info.java</code> que depende de <code>clientes</code>, <code>oportunidades</code>, <code>leads</code>, <code>etiquetas</code> y <code>usuarios</code>. El acceso a los OPEN es directo a sus repositorios; el acceso a usuarios (CLOSED) es solo por su API pública.</p>
+  <div class="note ok"><b>Regla Modulith:</b> nunca importes <code>com.viernes.clientes.adapters.out.persistence.repository</code> desde otro m&oacute;dulo si clientes es CLOSED. Usa su <code>port/in</code> (API p&uacute;blica) en su lugar.</div>
+
+  <!-- ============ 13 ============ -->
+  <h2 id="s13"><span class="num">13</span> Flujo completo de una petición</h2>
+  <p class="sec-intro">As&iacute; viaja una petici&oacute;n <code>POST /api/v1/actividades</code> de extremo a extremo. Cada salto es una capa distinta.</p>
+  <div class="flow">
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">HTTP llega al controller</div><div class="sd"><code>POST /api/v1/actividades</code> con un JSON. El controller recibe <code>@Valid @RequestBody ActividadRequest</code>. No valida reglas de negocio; solo delega.</div></div></div>
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">Controller llama al puerto in</div><div class="sd">El controller conoce <code>ManageActividadUseCase</code> (interfaz), no el service concreto. Spring inyecta <code>ActividadService</code> en runtime.</div></div></div>
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">Service aplica reglas de negocio</div><div class="sd"><code>ActividadService.crear()</code> valida relaciones (cliente/lead existe), valida m&aacute;ximo 8 etiquetas, construye el dominio y llama <code>persistencePort.save()</code>. Todo en una transacci&oacute;n <code>@Transactional</code>.</div></div></div>
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">Adapter out persiste en Oracle</div><div class="sd"><code>ActividadPersistenceAdapter.save()</code> convierte dominio &#8594; entidad JPA, llama <code>repository.save()</code> &#8594; Hibernate ejecuta el INSERT en <code>CRM_ACTIVIDADES</code>.</div></div></div>
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">Service arma la respuesta</div><div class="sd"><code>toResponse()</code> convierte dominio &#8594; <code>ActividadResponse</code> (DTO), calcula campos derivados como <code>esVencida</code>.</div></div></div>
+    <div class="flow-step"><div class="sn"></div><div class="sb"><div class="st">Controller devuelve HTTP 201</div><div class="sd"><code>new ResponseEntity&lt;&gt;(response, HttpStatus.CREATED)</code>. El JSON vuelve al cliente. Si algo fall&oacute;, <code>GlobalExceptionHandler</code> traduce la excepci&oacute;n a 400/404.</div></div></div>
+  </div>
+
+  <!-- ============ 14 ============ -->
+  <h2 id="s14"><span class="num">14</span> Checklist para crear un módulo nuevo</h2>
+  <p class="sec-intro">Si vas a crear un m&oacute;dulo <code>facturas</code>, estos son los archivos que necesitas. Cada paso cita el equivalente en un m&oacute;dulo existente.</p>
+  <ul class="checklist">
+    <li>
+      <span class="box">&#10003;</span>
+      <div>
+        <div class="ct">1. Crear la tabla en Oracle</div>
+        <div class="cd">Archivo SQL en <code>base de datos/03_tablas/NN_facturas.sql</code> con <code>CREATE TABLE CRM_FACTURAS</code>, PK <code>ID_FACTURA</code>, tablespace <code>VIERNES_FACTURAS</code>.</div>
+        <div class="ca"><span class="anchor">base de datos/03_tablas/07_actividades.sql</span></div>
+      </div>
+    </li>
+    <li>
+      <span class="box">&#10003;</span>
+      <div>
+        <div class="ct">2. Crear el paquete y package-info.java</div>
+        <div class="cd">Carpeta <code>com/viernes/facturas/</code> con <code>package-info.java</code> que lleve <code>@ApplicationModule</code>. Define si es OPEN o CLOSED y <code>allowedDependencies</code>.</div>
+        <div class="ca"><span class="anchor">actividades/package-info.java</span></div>
+      </div>
+    </li>
+    <li>
+      <span class="box">&#10003;</span>
+      <div>
+        <div class="ct">3. Crear el dominio</div>
+        <div class="cd">POJO <code>Factura.java</code> y enums (<code>EstadoFactura</code>, <code>TipoFactura</code>) en <code>domain/</code>. Sin anotaciones de framework.</div>
+        <div class="ca"><span class="anchor">actividades/domain/Actividad.java</span></div>
+      </div>
+    </li>
+    <li>
+      <span class="box">&#10003;</span>
+      <div>
+        <div class="ct">4. Crear los DTOs</div>
+        <div class="cd"><code>FacturaRequest.java</code> y <code>FacturaResponse.java</code> como records en <code>application/dto/</code>.</div>
+        <div class="ca"><span class="anchor">actividades/application/dto/ActividadRequest.java</span></div>
+      </div>
+    </li>
+    <li>
+      <span class="box">&#10003;</span>
+      <div>
+        <div class="ct">5. Crear el puerto in</div>
+        <div class="cd"><code>ManageFacturaUseCase.java</code> en <code>application/port/in/</code>. Interfaz con los m&eacute;todos del CRUD + casos de uso espec&iacute;ficos.</div>
+        <div class="ca"><span class="anchor">actividades/application/port/in/ManageActividadUseCase.java</span></div>
+      </div>
+    </li>
+    <li>
+      <span class="box">&#10003;</span>
+      <div>
+        <div class="ct">6. Crear el/los puerto(s) out</div>
+        <div class="cd"><code>FacturaPersistencePort.java</code> en <code>application/port/out/</code>. Si el m&oacute;dulo consulta otros, crea puertos adicionales (ej: <code>ClienteQueryPort</code>).</div>
+        <div class="ca"><span class="anchor">actividades/application/port/out/ActividadPersistencePort.java</span></div>
+      </div>
+    </li>
+    <li>
+      <span class="box">&#10003;</span>
+      <div>
+        <div class="ct">7. Crear el servicio</div>
+        <div class="cd"><code>FacturaService.java</code> en <code>application/service/</code>. Implementa <code>ManageFacturaUseCase</code>, inyecta puertos <code>out</code> por constructor, anota con <code>@Service</code> y <code>@Transactional</code>.</div>
+        <div class="ca"><span class="anchor">actividades/application/service/ActividadService.java</span></div>
+      </div>
+    </li>
+    <li>
+      <span class="box">&#10003;</span>
+      <div>
+        <div class="ct">8. Crear la entidad JPA</div>
+        <div class="cd"><code>FacturaEntity.java</code> en <code>adapters/out/persistence/entity/</code> con <code>@Entity</code>, <code>@Table(name="CRM_FACTURAS")</code>. Campos con <code>@Column</code> mapeando las columnas SQL.</div>
+        <div class="ca"><span class="anchor">actividades/adapters/out/persistence/entity/ActividadEntity.java</span></div>
+      </div>
+    </li>
+    <li>
+      <span class="box">&#10003;</span>
+      <div>
+        <div class="ct">9. Crear el repository Spring Data</div>
+        <div class="cd"><code>FacturaSpringDataRepository.java</code> en <code>adapters/out/persistence/repository/</code> que extienda <code>JpaRepository&lt;FacturaEntity, Long&gt;</code>. A&ntilde;ade m&eacute;todos de b&uacute;squeda por nombre.</div>
+        <div class="ca"><span class="anchor">actividades/adapters/out/persistence/repository/ActividadSpringDataRepository.java</span></div>
+      </div>
+    </li>
+    <li>
+      <span class="box">&#10003;</span>
+      <div>
+        <div class="ct">10. Crear el persistence adapter</div>
+        <div class="cd"><code>FacturaPersistenceAdapter.java</code> en <code>adapters/out/persistence/</code>. Implementa <code>FacturaPersistencePort</code>, usa el repository, mapea dominio &#8594; entidad y viceversa con <code>toEntity</code>/<code>toDomain</code>.</div>
+        <div class="ca"><span class="anchor">actividades/adapters/out/persistence/ActividadPersistenceAdapter.java</span></div>
+      </div>
+    </li>
+    <li>
+      <span class="box">&#10003;</span>
+      <div>
+        <div class="ct">11. Crear el controller</div>
+        <div class="cd"><code>FacturaController.java</code> en <code>adapters/in/web/</code> con <code>@RestController</code>, <code>@RequestMapping("/api/v1/facturas")</code>. Inyecta <code>ManageFacturaUseCase</code> por constructor.</div>
+        <div class="ca"><span class="anchor">actividades/adapters/in/web/ActividadController.java</span></div>
+      </div>
+    </li>
+    <li>
+      <span class="box">&#10003;</span>
+      <div>
+        <div class="ct">12. Registrar dependencias en package-info</div>
+        <div class="cd">Si el m&oacute;dulo necesita leer de otros, a&ntilde;ade sus nombres en <code>allowedDependencies</code> del <code>package-info.java</code>.</div>
+        <div class="ca"><span class="anchor">actividades/package-info.java</span></div>
+      </div>
+    </li>
+    <li>
+      <span class="box">&#10003;</span>
+      <div>
+        <div class="ct">13. Crear datos semilla (opcional)</div>
+        <div class="cd">Si el m&oacute;dulo necesita datos iniciales, a&ntilde;ade INSERTs en <code>base de datos/08_datos_semilla/seed_datos_demo.sql</code>.</div>
+        <div class="ca"><span class="anchor">base de datos/08_datos_semilla/seed_datos_demo.sql</span></div>
+      </div>
+    </li>
+    <li>
+      <span class="box">&#10003;</span>
+      <div>
+        <div class="ct">14. Crear tests</div>
+        <div class="cd">Test del service con mocks de los puertos <code>out</code> (sin BD). Test del controller con <code>MockMvc</code>. Test del adapter con <code>@DataJpaTest</code> si es necesario.</div>
+      </div>
+    </li>
+  </ul>
+
+  <!-- ============ 15 ============ -->
+  <h2 id="s15"><span class="num">15</span> Errores comunes</h2>
+  <p class="sec-intro">Lo que rompe la arquitectura si no se respeta.</p>
+  <table>
+    <thead><tr><th>Error</th><th>Por qu&eacute; pasa</th><th>C&oacute;mo se corrige</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="badge b-gap">ERROR</span> El service importa <code>EntityManager</code> o <code>JpaRepository</code></td>
+        <td>El desarrollador salta la capa de adapters y accede a JPA directamente desde el n&uacute;cleo.</td>
+        <td>Crear un <code>port/out</code> y un adapter que lo implemente. El service solo conoce la interfaz.</td>
+      </tr>
+      <tr>
+        <td><span class="badge b-gap">ERROR</span> El controller tiene l&oacute;gica de negocio</td>
+        <td>Se valida una regla (ej: m&aacute;ximo 8 etiquetas) dentro del controller en vez del service.</td>
+        <td>Mover toda regla al service. El controller solo recibe, delega y responde.</td>
+      </tr>
+      <tr>
+        <td><span class="badge b-gap">ERROR</span> Un m&oacute;dulo importa el repositorio de otro CLOSED</td>
+        <td>Se accede a <code>com.viernes.usuarios.adapters.out.persistence.repository</code> desde otro m&oacute;dulo.</td>
+        <td>Usar la API p&uacute;blica del m&oacute;dulo (<code>port/in</code>) o pedir que lo abran como OPEN si es leg&iacute;timo.</td>
+      </tr>
+      <tr>
+        <td><span class="badge b-gap">ERROR</span> Falta <code>package-info.java</code></td>
+        <td>Spring Modulith no reconoce el m&oacute;dulo y no valida dependencias.</td>
+        <td>Crear el archivo con <code>@ApplicationModule</code> y <code>allowedDependencies</code>.</td>
+      </tr>
+      <tr>
+        <td><span class="badge b-gap">ERROR</span> El service devuelve la entidad JPA</td>
+        <td>Se devuelve <code>ActividadEntity</code> en vez de <code>ActividadResponse</code>, filtrando la tecnolog&iacute;a al exterior.</td>
+        <td>Siempre convertir a DTO con <code>toResponse()</code> antes de devolver.</td>
+      </tr>
+      <tr>
+        <td><span class="badge b-gap">ERROR</span> El dominio tiene anotaciones JPA</td>
+        <td>Se mezcla <code>@Entity</code> en la clase del dominio, acoplando el n&uacute;cleo a Hibernate.</td>
+        <td>El dominio es puro. La entidad JPA vive en <code>adapters/out/persistence/entity/</code> como clase separada.</td>
+      </tr>
+      <tr>
+        <td><span class="badge b-gap">ERROR</span> Inyecci&oacute;n con <code>@Autowired</code> en campo</td>
+        <td>Se usa <code>@Autowired</code> en un campo privado en vez de constructor.</td>
+        <td>Usar inyecci&oacute;n por constructor (campo <code>final</code> + constructor). Spring lo hace autom&aacute;tico si hay un &uacute;nico constructor.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ============ 16 ============ -->
+  <h2 id="s16"><span class="num">16</span> Los 16 módulos del sistema</h2>
+  <p class="sec-intro">El backend tiene 16 paquetes bajo <code>com.viernes</code>. Los 15 primeros son m&oacute;dulos de negocio; <code>shared</code> es infraestructura transversal.</p>
+  <table>
+    <thead><tr><th>M&oacute;dulo</th><th>Capacidad de negocio</th><th>Tipo Modulith</th><th>Depende de</th></tr></thead>
+    <tbody>
+      <tr><td><code>actividades</code></td><td>Registro y gesti&oacute;n de actividades (llamadas, reuniones)</td><td>OPEN</td><td>clientes, oportunidades, leads, etiquetas, usuarios</td></tr>
+      <tr><td><code>auth</code></td><td>Autenticaci&oacute;n con Keycloak (OAuth2)</td><td>&mdash;</td><td>shared</td></tr>
+      <tr><td><code>clientes</code></td><td>Gesti&oacute;n de clientes y contactos + consulta DNI/RUC</td><td>OPEN</td><td>shared</td></tr>
+      <tr><td><code>dashboard</code></td><td>M&eacute;tricas y resumen del pipeline</td><td>&mdash;</td><td>varios m&oacute;dulos</td></tr>
+      <tr><td><code>equipos</code></td><td>Gesti&oacute;n de equipos de venta</td><td>&mdash;</td><td>usuarios</td></tr>
+      <tr><td><code>etiquetas</code></td><td>Etiquetas para clasificar entidades</td><td>&mdash;</td><td>shared</td></tr>
+      <tr><td><code>leads</code></td><td>Gesti&oacute;n de leads (prospectos)</td><td>&mdash;</td><td>shared</td></tr>
+      <tr><td><code>marketing</code></td><td>Campa&ntilde;as de marketing</td><td>&mdash;</td><td>shared</td></tr>
+      <tr><td><code>mensajeria</code></td><td>Mensajes entre usuarios</td><td>&mdash;</td><td>usuarios</td></tr>
+      <tr><td><code>oportunidades</code></td><td>Oportunidades de venta y pipeline</td><td>&mdash;</td><td>clientes, productos</td></tr>
+      <tr><td><code>productos</code></td><td>Cat&aacute;logo de productos</td><td>&mdash;</td><td>shared</td></tr>
+      <tr><td><code>propuestas</code></td><td>Propuestas comerciales</td><td>&mdash;</td><td>oportunidades, productos</td></tr>
+      <tr><td><code>relationshipmap</code></td><td>Mapa de relaciones entre entidades</td><td>&mdash;</td><td>varios</td></tr>
+      <tr><td><code>usuarios</code></td><td>Gesti&oacute;n de usuarios del sistema</td><td>CLOSED</td><td>shared, shared.exception</td></tr>
+      <tr><td><code>shared</code></td><td><b>Infraestructura</b>: excepciones globales, cache, rate-limit, filtros</td><td>&mdash;</td><td>&mdash;</td></tr>
+    </tbody>
+  </table>
+  <div class="note info"><b>shared no es un m&oacute;dulo de negocio:</b> es infraestructura transversal que todos usan. Contiene <code>GlobalExceptionHandler</code>, <code>CacheConfig</code>, <code>CorrelationIdFilter</code>, <code>ConsultaDocumentoRateLimiter</code> y las excepciones de dominio (<code>ResourceNotFoundException</code>, <code>RateLimitExceededException</code>).</div>
+
+  <footer>VIERNES CRM V7 &middot; Gu&iacute;a de desarrollo de un m&oacute;dulo &middot; generada sobre el c&oacute;digo real de E:\Viernes\Viernes &middot; anclajes archivo:l&iacute;nea verificados.</footer>
+</div>
+</body>
+</html>
