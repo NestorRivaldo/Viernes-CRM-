@@ -1,39 +1,42 @@
 # ==============================================================================
-# VIERNES CRM V1 - LANZADOR AUTOMÁTICO MULTI-PC
-# Diseñado para funcionar en cualquier máquina Windows con 1 solo clic o comando.
+# VIERNES CRM V1 - LANZADOR AUTOMATICO MULTI-PC (VERSION ROBUSTA)
+# Maneja: puerto ocupado, volumen corrupto, contenedor colgado, primera vez.
 # ==============================================================================
 
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
-$Host.UI.RawUI.WindowTitle = "VIERNES CRM V1 - Lanzador Automático Multi-PC"
+$Host.UI.RawUI.WindowTitle = "VIERNES CRM V1 - Lanzador"
 
 Clear-Host
 Write-Host "==============================================================================" -ForegroundColor Cyan
-Write-Host "             VIERNES CRM V1 - LANZADOR AUTOMÁTICO DE SERVICIOS                " -ForegroundColor Cyan
+Write-Host "             VIERNES CRM V1 - LANZADOR AUTOMATICO DE SERVICIOS                " -ForegroundColor Cyan
 Write-Host "==============================================================================" -ForegroundColor Cyan
 Write-Host ""
 
 $RootDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 Set-Location -Path $RootDir
 
-# ------------------------------------------------------------------------------
-# 0. DETECCIÓN ROBUSTA DE JAVA 21
-# ------------------------------------------------------------------------------
-Write-Host "[0/5] Buscando Java 21 en el equipo..." -ForegroundColor Yellow
+# Detectar compose de BD
+$ComposeDB = if (Test-Path "$RootDir\base de datos\compose-dev.yml") {
+    "$RootDir\base de datos\compose-dev.yml"
+} else {
+    "$RootDir\viernes-backend\compose-dev.yml"
+}
+
+# ==============================================================================
+# PASO 0 - JAVA 21
+# ==============================================================================
+Write-Host "[0/5] Buscando Java 21..." -ForegroundColor Yellow
 
 $JavaHome = $null
 
-# A. Si JAVA_HOME ya está configurado
 if ($env:JAVA_HOME -and (Test-Path "$env:JAVA_HOME\bin\java.exe")) {
     $JavaHome = $env:JAVA_HOME
 }
-
-# B. Buscar en .tools\jdk21 local
 if (-not $JavaHome) {
-    $LocalJdk = Get-Item "$RootDir\.tools\jdk21\jdk-*" -ErrorAction SilentlyContinue | Where-Object { Test-Path "$_\bin\java.exe" } | Select-Object -First 1
+    $LocalJdk = Get-Item "$RootDir\.tools\jdk21\jdk-*" -ErrorAction SilentlyContinue |
+        Where-Object { Test-Path "$_\bin\java.exe" } | Select-Object -First 1
     if ($LocalJdk) { $JavaHome = $LocalJdk.FullName }
 }
-
-# C. Buscar en rutas estándar de instalación de Windows
 if (-not $JavaHome) {
     $Candidates = @(
         "C:\Program Files\Microsoft\jdk-21*",
@@ -44,195 +47,182 @@ if (-not $JavaHome) {
         "C:\Program Files\Semeru\jdk-21*",
         "$env:LOCALAPPDATA\Programs\Eclipse Adoptium\jdk-21*"
     )
-    foreach ($pattern in $Candidates) {
-        $found = Get-Item $pattern -ErrorAction SilentlyContinue | Where-Object { Test-Path "$_\bin\java.exe" } | Select-Object -First 1
-        if ($found) {
-            $JavaHome = $found.FullName
-            break
-        }
+    foreach ($p in $Candidates) {
+        $f = Get-Item $p -ErrorAction SilentlyContinue |
+            Where-Object { Test-Path "$_\bin\java.exe" } | Select-Object -First 1
+        if ($f) { $JavaHome = $f.FullName; break }
     }
 }
-
-# D. Buscar en PATH si es Java 21
 if (-not $JavaHome) {
-    $JavaCmd = Get-Command java -ErrorAction SilentlyContinue
-    if ($JavaCmd) {
-        $Resolved = $JavaCmd.Source
-        $Parent = Split-Path -Parent (Split-Path -Parent $Resolved)
-        if (Test-Path "$Parent\bin\java.exe") {
-            $JavaHome = $Parent
-        }
+    $j = Get-Command java -ErrorAction SilentlyContinue
+    if ($j) {
+        $p = Split-Path -Parent (Split-Path -Parent $j.Source)
+        if (Test-Path "$p\bin\java.exe") { $JavaHome = $p }
     }
 }
 
 if ($JavaHome) {
     $env:JAVA_HOME = $JavaHome
     $env:Path = "$JavaHome\bin;" + $env:Path
-    Write-Host "      [OK] Java 21 detectado en: $JavaHome" -ForegroundColor Green
+    Write-Host "      [OK] Java 21: $JavaHome" -ForegroundColor Green
 } else {
-    Write-Host ""
-    Write-Host "[ERROR] No se encontró Java 21 en esta computadora." -ForegroundColor Red
-    Write-Host ""
-    Write-Host "Solución rápida en 1 minuto:" -ForegroundColor White
-    Write-Host " 1. Descarga e instala OpenJDK 21 (Temurin o Microsoft):" -ForegroundColor Gray
-    Write-Host "    https://adoptium.net/temurin/releases/?version=21" -ForegroundColor Cyan
-    Write-Host " 2. Durante la instalación, marca 'Set JAVA_HOME variable'." -ForegroundColor Gray
-    Write-Host " 3. Vuelve a ejecutar este lanzador." -ForegroundColor Gray
-    Write-Host ""
-    Read-Host "Presiona Enter para salir..."
-    exit 1
+    Write-Host "[ERROR] No se encontro Java 21." -ForegroundColor Red
+    Write-Host "Instala OpenJDK 21 desde: https://adoptium.net/temurin/releases/?version=21" -ForegroundColor Cyan
+    Read-Host "Presiona Enter para salir..."; exit 1
 }
 
-# ------------------------------------------------------------------------------
-# 1. DETECCIÓN DE NODE.JS Y NPM
-# ------------------------------------------------------------------------------
-Write-Host "[1/5] Verificando Node.js y npm..." -ForegroundColor Yellow
+# ==============================================================================
+# PASO 1 - NODE.JS
+# ==============================================================================
+Write-Host "[1/5] Verificando Node.js..." -ForegroundColor Yellow
 
-$NodeCmd = Get-Command node -ErrorAction SilentlyContinue
-$NpmCmd = Get-Command npm -ErrorAction SilentlyContinue
-
-if (-not $NodeCmd -or -not $NpmCmd) {
-    Write-Host ""
-    Write-Host "[ERROR] Node.js o npm no están instalados en esta PC." -ForegroundColor Red
-    Write-Host "Descarga e instala Node.js LTS (v20 o v22) desde: https://nodejs.org/" -ForegroundColor Cyan
-    Write-Host ""
-    Read-Host "Presiona Enter para salir..."
-    exit 1
+if (-not (Get-Command node -ErrorAction SilentlyContinue) -or
+    -not (Get-Command npm  -ErrorAction SilentlyContinue)) {
+    Write-Host "[ERROR] Node.js no esta instalado." -ForegroundColor Red
+    Write-Host "Instala Node.js LTS desde: https://nodejs.org/" -ForegroundColor Cyan
+    Read-Host "Presiona Enter para salir..."; exit 1
 }
+Write-Host "      [OK] Node.js $(node -v) listo." -ForegroundColor Green
 
-$NodeVersion = & node -v
-Write-Host "      [OK] Node.js $NodeVersion y npm listos." -ForegroundColor Green
-
-# ------------------------------------------------------------------------------
-# 2. DETECCIÓN DE DOCKER DESKTOP
-# ------------------------------------------------------------------------------
+# ==============================================================================
+# PASO 2 - DOCKER
+# ==============================================================================
 Write-Host "[2/5] Verificando Docker Desktop..." -ForegroundColor Yellow
 
-$DockerCmd = Get-Command docker -ErrorAction SilentlyContinue
-if (-not $DockerCmd) {
-    Write-Host ""
-    Write-Host "[ERROR] Docker Desktop no está instalado en esta computadora." -ForegroundColor Red
-    Write-Host "Instálalo desde: https://www.docker.com/products/docker-desktop/" -ForegroundColor Cyan
-    Write-Host ""
-    Read-Host "Presiona Enter para salir..."
-    exit 1
+if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
+    Write-Host "[ERROR] Docker Desktop no esta instalado." -ForegroundColor Red
+    Write-Host "Instala desde: https://www.docker.com/products/docker-desktop/" -ForegroundColor Cyan
+    Read-Host "Presiona Enter para salir..."; exit 1
 }
 
-# Comprobar si el motor de Docker está corriendo
-$DockerRunning = $false
-try {
-    $info = docker info 2>&1
-    if ($LASTEXITCODE -eq 0) { $DockerRunning = $true }
-} catch {}
+$DockerOk = $false
+$Wait = 0
+while (-not $DockerOk -and $Wait -lt 30) {
+    try { docker info 2>&1 | Out-Null; if ($LASTEXITCODE -eq 0) { $DockerOk = $true } }
+    catch {}
+    if (-not $DockerOk) { Start-Sleep -Seconds 3; $Wait++ }
+}
+if (-not $DockerOk) {
+    Write-Host "[ERROR] Docker no responde. Abre Docker Desktop y reintenta." -ForegroundColor Red
+    Read-Host "Presiona Enter para salir..."; exit 1
+}
+Write-Host "      [OK] Docker activo." -ForegroundColor Green
 
-if (-not $DockerRunning) {
-    Write-Host ""
-    Write-Host "[AVISO] Docker Desktop está instalado pero no se ha iniciado." -ForegroundColor Yellow
-    Write-Host "Por favor, abre la aplicación Docker Desktop en Windows y espera unos segundos." -ForegroundColor White
-    Write-Host "Esperando a que el motor de Docker responda..." -ForegroundColor Gray
-    
-    $WaitCount = 0
-    while (-not $DockerRunning -and $WaitCount -lt 30) {
-        Start-Sleep -Seconds 3
-        $WaitCount++
-        try {
-            $info = docker info 2>&1
-            if ($LASTEXITCODE -eq 0) { $DockerRunning = $true }
-        } catch {}
-        Write-Host -NoNewline "."
-    }
-    Write-Host ""
-    if (-not $DockerRunning) {
-        Write-Host "[ERROR] Docker Desktop sigue sin responder. Inícialo manualmente y reintenta." -ForegroundColor Red
-        Read-Host "Presiona Enter para salir..."
-        exit 1
+# ==============================================================================
+# PASO 3 - ORACLE Y KEYCLOAK
+# ==============================================================================
+Write-Host "[3/5] Iniciando contenedores..." -ForegroundColor Yellow
+
+# --- Liberar puerto 1521 si esta ocupado por otro contenedor ---
+Write-Host "      Verificando puerto 1521..." -ForegroundColor Gray
+$OcupantId = docker ps -q --filter "publish=1521" 2>$null
+if ($OcupantId) {
+    $OcupantName = docker inspect --format "{{.Name}}" $OcupantId 2>$null
+    if ($OcupantName -notlike "*viernes-oracle*") {
+        Write-Host "      Puerto 1521 ocupado por: $OcupantName — parando..." -ForegroundColor Yellow
+        docker stop $OcupantId | Out-Null
+        Write-Host "      [OK] Puerto 1521 liberado." -ForegroundColor Green
     }
 }
-Write-Host "      [OK] Docker Desktop está activo y respondiendo." -ForegroundColor Green
 
-# ------------------------------------------------------------------------------
-# 3. INICIO DE ORACLE Y KEYCLOAK EN DOCKER
-# ------------------------------------------------------------------------------
-Write-Host "[3/5] Iniciando Contenedores en Docker..." -ForegroundColor Yellow
+# --- Arrancar Oracle ---
+Write-Host "      Iniciando Oracle Database 23c..." -ForegroundColor Gray
+docker compose -f $ComposeDB up -d 2>&1 | Out-Null
 
-# Iniciar Oracle
-Write-Host "      Iniciando Oracle Database 23c (puerto 1521)..." -ForegroundColor Gray
-if (Test-Path "$RootDir\base de datos\compose-dev.yml") {
-    docker compose -f "$RootDir\base de datos\compose-dev.yml" up -d | Out-Null
-} else {
-    docker compose -f "$RootDir\viernes-backend\compose-dev.yml" up -d | Out-Null
-}
+# --- Esperar healthy con recuperacion automatica ---
+Write-Host "      Esperando que Oracle quede listo (max 5 min)..." -ForegroundColor Gray
+$OracleOk  = $false
+$Intentos  = 0
+$MaxIntentos = 60   # 60 x 5s = 5 minutos
 
-# Iniciar Keycloak
-Write-Host "      Iniciando Keycloak 25 (puerto 8180)..." -ForegroundColor Gray
-docker compose -f "$RootDir\compose-keycloak.yml" up -d | Out-Null
-
-# Esperar a que Oracle quede healthy
-Write-Host "      Esperando a que Oracle Database quede listo (healthy)..." -ForegroundColor Gray
-$OracleHealthy = $false
-$Attempts = 0
-
-while (-not $OracleHealthy -and $Attempts -lt 60) {
+while (-not $OracleOk -and $Intentos -lt $MaxIntentos) {
     $status = docker inspect -f "{{.State.Health.Status}}" viernes-oracle 2>$null
+    
     if ($status -eq "healthy") {
-        $OracleHealthy = $true
+        $OracleOk = $true
         break
     }
-    $Attempts++
-    Write-Host "      ... Oracle: $status (intento $Attempts/60)..." -ForegroundColor DarkGray
+
+    # Si lleva mas de 2 minutos unhealthy -> limpiar volumen y reiniciar
+    if ($status -eq "unhealthy" -and $Intentos -ge 24) {
+        Write-Host "" 
+        Write-Host "      Oracle no pudo iniciar (volumen posiblemente corrupto)." -ForegroundColor Yellow
+        Write-Host "      Limpiando volumen y reiniciando Oracle..." -ForegroundColor Yellow
+        docker compose -f $ComposeDB down -v 2>&1 | Out-Null
+        Start-Sleep -Seconds 3
+        docker compose -f $ComposeDB up -d 2>&1 | Out-Null
+        $Intentos = 0
+        Write-Host "      Reiniciado. Esperando de nuevo..." -ForegroundColor Gray
+        Start-Sleep -Seconds 5
+        continue
+    }
+
+    $Intentos++
+    if ($Intentos % 6 -eq 0) {
+        $mins = [math]::Round($Intentos * 5 / 60, 1)
+        Write-Host "      Oracle: $status ... ($mins min)" -ForegroundColor DarkGray
+    }
     Start-Sleep -Seconds 5
 }
 
-if (-not $OracleHealthy) {
-    Write-Host "[ERROR] Oracle Database no quedó healthy a tiempo. Revisa: docker logs viernes-oracle" -ForegroundColor Red
-    Read-Host "Presiona Enter para salir..."
-    exit 1
+if (-not $OracleOk) {
+    Write-Host "[ERROR] Oracle no quedo listo." -ForegroundColor Red
+    Write-Host "Revisa con: docker logs viernes-oracle" -ForegroundColor Cyan
+    Read-Host "Presiona Enter para salir..."; exit 1
 }
-Write-Host "      [OK] Oracle Database está saludable y listo." -ForegroundColor Green
+Write-Host "      [OK] Oracle listo." -ForegroundColor Green
 
-# Auto-comprobación de tablas en Oracle (si la PC o el volumen es nuevo)
-Write-Host "      Verificando tablas del CRM en Oracle..." -ForegroundColor Gray
-$UserCheck = "SET HEADING OFF FEEDBACK OFF; SELECT count(*) FROM all_users WHERE username='BOM_VENTAS'; EXIT;" | docker exec -i viernes-oracle sqlplus -s system/123456@//localhost:1521/FREEPDB1 2>$null
+# --- Keycloak ---
+Write-Host "      Iniciando Keycloak..." -ForegroundColor Gray
+docker compose -f "$RootDir\compose-keycloak.yml" up -d 2>&1 | Out-Null
+Write-Host "      [OK] Keycloak iniciado." -ForegroundColor Green
+
+# --- Verificar y cargar tablas BOM_VENTAS si es PC nueva ---
+Write-Host "      Verificando esquema BOM_VENTAS..." -ForegroundColor Gray
+$UserCheck = "SET HEADING OFF FEEDBACK OFF; SELECT count(*) FROM all_users WHERE username='BOM_VENTAS'; EXIT;" |
+    docker exec -i viernes-oracle sqlplus -s system/123456@//localhost:1521/FREEPDB1 2>$null
 $HasBomVentas = ($UserCheck -match '\b1\b')
 
 if (-not $HasBomVentas) {
-    Write-Host ""
-    Write-Host "      [AVISO] Base de datos limpia detectada. Inicializando tablas y datos demo..." -ForegroundColor Yellow
-    if (Test-Path "$RootDir\base de datos\ejecutar_todo.sql") {
-        Get-Content "$RootDir\base de datos\ejecutar_todo.sql" | docker exec -i viernes-oracle sqlplus -s system/123456@//localhost:1521/FREEPDB1 | Out-Null
-        Write-Host "      [OK] Tablas de BOM_VENTAS cargadas exitosamente." -ForegroundColor Green
+    Write-Host "      PC nueva detectada. Cargando tablas demo..." -ForegroundColor Yellow
+    $sqlFile = if (Test-Path "$RootDir\base de datos\ejecutar_todo.sql") {
+        "$RootDir\base de datos\ejecutar_todo.sql"
+    } else { $null }
+
+    if ($sqlFile) {
+        Get-Content $sqlFile | docker exec -i viernes-oracle sqlplus -s system/123456@//localhost:1521/FREEPDB1 | Out-Null
+        Write-Host "      [OK] Tablas BOM_VENTAS cargadas." -ForegroundColor Green
+    } else {
+        Write-Host "      [AVISO] No se encontro ejecutar_todo.sql. Carga las tablas manualmente si es necesario." -ForegroundColor Yellow
     }
 } else {
-    Write-Host "      [OK] Esquema BOM_VENTAS verificado y listo." -ForegroundColor Green
+    Write-Host "      [OK] Esquema BOM_VENTAS verificado." -ForegroundColor Green
 }
 
-# ------------------------------------------------------------------------------
-# 4. INICIAR BACKEND (SPRING BOOT)
-# ------------------------------------------------------------------------------
+# ==============================================================================
+# PASO 4 - BACKEND SPRING BOOT
+# ==============================================================================
 Write-Host ""
 Write-Host "[4/5] Iniciando Backend Spring Boot (puerto 8080)..." -ForegroundColor Yellow
 
-if (-not (Test-Path "$RootDir\viernes-backend\.env.local") -and (Test-Path "$RootDir\viernes-backend\.env.local.example")) {
+if (-not (Test-Path "$RootDir\viernes-backend\.env.local") -and
+    (Test-Path "$RootDir\viernes-backend\.env.local.example")) {
     Copy-Item "$RootDir\viernes-backend\.env.local.example" "$RootDir\viernes-backend\.env.local"
-    Write-Host "      [OK] Archivo .env.local creado desde plantilla example." -ForegroundColor Gray
+    Write-Host "      [OK] .env.local creado desde plantilla." -ForegroundColor Gray
 }
 
-# Iniciar proceso del backend en una ventana independiente de cmd
 $BackendCmd = "chcp 65001 >nul && set `"JAVA_HOME=$JavaHome`" && set `"PATH=$JavaHome\bin;%PATH%`" && cd /d `"$RootDir\viernes-backend`" && mvnw.cmd spring-boot:run"
 Start-Process cmd.exe -ArgumentList "/k `"$BackendCmd`""
+Write-Host "      [OK] Backend ejecutandose en su consola (puerto 8080)." -ForegroundColor Green
 
-Write-Host "      [OK] Backend ejecutándose en su propia consola (puerto 8080)." -ForegroundColor Green
-
-# ------------------------------------------------------------------------------
-# 5. INICIAR FRONTEND (ANGULAR)
-# ------------------------------------------------------------------------------
+# ==============================================================================
+# PASO 5 - FRONTEND ANGULAR
+# ==============================================================================
 Write-Host ""
 Write-Host "[5/5] Iniciando Frontend Angular (puerto 4200)..." -ForegroundColor Yellow
 
 if (-not (Test-Path "$RootDir\viernes-frontend\node_modules")) {
-    Write-Host ""
-    Write-Host "      [AVISO] Primera ejecución detectada en esta PC." -ForegroundColor Yellow
-    Write-Host "      Instalando dependencias de Angular (npm install)..." -ForegroundColor Gray
+    Write-Host "      Primera vez en esta PC. Instalando dependencias npm..." -ForegroundColor Yellow
     Push-Location "$RootDir\viernes-frontend"
     & npm install
     Pop-Location
@@ -241,29 +231,24 @@ if (-not (Test-Path "$RootDir\viernes-frontend\node_modules")) {
 
 $FrontendCmd = "chcp 65001 >nul && cd /d `"$RootDir\viernes-frontend`" && npm start"
 Start-Process cmd.exe -ArgumentList "/k `"$FrontendCmd`""
+Write-Host "      [OK] Frontend ejecutandose en su consola (puerto 4200)." -ForegroundColor Green
 
-Write-Host "      [OK] Frontend ejecutándose en su propia consola (puerto 4200)." -ForegroundColor Green
-
-# ------------------------------------------------------------------------------
-# RESUMEN FINAL
-# ------------------------------------------------------------------------------
+# ==============================================================================
+# RESUMEN
+# ==============================================================================
 Write-Host ""
 Write-Host "==============================================================================" -ForegroundColor Green
-Write-Host "                      ¡SISTEMA VIERNES CRM ACTIVADO!                          " -ForegroundColor Green
+Write-Host "                      SISTEMA VIERNES CRM ACTIVADO                            " -ForegroundColor Green
 Write-Host "==============================================================================" -ForegroundColor Green
 Write-Host ""
-Write-Host " Enlaces de acceso:" -ForegroundColor Cyan
-Write-Host "  - Aplicación Web:      http://localhost:4200" -ForegroundColor White
-Write-Host "  - Backend Swagger:     http://localhost:8080/swagger-ui.html" -ForegroundColor White
-Write-Host "  - Keycloak Auth:       http://localhost:8180 (Realm: viernes-realm)" -ForegroundColor White
+Write-Host " Acceso:" -ForegroundColor Cyan
+Write-Host "  Aplicacion:   http://localhost:4200" -ForegroundColor White
+Write-Host "  Swagger:      http://localhost:8080/swagger-ui.html" -ForegroundColor White
+Write-Host "  Keycloak:     http://localhost:8180" -ForegroundColor White
 Write-Host ""
-Write-Host " Credenciales de acceso al CRM:" -ForegroundColor Cyan
-Write-Host "  - Usuario:     admin@viernes.com" -ForegroundColor White
-Write-Host "  - Contraseña:  Admin12345" -ForegroundColor White
-Write-Host "  - Rol:         ADMIN (Acceso Total)" -ForegroundColor White
-Write-Host ""
-Write-Host "==============================================================================" -ForegroundColor Gray
-Write-Host "Abriendo http://localhost:4200 en tu navegador..." -ForegroundColor Gray
+Write-Host " Credenciales:" -ForegroundColor Cyan
+Write-Host "  Usuario:      admin@viernes.com" -ForegroundColor White
+Write-Host "  Contrasena:   Admin12345" -ForegroundColor White
 Write-Host "==============================================================================" -ForegroundColor Gray
 
 Start-Sleep -Seconds 5
