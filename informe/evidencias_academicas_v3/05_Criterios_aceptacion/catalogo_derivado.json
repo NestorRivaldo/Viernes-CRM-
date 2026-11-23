@@ -1,0 +1,482 @@
+[
+  {
+    "code": "01",
+    "title": "Autorizar operaciones por rol",
+    "actor": "Usuario autenticado",
+    "source": "auth/keycloak/KeycloakSecurityConfig.java",
+    "line": 121,
+    "scenarios": [
+      [
+        "un JWT válido de ADMIN",
+        "se solicita escribir usuarios",
+        "la regla de seguridad permite continuar; todavía aplican validaciones de negocio"
+      ],
+      [
+        "un JWT de VENDEDOR y perfil keycloak",
+        "se solicita aprobar una propuesta",
+        "se rechaza con 403, sin ejecutar la operación protegida"
+      ],
+      [
+        "una petición a una API protegida sin JWT válido",
+        "se solicita acceso",
+        "se responde 401; los endpoints públicos configurados son excepción"
+      ]
+    ]
+  },
+  {
+    "code": "02",
+    "title": "Administrar usuarios CRM",
+    "actor": "ADMIN",
+    "source": "usuarios/application/service/UsuarioService.java",
+    "line": 47,
+    "scenarios": [
+      [
+        "correo no registrado y datos válidos",
+        "se crea un usuario CRM",
+        "se guarda ACTIVO con passwordHash codificado; no se presupone alta en Keycloak"
+      ],
+      [
+        "correo ya registrado o contraseña vacía al crear",
+        "se solicita el alta",
+        "se rechaza con IllegalArgumentException (400 por handler)"
+      ],
+      [
+        "usuario existente",
+        "se actualiza sin una nueva contraseña",
+        "se conserva el hash anterior y se actualiza la fecha de modificación"
+      ]
+    ]
+  },
+  {
+    "code": "03",
+    "title": "Registrar y mantener clientes",
+    "actor": "Usuario autenticado",
+    "source": "clientes/application/service/ClienteService.java",
+    "line": 79,
+    "scenarios": [
+      [
+        "datos válidos y documento no duplicado",
+        "se crea el cliente sin estado explícito",
+        "se guarda ACTIVO y con fecha de creación"
+      ],
+      [
+        "un documento ya registrado",
+        "se solicita crear otro cliente con ese número",
+        "se rechaza la duplicidad según validación del servicio"
+      ],
+      [
+        "ningún tipo ni número de documento",
+        "se crea un cliente con el resto de datos válidos",
+        "se permite el registro sin consulta externa; desactivar es distinto de eliminar"
+      ]
+    ]
+  },
+  {
+    "code": "04",
+    "title": "Mantener contactos de cliente",
+    "actor": "Usuario autenticado",
+    "source": "clientes/application/service/ClienteService.java",
+    "line": 119,
+    "scenarios": [
+      [
+        "cliente existente y contacto válido",
+        "se agrega el contacto",
+        "se guarda dentro de la colección del cliente y se devuelve el contacto"
+      ],
+      [
+        "contacto que no pertenece al cliente solicitado",
+        "se intenta actualizar",
+        "se devuelve 404 y no se modifica un contacto ajeno"
+      ],
+      [
+        "contacto existente y principal omitido en actualización",
+        "se actualizan sus otros datos",
+        "se conserva el valor anterior de principal"
+      ]
+    ]
+  },
+  {
+    "code": "05",
+    "title": "Consultar DNI/RUC de forma controlada",
+    "actor": "Usuario autenticado",
+    "source": "clientes/application/service/ClienteService.java",
+    "line": 67,
+    "scenarios": [
+      [
+        "DNI/RUC válido y proveedor simulado con datos",
+        "se solicita consultar documento",
+        "el backend devuelve el DTO de consulta; no crea el cliente automáticamente"
+      ],
+      [
+        "número incompatible con el tipo",
+        "se solicita consultar",
+        "se rechaza antes de consumir el puerto externo"
+      ],
+      [
+        "consulta repetida cubierta por caché",
+        "se consulta la misma clave dentro del TTL",
+        "el proxy de caché puede reutilizar respuesta; el 404 negativo dura 10 min, no es una aprobación de la identidad"
+      ]
+    ]
+  },
+  {
+    "code": "06",
+    "title": "Registrar leads y cambiar estado",
+    "actor": "Usuario autenticado",
+    "source": "leads/application/service/LeadService.java",
+    "line": 47,
+    "scenarios": [
+      [
+        "datos válidos sin estado",
+        "se crea un lead",
+        "el estado inicial es NUEVO"
+      ],
+      [
+        "fuenteId inexistente",
+        "se registra o actualiza el lead",
+        "se rechaza con ResourceNotFoundException (404)"
+      ],
+      [
+        "lead existente incluso DESCARTADO",
+        "se solicita estado CONVERTIDO u otro enum válido",
+        "se asigna ese estado sin crear oportunidad; no hay guardas de ciclo"
+      ]
+    ]
+  },
+  {
+    "code": "07",
+    "title": "Mantener fuentes de captación",
+    "actor": "JEFE / ADMIN",
+    "source": "leads/application/service/FuenteService.java",
+    "line": 39,
+    "scenarios": [
+      [
+        "código único y datos válidos",
+        "se crea una fuente sin activa explícita",
+        "se guarda activa=true"
+      ],
+      [
+        "código ya existente",
+        "se solicita crear otra fuente",
+        "se rechaza por duplicidad en el servicio"
+      ],
+      [
+        "fuente existente",
+        "se cambia activa=false mediante actualización",
+        "se conserva el registro, distinto de eliminarlo físicamente"
+      ]
+    ]
+  },
+  {
+    "code": "08",
+    "title": "Registrar oportunidades y etapas",
+    "actor": "Usuario autenticado",
+    "source": "oportunidades/application/service/OportunidadService.java",
+    "line": 69,
+    "scenarios": [
+      [
+        "datos válidos sin etapa",
+        "se crea una oportunidad",
+        "se guarda PROSPECCION; no se exige que provenga de un lead"
+      ],
+      [
+        "ID de oportunidad inexistente",
+        "se solicita cambiar etapa",
+        "se devuelve 404"
+      ],
+      [
+        "oportunidad GANADA o PERDIDA",
+        "se solicita otra etapa válida",
+        "se permite reapertura y no se recalcula probabilidad por la etapa"
+      ]
+    ]
+  },
+  {
+    "code": "09",
+    "title": "Asociar contactos, productos y colaboradores",
+    "actor": "Usuario autenticado",
+    "source": "oportunidades/application/service/OportunidadService.java",
+    "line": 108,
+    "scenarios": [
+      [
+        "oportunidad y contacto existentes no asociados",
+        "se agrega el contacto",
+        "se guarda rol y esDecisor (false por defecto)"
+      ],
+      [
+        "el mismo par oportunidad-contacto ya existe",
+        "se intenta agregar nuevamente",
+        "se rechaza con 400; productos y colaboradores también verifican duplicidad"
+      ],
+      [
+        "asociación existente",
+        "se actualiza solo rol o esDecisor",
+        "solo cambian los campos no nulos; no se actualiza el contacto maestro"
+      ]
+    ]
+  },
+  {
+    "code": "10",
+    "title": "Crear propuesta válida",
+    "actor": "Usuario autenticado",
+    "source": "propuestas/application/service/PropuestaService.java",
+    "line": 32,
+    "scenarios": [
+      [
+        "cliente y oportunidad existentes; detalle de 3 × 250, descuento 10",
+        "se crea con producto de catálogo y sin descripción/precio",
+        "se guarda BORRADOR, subtotal 750 y total 740; se copia descripción/precio del catálogo"
+      ],
+      [
+        "oportunidad inexistente",
+        "se solicita crear una propuesta",
+        "se lanza 404 y no se invoca save"
+      ],
+      [
+        "detalle libre sin productoId pero con descripción/precio",
+        "se crea la propuesta",
+        "no se consulta el catálogo y se conservan los datos del detalle"
+      ]
+    ]
+  },
+  {
+    "code": "11",
+    "title": "Editar y resolver una propuesta",
+    "actor": "Usuario para editar/enviar; JEFE/ADMIN para decidir",
+    "source": "propuestas/application/service/PropuestaService.java",
+    "line": 118,
+    "scenarios": [
+      [
+        "propuesta BORRADOR",
+        "se solicita enviar",
+        "se persiste ENVIADA; no se demuestra entrega de correo"
+      ],
+      [
+        "propuesta ENVIADA",
+        "se intenta editar",
+        "se rechaza por estado incompatible (409 por handler)"
+      ],
+      [
+        "propuesta BORRADOR y actor autorizado",
+        "se solicita cancelar",
+        "se guarda CANCELADA; una APROBADA no puede cancelarse"
+      ]
+    ]
+  },
+  {
+    "code": "12",
+    "title": "Conservar snapshot comercial del detalle",
+    "actor": "Usuario autenticado",
+    "source": "propuestas/application/service/PropuestaService.java",
+    "line": 220,
+    "scenarios": [
+      [
+        "producto existente y descripción/precio personalizados",
+        "se crea el detalle con override",
+        "se respetan los valores comerciales enviados, sin sustituirlos por catálogo"
+      ],
+      [
+        "productoId inexistente",
+        "se crea la propuesta",
+        "se lanza 404 y no se persiste"
+      ],
+      [
+        "propuesta BORRADOR con un nuevo producto",
+        "se actualizan los detalles sin precio/descripcion",
+        "se completa desde catálogo y se recalculan subtotal y total"
+      ]
+    ]
+  },
+  {
+    "code": "13",
+    "title": "Gestionar actividades y participantes",
+    "actor": "Usuario autenticado",
+    "source": "actividades/application/service/ActividadService.java",
+    "line": 63,
+    "scenarios": [
+      [
+        "referencias válidas y datos obligatorios",
+        "se crea una actividad sin estado explícito",
+        "se guarda PENDIENTE y se sincronizan las etiquetas"
+      ],
+      [
+        "un contacto ya es participante de la actividad",
+        "se solicita agregar el mismo par",
+        "se rechaza con 400"
+      ],
+      [
+        "actividad existente",
+        "se actualiza omitiendo etiquetaIds",
+        "se conservan las etiquetas; enviar lista vacía pide reemplazarlas por ninguna"
+      ]
+    ]
+  },
+  {
+    "code": "14",
+    "title": "Normalizar y archivar etiquetas",
+    "actor": "JEFE / ADMIN",
+    "source": "etiquetas/application/service/EtiquetaService.java",
+    "line": 60,
+    "scenarios": [
+      [
+        "nombre nuevo y color omitido",
+        "se crea una etiqueta",
+        "se normaliza el nombre, se guarda activa y se usa #2563EB"
+      ],
+      [
+        "otro nombre equivalente tras quitar tildes y normalizar espacios/mayúsculas",
+        "se intenta crear etiqueta",
+        "se rechaza por nombre normalizado duplicado"
+      ],
+      [
+        "etiqueta existente",
+        "se solicita eliminar",
+        "se archiva con activa=false, conservando el registro y el histórico"
+      ]
+    ]
+  },
+  {
+    "code": "15",
+    "title": "Mantener catálogo de productos",
+    "actor": "JEFE / ADMIN",
+    "source": "productos/application/service/ProductoService.java",
+    "line": 50,
+    "scenarios": [
+      [
+        "código nuevo y DTO válido",
+        "se crea producto sin estado",
+        "se guarda ACTIVO"
+      ],
+      [
+        "código duplicado",
+        "se solicita crear otro producto",
+        "se rechaza con 400"
+      ],
+      [
+        "producto existente",
+        "se actualiza manteniendo su código",
+        "no se rechaza por duplicidad consigo mismo y se invalida caché de productos"
+      ]
+    ]
+  },
+  {
+    "code": "16",
+    "title": "Gestionar equipos y miembros",
+    "actor": "JEFE / ADMIN",
+    "source": "equipos/application/service/EquipoService.java",
+    "line": 99,
+    "scenarios": [
+      [
+        "equipo y usuario existentes no asociados",
+        "se agrega el miembro",
+        "se guarda la asociación equipo-usuario"
+      ],
+      [
+        "usuario ya miembro del equipo",
+        "se agrega nuevamente",
+        "se rechaza con 400"
+      ],
+      [
+        "equipo activo existente",
+        "se desactiva",
+        "se guarda INACTIVO sin borrar miembros; eliminar es una operación distinta"
+      ]
+    ]
+  },
+  {
+    "code": "17",
+    "title": "Gestionar campañas y sus leads",
+    "actor": "JEFE / ADMIN",
+    "source": "marketing/application/service/CampaniaService.java",
+    "line": 76,
+    "scenarios": [
+      [
+        "campaña y lead existentes no asociados",
+        "se asocia el lead",
+        "se guarda la relación campaña-lead"
+      ],
+      [
+        "par campaña-lead ya registrado",
+        "se asocia nuevamente",
+        "se rechaza con 400"
+      ],
+      [
+        "asociación existente",
+        "se desasocia el lead",
+        "se elimina solo la asociación, no el lead maestro"
+      ]
+    ]
+  },
+  {
+    "code": "18",
+    "title": "Consultar indicadores del dashboard",
+    "actor": "Usuario autenticado",
+    "source": "dashboard/application/service/DashboardService.java",
+    "line": 18,
+    "scenarios": [
+      [
+        "datos disponibles en el puerto de consulta",
+        "se obtiene resumen",
+        "se integran clientes, leads, oportunidades, actividades y propuestas"
+      ],
+      [
+        "falla del puerto al calcular un indicador",
+        "se consulta el resumen sin caché válida",
+        "no se inventa éxito ni se sustituye todo por cifras cero; el error sigue el handler"
+      ],
+      [
+        "sumValorPropuestasAprobadas devuelve null",
+        "se consulta ese resumen",
+        "valorTotalAprobadas se representa como cero"
+      ]
+    ]
+  },
+  {
+    "code": "19",
+    "title": "Consultar mapa de relaciones",
+    "actor": "Usuario autenticado",
+    "source": "relationshipmap/application/service/RelationshipMapService.java",
+    "line": 47,
+    "scenarios": [
+      [
+        "fixture de cliente, contacto, oportunidad, actividad y propuesta",
+        "se obtiene mapa del cliente",
+        "se devuelven raíz CLIENTE:1, cinco nodos y cuatro aristas en ese fixture, no como cantidad universal"
+      ],
+      [
+        "cliente solicitado inexistente",
+        "se consulta su mapa",
+        "se propaga ResourceNotFoundException (404 en API)"
+      ],
+      [
+        "contacto existente con relaciones",
+        "se expande CONTACTO",
+        "el subgrafo contiene cliente, oportunidad y actividad según las asociaciones existentes"
+      ]
+    ]
+  },
+  {
+    "code": "20",
+    "title": "Enviar y consultar mensajería interna",
+    "actor": "Usuario autenticado",
+    "source": "mensajeria/application/service/MensajeService.java",
+    "line": 29,
+    "scenarios": [
+      [
+        "correo del emisor disponible y contenido válido",
+        "se envía mensaje",
+        "se guarda el contenido recortado y la identidad visible del emisor"
+      ],
+      [
+        "contenido vacío tras trim o mayor de 2000 caracteres",
+        "se envía mensaje",
+        "se rechaza con 400"
+      ],
+      [
+        "despuesDeId y límite mayor de 100",
+        "se solicitan mensajes",
+        "se usa consulta incremental con límite ajustado a 100; no es WebSocket"
+      ]
+    ]
+  }
+]

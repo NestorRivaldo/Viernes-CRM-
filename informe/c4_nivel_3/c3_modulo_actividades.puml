@@ -1,0 +1,114 @@
+@startuml c3_modulo_actividades
+!include <C4/C4_Component>
+
+title Viernes CRM V1 — Arquitectura C4 Nivel 3 (Módulo Actividades & Relaciones N:M)
+caption Diagrama C4 Nivel 3: Componentes Internos del Módulo Actividades, Participantes y Etiquetas N:M
+
+LAYOUT_WITH_LEGEND()
+
+' Actores y Contenedores Externos
+Container(spa, "Viernes Frontend SPA", "Angular 22.1 / Material", "Peticiones HTTP REST sobre /api/v1/actividades/** con Bearer JWT")
+ContainerDb(db, "Oracle Database Free 23c", "Oracle DB :1521", "Esquema BOM_VENTAS; tablas CRM_ACTIVIDADES y tablas intermedias N:M")
+
+' Módulos Externos del Backend (Colaboración Inter-módulo)
+Boundary(b_ext_modules, "Otros Módulos del Backend (Spring Modulith)") {
+    Component(mod_clientes, "Módulo Clientes", "ManageClienteUseCase", "Consulta datos del contacto participante y verifica existencia del cliente")
+    Component(mod_etiquetas, "Módulo Etiquetas", "EtiquetaPersistencePort", "Valida que los IDs de etiqueta existan y correspondan a etiquetas activas")
+    Component(mod_leads, "Módulo Leads", "LeadQueryPort / Repo", "Verifica existencia del lead asociado antes de guardar la actividad")
+    Component(mod_oportunidades, "Módulo Oportunidades", "OportunidadQueryPort / Repo", "Verifica existencia de la oportunidad asociada antes de guardar")
+    Component(mod_usuarios, "Módulo Usuarios", "UsuariosApi", "Verifica existencia del usuario asignado como responsable")
+}
+
+' Límite del Módulo Actividades
+Container_Boundary(b_actividades, "Módulo Actividades (com.viernes.actividades)") {
+
+    ' Adaptadores Web (Inbound)
+    Boundary(b_web, "Adaptadores Web (Inbound)") {
+        Component(ctrl, "ActividadController", "Spring REST Controller", "Endpoints CRUD, filtros múltiples (estado, vencidas, cliente, lead, oportunidad) y subrecursos /participantes")
+    }
+
+    ' Capa de Aplicación
+    Boundary(b_app, "Capa de Aplicación (Application)") {
+        Component(in_port, "ManageActividadUseCase", "Inbound Port (Java Interface)", "Contrato de casos de uso para gestión de actividades, participantes y etiquetas")
+        Component(service, "ActividadService", "Application Service (@Transactional)", "Orquesta bitácora comercial, aplica regla MAX_ETIQUETAS = 8, cálculo dinámico de vencidas y validación de relaciones")
+
+        ' Puertos de Salida de Persistencia
+        Component(p_port, "ActividadPersistencePort", "Outbound Port", "Contrato de persistencia para la entidad raíz Actividad")
+        Component(ppart_port, "ActividadParticipantePersistencePort", "Outbound Port N:M", "Contrato para relación Actividad ↔ Contacto Participante (CRM_ACTIVIDAD_PARTICIPANTES)")
+        Component(petiq_port, "ActividadEtiquetaPersistencePort", "Outbound Port N:M", "Contrato para relación Actividad ↔ Etiqueta con atributo orden (CRM_ACTIVIDAD_ETIQUETAS)")
+
+        ' Puertos de Salida de Validación y Consulta
+        Component(val_port, "RelacionValidationPort", "Validation Port (Outbound)", "Abstracción para validar existencia de Clientes, Leads, Oportunidades y Usuarios")
+        Component(cq_port, "ContactoQueryPort", "Query Port (Outbound)", "Abstracción para consultar datos de contactos en el módulo Clientes")
+    }
+
+    ' Capa de Dominio Puro
+    Boundary(b_domain, "Modelo de Dominio (Domain)") {
+        Component(d_act, "Actividad", "Domain Entity (POJO)", "Entidad raíz; encapsula tipo (LLAMADA, REUNION, TAREA, SEGUIMIENTO) y estado")
+        Component(d_act_part, "ActividadParticipante", "Domain Entity N:M", "Representa contacto vinculado a la actividad (idContacto, creadoEn)")
+        Component(d_act_etiq, "ActividadEtiqueta", "Domain Entity N:M", "Representa etiqueta asociada con secuencia ordenada (idEtiqueta, orden, creadoEn)")
+    }
+
+    ' Capa de Adaptadores de Persistencia y Validación
+    Boundary(b_persistence, "Adaptadores de Persistencia & Salida (Outbound)") {
+        Component(p_adapter, "ActividadPersistenceAdapter", "JPA Persistence Adapter", "Mapea Actividad ↔ ActividadEntity; resuelve consultas por filtros y cálculo de vencidas")
+        Component(ppart_adapter, "ActividadParticipantePersistenceAdapter", "JPA Persistence Adapter", "Mapea y gestiona registros en CRM_ACTIVIDAD_PARTICIPANTES")
+        Component(petiq_adapter, "ActividadEtiquetaPersistenceAdapter", "JPA Persistence Adapter", "Gestiona reemplazo atómico ordenado en CRM_ACTIVIDAD_ETIQUETAS")
+
+        Component(val_adapter, "RelacionValidationAdapter", "Validation Adapter", "Implementa validaciones cruzadas consultando repositorios foráneos de Clientes, Leads, Oportunidades y Usuarios")
+        Component(cq_adapter, "ContactoQueryAdapter", "Query Adapter", "Consume ManageClienteUseCase para enriquecer la respuesta del participante")
+    }
+
+    ' Repositorios Spring Data JPA
+    Boundary(b_repos, "Repositorios Spring Data JPA") {
+        Component(repo_act, "ActividadSpringDataRepository", "Spring Data Interface", "Operaciones CRUD y derived queries sobre CRM_ACTIVIDADES")
+        Component(repo_part, "ActividadParticipanteSpringDataRepository", "Spring Data Interface", "Consultas y eliminación por idActividad / idContacto")
+        Component(repo_etiq, "ActividadEtiquetaSpringDataRepository", "Spring Data Interface", "Consultas ordenadas y reemplazo por idActividad")
+    }
+}
+
+' Relaciones Web y Aplicación
+Rel(spa, ctrl, "Peticiones HTTP REST", "JSON")
+Rel(ctrl, in_port, "Delega ejecución", "Java Interface")
+Rel(in_port, service, "Implementado por", "Spring @Service")
+
+' Servicio y Dominio
+Rel(service, d_act, "Instancia y gestiona", "POJO")
+Rel(service, d_act_part, "Gestiona participantes N:M", "POJO")
+Rel(service, d_act_etiq, "Gestiona etiquetas N:M con orden", "POJO (max 8)")
+
+' Servicio hacia Puertos de Persistencia
+Rel(service, p_port, "Persistir actividad", "Interface call")
+Rel(service, ppart_port, "Agregar/quitar participante", "Interface call")
+Rel(service, petiq_port, "Sincronizar etiquetas (reemplazarEtiquetas)", "Interface call")
+
+' Servicio hacia Puertos de Validación y Consulta
+Rel(service, val_port, "validarRelaciones()", "Interface call")
+Rel(service, cq_port, "buscarPorId()", "Interface call")
+
+' Implementación de Puertos por Adaptadores
+Rel(p_port, p_adapter, "Implementa", "Spring Bean")
+Rel(ppart_port, ppart_adapter, "Implementa", "Spring Bean")
+Rel(petiq_port, petiq_adapter, "Implementa", "Spring Bean")
+Rel(val_port, val_adapter, "Implementa", "Spring Bean")
+Rel(cq_port, cq_adapter, "Implementa", "Spring Bean")
+
+' Adaptadores hacia Repositorios JPA
+Rel(p_adapter, repo_act, "Invoca operaciones JPA", "Spring Data")
+Rel(ppart_adapter, repo_part, "Invoca operaciones JPA", "Spring Data")
+Rel(petiq_adapter, repo_etiq, "Invoca operaciones JPA", "Spring Data")
+
+' Adaptadores hacia Módulos Externos
+Rel(val_adapter, mod_clientes, "Verifica cliente", "Repository call")
+Rel(val_adapter, mod_leads, "Verifica lead", "Repository call")
+Rel(val_adapter, mod_oportunidades, "Verifica oportunidad", "Repository call")
+Rel(val_adapter, mod_usuarios, "Verifica usuario", "UsuariosApi.existePorId()")
+Rel(cq_adapter, mod_clientes, "Obtiene ContactoResponse", "ManageClienteUseCase")
+Rel(service, mod_etiquetas, "Valida IDs de etiquetas", "EtiquetaPersistencePort")
+
+' Repositorios hacia Tablas Físicas de Oracle
+Rel(repo_act, db, "SELECT / INSERT / UPDATE / DELETE en CRM_ACTIVIDADES", "JDBC / SQL")
+Rel(repo_part, db, "SELECT / INSERT / DELETE en CRM_ACTIVIDAD_PARTICIPANTES", "JDBC / SQL")
+Rel(repo_etiq, db, "SELECT / INSERT / DELETE en CRM_ACTIVIDAD_ETIQUETAS", "JDBC / SQL")
+
+@enduml

@@ -1,0 +1,28 @@
+@startuml
+!pragma layout smetana
+skinparam defaultFontName Segoe UI
+skinparam defaultFontSize 13
+skinparam shadowing false
+title 06b estado lead — comportamiento implementado
+state "Registro existente" as R {
+state "Cualquier valor válido del enum" as ANY
+state "NUEVO" as E0
+ANY --> E0 : cambiarEstado(NUEVO)
+state "CONTACTADO" as E1
+ANY --> E1 : cambiarEstado(CONTACTADO)
+state "CALIFICADO" as E2
+ANY --> E2 : cambiarEstado(CALIFICADO)
+state "CONVERTIDO" as E3
+ANY --> E3 : cambiarEstado(CONVERTIDO)
+state "DESCARTADO" as E4
+ANY --> E4 : cambiarEstado(DESCARTADO)
+}
+[*] --> R : crear (default NUEVO; admite otro valor)
+note bottom of R
+  ANY resume el estado de origen: no es un valor persistido.
+  Se permite cualquier origen → cualquier destino válido, incluso el mismo.
+  No se comprueba secuencia ni se bloquea reapertura.
+  CONVERTIDO no crea oportunidad.
+  Las acciones residen en el servicio; no hay motor de estados.
+end note
+@enduml

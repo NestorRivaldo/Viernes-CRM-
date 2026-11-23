@@ -1,0 +1,266 @@
+VIERNES CRM V1 · Evidencias académicas · Cierre Documental
+Encargo docente ↔ implementación comprobada en E:\Viernes\Viernes
+08. ANÁLISIS DEL DOMINIO (DDD)
+
+08.1 Dominio Principal y Clasificación de Subdominios
+
+El sistema implementa el dominio de Gestión Comercial CRM y Marketing B2B para el mercado peruano. Los subdominios identificados en el árbol de paquetes (com.viernes.*) se clasifican según su valor estratégico:
+
+Subdominio	Tipo	Paquete Java	Propósito e Implementación
+Clientes	Core	com.viernes.clientes	Entidad central comercial. Administra clientes empresariales, contactos asociados y consultas externas oficiales DNI/RUC (vía ApisPeruDocumentoAdapter).
+Oportunidades	Core	com.viernes.oportunidades	Pipeline y embudo de ventas. Modela el ciclo comercial con cálculo de valor ponderado y relaciones N:M hacia contactos, productos y colaboradores.
+Propuestas	Core	com.viernes.propuestas	Gestión formal de cotizaciones comerciales. Controla ciclo de vida (Borrador -> Enviada -> Aprobada / Rechazada / Cancelada), cálculo de importes y detalles de ítems.
+Actividades	Core	com.viernes.actividades	Seguimiento operativo de interacciones comerciales (llamadas, reuniones, tareas). Integra relaciones N:M con etiquetas y contactos participantes.
+Leads	Core	com.viernes.leads	Captación y prospección de clientes potenciales con registro de fuentes comerciales.
+Marketing	Soporte	com.viernes.marketing	Administración de campañas comerciales asociadas a prospectos mediante relación N:M (CampaniaLead).
+Productos	Soporte	com.viernes.productos	Catálogo estándar de productos y servicios con código y precio base.
+Etiquetas	Soporte	com.viernes.etiquetas	Taxonomía transversal para clasificación visual y filtrado de actividades operativas.
+Equipos	Soporte	com.viernes.equipos	Estructura organizativa de ventas. Agrupa usuarios en equipos comerciales mediante relación N:M (EquipoMiembro).
+Usuarios	Soporte	com.viernes.usuarios	Gestión interna de identidades, roles de acceso (ADMIN, JEFE, VENDEDOR) y estado de activación.
+Mensajería	Soporte	com.viernes.mensajeria	Canal interno de comunicación entre colaboradores del equipo.
+Dashboard	Genérico	com.viernes.dashboard	Servicio de agregación de métricas comerciales y KPIs operativos en memoria/caché. No posee entidades persistentes propias.
+Relationship Map	Genérico	com.viernes.relationshipmap	Construcción y visualización de grafos contextuales navegables de relaciones comerciales.
+Auth	Genérico	com.viernes.auth	Capa de seguridad y control de acceso. Implementa el convertidor de tokens OAuth2 de Keycloak.
+Shared	Genérico	com.viernes.shared	Infraestructura transversal: manejo global de excepciones, limitación de tasa (rate-limit), configuración de caché Caffeine y trazabilidad distribuida (Correlation ID).
+
+08.2 Entidades de Dominio y Objetos de Valor (Value Objects)
+
+A diferencia de modelos con acoplamiento a infraestructura, el dominio de Viernes CRM implementa POJOs puros libres de anotaciones JPA (ubicados en com.viernes.<modulo>.domain).
+
+Entidades de Dominio identificadas:
+- Clientes: Cliente (raíz), Contacto.
+- Oportunidades: Oportunidad (raíz), OportunidadContacto, OportunidadProducto, OportunidadColaborador.
+- Propuestas: Propuesta (raíz), DetallePropuesta.
+- Actividades: Actividad (raíz), ActividadParticipante, ActividadEtiqueta.
+- Leads: Lead (raíz), Fuente.
+- Marketing: Campania (raíz), CampaniaLead.
+- Equipos: Equipo (raíz), EquipoMiembro.
+- Productos: Producto.
+- Etiquetas: Etiqueta.
+- Usuarios: Usuario.
+- Mensajería: Mensaje.
+
+Objetos de Valor (Value Objects):
+Los objetos de valor modelan características inmutables sin identidad propia:
+1. Enumeraciones de Estado y Tipo:
+   - EstadoCliente (ACTIVO, INACTIVO) y TipoDocumento (DNI, RUC).
+   - EtapaOportunidad (PROSPECCION, CONTACTO, CALIFICACION, PROPUESTA, NEGOCIACION, GANADA, PERDIDA).
+   - EstadoPropuesta (BORRADOR, ENVIADA, APROBADA, RECHAZADA, CANCELADA).
+   - TipoActividad (LLAMADA, REUNION, TAREA, SEGUIMIENTO) y EstadoActividad (PENDIENTE, EN_PROCESO, COMPLETADA, CANCELADA).
+   - EstadoLead (NUEVO, CONTACTADO, CALIFICADO, CONVERTIDO, DESCARTADO).
+   - EstadoCampania (BORRADOR, ACTIVA, FINALIZADA, CANCELADA).
+   - EstadoProducto (ACTIVO, INACTIVO, DESCONTINUADO).
+   - EstadoEquipo (ACTIVO, INACTIVO).
+   - RolUsuario (ADMIN, JEFE, VENDEDOR) y EstadoUsuario (ACTIVO, INACTIVO).
+   - NodeType y EdgeType en Relationship Map (7 tipos de nodo y 11 tipos de relación).
+2. Records Inmutables:
+   - DocumentoConsultado (record): Encapsula los datos de consulta oficial RENIEC/SUNAT sin identificador de base de datos.
+   - DTOs de comando y consulta en application.dto.
+
+08.3 Agregados y Raíces de Agregado
+
+La consistencia transaccional y las reglas de negocio están delimitadas por agregados:
+- Agregado Propuesta: Raíz Propuesta; entidad subordinada DetallePropuesta. Invariantes: el detalle no existe sin su propuesta; la modificación de ítems recalculas subtotal y total (recalcularTotales()); la propuesta prohíbe modificaciones en estados terminales APROBADA, RECHAZADA o CANCELADA (esEstadoTerminal()).
+- Agregado Oportunidad: Raíz Oportunidad; entidades subordinadas OportunidadContacto, OportunidadProducto y OportunidadColaborador. Invariante: las relaciones dependen de la vigencia de la oportunidad y se orquestan mediante subrecursos REST controlados.
+- Agregado Actividad: Raíz Actividad; entidades subordinadas ActividadParticipante y ActividadEtiqueta. Invariante: máximo 8 etiquetas asociadas por actividad (MAX_ETIQUETAS = 8); existencia obligatoria y previa de los participantes en el módulo Clientes.
+- Agregado Cliente: Raíz Cliente; entidad subordinada Contacto. Invariante: los contactos pertenecen a un único cliente y se administran a través del caso de uso ManageClienteUseCase.
+- Agregado Equipo: Raíz Equipo; entidad subordinada EquipoMiembro.
+
+08.4 Relaciones N:M — Impacto en el Modelo de Dominio e Implementación Física
+
+La implementación real del sistema no utiliza anotaciones @ManyToMany genéricas en JPA. Cada relación de muchos a muchos fue modelada explícitamente como una entidad de dominio intermedia, con su correspondiente entidad JPA, tabla física en Oracle y repositorio independiente:
+
+Relación	Entidad Dominio	Entidad JPA	Tabla Oracle	Atributos de Enlace
+Oportunidad ↔ Contacto	OportunidadContacto	OportunidadContactoEntity	CRM_OPORTUNIDAD_CONTACTOS	rol (String), esDecisor (Boolean)
+Oportunidad ↔ Producto	OportunidadProducto	OportunidadProductoEntity	CRM_OPORTUNIDAD_PRODUCTOS	cantidad (Integer)
+Oportunidad ↔ Colaborador	OportunidadColaborador	OportunidadColaboradorEntity	CRM_OPORTUNIDAD_COLABORADORES	idUsuario, creadoEn
+Actividad ↔ Participante	ActividadParticipante	ActividadParticipanteEntity	CRM_ACTIVIDAD_PARTICIPANTES	idContacto, creadoEn
+Actividad ↔ Etiqueta	ActividadEtiqueta	ActividadEtiquetaEntity	CRM_ACTIVIDAD_ETIQUETAS	orden (Integer), creadoEn
+Equipo ↔ Usuario	EquipoMiembro	EquipoMiembroEntity	CRM_EQUIPO_MIEMBROS	usuarioId, creadoEn
+Campaña ↔ Lead	CampaniaLead	CampaniaLeadEntity	CRM_CAMPANIA_LEADS	leadId, creadoEn
+
+Impacto técnico del diseño N:M:
+1. Las relaciones intermedias permiten atributos descriptivos esenciales para la lógica del negocio (ej. identificar si un contacto es tomador de decisión, asignar cantidades estimadas de producto o secuenciar etiquetas).
+2. Se evitan problemas de carga diferida (lazy loading exceptions) y operaciones en cascada imprevistas en Oracle.
+3. Las restricciones de unicidad (@UniqueConstraint sobre pares foráneos) aseguran a nivel de base de datos que no existan duplicados en los puentes relacionales.
+
+08.5 Puertos, Servicios y Repositorios
+
+El desacoplamiento se fundamenta en contratos independientes:
+- Driving Ports (Entrada / Casos de Uso): Interfaces Manage*UseCase en application.port.in (ej. ManagePropuestaUseCase, ManageOportunidadUseCase).
+- Driven Ports (Salida / Persistencia y Validación): Interfaces *PersistencePort en application.port.out (ej. PropuestaPersistencePort, RelacionValidationPort).
+- Application Services: Clases de servicio en application.service que orquestan casos de uso, transacciones (@Transactional) y validación cruzada.
+- Adaptadores de Persistencia: Implementaciones *PersistenceAdapter en adapters.out.persistence que mapean bidireccionalmente entre el dominio puro y las entidades JPA.
+- Named Interface Pública: El módulo Usuarios expone la interfaz UsuariosApi en com.viernes.usuarios para consultas seguras entre módulos según la convención de Spring Modulith.
+
+08.6 Capa Anticorrupción (ACL) con Keycloak
+
+El módulo com.viernes.auth actúa como una Capa Anticorrupción (Anticorruption Layer - ACL) frente al proveedor de identidad Keycloak:
+- KeycloakJwtAuthenticationConverter: Adapta las estructuras JWT externas (claims en realm_access.roles) a los objetos GrantedAuthority del dominio Spring Security, eliminando roles internos irrelevantes (default-roles, offline_access).
+- Desacoplamiento del Dominio: Ningún módulo de negocio (Clientes, Oportunidades, etc.) importa clases de Keycloak. El modelo interno solo reconoce los roles del negocio: ADMIN, JEFE y VENDEDOR.
+- Frontend: AuthService proporciona una fachada única en Angular que oculta los métodos específicos de la librería keycloak-js al resto de componentes y guards de la interfaz.
+
+08.7 Reglas de Negocio e Invariantes Documentadas
+
+1. R-01 (Oportunidad): Valor Ponderado calculado como (valor * probabilidad) / 100 con redondeo HALF_UP (Oportunidad.java: getValorPonderado()).
+2. R-02 (Propuesta): Inmutabilidad en estados terminales; no se permite modificar propuestas en estado APROBADA, RECHAZADA o CANCELADA (Propuesta.java: esEstadoTerminal()).
+3. R-03 (Propuesta): Cálculo exacto de subtotal de detalle como (cantidad * precioUnitario) (DetallePropuesta.java: calcularSubtotal()).
+4. R-04 (Propuesta): Totalización automática de propuesta restando descuentos válidos (Propuesta.java: recalcularTotales()).
+5. R-05 (Actividades): Restricción de categorización a un máximo de 8 etiquetas por actividad (ActividadService.java: MAX_ETIQUETAS = 8).
+6. R-06 (Actividades/Propuestas): Validación previa de existencia de entidades referenciadas en módulos externos antes de persistir (RelacionValidationPort y PropuestaRelacionValidationPort).
+7. R-07 (Usuarios): Unicidad obligatoria de correo electrónico y almacenamiento seguro con algoritmo BCrypt costo 12 (UsuarioService.java / PasswordEncoderConfig.java).
+8. R-08 (Seguridad): Operaciones destructivas (DELETE) y gestión de usuarios reservadas estrictamente para el rol ADMIN (KeycloakSecurityConfig.java).
+9. R-09 (Integración): Limitación de consultas externas DNI/RUC a 20 peticiones por minuto por usuario autenticado (ConsultaDocumentoRateLimiter.java).
+
+08.8 Referencias a Diagramas Existentes
+- UML 03 (03_clases_dominio.svg): Refleja las entidades de dominio y enumeraciones analizadas.
+- UML 06a, 06b, 06c (06a_estado_propuesta.svg, 06b_estado_lead.svg, 06c_estado_oportunidad.svg): Máquinas de estado de los agregados principales.
+- ERD 26 (erd_oracle_26.svg): Representa las 26 tablas físicas en Oracle, incluyendo las 7 tablas intermedias de relaciones N:M.
+
+[VALIDACIÓN CON EQUIPO]: Se recomienda verificar si a futuro se incorporará lógica de transición formalizada mediante el patrón State en lugar de validaciones condicionales dentro de los servicios.
+
+
+VIERNES CRM V1 · Evidencias académicas · Cierre Documental
+Encargo docente ↔ implementación comprobada en E:\Viernes\Viernes
+09. ARQUITECTURA DE SOFTWARE
+
+09.1 Estilo Arquitectónico: Monolito Modular con Spring Modulith
+
+Viernes CRM V1 está concebido como un Monolito Modular de alto rendimiento, empaquetado en una única unidad de ejecución (viernes-backend-0.0.1-SNAPSHOT.jar) pero estructurado con límites estrictos entre módulos funcionales.
+
+Características del Monolito Modular:
+- Framework: Spring Modulith 2.0.7 sobre Spring Boot 4.0.7 y Java 21.
+- Verificación Automatizada: La clase com.viernes.ModularityTests ejecuta modules.verify() en compilación, asegurando que ningún módulo viole las restricciones de encapsulamiento ni cree dependencias cíclicas.
+- Tipificación de Módulos (package-info.java):
+  * Type.OPEN: Clientes, Oportunidades, Leads, Marketing, Productos, Etiquetas, Propuestas, Actividades, Dashboard, Relationship Map, Shared.
+  * Type.CLOSED (con dependencias explícitas permitidas):
+    - com.viernes.auth: allowedDependencies = {"usuarios"}
+    - com.viernes.equipos: allowedDependencies = {"usuarios", "shared", "shared.exception"}
+    - com.viernes.mensajeria: allowedDependencies = {"usuarios", "shared", "shared.exception"}
+    - com.viernes.usuarios: allowedDependencies = {"shared", "shared.exception"}
+
+09.2 Arquitectura Hexagonal (Ports & Adapters)
+
+Cada módulo funcional organiza internamente su código en capas concéntricas con inversión de dependencias:
+1. Capa de Dominio (domain/): Libre de dependencias externas.
+2. Capa de Aplicación (application/):
+   - Puertos de entrada (port/in/): Casos de uso (Manage*UseCase).
+   - Puertos de salida (port/out/): Abstracciones de persistencia y validación.
+   - Servicios de aplicación (service/*Service.java): Orquestadores transaccionales.
+3. Capa de Adaptadores (adapters/):
+   - Primarios / Conducidos por entrada (adapters/in/web/): Controladores REST Spring Web MVC.
+   - Secundarios / Conducidos por salida (adapters/out/persistence/): Adaptadores JPA que implementan los puertos de salida e interactúan con Oracle.
+   - Externos (adapters/out/external/): Adaptador RESTClient hacia APIsPerú para consulta DNI/RUC.
+
+09.3 Stack Tecnológico e Infraestructura
+
+Backend:
+- Runtime: OpenJDK 21 LTS de 64 bits.
+- Framework: Spring Boot 4.0.7 con Spring Data JPA y Spring Security 6.
+- Base de Datos: Oracle Database Free 23c (contenedor Docker bomerp-oracle en puerto 1521, PDB FREEPDB1, esquema BOM_VENTAS).
+- Caché: Caffeine Cache local integrada en Spring Cache (CaffeineCacheManager).
+- Documentación OpenAPI: SpringDoc OpenAPI 3.0.2 con interfaz Swagger UI en /swagger-ui.html.
+- Observabilidad: Micrometer Prometheus + Spring Boot Actuator en /actuator.
+
+Frontend:
+- Framework: Angular 22.1.0 con componentes Standalone y zoneless change detection (provideZonelessChangeDetection()).
+- UI Suite: Angular Material 22.2.0 y Angular CDK.
+- Visualización de Grafos: Cytoscape.js 3.34.4.
+- Conector de Autenticación: keycloak-js 26.2.4.
+- Interceptores HTTP: jwtInterceptor (inyección Bearer) y traceIdInterceptor (propagación X-Trace-ID).
+
+Servidores de Soporte (Docker):
+- Keycloak 25.0.6 (puerto 8180, realm viernes-realm) asistido por PostgreSQL 16 (puerto 5433).
+- Stack de Monitoreo: Prometheus, Promtail, Loki y Grafana en obs/compose.yml.
+
+09.4 Decisiones Arquitectónicas Relevantes (ADRs)
+
+ADR-01: Adopción de Monolito Modular vs. Microservicios Distribuidos
+- Decisión: Agrupar todos los submódulos en una sola base de código gobernada por Spring Modulith.
+- Justificación: Elimina latencia de red en transacciones comerciales frecuentes, simplifica el despliegue a un solo artefacto JAR y previene la sobrecarga operativa de orquestación de microservicios sin renunciar a límites modulares claros.
+
+ADR-02: Implementación Estricta de Arquitectura Hexagonal
+- Decisión: Separar modelos de dominio de entidades JPA y forzar el uso de puertos e interfaces.
+- Justificación: Protege las reglas de negocio de modificaciones del motor de base de datos o de frameworks ORM. Las pruebas unitarias pueden ejecutarse aislando la capa de persistencia mediante mocks de los puertos.
+
+ADR-03: Delegación de Identidad y Acceso a Keycloak (OAuth2 / OIDC)
+- Decisión: Desacoplar la autenticación del backend local y utilizar Keycloak en contenedor independiente.
+- Justificación: Permite delegar la seguridad en un estándar de industria (OAuth2 Authorization Code con PKCE S256 en la SPA y Resource Server JWT en el backend), facilitando auditoría centralizada, gestión de sesiones y futuro SSO institucional.
+
+ADR-04: Relaciones N:M mediante Entidades y Tablas Intermedias Propias
+- Decisión: Prescindir de @ManyToMany opaco en JPA y formalizar cada enlace como entidad propia.
+- Justificación: Admite atributos de relación (roles, cantidades, orden), control de auditoría temporal (creadoEn) y control de excepciones sin problemas de lazy initialization.
+
+ADR-05: Caché Multiescala en Memoria con Caffeine
+- Decisión: Configurar CaffeineCacheManager con TTLs segmentados por tipo de recurso (Catálogos: 5 min; Dashboard: 30 seg; Consultas DNI/RUC: 24 horas; Caché negativa de documentos: 3 min).
+- Justificación: Reduce la contención en Oracle y optimiza el consumo de cuota externa en la API de RENIEC/SUNAT.
+
+ADR-06: Trazabilidad Distribuida Unificada mediante Correlation ID
+- Decisión: Integrar CorrelationIdFilter en backend y traceIdInterceptor en frontend mediante el encabezado HTTP X-Trace-ID y el MDC de Logback.
+- Justificación: Permite relacionar unívocamente una interacción del usuario en la SPA con las líneas de log generadas en el backend y los paneles de observabilidad en Grafana/Loki.
+
+09.5 Contraste y Validez de Diagramas C4
+
+1. C1 — Nivel Contexto: VÁLIDO. Los actores (Vendedor, Jefe Comercial, Administrador) y los sistemas externos (Keycloak, APIsPerú, Oracle) corresponden fielmente con la arquitectura desplegada.
+2. C2 — Nivel Contenedor: VÁLIDO. El flujo entre Angular SPA (puerto 4200), Spring Boot Backend (puerto 8080), Oracle Database (puerto 1521) y Keycloak (puerto 8180) refleja la topología física real.
+3. C3 — Nivel Componente: REQUIERE ACTUALIZACIÓN. Los diagramas preliminares no incluían los módulos de relationshipmap, propuestas, equipos y marketing, ni mostraban la división entre puertos de entrada/salida de la arquitectura hexagonal. Deben reemplazarse por la estructura modular de Spring Modulith documentada.
+
+[VALIDACIÓN CON EQUIPO]: Se requiere confirmar si los diagramas C3 en Miro y Lucidchart serán reemplazados formalmente en el Word final o si se mantendrán como antecedentes de diseño previos a la modularización.
+
+
+VIERNES CRM V1 · Evidencias académicas · Cierre Documental
+Encargo docente ↔ implementación comprobada en E:\Viernes\Viernes
+10. PATRONES GRASP Y GoF
+
+10.1 Los Nueve Principios GRASP
+
+Principio GRASP	Estado	Clase y Método Concreto	Ruta de Archivo	Problema Resuelto y Justificación
+Information Expert (Experto en Información)	Implementado (Código Propio)	Oportunidad.getValorPonderado()	com/viernes/oportunidades/domain/Oportunidad.java	Calcula el valor ponderado del negocio multiplicando el valor por el porcentaje de probabilidad. Asigna la responsabilidad a la clase que posee los atributos requeridos.
+Information Expert (Experto en Información)	Implementado (Código Propio)	Propuesta.recalcularTotales() y esEstadoTerminal()	com/viernes/propuestas/domain/Propuesta.java	Totaliza la cotización sumando subtotales de detalles y aplicando descuento; verifica inmutabilidad de estados terminales.
+Information Expert (Experto en Información)	Implementado (Código Propio)	DetallePropuesta.calcularSubtotal()	com/viernes/propuestas/domain/DetallePropuesta.java	Calcula el importe del ítem multiplicando cantidad por precio unitario.
+Creator (Creador)	Implementado (Código Propio)	ActividadService.crear()	com/viernes/actividades/application/service/ActividadService.java	El servicio crea, valida relaciones externas y persiste la entidad Actividad y sus enlaces de etiquetas subordinados.
+Creator (Creador)	Implementado (Código Propio)	UsuarioService.crear()	com/viernes/usuarios/application/service/UsuarioService.java	Crea instancias de Usuario encriptando contraseñas con BCrypt y garantizando unicidad de correo.
+Controller (Controlador)	Implementado (Híbrido: Propio / Spring Web)	*Controller (14 controladores REST)	com/viernes/*/adapters/in/web/*Controller.java	Punto de entrada no-UI que recibe comandos HTTP y delega la ejecución en los casos de uso (Manage*UseCase).
+Low Coupling (Bajo Acoplamiento)	Implementado (Código Propio)	Puertos de salida e interfaces de validación	com/viernes/actividades/application/port/out/RelacionValidationPort.java	Desacopla los servicios de aplicación de dependencias concretas de infraestructura y de otros módulos.
+High Cohesion (Alta Cohesión)	Implementado (Código Propio)	Servicios de Aplicación por Módulo	com/viernes/*/application/service/*Service.java	Cada clase concentra exclusivamente la orquestación y reglas de un agregado específico sin dispersión.
+Polymorphism (Polimorfismo)	Implementado (Híbrido: Propio / Spring DI)	*PersistencePort / DocumentoLookupPort	com/viernes/clientes/application/port/out/DocumentoLookupPort.java	Permite alternar o simular implementaciones de persistencia o servicios externos sin alterar la capa de aplicación.
+Pure Fabrication (Fabricación Pura)	Implementado (Código Propio)	Adaptadores de Persistencia, CorrelationIdFilter, ConsultaDocumentoRateLimiter	com/viernes/shared/filter/CorrelationIdFilter.java	Clases de soporte técnico no pertenecientes al dominio comercial creadas para preservar alta cohesión y bajo acoplamiento.
+Indirection (Indirección)	Implementado (Código Propio)	Puertos Hexagonales y AuthService Frontend	com/viernes/actividades/application/port/out/ContactoQueryPort.java y auth.service.ts	Introduce una interfaz intermedia para que los componentes colaboren sin conocerse directamente.
+Protected Variations (Variaciones Protegidas)	Implementado (Código Propio)	Puertos de Dominio y UsuariosApi	com/viernes/usuarios/UsuariosApi.java	Protege la lógica central contra cambios en bases de datos o servicios externos mediante contratos estables.
+
+10.2 Patrones de Diseño GoF (Gang of Four)
+
+Patrón GoF	Categoría	Estado	Clase y Método Concreto	Ruta del Archivo	Origen	Problema que Resuelve y Justificación
+Builder	Creacional	Implementado	@Builder en 17 entidades y DTOs	com/viernes/*/domain/*.java	Lombok (Código Generado)	Construcción fluida de objetos complejos con parámetros opcionales evitando constructores extensos.
+Singleton	Creacional	Implementado	Beans de Spring (@Service, @Component, @Configuration)	ApplicationContext de Spring Boot	Spring Framework	Garantiza una única instancia compartida por inyección de dependencias para servicios y componentes sin estado.
+Factory Method	Creacional	Parcial	@Bean en clases de configuración	com/viernes/auth/config/PasswordEncoderConfig.java y CacheConfig.java	Híbrido (Método Propio / Invocado por Spring)	Centraliza la instanciación de beans de infraestructura (PasswordEncoder, CacheManager).
+Adapter (Adaptador)	Estructural	Implementado	*PersistenceAdapter (12 clases) y ApisPeruDocumentoAdapter	com/viernes/*/adapters/out/persistence/*Adapter.java	Código Propio	Adapta las interfaces de los puertos de dominio a la API concreta de Spring Data JPA o servicios REST externos.
+Facade (Fachada)	Estructural	Implementado	DashboardService.getResumen() y AuthService en Angular	com/viernes/dashboard/application/service/DashboardService.java y auth.service.ts	Código Propio	Proporciona una interfaz unificada y simplificada sobre un subsistema complejo (múltiples repositorios o API de Keycloak).
+Proxy	Estructural	Implementado	Proxies dinámicos de Spring AOP para @Transactional y @Cacheable	Aspectos de Spring Framework	Spring Framework	Añade comportamiento transversal (gestión transaccional en Oracle y caché Caffeine) sin contaminar el código del servicio.
+Template Method	Comportamental	Implementado	CorrelationIdFilter extends OncePerRequestFilter	com/viernes/shared/filter/CorrelationIdFilter.java	Híbrido (Clase Base Spring / Implementación Propia)	Define el esqueleto de filtrado HTTP en la clase base y delega el paso específico doFilterInternal() a la clase propia.
+Strategy (Estrategia)	Comportamental	Implementado	Implementaciones de puertos inyectadas polimórficamente	DocumentoLookupPort -> ApisPeruDocumentoAdapter	Híbrido	Permite intercambiar algoritmos o fuentes de datos respetando una interfaz común inyectada en tiempo de ejecución.
+Observer (Observador)	Comportamental	Implementado	BehaviorSubject<boolean> en KeycloakAuthService	src/app/core/auth/keycloak/keycloak-auth.service.ts	Código Propio (RxJS)	Notifica cambios reactivos en el estado de autenticación a múltiples suscriptores (guards y componentes).
+Chain of Responsibility	Comportamental	Implementado	SecurityFilterChain (Spring Security) y HttpInterceptorFn (Angular)	KeycloakSecurityConfig.java y jwt.interceptor.ts	Spring Framework / Angular	Pasa las solicitudes HTTP secuencialmente a través de filtros/interceptores que validan CORS, CSRF, JWT y trazas.
+Repository	DDD / PoEAA	Implementado	*SpringDataRepository envueltos por *PersistenceAdapter	com/viernes/*/adapters/out/persistence/repository/*Repository.java	Híbrido	Abstrae la persistencia relacional simulando una colección en memoria de entidades de dominio.
+
+10.3 Patrones GoF Clasificados Rigurosamente como No Identificados
+
+Para cumplir con el rigor académico y no falsear la presencia de patrones inexistentes, se declara formalmente que los siguientes 12 patrones GoF no están implementados en el código de Viernes CRM V1:
+1. Abstract Factory (Creacional): No existen familias de objetos de creación polimórfica.
+2. Prototype (Creacional): No se utiliza clonación de instancias en memoria.
+3. Bridge (Estructural): La separación dominio/persistencia se resuelve como Adapter, no como jerarquía de abstracción-implementación desacoplada.
+4. Composite (Estructural): No se gestionan estructuras en árbol de parte-todo recursivas.
+5. Decorator (Estructural): El comportamiento dinámico se aplica vía proxies Spring AOP, no decoradores manuales de clases.
+6. Flyweight (Estructural): No hay compartición de estado intrínseco para optimizar memoria.
+7. Command (Comportamental): Las peticiones se ejecutan directamente en servicios, no se encapsulan como objetos de comando con cola o rollback.
+8. Iterator (Comportamental): Solo se consumen iteradores estándar de Java/TypeScript; no existe una implementación propia del patrón.
+9. Mediator (Comportamental): Las dependencias se resuelven mediante puertos directos; no hay un mediador centralizado inter-módulos.
+10. Memento (Comportamental): No se implementa almacenamiento de estados históricos para restauración de datos (undo/redo).
+11. State (Comportamental): Las transiciones de estado de propuestas y leads se controlan mediante campos de tipo enum y validaciones condicionales, no mediante clases de estado polimórficas.
+12. Visitor (Comportamental): No existen operaciones que recorran jerarquías complejas de objetos sin alterar sus clases.
+
+10.4 Referencias a Evidencias del Proyecto
+- Guía Visual de Patrones: informe/guia_visual_patrones_grasp_gof.html
+- Informe Detallado Sesión 5: informe/informe_seccion5_patrones_grasp_gof.html
+- Tests Unitarios que Comprueban el Comportamiento: com.viernes.oportunidades.domain.OportunidadTest (cálculo ponderado) y com.viernes.relationshipmap.RelationshipMapServiceTest (consultas de grafo).
+

@@ -1,0 +1,177 @@
+@startuml
+!pragma layout smetana
+title Viernes CRM V1 — Modelo de clases de dominio del flujo comercial\nExtracto del dominio; árbol de trabajo revisado 11/11/2026
+left to right direction
+skinparam shadowing false
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 11
+skinparam classAttributeIconSize 0
+skinparam classFontSize 12
+skinparam nodesep 45
+skinparam ranksep 70
+skinparam linetype ortho
+hide circle
+hide empty members
+
+class Cliente <<dominio>> {
+  - id : Long
+  - nombre : String
+  - empresa : String
+  - tipoDocumento : TipoDocumento
+  - numeroDocumento : String
+  - estado : EstadoCliente
+}
+class Contacto <<dominio>> {
+  - id : Long
+  - idCliente : Long
+  - nombre : String
+  - apellido : String
+  - cargo : String
+  - principal : Boolean
+}
+class Lead <<dominio>> {
+  - id : Long
+  - nombre : String
+  - empresa : String
+  - fuenteId : Long
+  - estado : EstadoLead
+}
+class Fuente <<dominio>> {
+  - id : Long
+  - codigo : String
+  - nombre : String
+  - activa : Boolean
+}
+class Oportunidad <<dominio>> {
+  - id : Long
+  - nombre : String
+  - clienteNombre : String
+  - valor : BigDecimal
+  - probabilidad : Integer
+  - etapa : EtapaOportunidad
+  + getValorPonderado() : BigDecimal
+}
+class Producto <<dominio>> {
+  - id : Long
+  - codigo : String
+  - nombre : String
+  - precioBase : BigDecimal
+  - estado : EstadoProducto
+}
+class Propuesta <<dominio>> {
+  - id : Long
+  - numeroPropuesta : String
+  - idOportunidad : Long
+  - idCliente : Long
+  - estado : EstadoPropuesta
+  - subtotal : BigDecimal
+  - descuento : BigDecimal
+  - total : BigDecimal
+  + recalcularTotales() : void
+  + esEstadoTerminal() : boolean
+}
+class DetallePropuesta <<dominio>> {
+  - id : Long
+  - idProducto : Long
+  - descripcion : String
+  - cantidad : Integer
+  - precioUnitario : BigDecimal
+  - subtotal : BigDecimal
+  + calcularSubtotal() : void
+}
+class Actividad <<dominio>> {
+  - id : Long
+  - idUsuario : String
+  - idCliente : Long
+  - idLead : Long
+  - idOportunidad : Long
+  - tipo : TipoActividad
+  - titulo : String
+  - fecha : LocalDateTime
+  - estado : EstadoActividad
+}
+class Etiqueta <<dominio>> {
+  - id : Long
+  - nombre : String
+  - nombreNormalizado : String
+  - color : String
+  - activa : Boolean
+}
+class Campania <<dominio>> {
+  - id : Long
+  - nombre : String
+  - fechaInicio : LocalDate
+  - fechaFin : LocalDate
+  - estado : EstadoCampania
+}
+class Equipo <<dominio>> {
+  - id : Long
+  - nombre : String
+  - descripcion : String
+  - estado : EstadoEquipo
+}
+class Usuario <<dominio>> {
+  - id : Long
+  - nombre : String
+  - apellido : String
+  - correo : String
+  - rol : RolUsuario
+  - estado : EstadoUsuario
+}
+class Mensaje <<dominio>> {
+  - id : Long
+  - usuarioCorreo : String
+  - usuarioNombre : String
+  - contenido : String
+  - creadoEn : LocalDateTime
+}
+
+Cliente "1" -- "0..*" Contacto
+Cliente "1" .. "0..*" Propuesta
+Lead "0..*" ..> "0..1" Fuente : fuenteId
+Oportunidad "1" .. "0..*" Propuesta
+Propuesta "1" *-- "1..*" DetallePropuesta
+DetallePropuesta "0..*" ..> "0..1" Producto : idProducto
+Campania "0..*" .. "0..*" Lead : campaña
+Oportunidad "0..*" .. "0..*" Contacto : contactos
+Oportunidad "0..*" .. "0..*" Producto : productos
+Oportunidad "0..*" .. "0..*" Usuario : colaboradores
+Actividad "0..*" .. "0..*" Contacto : participantes
+Actividad "0..*" .. "0..*" Etiqueta : etiquetas
+Equipo "0..*" .. "0..*" Usuario : miembros
+
+note right of Actividad
+  idCliente, idLead e idOportunidad son
+  referencias lógicas sin FK declarada en JPA.
+end note
+
+note right of Cliente
+  Asociación declarada en JPA:\nCotejo físico en sección 11:
+  CRM_CONTACTOS.ID_CLIENTE →
+  CRM_CLIENTES.ID
+end note
+
+note right of Propuesta
+  Asociación declarada en JPA:\nCotejo físico en sección 11:
+  CRM_PROPUESTA_DETALLES.ID_PROPUESTA →
+  CRM_PROPUESTAS.ID
+end note
+
+note bottom of Mensaje
+  Las asociaciones N:M se materializan en
+  tablas puente con IDs lógicos (sin FK JPA):
+  CRM_CAMPANIA_LEADS, CRM_OPORTUNIDAD_CONTACTOS,
+  CRM_OPORTUNIDAD_PRODUCTOS,
+  CRM_OPORTUNIDAD_COLABORADORES,
+  CRM_ACTIVIDAD_PARTICIPANTES,
+  CRM_ACTIVIDAD_ETIQUETAS, CRM_EQUIPO_MIEMBROS.
+  Mensaje no participa del flujo comercial.
+end note
+
+legend right
+  Línea continua: asociación 1:N o composición.
+  Asociaciones N:M: se materializan en tabla puente;
+  sin asociación JPA entre los extremos.
+  Línea punteada: relación de dominio, incluidas N:M.\n  Las siete puentes sí tienen FK físicas en Oracle: ver sección 11.
+endlegend
+@enduml

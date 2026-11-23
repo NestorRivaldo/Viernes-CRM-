@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examen Técnico de Código: Módulo Actividades – VIERNES CRM V1</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #090d16;
+            --surface: #111726;
+            --surface2: #172033;
+            --surface3: #1f2b45;
+            --border: #232f48;
+            --border-highlight: #3b82f6;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --text-subtle: #64748b;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.25);
+            --accent-soft: rgba(59, 130, 246, 0.12);
+            --green: #10b981;
+            --green-soft: rgba(16, 185, 129, 0.12);
+            --purple: #a855f7;
+            --purple-soft: rgba(168, 85, 247, 0.12);
+            --amber: #f59e0b;
+            --amber-soft: rgba(245, 158, 11, 0.12);
+            --cyan: #06b6d4;
+            --cyan-soft: rgba(6, 182, 212, 0.12);
+            --rose: #f43f5e;
+            --rose-soft: rgba(244, 63, 94, 0.12);
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --mono: 'JetBrains Mono', monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            padding: 40px 20px 100px;
+            background-image: 
+                radial-gradient(circle at 10% 10%, rgba(59, 130, 246, 0.09) 0%, transparent 45%),
+                radial-gradient(circle at 90% 85%, rgba(168, 85, 247, 0.08) 0%, transparent 45%);
+            background-attachment: fixed;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Top Nav */
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #60a5fa;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover { color: #93c5fd; }
+
+        .system-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12.5px;
+            color: var(--text-muted);
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--green);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--green);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.85); }
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 40px;
+            background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 35px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, #3b82f6, #a855f7, #10b981);
+        }
+
+        .title-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--accent-soft);
+            color: #93c5fd;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-desc {
+            font-size: 15px;
+            color: var(--text-muted);
+            max-width: 880px;
+        }
+
+        .tags-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .tag {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-family: var(--mono);
+            color: #94a3b8;
+        }
+        .tag-blue { color: #60a5fa; border-color: rgba(59, 130, 246, 0.3); background: rgba(59, 130, 246, 0.08); }
+        .tag-green { color: #34d399; border-color: rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.08); }
+        .tag-purple { color: #c084fc; border-color: rgba(168, 85, 247, 0.3); background: rgba(168, 85, 247, 0.08); }
+
+        /* Tabs Navigation */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-muted);
+            padding: 8px 18px;
+            border-radius: var(--radius-sm);
+            font-size: 13.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            color: var(--text);
+            background: var(--surface);
+        }
+
+        .tab-btn.active {
+            color: #ffffff;
+            background: var(--accent);
+            border-color: var(--accent);
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+
+        .tab-pane {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Card sections */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 28px;
+            margin-bottom: 25px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #ffffff;
+        }
+
+        .badge-path {
+            font-family: var(--mono);
+            font-size: 12px;
+            background: var(--surface2);
+            color: #38bdf8;
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+        }
+
+        /* Flow diagram */
+        .hex-flow {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .flow-step {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 18px;
+            position: relative;
+            border-left: 4px solid var(--accent);
+        }
+
+        .flow-step.step-web { border-left-color: var(--cyan); }
+        .flow-step.step-port { border-left-color: var(--purple); }
+        .flow-step.step-service { border-left-color: var(--green); }
+        .flow-step.step-db { border-left-color: var(--amber); }
+
+        .step-num {
+            font-family: var(--mono);
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--text-subtle);
+            margin-bottom: 5px;
+        }
+
+        .step-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+
+        .step-file {
+            font-family: var(--mono);
+            font-size: 11.5px;
+            color: #94a3b8;
+            word-break: break-all;
+        }
+
+        /* Code Blocks */
+        pre {
+            background: #060911;
+            border: 1px solid #1c263c;
+            border-radius: var(--radius-sm);
+            padding: 18px 20px;
+            overflow-x: auto;
+            font-family: var(--mono);
+            font-size: 13px;
+            line-height: 1.6;
+            margin: 15px 0;
+            color: #e2e8f0;
+        }
+
+        .kw { color: #f43f5e; font-weight: 600; }
+        .type { color: #38bdf8; }
+        .ann { color: #fbbf24; font-weight: 500; }
+        .str { color: #34d399; }
+        .com { color: #64748b; font-style: italic; }
+        .fn { color: #a78bfa; }
+
+        /* Accordion for Exam Questions */
+        .qa-item {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            margin-bottom: 14px;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+
+        .qa-item:hover {
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+
+        .qa-header {
+            padding: 18px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+            background: var(--surface2);
+        }
+
+        .qa-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #f1f5f9;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .qa-badge {
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: var(--mono);
+        }
+
+        .qa-icon {
+            font-size: 14px;
+            color: var(--text-muted);
+            transition: transform 0.2s;
+        }
+
+        .qa-item.open .qa-icon {
+            transform: rotate(180deg);
+        }
+
+        .qa-body {
+            padding: 0 20px 20px;
+            display: none;
+            border-top: 1px solid var(--border);
+            background: #0d1322;
+        }
+
+        .qa-item.open .qa-body {
+            display: block;
+        }
+
+        .defense-tip {
+            background: rgba(245, 158, 11, 0.08);
+            border-left: 3px solid var(--amber);
+            padding: 12px 16px;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            margin: 12px 0;
+            font-size: 13.5px;
+            color: #fde68a;
+        }
+
+        /* Quiz Simulator */
+        .quiz-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .quiz-q {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #ffffff;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .quiz-opt {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 12px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--text-muted);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .quiz-opt:hover {
+            background: var(--surface3);
+            color: var(--text);
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+
+        .quiz-opt.correct {
+            background: rgba(16, 185, 129, 0.15) !important;
+            border-color: var(--green) !important;
+            color: #a7f3d0 !important;
+            font-weight: 600;
+        }
+
+        .quiz-opt.wrong {
+            background: rgba(244, 63, 94, 0.15) !important;
+            border-color: var(--rose) !important;
+            color: #fecdd3 !important;
+        }
+
+        .quiz-feedback {
+            margin-top: 12px;
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            display: none;
+        }
+
+        .score-box {
+            text-align: center;
+            padding: 30px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            margin-top: 25px;
+        }
+
+        .score-val {
+            font-size: 48px;
+            font-weight: 900;
+            color: var(--green);
+            margin: 10px 0;
+            font-family: var(--mono);
+        }
+
+        /* Tables inside cards */
+        .spec-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13.5px;
+            margin: 15px 0;
+        }
+
+        .spec-table th, .spec-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+        }
+
+        .spec-table th {
+            color: var(--text-subtle);
+            font-size: 12px;
+            text-transform: uppercase;
+            font-weight: 700;
+            background: var(--surface2);
+        }
+
+        .spec-table code {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: #38bdf8;
+            background: rgba(56, 189, 248, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Top Navigation -->
+    <div class="top-nav">
+        <a href="index.html" class="back-link">
+            ← Volver al Portal de Informes
+        </a>
+        <div class="system-status">
+            <span class="pulse-dot"></span>
+            <span>Módulo Verificado: <strong>actividades</strong> (OPEN)</span>
+        </div>
+    </div>
+
+    <!-- Header Hero -->
+    <div class="header">
+        <div class="title-badge">Examen Técnico de Arquitectura y Código</div>
+        <h1>Módulo de Actividades (Viernes CRM V1)</h1>
+        <p class="header-desc">
+            Evaluación técnica exhaustiva a nivel de código fuente: implementación de Arquitectura Hexagonal, puertos y adaptadores, gobierno Spring Modulith, transaccionalidad JDBC única y persistencia Oracle en <code>VIERNES_DATOS</code>.
+        </p>
+        <div class="tags-row">
+            <span class="tag tag-blue">Spring Boot 4.0.7</span>
+            <span class="tag tag-blue">Java 21</span>
+            <span class="tag tag-purple">Spring Modulith 2.0.7</span>
+            <span class="tag tag-green">Oracle Database 23c / 21c XE</span>
+            <span class="tag">Arquitectura Hexagonal</span>
+            <span class="tag">34 Unit Tests</span>
+        </div>
+    </div>
+
+    <!-- Tabs Navigation -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="showTab('anatomia')">📐 1. Anatomía y Flujo de Código</button>
+        <button class="tab-btn" onclick="showTab('balotario')">🎯 2. Balotario de Sustentación (Q&A)</button>
+        <button class="tab-btn" onclick="showTab('simulador')">📝 3. Simulador de Examen Interactivo</button>
+        <button class="tab-btn" onclick="showTab('bd')">💾 4. Base de Datos Oracle</button>
+    </div>
+
+    <!-- TAB 1: ANATOMIA Y FLUJO -->
+    <div id="anatomia" class="tab-pane active">
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">1.1 Cadena de Invocación Hexagonal (End-to-End)</div>
+                <span class="badge-path">POST /api/v1/actividades</span>
+            </div>
+            <p style="color: var(--text-muted); font-size: 14px;">
+                Cada petición atraviesa estrictamente la frontera desde los adaptadores externos hasta el dominio puro, garantizando que el dominio nunca dependa del framework Spring ni de Hibernate.
+            </p>
+
+            <div class="hex-flow">
+                <div class="flow-step step-web">
+                    <div class="step-num">[1] Web Controller</div>
+                    <div class="step-name">ActividadController</div>
+                    <div class="step-file">adapters/in/web</div>
+                    <p style="font-size: 12px; color: var(--text-muted); margin-top: 6px;">Recibe HTTP, valida DTO Request con Bean Validation (<code>@Valid</code>).</p>
+                </div>
+
+                <div class="flow-step step-port">
+                    <div class="step-num">[2] Puerto de Entrada</div>
+                    <div class="step-name">ManageActividadUseCase</div>
+                    <div class="step-file">application/port/in</div>
+                    <p style="font-size: 12px; color: var(--text-muted); margin-top: 6px;">Interfaz del caso de uso. Define el contrato para crear, actualizar y filtrar.</p>
+                </div>
+
+                <div class="flow-step step-service">
+                    <div class="step-num">[3] Caso de Uso / Tx</div>
+                    <div class="step-name">ActividadService</div>
+                    <div class="step-file">application/service</div>
+                    <p style="font-size: 12px; color: var(--text-muted); margin-top: 6px;">Abre <code>@Transactional</code>. Orquesta validaciones y muta el modelo de Dominio.</p>
+                </div>
+
+                <div class="flow-step step-port">
+                    <div class="step-num">[4] Puertos Salida</div>
+                    <div class="step-name">ActividadPersistencePort</div>
+                    <div class="step-file">application/port/out</div>
+                    <p style="font-size: 12px; color: var(--text-muted); margin-top: 6px;">Desacopla la lógica de negocio de JPA y de otros módulos.</p>
+                </div>
+
+                <div class="flow-step step-db">
+                    <div class="step-num">[5] Adapter & BD</div>
+                    <div class="step-name">ActividadPersistenceAdapter</div>
+                    <div class="step-file">adapters/out/persistence</div>
+                    <p style="font-size: 12px; color: var(--text-muted); margin-top: 6px;">Traduce <code>Actividad</code> ↔ <code>ActividadEntity</code> e interactúa con Oracle.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">1.2 Declaración de Fronteras Spring Modulith</div>
+                <span class="badge-path">com.viernes.actividades.package-info.java</span>
+            </div>
+            <pre><span class="ann">@org.springframework.modulith.ApplicationModule</span>(
+    type = org.springframework.modulith.ApplicationModule.Type.OPEN,
+    allowedDependencies = {
+        <span class="str">"clientes"</span>,        <span class="com">// Consulta de contactos y existencia de clientes</span>
+        <span class="str">"oportunidades"</span>,   <span class="com">// Validación de pertenencia a oportunidad</span>
+        <span class="str">"leads"</span>,           <span class="com">// Validación de lead relacionado</span>
+        <span class="str">"etiquetas"</span>,       <span class="com">// Clasificación y color de actividades</span>
+        <span class="str">"usuarios"</span>,        <span class="com">// Verificación de asignación de responsable</span>
+        <span class="str">"shared"</span>,          <span class="com">// Manejo de excepciones y utilitarios</span>
+        <span class="str">"shared.exception"</span>
+    }
+)
+<span class="kw">package</span> com.viernes.actividades;</pre>
+            <div class="defense-tip">
+                💡 <strong>Dato de defensa oral:</strong> La prueba <code>ModularityTests.verify()</code> inspecciona el bytecode en tiempo de test. Si en cualquier clase de <code>actividades</code> agregas un <code>import com.viernes.propuestas...</code>, la prueba fallará de inmediato porque <code>propuestas</code> no está en <code>allowedDependencies</code>.
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">1.3 El Dominio Puro vs La Entidad de Persistencia</div>
+            </div>
+            <table class="spec-table">
+                <thead>
+                    <tr>
+                        <th>Concepto</th>
+                        <th>Dominio: <code>Actividad.java</code></th>
+                        <th>Persistencia: <code>ActividadEntity.java</code></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Ubicación</strong></td>
+                        <td><code>com.viernes.actividades.domain</code></td>
+                        <td><code>com.viernes.actividades.adapters.out.persistence.entity</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Anotaciones</strong></td>
+                        <td><strong>Ninguna</strong> (Java POJO puro sin dependencias de Spring ni JPA)</td>
+                        <td><code>@Entity</code>, <code>@Table(name="CRM_ACTIVIDADES")</code>, <code>@Column</code>, <code>@Lob</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Identificador</strong></td>
+                        <td><code>private Long id;</code> (sin anotaciones de generación)</td>
+                        <td><code>@Id @GeneratedValue(strategy = GenerationType.IDENTITY)</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Propósito</strong></td>
+                        <td>Representa las reglas de negocio en memoria del CRM</td>
+                        <td>Mapeo de columnas hacia la tabla física en Oracle</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <!-- TAB 2: BALOTARIO DE SUSTENTACION -->
+    <div id="balotario" class="tab-pane">
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Preguntas Críticas de Evaluación de Código</div>
+                <span class="badge-path">Respuestas con anclas a archivos reales</span>
+            </div>
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px;">
+                Haz clic en cada pregunta para desplegar el análisis técnico de código y la respuesta que debes dar ante el evaluador:
+            </p>
+
+            <!-- Q1 -->
+            <div class="qa-item open">
+                <div class="qa-header" onclick="toggleQA(this)">
+                    <div class="qa-title">
+                        <span class="qa-badge">P1</span>
+                        ¿Por qué `Actividad` y `ActividadEntity` son clases distintas si tienen los mismos atributos?
+                    </div>
+                    <span class="qa-icon">▼</span>
+                </div>
+                <div class="qa-body">
+                    <p style="margin: 12px 0 8px; font-size: 14px;">
+                        <strong>Respuesta arquitectónica:</strong> Por el principio de <strong>Inversión de Dependencias y Aislamiento de Dominio</strong> de la Arquitectura Hexagonal.
+                    </p>
+                    <p style="font-size: 13.5px; color: var(--text-muted);">
+                        El dominio (<code>Actividad.java</code>) no debe tener dependencias hacia tecnologías externas de infraestructura como Hibernate o Jakarta Persistence. Si en el futuro se migra el motor a MongoDB, JDBC plano o microservicios, el dominio no cambia en absoluto; únicamente se implementa un nuevo <code>ActividadPersistencePort</code>.
+                    </p>
+                    <div class="defense-tip">
+                        📌 <strong>Archivo ancla:</strong> <code>ActividadPersistenceAdapter.java:82-106</code> es el encargado de hacer la traducción bidireccional (<code>toEntity</code> y <code>toDomain</code>).
+                    </div>
+                </div>
+            </div>
+
+            <!-- Q2 -->
+            <div class="qa-item">
+                <div class="qa-header" onclick="toggleQA(this)">
+                    <div class="qa-title">
+                        <span class="qa-badge">P2</span>
+                        ¿Cómo se garantiza la integridad si en la base de datos no hay una FK física entre `CRM_ACTIVIDADES` y `CRM_CLIENTES`?
+                    </div>
+                    <span class="qa-icon">▼</span>
+                </div>
+                <div class="qa-body">
+                    <p style="margin: 12px 0 8px; font-size: 14px;">
+                        <strong>Respuesta arquitectónica:</strong> La integridad referencial entre módulos es <strong>lógica</strong> y está garantizada por la capa de aplicación antes de persistir.
+                    </p>
+                    <pre><span class="com">// ActividadService.java:235-248</span>
+<span class="kw">private void</span> <span class="fn">validarRelaciones</span>(ActividadRequest request) {
+    <span class="kw">if</span> (request.idCliente() != <span class="kw">null</span> && !validationPort.existeCliente(request.idCliente())) {
+        <span class="kw">throw new</span> ResourceNotFoundException(<span class="str">"Cliente no encontrado con ID: "</span> + request.idCliente());
+    }
+    <span class="kw">if</span> (request.idLead() != <span class="kw">null</span> && !validationPort.existeLead(request.idLead())) {
+        <span class="kw">throw new</span> ResourceNotFoundException(<span class="str">"Lead no encontrado con ID: "</span> + request.idLead());
+    }
+    <span class="kw">if</span> (request.idUsuario() != <span class="kw">null</span> && !validationPort.existeUsuario(request.idUsuario())) {
+        <span class="kw">throw new</span> ResourceNotFoundException(<span class="str">"Usuario no encontrado con ID: "</span> + request.idUsuario());
+    }
+}</pre>
+                    <p style="font-size: 13.5px; color: var(--text-muted);">
+                        Esto desacopla el ciclo de vida de los módulos a nivel de esquema de base de datos en Oracle, permitiendo que cada módulo gobierne su propio ciclo sin bloqueos en cascada.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Q3 -->
+            <div class="qa-item">
+                <div class="qa-header" onclick="toggleQA(this)">
+                    <div class="qa-title">
+                        <span class="qa-badge">P3</span>
+                        ¿Cómo gestiona `ActividadService` las transacciones y las optimizaciones de lectura?
+                    </div>
+                    <span class="qa-icon">▼</span>
+                </div>
+                <div class="qa-body">
+                    <p style="margin: 12px 0 8px; font-size: 14px;">
+                        <strong>Respuesta arquitectónica:</strong> Mediante Spring Declarative Transaction Management con distinción de transacciones de lectura vs escritura.
+                    </p>
+                    <ul style="margin-left: 20px; font-size: 13.5px; color: var(--text-muted);">
+                        <li>A nivel de clase ([línea 36](file:///e:/Viernes/Viernes/viernes-backend/src/main/java/com/viernes/actividades/application/service/ActividadService.java#L36)), se anota con <code>@Transactional</code>. Esto hace que métodos como <code>crear()</code>, <code>actualizar()</code> y <code>eliminar()</code> se ejecuten dentro de una transacción con capacidad de escritura.</li>
+                        <li>Los métodos de consulta como <code>listarTodos()</code> y <code>obtener(id)</code> sobreescriben la configuración con <code>@Transactional(readOnly = true)</code>.</li>
+                    </ul>
+                    <div class="defense-tip">
+                        ⚡ <strong>Beneficio de rendimiento:</strong> <code>readOnly = true</code> desactiva la detección sucia (dirty checking) de entidades en el Session/EntityManager de Hibernate, consumiendo menos CPU y liberando la conexión de HikariCP más rápido.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Q4 -->
+            <div class="qa-item">
+                <div class="qa-header" onclick="toggleQA(this)">
+                    <div class="qa-title">
+                        <span class="qa-badge">P4</span>
+                        ¿Por qué las pruebas unitarias de `ActividadService` corren en milisegundos sin levantar Oracle?
+                    </div>
+                    <span class="qa-icon">▼</span>
+                </div>
+                <div class="qa-body">
+                    <p style="margin: 12px 0 8px; font-size: 14px;">
+                        <strong>Respuesta arquitectónica:</strong> Gracias a los <strong>Puertos de Salida (Ports Out)</strong>, el servicio se prueba con mocks puros de Mockito (<code>@ExtendWith(MockitoExtension.class)</code>).
+                    </p>
+                    <pre><span class="com">// ActividadServiceTest.java:38-57</span>
+<span class="ann">@Mock</span> <span class="kw">private</span> ActividadPersistencePort persistencePort;
+<span class="ann">@Mock</span> <span class="kw">private</span> RelacionValidationPort validationPort;
+<span class="ann">@Mock</span> <span class="kw">private</span> ActividadParticipantePersistencePort participantePort;
+<span class="ann">@InjectMocks</span> <span class="kw">private</span> ActividadService servicio;</pre>
+                    <p style="font-size: 13.5px; color: var(--text-muted);">
+                        No se levanta el contexto de Spring (<code>@SpringBootTest</code>) ni Docker. Se mockean únicamente las interfaces de persistencia y validación, permitiendo probar toda la lógica de negocio en menos de 50 milisegundos.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Q5 -->
+            <div class="qa-item">
+                <div class="qa-header" onclick="toggleQA(this)">
+                    <div class="qa-title">
+                        <span class="qa-badge">P5</span>
+                        ¿Qué es la Brecha B9 de arquitectura y cómo afecta a `ContactoQueryAdapter`?
+                    </div>
+                    <span class="qa-icon">▼</span>
+                </div>
+                <div class="qa-body">
+                    <p style="margin: 12px 0 8px; font-size: 14px;">
+                        <strong>Respuesta arquitectónica:</strong> Es un residuo de diseño donde se realiza una consulta ineficiente en memoria debido a la falta de un método específico en el módulo proveedor.
+                    </p>
+                    <pre><span class="com">// ContactoQueryAdapter.java:31-34</span>
+<span class="kw">return</span> clienteUseCase.listar().stream()
+        .flatMap(cliente -> cliente.contactos().stream())
+        .filter(contacto -> contacto.id().equals(idContacto))
+        .findFirst();</pre>
+                    <p style="font-size: 13.5px; color: var(--text-muted);">
+                        Para buscar un solo contacto por ID, se invoca <code>clienteUseCase.listar()</code> que trae <strong>todos los clientes con todos sus contactos</strong> a memoria y los filtra con Java Streams.
+                    </p>
+                    <div class="defense-tip">
+                        🛠️ <strong>Solución:</strong> Exponer <code>buscarContactoPorId(Long id)</code> directamente en el puerto público <code>ManageClienteUseCase</code> para que la consulta la resuelva Oracle con un <code>WHERE ID = :id</code> indexado.
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- TAB 3: SIMULADOR INTERACTIVO -->
+    <div id="simulador" class="tab-pane">
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Simulador de Preguntas de Evaluación</div>
+                <span class="badge-path">5 Preguntas de Opción Múltiple con Validación en Tiempo Real</span>
+            </div>
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 25px;">
+                Selecciona la opción correcta para cada pregunta. Al final obtendrás tu puntuación técnica:
+            </p>
+
+            <!-- Quiz 1 -->
+            <div class="quiz-card" id="q1">
+                <div class="quiz-q">1. ¿En qué capa se encuentra la interfaz <code>ManageActividadUseCase</code>?</div>
+                <div class="quiz-options">
+                    <div class="quiz-opt" onclick="checkAnswer(1, 0, false)">A) En <code>adapters.in.web</code> como un RestController</div>
+                    <div class="quiz-opt" onclick="checkAnswer(1, 1, true)">B) En <code>application.port.in</code> como contrato de caso de uso</div>
+                    <div class="quiz-opt" onclick="checkAnswer(1, 2, false)">C) En <code>domain</code> como entidad de negocio</div>
+                    <div class="quiz-opt" onclick="checkAnswer(1, 3, false)">D) En <code>adapters.out.persistence</code> como repositorio Spring Data</div>
+                </div>
+                <div class="quiz-feedback" id="fb1"></div>
+            </div>
+
+            <!-- Quiz 2 -->
+            <div class="quiz-card" id="q2">
+                <div class="quiz-q">2. ¿Por qué el método <code>listarTodos()</code> en ActividadService lleva <code>@Transactional(readOnly = true)</code>?</div>
+                <div class="quiz-options">
+                    <div class="quiz-opt" onclick="checkAnswer(2, 0, false)">A) Porque impide que otros usuarios lean la tabla simultáneamente</div>
+                    <div class="quiz-opt" onclick="checkAnswer(2, 1, false)">B) Porque es obligatorio para que Spring Boot pueda serializar a JSON</div>
+                    <div class="quiz-opt" onclick="checkAnswer(2, 2, true)">C) Para optimizar el rendimiento desactivando el dirty-checking de Hibernate</div>
+                    <div class="quiz-opt" onclick="checkAnswer(2, 3, false)">D) Para ejecutar la consulta en un thread asíncrono secundario</div>
+                </div>
+                <div class="quiz-feedback" id="fb2"></div>
+            </div>
+
+            <!-- Quiz 3 -->
+            <div class="quiz-card" id="q3">
+                <div class="quiz-q">3. Si en el código intentas importar una clase del módulo <code>marketing</code> dentro de <code>actividades</code>, ¿qué sucede?</div>
+                <div class="quiz-options">
+                    <div class="quiz-opt" onclick="checkAnswer(3, 0, false)">A) Compila y corre normal, Spring Modulith no restringe el código</div>
+                    <div class="quiz-opt" onclick="checkAnswer(3, 1, true)">B) <code>ModularityTests.verify()</code> rompe el build porque <code>marketing</code> no está en <code>allowedDependencies</code></div>
+                    <div class="quiz-opt" onclick="checkAnswer(3, 2, false)">C) Lanza una excepción ORA-00942 de Oracle al arrancar</div>
+                    <div class="quiz-opt" onclick="checkAnswer(3, 3, false)">D) Keycloak rechaza el token JWT del usuario</div>
+                </div>
+                <div class="quiz-feedback" id="fb3"></div>
+            </div>
+
+            <!-- Quiz 4 -->
+            <div class="quiz-card" id="q4">
+                <div class="quiz-q">4. ¿Qué rol cumple <code>RelacionValidationAdapter</code>?</div>
+                <div class="quiz-options">
+                    <div class="quiz-opt" onclick="checkAnswer(4, 0, false)">A) Crear los clientes y leads si no existen al guardar la actividad</div>
+                    <div class="quiz-opt" onclick="checkAnswer(4, 1, false)">B) Conectarse a APIsPERU para verificar el RUC del cliente</div>
+                    <div class="quiz-opt" onclick="checkAnswer(4, 2, true)">C) Implementar <code>RelacionValidationPort</code> consultando los repositorios/APIs de otros módulos</div>
+                    <div class="quiz-opt" onclick="checkAnswer(4, 3, false)">D) Generar los tokens de autenticación de Keycloak</div>
+                </div>
+                <div class="quiz-feedback" id="fb4"></div>
+            </div>
+
+            <!-- Quiz 5 -->
+            <div class="quiz-card" id="q5">
+                <div class="quiz-q">5. En Oracle Database, ¿en qué Tablespace físico se guardan los registros de la tabla <code>CRM_ACTIVIDADES</code>?</div>
+                <div class="quiz-options">
+                    <div class="quiz-opt" onclick="checkAnswer(5, 0, false)">A) En <code>SYSTEM</code></div>
+                    <div class="quiz-opt" onclick="checkAnswer(5, 1, false)">B) En <code>VIERNES_INDICES</code></div>
+                    <div class="quiz-opt" onclick="checkAnswer(5, 2, true)">C) En <code>VIERNES_DATOS</code> (con datafile viernes_datos01.dbf)</div>
+                    <div class="quiz-opt" onclick="checkAnswer(5, 3, false)">D) En <code>VIERNES_TEMP</code></div>
+                </div>
+                <div class="quiz-feedback" id="fb5"></div>
+            </div>
+
+            <!-- Score Display -->
+            <div class="score-box" id="scoreBox" style="display: none;">
+                <div style="font-size: 16px; font-weight: 700; color: var(--text);">Resultado de tu Evaluación Técnica:</div>
+                <div class="score-val" id="scoreVal">0 / 5</div>
+                <div id="scoreFeedback" style="font-size: 14px; color: var(--text-muted);"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- TAB 4: BASE DE DATOS ORACLE -->
+    <div id="bd" class="tab-pane">
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Mapeo Físico en Oracle Database</div>
+                <span class="badge-path">base de datos/03_tablas/07_actividades.sql</span>
+            </div>
+
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 15px;">
+                El módulo gobierna 3 tablas físicas en Oracle, separando estrictamente los datos de los índices en tablespaces dedicados:
+            </p>
+
+            <table class="spec-table">
+                <thead>
+                    <tr>
+                        <th>Tabla Física</th>
+                        <th>Tablespace de Datos</th>
+                        <th>Tablespace de Índices</th>
+                        <th>Propósito</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>CRM_ACTIVIDADES</code></td>
+                        <td><code>VIERNES_DATOS</code></td>
+                        <td><code>VIERNES_INDICES</code></td>
+                        <td>Tabla maestra de reuniones, llamadas, tareas y seguimientos.</td>
+                    </tr>
+                    <tr>
+                        <td><code>CRM_ACTIVIDAD_ETIQUETAS</code></td>
+                        <td><code>VIERNES_DATOS</code></td>
+                        <td><code>VIERNES_INDICES</code></td>
+                        <td>Tabla puente muchos-a-muchos con ordenación y clave única (<code>UK_ACTIVIDAD_ETIQUETA</code>).</td>
+                    </tr>
+                    <tr>
+                        <td><code>CRM_ACTIVIDAD_PARTICIPANTES</code></td>
+                        <td><code>VIERNES_DATOS</code></td>
+                        <td><code>VIERNES_INDICES</code></td>
+                        <td>Tabla puente con contactos (<code>UK_ACTIVIDAD_CONTACTO</code>).</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <pre><span class="com">-- Índices secundarios creados para optimizar filtros frecuentes</span>
+<span class="kw">CREATE INDEX</span> IX_CRM_ACT_ESTADO  <span class="kw">ON</span> CRM_ACTIVIDADES (ESTADO)       <span class="kw">TABLESPACE</span> VIERNES_INDICES;
+<span class="kw">CREATE INDEX</span> IX_CRM_ACT_FECHA   <span class="kw">ON</span> CRM_ACTIVIDADES (FECHA)        <span class="kw">TABLESPACE</span> VIERNES_INDICES;
+<span class="kw">CREATE INDEX</span> IX_CRM_ACT_CLIENTE <span class="kw">ON</span> CRM_ACTIVIDADES (ID_CLIENTE)   <span class="kw">TABLESPACE</span> VIERNES_INDICES;
+<span class="kw">CREATE INDEX</span> IX_CRM_ACT_OPOR    <span class="kw">ON</span> CRM_ACTIVIDADES (ID_OPORTUNIDAD) <span class="kw">TABLESPACE</span> VIERNES_INDICES;</pre>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    function showTab(tabId) {
+        document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+
+    function toggleQA(header) {
+        header.parentElement.classList.toggle('open');
+    }
+
+    let answers = { 1: null, 2: null, 3: null, 4: null, 5: null };
+
+    function checkAnswer(qNum, optIndex, isCorrect) {
+        const card = document.getElementById('q' + qNum);
+        const opts = card.querySelectorAll('.quiz-opt');
+        const fb = document.getElementById('fb' + qNum);
+
+        opts.forEach((opt, idx) => {
+            opt.classList.remove('correct', 'wrong');
+            if (idx === optIndex) {
+                opt.classList.add(isCorrect ? 'correct' : 'wrong');
+            }
+        });
+
+        fb.style.display = 'block';
+        if (isCorrect) {
+            fb.style.background = 'rgba(16, 185, 129, 0.12)';
+            fb.style.color = '#34d399';
+            fb.style.border = '1px solid rgba(16, 185, 129, 0.3)';
+            fb.innerHTML = '<strong>¡Correcto!</strong> Respuesta fundamentada exactamente en el diseño hexagonal y Modulith.';
+            answers[qNum] = true;
+        } else {
+            fb.style.background = 'rgba(244, 63, 94, 0.12)';
+            fb.style.color = '#f87171';
+            fb.style.border = '1px solid rgba(244, 63, 94, 0.3)';
+            fb.innerHTML = '<strong>Incorrecto.</strong> Revisa la pestaña de <em>Anatomía y Flujo</em> para ver el contrato exacto.';
+            answers[qNum] = false;
+        }
+
+        updateScore();
+    }
+
+    function updateScore() {
+        const answered = Object.values(answers).filter(v => v !== null);
+        if (answered.length === 5) {
+            const correct = Object.values(answers).filter(v => v === true).length;
+            const scoreBox = document.getElementById('scoreBox');
+            const scoreVal = document.getElementById('scoreVal');
+            const scoreFb = document.getElementById('scoreFeedback');
+            scoreBox.style.display = 'block';
+            scoreVal.textContent = correct + ' / 5';
+
+            if (correct === 5) {
+                scoreVal.style.color = 'var(--green)';
+                scoreFb.textContent = '🎉 ¡Excelente! Dominas a la perfección la arquitectura hexagonal y el código de actividades.';
+            } else if (correct >= 3) {
+                scoreVal.style.color = 'var(--amber)';
+                scoreFb.textContent = '👍 Buen nivel. Repasa las preguntas del balotario para pulir los detalles de Modulith y JPA.';
+            } else {
+                scoreVal.style.color = 'var(--rose)';
+                scoreFb.textContent = '⚠️ Requiere repaso. Lee atentamente la pestaña de Balotario de Sustentación.';
+            }
+        }
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,15 @@
+﻿Tabla,Nombre declarado,Columnas,Evidencia
+CRM_ACTIVIDAD_ETIQUETAS,uk_actividad_etiqueta,"ID_ACTIVIDAD, ID_ETIQUETA",JPA; índice físico pendiente
+CRM_ACTIVIDAD_PARTICIPANTES,uk_actividad_contacto,"ID_ACTIVIDAD, ID_CONTACTO",JPA; índice físico pendiente
+CRM_CLIENTES,UK_CRM_CLIENTES_DOCUMENTO,"TIPO_DOCUMENTO, NUMERO_DOCUMENTO",JPA; índice físico pendiente
+CRM_EQUIPOS,Nombre por proveedor,NOMBRE,JPA; índice físico pendiente
+CRM_EQUIPO_MIEMBROS,UK_EQUIPO_MIEMBRO,"EQUIPO_ID, USUARIO_ID",JPA; índice físico pendiente
+CRM_ETIQUETAS,uk_etiqueta_nombre_normalizado,NOMBRE_NORMALIZADO,JPA; índice físico pendiente
+CRM_FUENTES,Nombre por proveedor,CODIGO,JPA; índice físico pendiente
+CRM_CAMPANIA_LEADS,UK_CAMPANIA_LEAD,"CAMPANIA_ID, LEAD_ID",JPA; índice físico pendiente
+CRM_OPORTUNIDAD_COLABORADORES,uk_oportunidad_colaborador,"ID_OPORTUNIDAD, ID_USUARIO",JPA; índice físico pendiente
+CRM_OPORTUNIDAD_CONTACTOS,uk_oportunidad_contacto,"ID_OPORTUNIDAD, ID_CONTACTO",JPA; índice físico pendiente
+CRM_OPORTUNIDAD_PRODUCTOS,uk_oportunidad_producto,"ID_OPORTUNIDAD, ID_PRODUCTO",JPA; índice físico pendiente
+CRM_PRODUCTOS,Nombre por proveedor,CODIGO,JPA; índice físico pendiente
+CRM_PROPUESTAS,Nombre por proveedor,NUMERO_PROPUESTA,JPA; índice físico pendiente
+CRM_USUARIOS,Nombre por proveedor,CORREO,JPA; índice físico pendiente

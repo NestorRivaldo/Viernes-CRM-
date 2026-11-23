@@ -1,24 +1,34 @@
-name: bomerp-backend-dev
+name: viernes-db-dev
 
 services:
   oracle:
     image: gvenzl/oracle-free:23-slim
-    container_name: bomerp-oracle
+    container_name: viernes-oracle
     restart: unless-stopped
     ports:
       - "1521:1521"
     environment:
-      ORACLE_PASSWORD: 123456
+      # Credenciales SOLO para desarrollo local. No usar en producción.
+      ORACLE_PASSWORD: "123456"
       APP_USER: BOM_VENTAS
-      APP_USER_PASSWORD: 123456
+      APP_USER_PASSWORD: "123456"
     volumes:
-      - oracle-data:/opt/oracle/oradata
+      # Datos persistentes del contenedor. El nombre es fijo para que
+      # `docker compose down -v` sea una decisión explícita.
+      - viernes-oracle-data:/opt/oracle/oradata
+      # Scripts que se ejecutan UNA sola vez, cuando el volumen está vacío.
+      # Crean tablespaces, usuario, esquema, PL/SQL y datos demo.
+      - ./db/init:/container-entrypoint-initdb.d:ro
+      # Carpeta compartida para backups de Data Pump (expdp/impdp).
+      - ./db/backups:/opt/oracle/backup
     healthcheck:
       test: ["CMD", "healthcheck.sh"]
       interval: 10s
       timeout: 5s
-      retries: 10
-      start_period: 60s
+      retries: 30
+      start_period: 120s
+      start_interval: 5s
 
 volumes:
-  oracle-data:
+  viernes-oracle-data:
+    name: viernes-oracle-data

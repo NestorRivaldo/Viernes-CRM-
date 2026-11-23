@@ -1,0 +1,198 @@
+[
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/actividades/adapters/out/persistence/entity/ActividadEntity.java",
+    "sha256": "6ca3fc41230af671315eb83ec0f41ea307d9eea05ac2ec7f6d3b4f4943b4a1ff"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/actividades/adapters/out/persistence/entity/ActividadEtiquetaEntity.java",
+    "sha256": "210c2ab2677baf05f9fd9fa9aef8930eb11e6a50e73f15cccc53800f7572ed77"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/actividades/adapters/out/persistence/entity/ActividadParticipanteEntity.java",
+    "sha256": "1158832c3fb367e3db85054e8642ffc88d16b39b274c4732d2bb92460fbf9972"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/actividades/adapters/out/persistence/RelacionValidationAdapter.java",
+    "sha256": "1e24d9521a8e9176f301f449f29188aace271c6816ffff928dc8ff2c28342f0b"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/actividades/application/service/ActividadService.java",
+    "sha256": "0d34ab922f8ab5b6dda47a6e5134a19f70cbfe89943a755a4e7f96c18d1fc596"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/auth/keycloak/KeycloakSecurityConfig.java",
+    "sha256": "d726f966e0c325fd7eec61ec5f17b7f6962fb22b87eb38094cee9cf1d41354cf"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/clientes/adapters/in/web/ClienteController.java",
+    "sha256": "611f10a7fe7cb0acf3b0c7cdeb6f183a402ec17c0274cb2af51a933560f7472a"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/clientes/adapters/out/persistence/entity/ClienteEntity.java",
+    "sha256": "14bd3655683b8c38b59def2367fc132e3c64b14ca1725cc184ac63a09b171ec3"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/clientes/adapters/out/persistence/entity/ContactoEntity.java",
+    "sha256": "a736e534e39540d184934aa1140ce7b08f95ba9a73aa00955c3974fafe5c0fee"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/clientes/application/service/ClienteService.java",
+    "sha256": "6c6d5ea5e05b66ac7ee44a545ec6110c94c0e0f48c8c2b4dd6d13613521adbc6"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/clientes/domain/Cliente.java",
+    "sha256": "4fc69342a5376ac2e719c79834c41d0914744e3ca758732d15d5431f6efb309c"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/dashboard/application/service/DashboardService.java",
+    "sha256": "364a508a5fe90ac1f07e1baad5b551063db1d186ef3ae52188bd60c38cef89fe"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/equipos/adapters/out/persistence/entity/EquipoEntity.java",
+    "sha256": "e2da5c8db6f3e6c54017e4a2d483a27d797b9e4cbf7668684b0f41e520a6c60b"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/equipos/adapters/out/persistence/entity/EquipoMiembroEntity.java",
+    "sha256": "822154d900dc4bf2cd73410ba0807f6f791681d8a610213c10e6968fee36baca"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/equipos/application/service/EquipoService.java",
+    "sha256": "b70ced9850fdaf0236c7c0bab84eac0b8c0022b80cb69814fb45abc4f65dfd7b"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/etiquetas/adapters/out/persistence/entity/EtiquetaEntity.java",
+    "sha256": "04861f07720cbc242e72dcfb74726ca4444e409df084db3e64550aae024fab20"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/etiquetas/application/service/EtiquetaService.java",
+    "sha256": "26d809643179a9db009b32b76c8a48f0f8a3a1980cf6d39ea81cbd850114ea18"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/leads/adapters/out/persistence/entity/FuenteEntity.java",
+    "sha256": "df8cc0de8ea699d7fc0be8459337da7a58fcb0b9c1e14c5f096f4011afd885e0"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/leads/adapters/out/persistence/entity/LeadEntity.java",
+    "sha256": "d93063bb59412345374857008e34549d89a14dbf97aa834cdcafb64e4344ba94"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/leads/application/service/FuenteService.java",
+    "sha256": "eb30922413c38c3bfd9f1566481c2a92005de18e102ce139f6040330559e6190"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/leads/application/service/LeadService.java",
+    "sha256": "306e2a476dcf58614a36335c201a03d0f01a778826d18fd18d73cade4095bc94"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/leads/domain/Lead.java",
+    "sha256": "a219ce1efe211ef012488dcb99cf2e6b592811cc574c8a37bba632346d516192"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/marketing/adapters/out/persistence/entity/CampaniaEntity.java",
+    "sha256": "8a48ff3439947735e14efa7bedd4f161f913bb2a32f3385e9212e174f929f74d"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/marketing/adapters/out/persistence/entity/CampaniaLeadEntity.java",
+    "sha256": "d685df1aa8a1ae513164db96c511becbd104272682a978abc358605aca0b2581"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/marketing/application/service/CampaniaService.java",
+    "sha256": "73d3e4fbc9ff9ebcb2789f945ad3f8eda05b1ea689b104b5c5d62f70addcd872"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/mensajeria/adapters/out/persistence/entity/MensajeEntity.java",
+    "sha256": "2077a483daa8e926b6a3088abebfd35f18ca1c56e281312dfd1b7c042e4ce119"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/mensajeria/application/service/MensajeService.java",
+    "sha256": "335e3a42494933d0533a7d85cbeca5cace4f6501424ecfa80c56e7807131893e"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/oportunidades/adapters/out/persistence/entity/OportunidadColaboradorEntity.java",
+    "sha256": "089291fd043e4fb9a07e7122703ba4da15efd83da5961a952d438eef5215b89b"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/oportunidades/adapters/out/persistence/entity/OportunidadContactoEntity.java",
+    "sha256": "6d6cec1262811d274bc892ce31424cf84e5b7e4cb4a3652989c90a87d2625c68"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/oportunidades/adapters/out/persistence/entity/OportunidadEntity.java",
+    "sha256": "197ce9989229d01a73ef5ed90e14ee01271be3f97dcd6f082618379d99d0a63e"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/oportunidades/adapters/out/persistence/entity/OportunidadProductoEntity.java",
+    "sha256": "dd2fb3883c45f42c9b7b4b01788816a28b0e58cac5224b329eb9089342347b9c"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/oportunidades/application/service/OportunidadService.java",
+    "sha256": "833c1bbb05680e5745e3c69cd0571f5c097cd5b125e169a1f0b88913ce99e3f7"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/oportunidades/domain/Oportunidad.java",
+    "sha256": "b4f3d1af2ad47f413862ec987560fe7406e99e7ce7c73fd0cb2a268b5dd1ab0c"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/productos/adapters/out/persistence/entity/ProductoEntity.java",
+    "sha256": "af8480b855c8c3cd1d895184610f496784b2f5a98892dcd2d9e81db4f2dcdf84"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/productos/application/service/ProductoService.java",
+    "sha256": "ae9506910a7ae4e57add69015d5dbf78c51351b409d28efbbfe250dc1380e5e9"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/propuestas/adapters/in/web/PropuestaController.java",
+    "sha256": "4cd55f24911999b5ccc0b43b5b1e4a71245dac5ed197311b3991ea25d5af6736"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/propuestas/adapters/out/persistence/entity/DetallePropuestaEntity.java",
+    "sha256": "42ca64db730a2d1ca6800de8d8b9973fff4836bdfb5c7dd3afbd7a822575145c"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/propuestas/adapters/out/persistence/entity/PropuestaEntity.java",
+    "sha256": "58e2a9e8e687f00ccbccfce646170edad49ca7a306f14cd6fad7d7d4e92bdb59"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/propuestas/adapters/out/persistence/PropuestaPersistenceAdapter.java",
+    "sha256": "ac79ebe8a3605ccfd49425101c34cb3d1074010e1d1d524a9b4afdddef61eecb"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/propuestas/application/dto/PropuestaRequest.java",
+    "sha256": "79bd361ab9841252341fe765bd1215712b1b0f98761ec32ce2d6c1271015dd20"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/propuestas/application/service/PropuestaService.java",
+    "sha256": "2b3a22cf68b60f7db6d038bcfed3852c55bc0f12570865230d6719f86290eab4"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/propuestas/domain/Propuesta.java",
+    "sha256": "f60fc9e649b90fa8c7c811d6f7bba3012f461d2f37d379cc9ac2d45edc3e1dab"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/relationshipmap/adapters/in/web/RelationshipMapController.java",
+    "sha256": "6da2e88997e8c4608e45bd0fffe8680cf0382860497fcdcfa189234024063b6c"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/relationshipmap/application/service/RelationshipMapService.java",
+    "sha256": "ce27d7ee52c6fef614b76e9c3961fdc971c3e71da01989b60fa5929386af3b8a"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/usuarios/adapters/out/persistence/entity/UsuarioEntity.java",
+    "sha256": "39926d9bf12c26e3dd867f57527fb701c1afb54eb653a2205d1b2e80e0edf684"
+  },
+  {
+    "archivo": "viernes-backend/src/main/java/com/viernes/usuarios/application/service/UsuarioService.java",
+    "sha256": "4d0a14a07d8099b20409d6ec7bee26549cc29c50829ce39c599ce59193929ff4"
+  },
+  {
+    "archivo": "viernes-backend/src/main/resources/application-dev.yml",
+    "sha256": "d5c531cfa41b25e833890666c1d8cbd3418c235bd8a553e48b98f1234219597d"
+  },
+  {
+    "archivo": "viernes-backend/src/test/java/com/viernes/propuestas/adapters/in/web/PropuestaControllerTest.java",
+    "sha256": "dd759fcd2ba005d4eecf6e66dff90c6840f6ff497b9de70a6718f737121dd1bf"
+  },
+  {
+    "archivo": "viernes-backend/src/test/java/com/viernes/ViernesApplicationTests.java",
+    "sha256": "e82991ded1518544541dcfff702a954954703050990f8ec18a265afcc5214c71"
+  }
+]

@@ -7,3 +7,37 @@ target/
 *.log
 logs/
 .tools/
+# Backups de Oracle (Data Pump)
+viernes-backend/db/backups/*.dmp
+viernes-backend/db/backups/*.log
+base de datos/backups/*.dmp
+base de datos/backups/*.log
+
+# Archivos comprimidos
+*.zip
+
+# --- Trabajo externo: modulo Odoo club_automation + asistente Ollama ---
+# Se conservan a proposito en la raiz, pero NO pertenecen a Viernes CRM.
+# Listados uno por uno para no ignorar archivos legitimamente nuevos.
+assistant_capsule.css
+assistant_capsule.js
+assistant_capsule.xml
+assistant_controller.py
+automation_conversation.py
+automation_wizard_v2.py
+automation_wizard_views_new.xml
+club_automation_wizard_new.py
+controllers_init.py
+fix_manifest.py
+gen_assets.py
+gen_patch.py
+gen_patch2.py
+models_init.py
+patch_args.py
+patch_assets2.py
+patch_csv.py
+patch_tools4.py
+PLAN_OLLAMA_ASISTENTE.md
+test_ollama.json
+__pycache__/
+*.pyc

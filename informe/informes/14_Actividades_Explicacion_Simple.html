@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Actividades explicado como una oficina · Viernes CRM</title>
+<style>
+  :root {
+    --bg: #f4efe4;
+    --paper: #fffdf8;
+    --ink: #23262b;
+    --muted: #626975;
+    --line: #e3d9c6;
+    --accent: #0f766e;
+    --accent-soft: #e6f4f1;
+    --amber: #b45309;
+    --amber-soft: #fdf1e3;
+    --blue: #1d4ed8;
+    --blue-soft: #e8eefc;
+    --rose: #be123c;
+    --rose-soft: #fde8ed;
+    --shadow: 0 12px 34px rgba(35, 38, 43, .09);
+    --radius: 18px;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background:
+      radial-gradient(circle at 12% 0%, #fbf6ea 0, transparent 42%),
+      radial-gradient(circle at 88% 12%, #eef6f2 0, transparent 38%),
+      var(--bg);
+    color: var(--ink);
+    font-family: "Segoe UI", "Trebuchet MS", system-ui, -apple-system, sans-serif;
+    line-height: 1.55;
+  }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .wrap {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 22px 70px;
+  }
+
+  /* ---------- PORTADA ---------- */
+  header.hero {
+    position: relative;
+    margin: 22px auto 0;
+    max-width: 1180px;
+    border-radius: 26px;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 85% 20%, rgba(255,255,255,.18), transparent 45%),
+      linear-gradient(135deg, #0b4f4a 0%, #0f766e 55%, #14958a 100%);
+    color: #f6fffd;
+    padding: 46px 42px 40px;
+    box-shadow: var(--shadow);
+  }
+
+  header.hero::after {
+    content: "";
+    position: absolute;
+    inset: auto -40px -70px auto;
+    width: 260px;
+    height: 260px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.08);
+  }
+
+  .hero-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,.14);
+    border: 1px solid rgba(255,255,255,.24);
+    padding: 6px 13px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+
+  header.hero h1 {
+    font-size: clamp(30px, 4.4vw, 52px);
+    line-height: 1.08;
+    margin: 18px 0 12px;
+    letter-spacing: -.02em;
+    max-width: 850px;
+  }
+
+  header.hero p.lead {
+    font-size: clamp(15px, 1.6vw, 19px);
+    max-width: 760px;
+    color: #d9f3ee;
+    margin: 0 0 26px;
+  }
+
+  .hero-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .hero-pills span {
+    background: rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.22);
+    border-radius: 12px;
+    padding: 8px 13px;
+    font-size: 13.5px;
+    font-weight: 600;
+  }
+
+  /* ---------- NAV ---------- */
+  nav.jump {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    margin: 18px auto 0;
+    max-width: 1180px;
+    background: rgba(255, 253, 248, .93);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 10px 12px;
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    box-shadow: 0 6px 20px rgba(35,38,43,.05);
+  }
+
+  nav.jump a {
+    white-space: nowrap;
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--muted);
+  }
+
+  nav.jump a:hover {
+    background: var(--accent-soft);
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  /* ---------- SECCIONES ---------- */
+  section { margin-top: 44px; }
+
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+
+  .section-head h2 {
+    font-size: clamp(23px, 2.8vw, 32px);
+    margin: 0;
+    letter-spacing: -.015em;
+  }
+
+  .section-head .num {
+    display: inline-grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 11px;
+    background: var(--ink);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 800;
+    flex: 0 0 auto;
+  }
+
+  .section-sub {
+    color: var(--muted);
+    margin: 0 0 20px;
+    max-width: 820px;
+  }
+
+  /* ---------- TARJETAS ---------- */
+  .grid {
+    display: grid;
+    gap: 14px;
+  }
+
+  .grid.two { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+  .grid.three { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+
+  .card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px 20px 18px;
+    box-shadow: var(--shadow);
+  }
+
+  .card h3 {
+    margin: 0 0 6px;
+    font-size: 17px;
+    letter-spacing: -.01em;
+  }
+
+  .card p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 14.5px;
+  }
+
+  .icon {
+    display: inline-grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 13px;
+    background: var(--accent-soft);
+    font-size: 21px;
+    margin-bottom: 12px;
+  }
+
+  .icon.amber { background: var(--amber-soft); }
+  .icon.blue { background: var(--blue-soft); }
+  .icon.rose { background: var(--rose-soft); }
+
+  /* ---------- EDIFICIO ---------- */
+  .building {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+  }
+
+  .floor {
+    display: grid;
+    grid-template-columns: 54px 1fr;
+    gap: 16px;
+    align-items: start;
+    padding: 16px 14px;
+    border-radius: 14px;
+    border: 1px dashed transparent;
+  }
+
+  .floor + .floor { border-top: 1px solid var(--line); }
+
+  .floor:hover {
+    background: #fbf7ee;
+    border-color: var(--line);
+  }
+
+  .floor .lift {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    display: grid;
+    place-items: center;
+    background: var(--accent);
+    color: #fff;
+    font-size: 21px;
+  }
+
+  .floor:nth-child(2) .lift { background: #1d4ed8; }
+  .floor:nth-child(3) .lift { background: #b45309; }
+  .floor:nth-child(4) .lift { background: #7c3aed; }
+  .floor:nth-child(5) .lift { background: #be123c; }
+
+  .floor h3 { margin: 1px 0 3px; font-size: 16px; }
+  .floor p { margin: 0; color: var(--muted); font-size: 14px; }
+  .floor code {
+    display: inline-block;
+    margin-top: 7px;
+    font-size: 12.5px;
+    background: #f1eadc;
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    padding: 2px 7px;
+    color: #4b5563;
+  }
+
+  /* ---------- GLOSARIO ---------- */
+  .glossary .card { padding: 16px 17px; }
+  .glossary .card h3 { font-size: 15.5px; }
+  .glossary .card p { font-size: 13.5px; }
+  .glossary .role { font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); display: block; margin-bottom: 2px; }
+
+  /* ---------- BUSCADOR + ARCHIVOS ---------- */
+  .file-tools {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin: 0 0 18px;
+  }
+
+  .search {
+    flex: 1 1 300px;
+    position: relative;
+  }
+
+  .search input {
+    width: 100%;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    border-radius: 13px;
+    padding: 12px 14px 12px 40px;
+    font: inherit;
+    font-size: 14.5px;
+    color: var(--ink);
+    box-shadow: 0 4px 14px rgba(35,38,43,.04);
+  }
+
+  .search input:focus {
+    outline: 3px solid rgba(15,118,110,.16);
+    border-color: var(--accent);
+  }
+
+  .search::before {
+    content: "🔍";
+    position: absolute;
+    left: 13px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 15px;
+    opacity: .65;
+  }
+
+  .btn {
+    border: 1px solid var(--line);
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: 12px;
+    padding: 11px 15px;
+    font: inherit;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(35,38,43,.04);
+  }
+
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .group {
+    margin-top: 26px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 18px;
+    box-shadow: var(--shadow);
+  }
+
+  .group-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+
+  .group-head h3 { margin: 0; font-size: 19px; }
+
+  .tag {
+    display: inline-block;
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+
+  .tag.fe { background: var(--blue-soft); color: var(--blue); }
+  .tag.db { background: var(--amber-soft); color: var(--amber); }
+  .tag.test { background: var(--rose-soft); color: var(--rose); }
+
+  .group-note {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 2px 0 16px;
+  }
+
+  .files {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+    gap: 9px;
+  }
+
+  .file {
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--accent);
+    border-radius: 11px;
+    padding: 11px 13px;
+    background: #fffefb;
+    transition: transform .12s ease, box-shadow .12s ease;
+  }
+
+  .file:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(35,38,43,.07);
+  }
+
+  .file.fe { border-left-color: var(--blue); }
+  .file.db { border-left-color: var(--amber); }
+  .file.test { border-left-color: var(--rose); }
+
+  .file code {
+    display: block;
+    font-size: 12.7px;
+    font-weight: 700;
+    color: #2f333a;
+    word-break: break-word;
+    margin-bottom: 2px;
+  }
+
+  .file span {
+    display: block;
+    font-size: 13.3px;
+    color: var(--muted);
+    line-height: 1.42;
+  }
+
+  .file.hidden { display: none; }
+
+  .empty-search {
+    display: none;
+    margin-top: 18px;
+    padding: 18px;
+    border: 1px dashed var(--line);
+    border-radius: 14px;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  .empty-search.show { display: block; }
+
+  /* ---------- FLUJO ---------- */
+  .flow {
+    display: grid;
+    gap: 12px;
+    counter-reset: step;
+  }
+
+  .step {
+    display: grid;
+    grid-template-columns: 46px 1fr;
+    gap: 14px;
+    align-items: start;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 15px 17px;
+    box-shadow: 0 5px 16px rgba(35,38,43,.04);
+  }
+
+  .step::before {
+    counter-increment: step;
+    content: counter(step);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 800;
+    font-size: 16px;
+  }
+
+  .step h3 { margin: 0 0 3px; font-size: 15.5px; }
+  .step p { margin: 0; color: var(--muted); font-size: 14px; }
+
+  /* ---------- REGLAS ---------- */
+  .rules {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 10px;
+  }
+
+  .rule {
+    display: flex;
+    gap: 11px;
+    align-items: flex-start;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 13px;
+    padding: 13px 14px;
+    font-size: 14px;
+  }
+
+  .rule b { display: block; margin-bottom: 1px; }
+  .rule span { color: var(--muted); }
+
+  .check {
+    flex: 0 0 auto;
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    display: grid;
+    place-items: center;
+    font-weight: 900;
+    font-size: 13px;
+    margin-top: 1px;
+  }
+
+  /* ---------- TABLA ---------- */
+  .table-wrap {
+    overflow-x: auto;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 560px;
+  }
+
+  th, td {
+    text-align: left;
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--line);
+    font-size: 14px;
+    vertical-align: top;
+  }
+
+  th {
+    background: #faf5ea;
+    font-size: 12px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  tr:last-child td { border-bottom: 0; }
+
+  .pill {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    background: var(--accent-soft);
+    color: var(--accent);
+    white-space: nowrap;
+  }
+
+  .pill.admin { background: var(--rose-soft); color: var(--rose); }
+  .pill.all { background: var(--blue-soft); color: var(--blue); }
+
+  /* ---------- NOTAS ---------- */
+  .note {
+    border-left: 4px solid var(--amber);
+    background: var(--amber-soft);
+    border-radius: 0 14px 14px 0;
+    padding: 14px 17px;
+    font-size: 14px;
+    color: #6b4213;
+    margin-top: 16px;
+  }
+
+  .note b { color: #4b2d0b; }
+
+  .not-yet {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 10px;
+  }
+
+  .not-yet div {
+    background: var(--paper);
+    border: 1px dashed var(--line);
+    border-radius: 13px;
+    padding: 13px 14px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  .not-yet strong { color: var(--ink); }
+
+  /* ---------- PIE ---------- */
+  footer {
+    margin-top: 54px;
+    padding-top: 22px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  footer code {
+    background: #efe7d7;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 12px;
+  }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 640px) {
+    header.hero { padding: 32px 24px; border-radius: 20px; }
+    .wrap { padding: 0 14px 50px; }
+    .floor { grid-template-columns: 42px 1fr; gap: 11px; padding: 14px 8px; }
+    .floor .lift { width: 38px; height: 38px; font-size: 17px; }
+    .step { grid-template-columns: 38px 1fr; gap: 10px; }
+    .step::before { width: 34px; height: 34px; font-size: 14px; }
+  }
+
+  /* ---------- IMPRESIÓN ---------- */
+  @media print {
+    body { background: #fff; }
+    nav.jump, .file-tools, .btn { display: none !important; }
+    header.hero { box-shadow: none; }
+    .card, .group, .table-wrap, .step, .building { box-shadow: none; break-inside: avoid; }
+    section { break-inside: avoid-page; }
+    .file.hidden { display: block !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-kicker">🏢 Viernes CRM · Guía de oficina</div>
+  <h1>Actividades, explicado como una oficina</h1>
+  <p class="lead">
+    Sin tecnicismos: aquí cada carpeta es un departamento, cada archivo es un empleado
+    y cada actividad es una ficha de trabajo que entra por la ventanilla y termina en el archivo.
+  </p>
+  <div class="hero-pills">
+    <span>📞 Llamada</span>
+    <span>🤝 Reunión</span>
+    <span>✅ Tarea</span>
+    <span>🔁 Seguimiento</span>
+    <span>🗂️ 3 cajones</span>
+    <span>👥 29 archivos backend</span>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <nav class="jump" aria-label="Índice">
+    <a href="#idea">La idea</a>
+    <a href="#edificio">El edificio</a>
+    <a href="#glosario">Quién es quién</a>
+    <a href="#archivos">Archivo por archivo</a>
+    <a href="#viaje">El viaje de una ficha</a>
+    <a href="#reglas">Reglas de la casa</a>
+    <a href="#permisos">Permisos</a>
+    <a href="#faltantes">Lo que falta</a>
+  </nav>
+
+  <!-- ================= IDEA ================= -->
+  <section id="idea">
+    <div class="section-head">
+      <span class="num">1</span>
+      <h2>La idea en 30 segundos</h2>
+    </div>
+    <p class="section-sub">
+      <b>Actividades</b> es la libreta de pendientes del equipo comercial. Cada hoja dice
+      qué hay que hacer, cuándo, con quién y en qué estado va.
+    </p>
+
+    <div class="grid three">
+      <div class="card">
+        <div class="icon">📝</div>
+        <h3>Una ficha de trabajo</h3>
+        <p>Cada actividad es una nota con título, tipo, fecha, estado y una descripción libre.</p>
+      </div>
+      <div class="card">
+        <div class="icon amber">📌</div>
+        <h3>Se pega a alguien</h3>
+        <p>Puede estar pegada a un cliente, a un lead, a una oportunidad… o a nada (solo agenda).</p>
+      </div>
+      <div class="card">
+        <div class="icon blue">🏷️</div>
+        <h3>Lleva etiquetas</h3>
+        <p>Hasta 8 etiquetas de colores para clasificarla: “urgente”, “cierre”, “visita”, etc.</p>
+      </div>
+      <div class="card">
+        <div class="icon rose">👥</div>
+        <h3>Puede tener invitados</h3>
+        <p>Una lista de contactos que participan en la reunión o llamada.</p>
+      </div>
+      <div class="card">
+        <div class="icon">🕒</div>
+        <h3>Tiene cuatro estados</h3>
+        <p>Pendiente, en proceso, completada o cancelada. Como una bandeja de entrada.</p>
+      </div>
+      <div class="card">
+        <div class="icon amber">⚠️</div>
+        <h3>Sabe si está vencida</h3>
+        <p>Si sigue pendiente y la fecha ya pasó, la oficina la marca como “vencida”.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= EDIFICIO ================= -->
+  <section id="edificio">
+    <div class="section-head">
+      <span class="num">2</span>
+      <h2>El edificio: qué hace cada carpeta</h2>
+    </div>
+    <p class="section-sub">
+      El backend está organizado como un edificio de oficinas. Cada piso tiene una función
+      y solo se comunica con los demás por las puertas correctas.
+    </p>
+
+    <div class="building">
+      <div class="floor">
+        <div class="lift">🚪</div>
+        <div>
+          <h3>La ventanilla — <code>adapters/in/web</code></h3>
+          <p>Recibe a quien llega de la calle (el navegador) y le toma la solicitud. Aquí vive el <b>Controller</b>.</p>
+        </div>
+      </div>
+      <div class="floor">
+        <div class="lift">🧑‍💼</div>
+        <div>
+          <h3>La oficina del coordinador — <code>application</code></h3>
+          <p>Revisa que el formulario esté bien, aplica las reglas y reparte el trabajo. Aquí vive el <b>Service</b> y los <b>puertos</b>.</p>
+        </div>
+      </div>
+      <div class="floor">
+        <div class="lift">📋</div>
+        <div>
+          <h3>El reglamento — <code>domain</code></h3>
+          <p>Define qué es una actividad, qué tipos existen y qué estados puede tener. Son las fichas y los sellos.</p>
+        </div>
+      </div>
+      <div class="floor">
+        <div class="lift">🧾</div>
+        <div>
+          <h3>Formularios y recibos — <code>application/dto</code></h3>
+          <p>El <b>Request</b> es lo que el cliente llena; el <b>Response</b> es el recibo que se le devuelve.</p>
+        </div>
+      </div>
+      <div class="floor">
+        <div class="lift">🗄️</div>
+        <div>
+          <h3>El archivo — <code>adapters/out/persistence</code></h3>
+          <p>Guarda y busca las fichas en los cajones de Oracle. Aquí viven <b>Adapter</b>, <b>Repository</b> y <b>Entity</b>.</p>
+        </div>
+      </div>
+      <div class="floor">
+        <div class="lift">🌐</div>
+        <div>
+          <h3>La oficina del vendedor — <code>viernes-frontend/.../actividades</code></h3>
+          <p>Es lo que se ve en pantalla: el tablero de actividades y el formulario para crear o editar.</p>
+        </div>
+      </div>
+      <div class="floor">
+        <div class="lift">🏢</div>
+        <div>
+          <h3>El sótano — <code>base de datos</code></h3>
+          <p>Los cajones de verdad: tres tablas y un tablero resumen. Ahí queda todo guardado.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <b>Truco para leer cualquier archivo:</b> el apellido del archivo dice su oficio.
+      Si termina en <b>Controller</b> es ventanilla; en <b>Service</b> es coordinador;
+      en <b>Repository</b> es índice; en <b>Entity</b> es cajón; en <b>Request</b> es formulario;
+      en <b>Response</b> es recibo; en <b>Port</b> es puerta; en <b>Adapter</b> es el empleado que conecta dos oficinas.
+    </div>
+  </section>
+
+  <!-- ================= GLOSARIO ================= -->
+  <section id="glosario">
+    <div class="section-head">
+      <span class="num">3</span>
+      <h2>Quién es quién</h2>
+    </div>
+    <p class="section-sub">Ocho oficios que se repiten en todos los módulos del sistema.</p>
+
+    <div class="grid three glossary">
+      <div class="card">
+        <span class="role">Controller</span>
+        <h3>🚪 El recepcionista</h3>
+        <p>Saluda, recibe la solicitud y la pasa al coordinador. No decide nada por su cuenta.</p>
+      </div>
+      <div class="card">
+        <span class="role">Service</span>
+        <h3>🧑‍💼 El coordinador</h3>
+        <p>El cerebro de la oficina: valida, aplica reglas y ordena qué hacer.</p>
+      </div>
+      <div class="card">
+        <span class="role">DTO</span>
+        <h3>🧾 Formulario y recibo</h3>
+        <p>El <b>Request</b> es lo que entra; el <b>Response</b> es lo que sale.</p>
+      </div>
+      <div class="card">
+        <span class="role">Port</span>
+        <h3>🚪 La puerta</h3>
+        <p>Un contrato: “para guardar, usa esta puerta”. No dice cómo, solo qué se necesita.</p>
+      </div>
+      <div class="card">
+        <span class="role">Adapter</span>
+        <h3>🔌 El conector</h3>
+        <p>El empleado que traduce entre la oficina y el mundo exterior (HTTP, base de datos, otra oficina).</p>
+      </div>
+      <div class="card">
+        <span class="role">Repository</span>
+        <h3>📇 El índice del archivo</h3>
+        <p>Busca cajones por número, por estado o por cliente sin recorrer todo el sótano.</p>
+      </div>
+      <div class="card">
+        <span class="role">Entity</span>
+        <h3>🗃️ El cajón</h3>
+        <p>La caja física que corresponde a una tabla de Oracle.</p>
+      </div>
+      <div class="card">
+        <span class="role">Domain</span>
+        <h3>📖 El reglamento</h3>
+        <p>Las definiciones puras: qué es una actividad, qué tipos y estados existen.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= ARCHIVOS ================= -->
+  <section id="archivos">
+    <div class="section-head">
+      <span class="num">4</span>
+      <h2>Archivo por archivo</h2>
+    </div>
+    <p class="section-sub">
+      Todo el módulo, con una frase por archivo. Usa el buscador si quieres encontrar uno concreto.
+    </p>
+
+    <div class="file-tools">
+      <div class="search">
+        <input id="buscador" type="search" placeholder="Buscar archivo o palabra: servicio, etiqueta, formulario…" aria-label="Buscar archivo" />
+      </div>
+      <button class="btn" type="button" onclick="window.print()">🖨️ Imprimir / PDF</button>
+    </div>
+
+    <!-- BACKEND -->
+    <div class="group">
+      <div class="group-head">
+        <h3>Backend · la oficina de atrás</h3>
+        <span class="tag">29 archivos</span>
+      </div>
+      <p class="group-note">Java + Spring Boot. Es el personal que recibe, decide y archiva.</p>
+
+      <div class="files">
+
+        <div class="file">
+          <code>package-info.java</code>
+          <span>La placa de la oficina: dice con qué otros departamentos puede hablar (clientes, leads, oportunidades, etiquetas, usuarios).</span>
+        </div>
+
+        <div class="file">
+          <code>domain/Actividad.java</code>
+          <span>La ficha en blanco: qué datos lleva una actividad (título, tipo, fecha, estado…).</span>
+        </div>
+
+        <div class="file">
+          <code>domain/EstadoActividad.java</code>
+          <span>Los cuatro sellos del expediente: Pendiente, En proceso, Completada y Cancelada.</span>
+        </div>
+
+        <div class="file">
+          <code>domain/TipoActividad.java</code>
+          <span>Los cuatro colores de etiqueta: Llamada, Reunión, Tarea y Seguimiento.</span>
+        </div>
+
+        <div class="file">
+          <code>domain/ActividadEtiqueta.java</code>
+          <span>El clip que pega una etiqueta a una ficha.</span>
+        </div>
+
+        <div class="file">
+          <code>domain/ActividadParticipante.java</code>
+          <span>Un renglón de la lista de asistencia: qué contacto va a la actividad.</span>
+        </div>
+
+        <div class="file">
+          <code>application/dto/ActividadRequest.java</code>
+          <span>El formulario que llega desde la web. Exige tipo, título y fecha; permite hasta 8 etiquetas.</span>
+        </div>
+
+        <div class="file">
+          <code>application/dto/ActividadResponse.java</code>
+          <span>El recibo que devuelve la oficina, con el aviso de “vencida” y las etiquetas puestas.</span>
+        </div>
+
+        <div class="file">
+          <code>application/dto/ParticipanteRequest.java</code>
+          <span>El papelito para anotar un asistente: solo pide el ID del contacto.</span>
+        </div>
+
+        <div class="file">
+          <code>application/dto/ParticipanteResponse.java</code>
+          <span>El recibo del asistente, ya con su nombre y correo.</span>
+        </div>
+
+        <div class="file">
+          <code>application/port/in/ManageActividadUseCase.java</code>
+          <span>El menú de servicios de la ventanilla: las 17 cosas que se pueden pedir.</span>
+        </div>
+
+        <div class="file">
+          <code>application/port/out/ActividadPersistencePort.java</code>
+          <span>La orden para el archivo: guardar, buscar, listar y borrar fichas.</span>
+        </div>
+
+        <div class="file">
+          <code>application/port/out/ActividadEtiquetaPersistencePort.java</code>
+          <span>La orden para el encargado de los clips: buscar, reemplazar y borrar etiquetas.</span>
+        </div>
+
+        <div class="file">
+          <code>application/port/out/ActividadParticipantePersistencePort.java</code>
+          <span>La orden para el encargado de la lista de asistencia.</span>
+        </div>
+
+        <div class="file">
+          <code>application/port/out/ContactoQueryPort.java</code>
+          <span>La orden para buscar un contacto en la guía telefónica de clientes.</span>
+        </div>
+
+        <div class="file">
+          <code>application/port/out/RelacionValidationPort.java</code>
+          <span>La orden para preguntar a otras oficinas si un cliente, lead u oportunidad existe.</span>
+        </div>
+
+        <div class="file">
+          <code>application/service/ActividadService.java</code>
+          <span>El coordinador: revisa el formulario, aplica las 10 reglas, calcula vencimientos y reparte el trabajo. Es el archivo más importante.</span>
+        </div>
+
+        <div class="file">
+          <code>adapters/in/web/ActividadController.java</code>
+          <span>La ventanilla: recibe las 9 solicitudes HTTP y las pasa al coordinador.</span>
+        </div>
+
+        <div class="file">
+          <code>adapters/out/persistence/ActividadPersistenceAdapter.java</code>
+          <span>El archivador: convierte la ficha de papel en cajón y el cajón en ficha.</span>
+        </div>
+
+        <div class="file">
+          <code>adapters/out/persistence/ActividadEtiquetaPersistenceAdapter.java</code>
+          <span>El encargado de pegar y despegar clips, conservando el orden elegido.</span>
+        </div>
+
+        <div class="file">
+          <code>adapters/out/persistence/ActividadParticipantePersistenceAdapter.java</code>
+          <span>El encargado de anotar y tachar asistentes de la lista.</span>
+        </div>
+
+        <div class="file">
+          <code>adapters/out/persistence/ContactoQueryAdapter.java</code>
+          <span>El buscador de contactos. Hoy recorre toda la guía de clientes; está anotado como deuda técnica.</span>
+        </div>
+
+        <div class="file">
+          <code>adapters/out/persistence/RelacionValidationAdapter.java</code>
+          <span>El verificador: llama a clientes, leads y oportunidades para confirmar que existen antes de guardar.</span>
+        </div>
+
+        <div class="file">
+          <code>adapters/out/persistence/entity/ActividadEntity.java</code>
+          <span>El cajón real llamado CRM_ACTIVIDADES.</span>
+        </div>
+
+        <div class="file">
+          <code>adapters/out/persistence/entity/ActividadEtiquetaEntity.java</code>
+          <span>El cajón de clips llamado CRM_ACTIVIDAD_ETIQUETAS.</span>
+        </div>
+
+        <div class="file">
+          <code>adapters/out/persistence/entity/ActividadParticipanteEntity.java</code>
+          <span>El cajón de asistencias llamado CRM_ACTIVIDAD_PARTICIPANTES.</span>
+        </div>
+
+        <div class="file">
+          <code>adapters/out/persistence/repository/ActividadSpringDataRepository.java</code>
+          <span>El índice del cajón principal: busca por estado, cliente, lead, oportunidad, usuario, etiqueta o vencidas.</span>
+        </div>
+
+        <div class="file">
+          <code>adapters/out/persistence/repository/ActividadEtiquetaSpringDataRepository.java</code>
+          <span>El índice de clips: qué etiquetas tiene cada actividad y en qué orden.</span>
+        </div>
+
+        <div class="file">
+          <code>adapters/out/persistence/repository/ActividadParticipanteSpringDataRepository.java</code>
+          <span>El índice de asistencias: qué contactos van a cada actividad.</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- FRONTEND -->
+    <div class="group">
+      <div class="group-head">
+        <h3>Frontend · la oficina del vendedor</h3>
+        <span class="tag fe">8 archivos</span>
+      </div>
+      <p class="group-note">Angular. Es lo que se ve y se toca en pantalla.</p>
+
+      <div class="files">
+
+        <div class="file fe">
+          <code>actividades.model.ts</code>
+          <span>La leyenda: los nombres de los estados, los tipos y la forma de una actividad en pantalla.</span>
+        </div>
+
+        <div class="file fe">
+          <code>actividades.service.ts</code>
+          <span>El mensajero: lleva los formularios al backend y trae las respuestas.</span>
+        </div>
+
+        <div class="file fe">
+          <code>actividad-list/actividad-list.ts</code>
+          <span>El tablero de corcho: guarda la lista, filtra en memoria, ordena y ofrece los botones de completar, editar y borrar.</span>
+        </div>
+
+        <div class="file fe">
+          <code>actividad-list/actividad-list.html</code>
+          <span>La cartelera visible: barra de búsqueda, filtro por etiqueta, tabla y estados vacíos.</span>
+        </div>
+
+        <div class="file fe">
+          <code>actividad-list/actividad-list.css</code>
+          <span>La decoración del tablero: colores, tarjetas, chips de estado y etiquetas.</span>
+        </div>
+
+        <div class="file fe">
+          <code>actividad-form/actividad-form.ts</code>
+          <span>El formulario de admisión: valida campos, arma la solicitud, guarda un borrador automático y envía.</span>
+        </div>
+
+        <div class="file fe">
+          <code>actividad-form/actividad-form.html</code>
+          <span>El formulario en papel: tipo, título, estado, descripción, fecha, vínculo y etiquetas.</span>
+        </div>
+
+        <div class="file fe">
+          <code>actividad-form/actividad-form.css</code>
+          <span>La presentación del formulario: dos columnas, botones y avisos de error.</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- BASE DE DATOS -->
+    <div class="group">
+      <div class="group-head">
+        <h3>Base de datos · el sótano</h3>
+        <span class="tag db">3 cajones + 1 tablero</span>
+      </div>
+      <p class="group-note">Oracle. Aquí queda todo guardado de verdad.</p>
+
+      <div class="files">
+
+        <div class="file db">
+          <code>CRM_ACTIVIDADES</code>
+          <span>El cajón principal: una fila por actividad, con título, tipo, fecha, estado y vínculos.</span>
+        </div>
+
+        <div class="file db">
+          <code>CRM_ACTIVIDAD_ETIQUETAS</code>
+          <span>El cajón de clips: qué etiqueta va pegada a qué actividad y en qué orden.</span>
+        </div>
+
+        <div class="file db">
+          <code>CRM_ACTIVIDAD_PARTICIPANTES</code>
+          <span>El cajón de asistencias: qué contacto participa en qué actividad.</span>
+        </div>
+
+        <div class="file db">
+          <code>VW_VIERNES_AGENDA</code>
+          <span>El tablero resumen que mezcla actividades con cliente, lead y oportunidad. Existe, pero la app todavía no lo usa.</span>
+        </div>
+
+        <div class="file db">
+          <code>base de datos/03_tablas/07_actividades.sql</code>
+          <span>El plano del cajón principal y sus dos cajones pequeños.</span>
+        </div>
+
+        <div class="file db">
+          <code>base de datos/init/003_esquema.sql</code>
+          <span>El plano general del edificio: incluye las tres tablas de actividades.</span>
+        </div>
+
+        <div class="file db">
+          <code>base de datos/06_vistas/vw_viernes_agenda.sql</code>
+          <span>El plano del tablero resumen.</span>
+        </div>
+
+        <div class="file db">
+          <code>base de datos/08_datos_semilla/seed_datos_demo.sql</code>
+          <span>Las cuatro fichas de ejemplo que ya vienen puestas para probar.</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TESTS -->
+    <div class="group">
+      <div class="group-head">
+        <h3>Pruebas · los inspectores</h3>
+        <span class="tag test">3 archivos</span>
+      </div>
+      <p class="group-note">No atienden público: revisan que la oficina funcione antes de abrir.</p>
+
+      <div class="files">
+
+        <div class="file test">
+          <code>ActividadServiceTest.java</code>
+          <span>19 simulacros del coordinador: crear, etiquetas, vencidas, participantes y errores.</span>
+        </div>
+
+        <div class="file test">
+          <code>ActividadControllerTest.java</code>
+          <span>14 pruebas de la ventanilla: que reciba bien y responda con el código correcto.</span>
+        </div>
+
+        <div class="file test">
+          <code>ActividadEtiquetaPersistenceAdapterTest.java</code>
+          <span>La prueba del encargado de clips: que reemplace etiquetas y respete el orden.</span>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="empty-search" id="sinResultados">
+      No hay archivos que coincidan con esa búsqueda.
+    </div>
+  </section>
+
+  <!-- ================= VIAJE ================= -->
+  <section id="viaje">
+    <div class="section-head">
+      <span class="num">5</span>
+      <h2>El viaje de una ficha</h2>
+    </div>
+    <p class="section-sub">
+      Así se mueve una actividad desde que el vendedor hace clic hasta que queda guardada.
+    </p>
+
+    <div class="flow">
+      <div class="step">
+        <div>
+          <h3>El vendedor pulsa “Nueva actividad”</h3>
+          <p>Se abre el formulario en un cuadro grande, encima del tablero.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div>
+          <h3>Llena el formulario</h3>
+          <p>Elige tipo, escribe el título, la fecha y, si quiere, un cliente, un lead o una oportunidad.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div>
+          <h3>El mensajero lo lleva al backend</h3>
+          <p><code>actividades.service.ts</code> envía el formulario por HTTP a la ventanilla.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div>
+          <h3>La ventanilla lo recibe</h3>
+          <p><code>ActividadController</code> comprueba que el formulario tenga lo mínimo y lo pasa al coordinador.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div>
+          <h3>El coordinador revisa las reglas</h3>
+          <p><code>ActividadService</code> confirma que el cliente/lead/oportunidad exista, que no haya más de 8 etiquetas y que las etiquetas sean reales.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div>
+          <h3>El archivador guarda</h3>
+          <p>Convierte la ficha en un cajón, el índice escribe la fila en Oracle y luego guarda los clips de etiquetas.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div>
+          <h3>Vuelve el recibo</h3>
+          <p>El backend responde con la actividad creada, ya con su número, su estado y su aviso de vencida si corresponde. El tablero se actualiza.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <b>Si algo falla en el camino</b>, el coordinador devuelve un mensaje claro: “cliente no encontrado”,
+      “máximo 8 etiquetas” o “la actividad no existe”. La ficha no se guarda a medias.
+    </div>
+  </section>
+
+  <!-- ================= REGLAS ================= -->
+  <section id="reglas">
+    <div class="section-head">
+      <span class="num">6</span>
+      <h2>Las reglas de la casa</h2>
+    </div>
+    <p class="section-sub">Lo que el coordinador acepta y lo que no.</p>
+
+    <div class="rules">
+      <div class="rule"><span class="check">✓</span><div><b>Tipo, título y fecha</b><span>Son obligatorios. Sin ellos, la ficha no entra.</span></div></div>
+      <div class="rule"><span class="check">✓</span><div><b>Estado por defecto</b><span>Si no se indica, la actividad nace como Pendiente.</span></div></div>
+      <div class="rule"><span class="check">✓</span><div><b>Máximo 8 etiquetas</b><span>Más de ocho, se rechaza.</span></div></div>
+      <div class="rule"><span class="check">✓</span><div><b>Etiquetas reales</b><span>No se puede pegar una etiqueta que no existe en el catálogo.</span></div></div>
+      <div class="rule"><span class="check">✓</span><div><b>Vínculos reales</b><span>El cliente, lead, oportunidad o usuario debe existir.</span></div></div>
+      <div class="rule"><span class="check">✓</span><div><b>Sin invitados repetidos</b><span>Un contacto no puede estar dos veces en la misma actividad.</span></div></div>
+      <div class="rule"><span class="check">✓</span><div><b>Vencida es automático</b><span>Si sigue Pendiente y la fecha ya pasó, se marca sola.</span></div></div>
+      <div class="rule"><span class="check">✓</span><div><b>Una sola vinculación</b><span>En la pantalla sí; en la API no se valida, así que un cliente externo podría mandar varias.</span></div></div>
+    </div>
+  </section>
+
+  <!-- ================= PERMISOS ================= -->
+  <section id="permisos">
+    <div class="section-head">
+      <span class="num">7</span>
+      <h2>Permisos: quién puede hacer qué</h2>
+    </div>
+    <p class="section-sub">Como en una oficina: todos leen, pero no todos firman.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Acción</th>
+            <th>Quién puede</th>
+            <th>Comentario de oficina</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Ver actividades</td>
+            <td><span class="pill all">Todos</span></td>
+            <td>Cualquier empleado con sesión iniciada puede mirar el tablero.</td>
+          </tr>
+          <tr>
+            <td>Crear y editar</td>
+            <td><span class="pill all">Todos</span></td>
+            <td>El vendedor, el jefe y el administrador pueden llenar fichas.</td>
+          </tr>
+          <tr>
+            <td>Marcar completada</td>
+            <td><span class="pill all">Todos</span></td>
+            <td>El botón verde está disponible para todos.</td>
+          </tr>
+          <tr>
+            <td>Eliminar</td>
+            <td><span class="pill admin">Solo ADMIN</span></td>
+            <td>Solo el administrador puede tirar una ficha a la basura.</td>
+          </tr>
+          <tr>
+            <td>Crear etiquetas</td>
+            <td><span class="pill admin">ADMIN / JEFE</span></td>
+            <td>El botón se ve para todos, pero el sistema rechaza al vendedor con un aviso.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ================= FALTANTES ================= -->
+  <section id="faltantes">
+    <div class="section-head">
+      <span class="num">8</span>
+      <h2>Lo que la oficina todavía no hace</h2>
+    </div>
+    <p class="section-sub">Cosas que uno esperaría de una agenda y que hoy no están implementadas.</p>
+
+    <div class="not-yet">
+      <div><strong>No asigna responsable solo.</strong> La pantalla nunca envía el usuario, así que las actividades nacen sin dueño.</div>
+      <div><strong>No avisa por correo.</strong> No hay recordatorios ni notificaciones automáticas.</div>
+      <div><strong>No repite tareas.</strong> No existe “reunión cada lunes”.</div>
+      <div><strong>No guarda historial.</strong> No se sabe quién cambió qué ni cuándo.</div>
+      <div><strong>No impide descompletar.</strong> Una actividad completada puede volver a pendiente.</div>
+      <div><strong>No cruza el buscador del mapa.</strong> El mapa navega con un filtro en la dirección, pero el tablero no lo lee.</div>
+    </div>
+  </section>
+
+  <footer>
+    <p>
+      Guía rápida del módulo <b>actividades</b> de Viernes CRM · 22/11/2026 ·
+      Basada en el código real de <code>E:\Viernes\Viernes</code>.
+    </p>
+    <p>
+      Para profundizar: <code>informe/informes/12_Explicacion_del_Codigo.md</code> (arquitectura general)
+      y <code>informe/informes/13_Auditoria_Codigo_Ajeno.md</code> (limpieza del repositorio).
+    </p>
+  </footer>
+
+</div>
+
+<script>
+  // Buscador sencillo: filtra las tarjetas de archivo por nombre o descripción.
+  const input = document.getElementById('buscador');
+  const files = Array.from(document.querySelectorAll('.file'));
+  const empty = document.getElementById('sinResultados');
+
+  input.addEventListener('input', () => {
+    const q = input.value.toLowerCase().trim();
+    let visibles = 0;
+
+    files.forEach((file) => {
+      const text = file.textContent.toLowerCase();
+      const coincide = !q || text.includes(q);
+      file.classList.toggle('hidden', !coincide);
+      if (coincide) visibles++;
+    });
+
+    empty.classList.toggle('show', visibles === 0);
+  });
+</script>
+
+</body>
+</html>

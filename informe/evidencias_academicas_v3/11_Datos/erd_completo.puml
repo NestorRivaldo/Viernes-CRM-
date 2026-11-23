@@ -1,0 +1,128 @@
+@startuml
+!pragma layout smetana
+title ERD completo — 21 tablas inferidas de JPA; Oracle NO comprobado
+skinparam defaultFontName Segoe UI
+skinparam defaultFontSize 12
+skinparam linetype ortho
+hide methods
+entity "CRM_ACTIVIDADES" as ActividadEntity {
+  * ID_ACTIVIDAD : Long <<PK>>
+  ID_CLIENTE : Long
+  ID_LEAD : Long
+  ID_OPORTUNIDAD : Long
+}
+entity "CRM_ACTIVIDAD_ETIQUETAS" as ActividadEtiquetaEntity {
+  * ID_ACTIVIDAD_ETIQUETA : Long <<PK>>
+  ID_ACTIVIDAD : Long
+  ID_ETIQUETA : Long
+}
+entity "CRM_ACTIVIDAD_PARTICIPANTES" as ActividadParticipanteEntity {
+  * ID_PARTICIPANTE : Long <<PK>>
+  ID_ACTIVIDAD : Long
+  ID_CONTACTO : Long
+}
+entity "CRM_CLIENTES" as ClienteEntity {
+  * ID : Long <<PK>>
+}
+entity "CRM_CONTACTOS" as ContactoEntity {
+  * ID : Long <<PK>>
+  ID_CLIENTE : Long
+}
+entity "CRM_EQUIPOS" as EquipoEntity {
+  * ID : Long <<PK>>
+}
+entity "CRM_EQUIPO_MIEMBROS" as EquipoMiembroEntity {
+  * ID : Long <<PK>>
+  EQUIPO_ID : Long
+  USUARIO_ID : Long
+}
+entity "CRM_ETIQUETAS" as EtiquetaEntity {
+  * ID_ETIQUETA : Long <<PK>>
+}
+entity "CRM_FUENTES" as FuenteEntity {
+  * ID : Long <<PK>>
+}
+entity "CRM_LEADS" as LeadEntity {
+  * ID : Long <<PK>>
+  FUENTE_ID : Long
+}
+entity "CRM_CAMPANIAS" as CampaniaEntity {
+  * ID : Long <<PK>>
+}
+entity "CRM_CAMPANIA_LEADS" as CampaniaLeadEntity {
+  * ID : Long <<PK>>
+  CAMPANIA_ID : Long
+  LEAD_ID : Long
+}
+entity "CRM_MENSAJES" as MensajeEntity {
+  * ID : Long <<PK>>
+}
+entity "CRM_OPORTUNIDAD_COLABORADORES" as OportunidadColaboradorEntity {
+  * ID : Long <<PK>>
+  ID_OPORTUNIDAD : Long
+  ID_USUARIO : Long
+}
+entity "CRM_OPORTUNIDAD_CONTACTOS" as OportunidadContactoEntity {
+  * ID : Long <<PK>>
+  ID_OPORTUNIDAD : Long
+  ID_CONTACTO : Long
+}
+entity "CRM_OPORTUNIDADES" as OportunidadEntity {
+  * ID : Long <<PK>>
+}
+entity "CRM_OPORTUNIDAD_PRODUCTOS" as OportunidadProductoEntity {
+  * ID : Long <<PK>>
+  ID_OPORTUNIDAD : Long
+  ID_PRODUCTO : Long
+}
+entity "CRM_PRODUCTOS" as ProductoEntity {
+  * ID : Long <<PK>>
+}
+entity "CRM_PROPUESTA_DETALLES" as DetallePropuestaEntity {
+  * ID : Long <<PK>>
+  ID_PRODUCTO : Long
+  ID_PROPUESTA : Long (ID del padre)
+}
+entity "CRM_PROPUESTAS" as PropuestaEntity {
+  * ID : Long <<PK>>
+  ID_OPORTUNIDAD : Long
+  ID_CLIENTE : Long
+}
+entity "CRM_USUARIOS" as UsuarioEntity {
+  * ID : Long <<PK>>
+}
+ClienteEntity "1" -- "0..*" ContactoEntity : ID_CLIENTE
+PropuestaEntity "1" -- "0..*" DetallePropuestaEntity : ID_PROPUESTA
+FuenteEntity "0..1" .. "0..*" LeadEntity : FUENTE_ID
+ClienteEntity "1" .. "0..*" PropuestaEntity : ID_CLIENTE
+OportunidadEntity "1" .. "0..*" PropuestaEntity : ID_OPORTUNIDAD
+ProductoEntity "0..1" .. "0..*" DetallePropuestaEntity : ID_PRODUCTO
+ClienteEntity "0..1" .. "0..*" ActividadEntity : ID_CLIENTE
+LeadEntity "0..1" .. "0..*" ActividadEntity : ID_LEAD
+OportunidadEntity "0..1" .. "0..*" ActividadEntity : ID_OPORTUNIDAD
+ActividadEntity "1" .. "0..*" ActividadEtiquetaEntity : ID_ACTIVIDAD
+EtiquetaEntity "1" .. "0..*" ActividadEtiquetaEntity : ID_ETIQUETA
+ActividadEntity "1" .. "0..*" ActividadParticipanteEntity : ID_ACTIVIDAD
+ContactoEntity "1" .. "0..*" ActividadParticipanteEntity : ID_CONTACTO
+OportunidadEntity "1" .. "0..*" OportunidadContactoEntity : ID_OPORTUNIDAD
+ContactoEntity "1" .. "0..*" OportunidadContactoEntity : ID_CONTACTO
+OportunidadEntity "1" .. "0..*" OportunidadProductoEntity : ID_OPORTUNIDAD
+ProductoEntity "1" .. "0..*" OportunidadProductoEntity : ID_PRODUCTO
+OportunidadEntity "1" .. "0..*" OportunidadColaboradorEntity : ID_OPORTUNIDAD
+UsuarioEntity "1" .. "0..*" OportunidadColaboradorEntity : ID_USUARIO
+EquipoEntity "1" .. "0..*" EquipoMiembroEntity : EQUIPO_ID
+UsuarioEntity "1" .. "0..*" EquipoMiembroEntity : USUARIO_ID
+CampaniaEntity "1" .. "0..*" CampaniaLeadEntity : CAMPANIA_ID
+LeadEntity "1" .. "0..*" CampaniaLeadEntity : LEAD_ID
+note bottom of MensajeEntity
+  Emisor como correo/nombre, sin FK JPA.
+end note
+note bottom of ActividadEntity
+  ID_USUARIO: texto; ID numérico o correo.
+end note
+legend bottom
+  Continua = FK declarada por JPA, NO comprobada en Oracle.
+  Discontinua = referencia lógica; cardinalidad de aplicación.
+  Se muestran claves; diccionario CSV/HTML contiene todas las columnas.
+endlegend
+@enduml

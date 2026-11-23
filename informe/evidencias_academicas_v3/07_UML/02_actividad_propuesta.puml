@@ -1,0 +1,63 @@
+@startuml
+!pragma layout smetana
+skinparam defaultFontName Segoe UI
+skinparam defaultFontSize 13
+skinparam shadowing false
+title Actividad de propuesta — acciones disponibles, no motor de workflow
+|Usuario autenticado|
+start
+:Elegir cliente y oportunidad existentes;
+:Preparar cabecera y uno o más detalles;
+|Backend|
+:Bean Validation del request;
+if (¿Request válido?) then (no)
+ :400; no crear;
+ stop
+endif
+:Validar existencia de cliente y oportunidad;
+if (¿Existen?) then (no)
+ :404; no crear;
+ stop
+endif
+:Validar vencimiento >= emisión;
+if (¿Fechas válidas?) then (no)
+ :400; no crear;
+ stop
+endif
+:Numerar PROP-año-(count+1);
+:Resolver producto opcional; completar\ndescripción/precio si no se enviaron;
+if (¿Producto y detalle resolubles?) then (no)
+ :404 producto inexistente o 400 datos faltantes;
+ stop
+endif
+:Calcular cantidad × precio;\nsubtotal y total = subtotal - descuento;
+:Guardar cabecera/detalles BORRADOR\nen una transacción;
+|Usuario autenticado|
+if (¿Enviar ahora?) then (no)
+ :Mantener borrador; se puede editar;
+ |ADMIN|
+ :Opcional: eliminar únicamente en BORRADOR;
+ stop
+else (sí)
+ |Backend|
+ :Exigir BORRADOR y guardar ENVIADA;
+ |JEFE / ADMIN|
+ if (¿Decisión?) then (aprobar)
+  |Backend|
+  :Exigir ENVIADA y guardar APROBADA;
+ elseif (¿Rechazar?) then (sí)
+  |Backend|
+  :Exigir ENVIADA y guardar RECHAZADA;
+ else (cancelar)
+  |Backend|
+  :Exigir estado no terminal y guardar CANCELADA;
+ endif
+endif
+stop
+note right
+ Cancelar también puede solicitarse desde BORRADOR.
+ Un estado inválido produce 409; rol insuficiente 403.
+ El cierre de oportunidad es otra acción de usuario.
+ No se envía email ni se crea una venta automáticamente.
+end note
+@enduml

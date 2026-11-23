@@ -10,6 +10,8 @@ spring:
   jpa:
     open-in-view: false
     hibernate:
+      # En DEV el backend crea/ajusta tablas si faltan. El DDL canónico vive
+      # en viernes-backend/db/init/003_esquema.sql (portable entre PCs).
       ddl-auto: update
     properties:
       hibernate:

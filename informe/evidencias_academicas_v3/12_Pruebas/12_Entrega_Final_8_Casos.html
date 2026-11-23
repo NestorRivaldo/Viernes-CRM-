@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>12. Verificación final de calidad y pruebas</title>
+<style>
+@page { size: A4 landscape; margin: 1.4cm; }
+body { font-family: Calibri, "Segoe UI", sans-serif; color: #163047; background: #f2f5f8; margin: 0; }
+main { max-width: 1500px; margin: auto; background: #fff; padding: 34px 40px; }
+h1 { color: #153e63; border-bottom: 4px solid #1e8293; padding-bottom: 12px; font-size: 24pt; }
+h2 { color: #153e63; margin-top: 28px; font-size: 15pt; break-after: avoid; }
+p, blockquote, td, th { font-size: 9.5pt; line-height: 1.35; }
+blockquote { border-left: 5px solid #dc9b35; background: #fff6e5; margin: 14px 0; padding: 10px 14px; }
+table { border-collapse: collapse; width: 100%; margin: 12px 0 18px; table-layout: fixed; }
+th, td { border: 1px solid #c9d5df; padding: 4px 5px; vertical-align: top; text-align: left; overflow-wrap: anywhere; word-break: break-word; font-size: 8.8pt; }
+th { background: #e7eef5; font-weight: 700; }
+tr { break-inside: avoid; }
+code { font-family: Consolas, monospace; font-size: 8.8pt; background: #eef2f6; padding: 0 2px; }
+strong { color: #0f3554; }
+@media print {
+  body { background: #fff; }
+  main { max-width: none; padding: 0; }
+  h2 { break-after: avoid; }
+  table { page-break-inside: auto; }
+}
+</style>
+</head>
+<body><main>
+<h1>12. Verificación final de calidad y pruebas</h1>
+<blockquote><strong>Nota metodológica.</strong> Los identificadores <code>RF-Dxx</code> y <code>HU-Dxx</code> son la correspondencia técnica provisional que existe en el repositorio; no se presentan como los códigos oficiales del Word académico. Los estados se refieren al alcance realmente evidenciado: <code>Satisfactorio</code> significa que las pruebas backend existentes del alcance pasan, no que exista una aceptación E2E o UAT. No se modificó código, Oracle ni Keycloak. La ejecución backend se toma del registro existente; no se volvió a ejecutar la suite.</blockquote>
+<h2>1. Tabla de ocho casos de prueba</h2>
+<table>
+<colgroup><col style="width:5%"><col style="width:11%"><col style="width:10%"><col style="width:17%"><col style="width:16%"><col style="width:20%"><col style="width:7%"><col style="width:14%"></colgroup>
+<thead><tr><th>ID</th><th>Funcionalidad</th><th>RF / HU</th><th>Procedimiento resumido</th><th>Resultado esperado</th><th>Resultado obtenido</th><th>Estado</th><th>Archivo o evidencia</th></tr></thead>
+<tbody>
+<tr><td>CP-01</td><td>Inicio de sesión y permisos</td><td>RF-D01 / HU-D01</td><td>Portal → Keycloak (admin) → ruta protegida; VENDEDOR contra acción ADMIN (no ejecutado).</td><td>Sesión válida; 401/403 sin token o rol insuficiente.</td><td>Capturas 01–03: portal, Keycloak y dashboard admin. Sin prueba de 401/403.</td><td>Parcial</td><td><code>01_login_portal.png</code>, <code>02_login_keycloak.png</code>, <code>03_dashboard_kpis.png</code>; <code>KeycloakSecurityConfig</code>; sin test</td></tr>
+<tr><td>CP-02</td><td>Gestión de clientes</td><td>RF-D03 / HU-D03 (rel. RF-D04, RF-D05)</td><td>CRUD de cliente; consulta inexistente; validar documento; agregar contacto.</td><td>201/200/204/400/404; documento inválido o duplicado rechazado; contacto asociado.</td><td>42 tests PASS (17+25) y 8 documentales; capturas 04/05. Sin E2E Oracle.</td><td>Satisfactorio</td><td><code>ClienteControllerTest</code> 17; <code>ClienteServiceTest</code> 25; <code>ApisPeruDocumentoAdapterTest</code> 8; <code>04</code>, <code>05</code></td></tr>
+<tr><td>CP-03</td><td>Gestión de leads</td><td>RF-D06 / HU-D06 (rel. RF-D07)</td><td>Listar, filtrar y buscar; CRUD; cambiar estado; validar fuente.</td><td>Filtros y CRUD correctos; estado por defecto <code>NUEVO</code>; 400/404.</td><td>19 tests PASS (11+8); captura 06. No se probó que <code>CONVERTIDO</code> no cree oportunidad.</td><td>Satisfactorio</td><td><code>LeadControllerTest</code> 11; <code>LeadServiceTest</code> 8; <code>06_leads_prospectos.png</code></td></tr>
+<tr><td>CP-04</td><td>Relaciones N:M de oportunidades</td><td>RF-D09 / HU-D09 (rel. RF-D08)</td><td>Asociar contactos (rol/decisor), productos (cantidad) y colaboradores a una oportunidad.</td><td>N:M persistidas y visibles; sin duplicados.</td><td>Captura 08 muestra la UI. Sin tests N:M; 20 tests de oportunidad cubren CRUD/etapa. Sin E2E.</td><td>Parcial</td><td><code>08_oportunidad_detalle_relaciones_nm.png</code>; <code>OportunidadControllerTest</code> 10; <code>OportunidadServiceTest</code> 5; <code>OportunidadTest</code> 5</td></tr>
+<tr><td>CP-05</td><td>Actividades y participantes</td><td>RF-D13 / HU-D13 (rel. RF-D14)</td><td>Crear actividad; ≤8 etiquetas; agregar/quitar participantes; duplicados y vencidas.</td><td>Relaciones persistidas; &gt;8 etiquetas y duplicados rechazados; vencida calculada.</td><td>34 tests PASS (14+18+2); captura 09. Sin E2E.</td><td>Satisfactorio</td><td><code>ActividadControllerTest</code> 14; <code>ActividadServiceTest</code> 18; <code>ActividadEtiquetaPersistenceAdapterTest</code> 2; <code>09</code></td></tr>
+<tr><td>CP-06</td><td>Propuestas y cálculo de totales</td><td>RF-D10 / HU-D10 (rel. RF-D11, RF-D12)</td><td>Crear con detalles; catálogo/override; calcular subtotal/total/descuento; transiciones.</td><td>Cálculo correcto; transiciones válidas; no persistir si falta una relación.</td><td>22 tests PASS (7+15); captura 10. Sin Oracle, concurrencia ni E2E.</td><td>Satisfactorio</td><td><code>PropuestaControllerTest</code> 7; <code>PropuestaServiceTest</code> 15; <code>10_propuestas_comerciales.png</code></td></tr>
+<tr><td>CP-07</td><td>Dashboard</td><td>RF-D18 / HU-D18</td><td>Consultar resumen, KPIs, pipeline, leads, actividades y propuestas; caso vacío.</td><td>Totales y desgloses correctos; caso vacío en cero.</td><td>8 tests PASS (5+3); captura 03. Sin E2E ni caché.</td><td>Satisfactorio</td><td><code>DashboardControllerTest</code> 5; <code>DashboardServiceTest</code> 3; <code>03_dashboard_kpis.png</code></td></tr>
+<tr><td>CP-08</td><td>Mapa contextual de relaciones</td><td>RF-D19 / HU-D19</td><td>Mapa general, cliente 7 y oportunidad 1; expandir/contraer; detalle.</td><td>Nodos y aristas correctos; expansión sin duplicados; 404 solo si el ID no existe.</td><td>7 tests PASS. Capturas 14: 2 nodos/1 arista; 16: 1 nodo/0; 15: 0/0 y error <code>Cliente no encontrado: 1</code>. Sin E2E.</td><td>Parcial</td><td><code>RelationshipMapServiceTest</code> 7; <code>14</code>, <code>15</code>, <code>16</code></td></tr>
+</tbody></table>
+<p><strong>Rutas de las evidencias.</strong> Capturas: <code>E:\Viernes\Viernes\informe\capturas_sistema_v1\</code>. Reportes: <code>E:\Viernes\Viernes\viernes-backend\target\surefire-reports\</code>. Inventario y extracto: <code>E:\Viernes\Viernes\informe\evidencias_academicas_v3\12_Pruebas\</code>.</p>
+<h2>2. Resumen de las pruebas backend ejecutadas</h2>
+<table>
+<colgroup><col style="width:30%"><col style="width:70%"></colgroup>
+<thead><tr><th>Indicador</th><th>Resultado registrado</th></tr></thead>
+<tbody>
+<tr><td>Clases de prueba</td><td>32</td></tr>
+<tr><td>Tests ejecutados</td><td>291</td></tr>
+<tr><td>Fallos / errores / omitidos</td><td>0 / 0 / 0</td></tr>
+<tr><td>Duración informada por Maven</td><td>38,405 s</td></tr>
+<tr><td>Resultado de construcción</td><td><code>BUILD SUCCESS</code></td></tr>
+<tr><td>Base de datos en <code>contextLoads</code></td><td>Oracle <code>23.26.2</code></td></tr>
+<tr><td>Perfiles activos</td><td><code>dev</code>, <code>keycloak</code></td></tr>
+<tr><td>Fin de la ejecución</td><td><code>2026-11-11T09:46:08-05:00</code></td></tr>
+<tr><td>Fuente</td><td>Extracto Maven y reportes Surefire existentes; no es una ejecución nueva</td></tr>
+</tbody></table>
+<p><strong>Lectura correcta del resultado.</strong> La suite es de backend y combina pruebas unitarias, de servicio y de controlador con mocks; solo <code>ViernesApplicationTests.contextLoads</code> conecta con Oracle. El PASS de 291 tests no acredita interfaz, RBAC real con Keycloak, concurrencia, integridad referencial en Oracle ni aceptación de usuarios. Tampoco existe un informe JaCoCo de cobertura. Los casos con prueba backend directa son CP-02, CP-03, CP-05, CP-06, CP-07 y CP-08; CP-01 y CP-04 no tienen prueba backend específica. La ejecución usó <code>ddl-auto:update</code>, por lo que no puede presentarse como estrictamente de solo lectura; no hay evidencia de cambios concretos.</p>
+<h2>3. Registro breve de incidencias</h2>
+<table>
+<colgroup><col style="width:6%"><col style="width:12%"><col style="width:38%"><col style="width:30%"><col style="width:14%"></colgroup>
+<thead><tr><th>ID</th><th>Tipo</th><th>Descripción comprobada</th><th>Evidencia</th><th>Estado</th></tr></thead>
+<tbody>
+<tr><td>I-01</td><td>Error funcional</td><td>El mapa del cliente muestra <code>No se pudo cargar el mapa del cliente: Cliente no encontrado: 1</code>, con 0 nodos y 0 conexiones. La captura 04 muestra clientes con IDs 7, 8, 9, 22 y 62; el ID 1 no aparece. No se dispone de un log en la evidencia que explique por qué la UI solicitó el ID 1; no se atribuye una causa no comprobada.</td><td><code>15_mapa_relaciones_cliente.png</code>, <code>04_clientes_listado.png</code>; <code>RelationshipMapServiceTest#obtenerMapaCliente_NoEncontrado_LanzaExcepcion</code> (verifica un ID inexistente, no la ruta de la UI)</td><td>Abierto; causa pendiente de diagnóstico</td></tr>
+<tr><td>I-02</td><td>Observación</td><td>El mapa de la oportunidad 1 carga solo el nodo raíz: 1 nodo y 0 conexiones. No se puede afirmar que sea un defecto; puede corresponder a un registro sin relaciones cargadas.</td><td><code>16_mapa_relaciones_oportunidad.png</code></td><td>Por confirmar</td></tr>
+<tr><td>I-03</td><td>Limitación de cobertura</td><td>No hay prueba E2E del frontend, UAT ni ejecución de la matriz de permisos con Keycloak real. Las capturas son evidencia visual, no una prueba funcional completa.</td><td>Capturas 01–18; ausencia de reporte frontend</td><td>Abierto</td></tr>
+<tr><td>I-04</td><td>Limitación de cobertura</td><td>Las relaciones N:M de oportunidad (contactos, productos y colaboradores) no tienen pruebas backend específicas; solo existe evidencia visual.</td><td><code>08_oportunidad_detalle_relaciones_nm.png</code>; inventario de 291 tests</td><td>Abierto</td></tr>
+<tr><td>I-05</td><td>Limitación de ejecución</td><td>La corrida backend usó los perfiles <code>dev</code> y <code>keycloak</code> y <code>ddl-auto:update</code>; no es estrictamente de solo lectura. No se observaron cambios concretos, pero no se puede certificar ausencia de DDL.</td><td><code>ejecucion_maven_extracto.txt</code>; <code>application-dev.yml</code></td><td>Informativo</td></tr>
+<tr><td>I-06</td><td>Limitación funcional</td><td>Cambiar un lead a <code>CONVERTIDO</code> solo actualiza su estado; no crea automáticamente la oportunidad ni el cliente. La conversión sigue siendo manual.</td><td><code>06_leads_prospectos.png</code>; índice de capturas, sección 4; <code>LeadService</code></td><td>Documentado; no es un error del alcance actual</td></tr>
+</tbody></table>
+<h2>4. Matriz RF → HU → prueba → evidencia</h2>
+<table>
+<colgroup><col style="width:12%"><col style="width:12%"><col style="width:18%"><col style="width:34%"><col style="width:12%"><col style="width:12%"></colgroup>
+<thead><tr><th>RF provisional</th><th>HU provisional</th><th>Caso</th><th>Prueba o evidencia</th><th>Tipo</th><th>Estado</th></tr></thead>
+<tbody>
+<tr><td>RF-D01</td><td>HU-D01</td><td>CP-01 Inicio de sesión y permisos</td><td>Sin test automatizado; <code>KeycloakSecurityConfig.java</code>; capturas 01 y 02</td><td>Configuración + visual</td><td>Parcial</td></tr>
+<tr><td>RF-D03 (rel. D04, D05)</td><td>HU-D03 (rel. D04, D05)</td><td>CP-02 Gestión de clientes</td><td><code>ClienteControllerTest</code> 17; <code>ClienteServiceTest</code> 25; <code>ApisPeruDocumentoAdapterTest</code> 8; capturas 04 y 05</td><td>Backend + visual</td><td>Satisfactorio</td></tr>
+<tr><td>RF-D06 (rel. D07)</td><td>HU-D06 (rel. D07)</td><td>CP-03 Gestión de leads</td><td><code>LeadControllerTest</code> 11; <code>LeadServiceTest</code> 8; captura 06</td><td>Backend + visual</td><td>Satisfactorio</td></tr>
+<tr><td>RF-D09 (rel. D08)</td><td>HU-D09 (rel. D08)</td><td>CP-04 Relaciones N:M de oportunidades</td><td><code>OportunidadControllerTest</code> 10; <code>OportunidadServiceTest</code> 5; <code>OportunidadTest</code> 5; captura 08; sin pruebas N:M</td><td>Backend CRUD + visual</td><td>Parcial</td></tr>
+<tr><td>RF-D13 (rel. D14)</td><td>HU-D13 (rel. D14)</td><td>CP-05 Actividades y participantes</td><td><code>ActividadControllerTest</code> 14; <code>ActividadServiceTest</code> 18; <code>ActividadEtiquetaPersistenceAdapterTest</code> 2; captura 09</td><td>Backend + visual</td><td>Satisfactorio</td></tr>
+<tr><td>RF-D10 (rel. D11, D12)</td><td>HU-D10 (rel. D11, D12)</td><td>CP-06 Propuestas y totales</td><td><code>PropuestaControllerTest</code> 7; <code>PropuestaServiceTest</code> 15; captura 10</td><td>Backend + visual</td><td>Satisfactorio</td></tr>
+<tr><td>RF-D18</td><td>HU-D18</td><td>CP-07 Dashboard</td><td><code>DashboardControllerTest</code> 5; <code>DashboardServiceTest</code> 3; captura 03</td><td>Backend + visual</td><td>Satisfactorio</td></tr>
+<tr><td>RF-D19</td><td>HU-D19</td><td>CP-08 Mapa contextual de relaciones</td><td><code>RelationshipMapServiceTest</code> 7; capturas 14, 15 y 16</td><td>Backend + visual</td><td>Parcial</td></tr>
+</tbody></table>
+<p><strong>Trazabilidad oficial pendiente.</strong> La matriz anterior usa los IDs técnicos disponibles. La correspondencia con los RF/HU del documento académico debe validarse antes de declararla definitiva; no se inventan códigos oficiales.</p>
+<h2>5. Comprobaciones pendientes</h2>
+<table>
+<colgroup><col style="width:4%"><col style="width:8%"><col style="width:56%"><col style="width:32%"></colgroup>
+<thead><tr><th>#</th><th>Prioridad</th><th>Comprobación pendiente</th><th>Evidencia que falta</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>P1</td><td>Reproducir el mapa del cliente con un ID existente (por ejemplo, 7) y registrar la petición y la respuesta; aclarar por qué la captura solicitó el ID 1. No modificar datos reales.</td><td>Captura de red/consola, respuesta 200/404 y conclusión del diagnóstico</td></tr>
+<tr><td>2</td><td>P1</td><td>E2E del mapa: cargar cliente 7, expandir, contraer y reexpandir; abrir el panel de detalle; verificar que no se duplican nodos ni aristas.</td><td>Secuencia de capturas o video y log de consola</td></tr>
+<tr><td>3</td><td>P1</td><td>RBAC con Keycloak real: sin token, token expirado y VENDEDOR contra aprobar/rechazar/cancelar propuestas y escribir usuarios.</td><td>Respuestas 401/403 y matriz de roles ejecutada</td></tr>
+<tr><td>4</td><td>P2</td><td>N:M de oportunidades: pruebas backend y UI para contactos con rol/decisor, productos con cantidad y colaboradores; verificar duplicados.</td><td>Tests y evidencia de persistencia/recuperación</td></tr>
+<tr><td>5</td><td>P2</td><td>Confirmar que un lead <code>CONVERTIDO</code> no crea oportunidad ni cliente y que la creación sigue siendo manual.</td><td>Prueba de integración y captura del resultado</td></tr>
+<tr><td>6</td><td>P2</td><td>Propuestas: vencimiento anterior a emisión, descuento mayor al subtotal, detalles al límite, correlativo concurrente y transiciones de estado.</td><td>Casos de borde en base aislada y resultados</td></tr>
+<tr><td>7</td><td>P2</td><td>FK, <code>CASCADE</code>/<code>NO ACTION</code> y borrados en Oracle; ejecutar solo en base de prueba aislada.</td><td>Script y resultado; nunca contra datos operativos</td></tr>
+<tr><td>8</td><td>P2</td><td>Dashboard con datos vacíos/parciales e invalidación de caché; generar informe de cobertura JaCoCo.</td><td>Pruebas ejecutadas y reporte de cobertura</td></tr>
+<tr><td>9</td><td>P3</td><td>UAT formal con usuarios, guion, testigo, fecha y aprobación.</td><td>Acta o firma y evidencia de aceptación</td></tr>
+</tbody></table>
+</main></body>
+</html>

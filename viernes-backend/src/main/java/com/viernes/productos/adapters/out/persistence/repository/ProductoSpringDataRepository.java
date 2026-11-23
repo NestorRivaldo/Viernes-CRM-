@@ -10,7 +10,11 @@ import java.util.Optional;
 @Repository
 public interface ProductoSpringDataRepository extends JpaRepository<ProductoEntity, Long> {
     List<ProductoEntity> findByEstado(EstadoProducto estado);
+
     List<ProductoEntity> findByNombreContainingIgnoreCaseOrCodigoContainingIgnoreCase(String nombre, String codigo);
+
     Optional<ProductoEntity> findByCodigo(String codigo);
+
     boolean existsByCodigo(String codigo);
+
 }

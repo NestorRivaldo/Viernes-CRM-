@@ -1,0 +1,123 @@
+@startuml c3_modulo_oportunidades
+!include <C4/C4_Component>
+
+title Viernes CRM V1 — Arquitectura C4 Nivel 3 (Módulo Oportunidades & Relaciones N:M)
+caption Diagrama C4 Nivel 3: Componentes Internos del Módulo Oportunidades y Gestión de Relaciones Muchos a Muchos
+
+LAYOUT_WITH_LEGEND()
+
+' Actores y Contenedores Externos
+Container(spa, "Viernes Frontend SPA", "Angular 22.1 / Material", "Peticiones HTTP REST sobre /api/v1/oportunidades/** con Bearer JWT")
+ContainerDb(db, "Oracle Database Free 23c", "Oracle DB :1521", "Esquema BOM_VENTAS; tablas CRM_OPORTUNIDADES y tablas puente N:M")
+
+' Módulos Externos del Backend (Colaboración Inter-módulo)
+Boundary(b_ext_modules, "Otros Módulos del Backend (Spring Modulith)") {
+    Component(mod_clientes, "Módulo Clientes", "ManageClienteUseCase", "Valida que el contacto exista y pertenezca al cliente de la oportunidad")
+    Component(mod_productos, "Módulo Productos", "ProductoPersistencePort", "Valida existencia, estado activo y precio del producto a cotizar")
+    Component(mod_usuarios, "Módulo Usuarios", "UsuariosApi", "Valida existencia del usuario asignado como colaborador en la oportunidad")
+}
+
+' Límite del Módulo Oportunidades
+Container_Boundary(b_oportunidades, "Módulo Oportunidades (com.viernes.oportunidades)") {
+
+    ' Capa de Adaptadores Web (Entrada)
+    Boundary(b_web, "Adaptadores Web (Inbound)") {
+        Component(ctrl, "OportunidadController", "Spring REST Controller", "Expone endpoints CRUD del pipeline y subrecursos N:M (/contactos, /productos, /colaboradores)")
+    }
+
+    ' Capa de Aplicación
+    Boundary(b_app, "Capa de Aplicación (Application)") {
+        Component(in_port, "ManageOportunidadUseCase", "Inbound Port (Java Interface)", "Contrato de casos de uso para gestión comercial de oportunidades y asociaciones N:M")
+        Component(service, "OportunidadService", "Application Service (@Transactional)", "Orquesta lógica comercial, valida etapas, cálculo de valor ponderado y sincronización N:M")
+
+        ' Puertos de Salida de Persistencia
+        Component(p_port, "OportunidadPersistencePort", "Outbound Port", "Contrato de persistencia para la entidad raíz Oportunidad")
+        Component(pc_port, "OportunidadContactoPersistencePort", "Outbound Port N:M", "Contrato para relaciones Oportunidad ↔ Contacto (rol, esDecisor)")
+        Component(pp_port, "OportunidadProductoPersistencePort", "Outbound Port N:M", "Contrato para relaciones Oportunidad ↔ Producto (cantidad)")
+        Component(pcol_port, "OportunidadColaboradorPersistencePort", "Outbound Port N:M", "Contrato para relaciones Oportunidad ↔ Colaborador (idUsuario)")
+
+        ' Puertos de Consulta Inter-Módulo
+        Component(qc_port, "ContactoQueryPort", "Query Port (Outbound)", "Abstracción para consultar contactos del módulo Clientes")
+        Component(qp_port, "ProductoQueryPort", "Query Port (Outbound)", "Abstracción para consultar productos del módulo Productos")
+        Component(qu_port, "UsuarioQueryPort", "Query Port (Outbound)", "Abstracción para verificar usuarios en el módulo Usuarios")
+    }
+
+    ' Capa de Dominio Puro
+    Boundary(b_domain, "Modelo de Dominio (Domain)") {
+        Component(d_opp, "Oportunidad", "Domain Entity (POJO)", "Entidad raíz; encapsula cálculo getValorPonderado() y validación de etapa")
+        Component(d_opp_c, "OportunidadContacto", "Domain Entity N:M", "Representa vínculo con contacto; contiene atributos rol y esDecisor")
+        Component(d_opp_p, "OportunidadProducto", "Domain Entity N:M", "Representa ítem comercial cotizado; contiene atributo cantidad")
+        Component(d_opp_col, "OportunidadColaborador", "Domain Entity N:M", "Representa co-responsable asignado; contiene idUsuario y creadoEn")
+    }
+
+    ' Capa de Adaptadores de Persistencia y Salida
+    Boundary(b_persistence, "Adaptadores de Persistencia & Salida (Outbound)") {
+        Component(p_adapter, "OportunidadPersistenceAdapter", "JPA Persistence Adapter", "Mapea Oportunidad ↔ OportunidadEntity; ejecuta consultas por etapa/nombre")
+        Component(pc_adapter, "OportunidadContactoPersistenceAdapter", "JPA Persistence Adapter", "Mapea y gestiona registros en CRM_OPORTUNIDAD_CONTACTOS")
+        Component(pp_adapter, "OportunidadProductoPersistenceAdapter", "JPA Persistence Adapter", "Mapea y gestiona registros en CRM_OPORTUNIDAD_PRODUCTOS")
+        Component(pcol_adapter, "OportunidadColaboradorPersistenceAdapter", "JPA Persistence Adapter", "Mapea y gestiona registros en CRM_OPORTUNIDAD_COLABORADORES")
+
+        Component(qc_adapter, "ContactoQueryAdapter", "Query Adapter", "Consume ManageClienteUseCase para verificar el contacto sin acoplar persistencia")
+        Component(qp_adapter, "ProductoQueryAdapter", "Query Adapter", "Consume ProductoPersistencePort para verificar catálogo de productos")
+        Component(qu_adapter, "UsuarioQueryAdapter", "Query Adapter", "Consume UsuariosApi (Named Interface de Modulith) para validar colaboradores")
+    }
+
+    ' Repositorios Spring Data JPA
+    Boundary(b_repos, "Repositorios Spring Data JPA") {
+        Component(repo_opp, "OportunidadSpringDataRepository", "Spring Data Interface", "CRUD y consultas derivadas sobre CRM_OPORTUNIDADES")
+        Component(repo_c, "OportunidadContactoSpringDataRepository", "Spring Data Interface", "Consultas y borrado por idOportunidad / idContacto")
+        Component(repo_p, "OportunidadProductoSpringDataRepository", "Spring Data Interface", "Consultas y borrado por idOportunidad / idProducto")
+        Component(repo_col, "OportunidadColaboradorSpringDataRepository", "Spring Data Interface", "Consultas y borrado por idOportunidad / idUsuario")
+    }
+}
+
+' Relaciones Web y Aplicación
+Rel(spa, ctrl, "Peticiones HTTP REST", "JSON")
+Rel(ctrl, in_port, "Delega ejecución", "Java Interface")
+Rel(in_port, service, "Implementado por", "Spring @Service")
+
+' Servicio y Dominio
+Rel(service, d_opp, "Instancia y consulta lógica", "getValorPonderado()")
+Rel(service, d_opp_c, "Gestiona enlaces N:M", "POJO")
+Rel(service, d_opp_p, "Gestiona enlaces N:M", "POJO")
+Rel(service, d_opp_col, "Gestiona enlaces N:M", "POJO")
+
+' Servicio hacia Puertos de Persistencia
+Rel(service, p_port, "Persistir oportunidad", "Interface call")
+Rel(service, pc_port, "Asignar/desvincular contacto", "Interface call")
+Rel(service, pp_port, "Agregar/quitar producto", "Interface call")
+Rel(service, pcol_port, "Asignar/quitar colaborador", "Interface call")
+
+' Servicio hacia Puertos de Consulta Externa
+Rel(service, qc_port, "Verificar contacto", "Interface call")
+Rel(service, qp_port, "Verificar producto", "Interface call")
+Rel(service, qu_port, "Verificar usuario", "Interface call")
+
+' Implementación de Puertos por Adaptadores
+Rel(p_port, p_adapter, "Implementa", "Spring Bean")
+Rel(pc_port, pc_adapter, "Implementa", "Spring Bean")
+Rel(pp_port, pp_adapter, "Implementa", "Spring Bean")
+Rel(pcol_port, pcol_adapter, "Implementa", "Spring Bean")
+
+Rel(qc_port, qc_adapter, "Implementa", "Spring Bean")
+Rel(qp_port, qp_adapter, "Implementa", "Spring Bean")
+Rel(qu_port, qu_adapter, "Implementa", "Spring Bean")
+
+' Adaptadores hacia Repositorios
+Rel(p_adapter, repo_opp, "Invoca operaciones JPA", "Spring Data")
+Rel(pc_adapter, repo_c, "Invoca operaciones JPA", "Spring Data")
+Rel(pp_adapter, repo_p, "Invoca operaciones JPA", "Spring Data")
+Rel(pcol_adapter, repo_col, "Invoca operaciones JPA", "Spring Data")
+
+' Adaptadores de Consulta hacia Módulos Externos
+Rel(qc_adapter, mod_clientes, "Consulta contacto por ID", "ManageClienteUseCase")
+Rel(qp_adapter, mod_productos, "Consulta producto por ID", "ProductoPersistencePort")
+Rel(qu_adapter, mod_usuarios, "Verifica usuario por ID", "UsuariosApi.existePorId()")
+
+' Repositorios hacia Tablas Físicas de Oracle
+Rel(repo_opp, db, "SELECT / INSERT / UPDATE / DELETE en CRM_OPORTUNIDADES", "JDBC / SQL")
+Rel(repo_c, db, "SELECT / INSERT / DELETE en CRM_OPORTUNIDAD_CONTACTOS", "JDBC / SQL")
+Rel(repo_p, db, "SELECT / INSERT / DELETE en CRM_OPORTUNIDAD_PRODUCTOS", "JDBC / SQL")
+Rel(repo_col, db, "SELECT / INSERT / DELETE en CRM_OPORTUNIDAD_COLABORADORES", "JDBC / SQL")
+
+@enduml

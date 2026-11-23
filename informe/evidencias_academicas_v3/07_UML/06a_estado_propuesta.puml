@@ -1,0 +1,58 @@
+@startuml
+!pragma layout smetana
+title Viernes CRM V1 — Estados de la propuesta comercial
+skinparam shadowing false
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+skinparam stateFontSize 13
+skinparam arrowFontSize 11
+hide empty description
+
+state "BORRADOR" as B
+state "ENVIADA" as E
+state "APROBADA" as A
+state "RECHAZADA" as R
+state "CANCELADA" as C
+
+[*] --> B : crear()\n[siempre inicia en BORRADOR]
+
+B --> E : enviar()\n[requiere BORRADOR]
+E --> A : aprobar()\n[requiere ENVIADA; ADMIN/JEFE]
+E --> R : rechazar()\n[requiere ENVIADA; ADMIN/JEFE]
+
+B --> C : cancelar()\n[ADMIN/JEFE]
+E --> C : cancelar()\n[ADMIN/JEFE]
+
+B --> B : actualizar()\n[solo BORRADOR]
+B --> [*] : eliminar()\n[ADMIN; eliminación del registro]
+
+A --> [*]
+R --> [*]
+C --> [*]
+
+note right of B
+  Edición y eliminación solo en BORRADOR.
+  Eliminar requiere rol ADMIN.
+  El estado no se modifica al editar.
+end note
+
+note right of E
+  Aprobar, rechazar y cancelar requieren
+  rol ADMIN o JEFE (KeycloakSecurityConfig).
+  Enviar no tiene restricción adicional
+  de rol: basta un token válido.
+end note
+
+note bottom of C
+  Estados terminales: APROBADA, RECHAZADA y CANCELADA.
+  cancelar() rechaza la operación si la propuesta
+  ya está en un estado terminal.
+  No existe transición de APROBADA a ENVIADA.
+end note
+
+note bottom of A
+  APROBADA no genera automáticamente una venta,
+  una oportunidad GANADA ni un asiento contable.
+  El cierre comercial es una acción externa.
+end note
+@enduml

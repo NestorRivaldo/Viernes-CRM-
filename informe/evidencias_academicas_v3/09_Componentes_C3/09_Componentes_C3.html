@@ -1,0 +1,927 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>C3 actualizado - Componentes de Viernes CRM V1</title>
+<style>
+@page { size: A4; margin: 2cm 1.7cm 2cm 1.7cm; }
+body {
+  font-family: Calibri, "Segoe UI", Arial, sans-serif;
+  font-size: 10.5pt;
+  line-height: 1.38;
+  color: #1f2937;
+  max-width: 18.2cm;
+  margin: 0 auto;
+  padding: 1.1cm 0.2cm;
+}
+h1 { font-size: 19pt; line-height: 1.2; margin: 0 0 0.35em; color: #101828; }
+h2 { font-size: 14pt; line-height: 1.25; margin: 1.25em 0 0.4em; color: #173f61; page-break-after: avoid; }
+h3 { font-size: 11.8pt; line-height: 1.3; margin: 1em 0 0.3em; color: #1f4e79; page-break-after: avoid; }
+p { margin: 0.35em 0 0.55em; text-align: justify; }
+ul { margin: 0.3em 0 0.7em 1.2em; padding: 0; }
+li { margin: 0.15em 0; }
+strong { color: #101828; }
+hr { border: 0; border-top: 1px solid #d0d5dd; margin: 1.1em 0; }
+blockquote {
+  border-left: 4px solid #2f6fa8;
+  margin: 0.8em 0 0.9em;
+  padding: 0.35em 0.9em;
+  background: #f5f8fc;
+  color: #344054;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.55em 0 1em;
+  font-size: 8.2pt;
+  line-height: 1.26;
+  table-layout: fixed;
+  page-break-inside: auto;
+}
+thead { display: table-header-group; }
+th, td {
+  border: 1px solid #aab4c0;
+  padding: 3.5px 4.5px;
+  vertical-align: top;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+}
+th { background: #e8eef7; font-weight: 700; color: #101828; }
+tr:nth-child(even) td { background: #f8fafc; }
+tr { page-break-inside: avoid; }
+figure {
+  margin: 0.9em 0 1em;
+  text-align: center;
+  page-break-inside: avoid;
+}
+figure img {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid #d0d5dd;
+  background: #fff;
+}
+figcaption {
+  font-size: 8.8pt;
+  color: #475467;
+  margin-top: 4px;
+  text-align: center;
+}
+code {
+  font-family: Consolas, "Courier New", monospace;
+  background: #f2f4f7;
+  padding: 1px 3px;
+  border-radius: 3px;
+  font-size: 8.8pt;
+}
+pre {
+  background: #f8fafc;
+  border: 1px solid #d0d5dd;
+  padding: 8px;
+  overflow: auto;
+  font-size: 8.2pt;
+  line-height: 1.3;
+}
+.page-break { page-break-before: always; }
+@media print {
+  body { max-width: none; margin: 0; padding: 0; }
+  .page-break { page-break-before: always; }
+}
+</style>
+</head>
+<body>
+<h1>C3 actualizado: componentes de Viernes CRM V1</h1>
+<p><strong>Proyecto:</strong> Viernes CRM V1 <strong>Backend:</strong> Spring Boot 4.0.7, Java 21, Spring Modulith 2.0.7 <strong>Fuente de verdad:</strong> árbol de trabajo <code>E:\Viernes\Viernes\viernes-backend</code> al 11/11/2026 <strong>Alcance:</strong> documentación estática de arquitectura; no se modificó código, esquema Oracle, configuración de Keycloak, dependencias ni migraciones.</p>
+<blockquote><p>Este documento reemplaza la vista incompleta de componentes usada en borradores anteriores. El C3 principal es un inventario de módulos; las dependencias internas verificadas se trasladaron al Anexo C3-D y las relaciones N:M a la Tabla 6. Con ello se evita convertir el C3 en un diagrama de tablas o en una maraña de flechas.</p></blockquote>
+<h2>1. Resumen ejecutivo</h2>
+<p>El backend de Viernes CRM V1 está organizado como un monolito modular con Spring Modulith y arquitectura hexagonal. El análisis del árbol de trabajo permitió identificar <strong>15 paquetes de nivel superior</strong>, <strong>17 módulos Modulith</strong> y <strong>14 controladores REST</strong>. Los módulos se clasificaron en ocho comerciales, dos de soporte, tres de administración o consulta y dos técnicos.</p>
+<table>
+<thead><tr>
+<th>Categoría</th>
+<th>Módulos</th>
+<th>N.º</th>
+</tr></thead><tbody>
+<tr>
+<td>Comerciales</td>
+<td><code>clientes</code>, <code>leads</code>, <code>oportunidades</code>, <code>actividades</code>, <code>propuestas</code>, <code>productos</code>, <code>marketing</code>, <code>equipos</code></td>
+<td>8</td>
+</tr>
+<tr>
+<td>Soporte de negocio</td>
+<td><code>etiquetas</code>, <code>mensajeria</code></td>
+<td>2</td>
+</tr>
+<tr>
+<td>Administración y consulta</td>
+<td><code>usuarios</code>, <code>dashboard</code>, <code>relationshipmap</code></td>
+<td>3</td>
+</tr>
+<tr>
+<td>Técnicos</td>
+<td><code>auth</code>, <code>shared</code></td>
+<td>2</td>
+</tr>
+<tr>
+<td><strong>Total de paquetes de nivel superior</strong></td>
+<td></td>
+<td><strong>15</strong></td>
+</tr>
+</tbody></table>
+<p><strong>Tabla 1.</strong> Clasificación funcional de los módulos.</p>
+<p>Los 17 módulos Modulith resultan de los 15 paquetes anteriores más los submódulos <code>shared.exception</code> y <code>shared.ratelimit</code>. La documentación generada por Spring Modulith (<code>all-docs.adoc</code>) lista esos 17 módulos; el grafo <code>components.puml</code> solo muestra 12 porque no todos los módulos participan en relaciones de módulo a módulo. Esta diferencia se explica en la sección 2.3.</p>
+<p>La conclusión principal es que el diseño sigue una dirección razonable: los controladores dependen de puertos de entrada, los servicios implementan esos puertos y la persistencia se resuelve mediante puertos y adaptadores. Las excepciones más relevantes son el acceso directo a repositorios de módulos <code>OPEN</code> en algunos adaptadores de validación, la dependencia directa de <code>Actividades</code> hacia <code>EtiquetaPersistencePort</code> y el uso de JPQL por nombre de entidad en <code>Dashboard</code>. Estas excepciones están identificadas y no se ocultaron en el diagrama.</p>
+<h2>2. Método, fuentes y criterios</h2>
+<h3>2.1 Fuentes revisadas</h3>
+<p>La verificación combinó código fuente y documentación generada:</p>
+<ul><li><code>package-info.java</code> de cada módulo, para conocer tipo (<code>OPEN</code> o <code>CLOSED</code>) y dependencias declaradas.</li><li><code>target/spring-modulith-docs/all-docs.adoc</code> y <code>module-*.adoc</code>, para el inventario de módulos.</li><li><code>target/spring-modulith-docs/components.puml</code>, como grafo secundario de dependencias.</li><li>Controladores, puertos, servicios, adaptadores, entidades y repositorios del backend.</li><li><code>11_Datos/oracle_constraints.csv</code>, para las restricciones físicas de Oracle.</li><li>Informes anteriores, en especial <code>09_Arquitectura_Software.md</code> y la vista antigua de Leads en <code>arquitectura_codigo.html</code>.</li></ul>
+<p>No se ejecutó la aplicación, no se levantó Oracle y no se hicieron pruebas de integración. El resultado es un análisis estático, reproducible y limitado a lo que el árbol de trabajo y las evidencias documentales permiten afirmar.</p>
+<h3>2.2 Decisión sobre el nivel C3</h3>
+<p>En C4, un diagrama C3 muestra los componentes dentro de un contenedor y sus interfaces. En este proyecto, cada módulo Spring Modulith se representa como una caja de componente y las interfaces públicas se indican en su interior. No se representan tablas dentro del C3: las tablas se usan solo como evidencia de persistencia en la Tabla 6.</p>
+<p>El C3 principal no dibuja flechas internas. Esa decisión es deliberada: con 15 módulos y más de veinte relaciones, un grafo completo resultaría ilegible en Word. Las dependencias verificadas no se eliminaron; se trasladaron al Anexo C3-D, donde cada fila indica origen, destino, elemento usado, tipo de acceso y evidencia. Los C3 de Oportunidades y Actividades sí incluyen flechas porque su alcance es un solo módulo y permiten explicar el flujo hexagonal.</p>
+<h3>2.3 Diferencia entre 15, 17 y 12 módulos</h3>
+<ul><li><strong>15</strong> son los paquetes de nivel superior bajo <code>com.viernes</code>.</li><li><strong>17</strong> son los módulos que reconoce la documentación de Spring Modulith, porque <code>shared</code> contiene los submódulos <code>shared.exception</code> y <code>shared.ratelimit</code>.</li><li><strong>12</strong> son los módulos que aparecen en <code>components.puml</code>, el grafo de dependencias generado. <code>auth</code>, <code>dashboard</code> y los componentes de <code>shared</code> no aparecen allí porque no aportan relaciones de módulo a módulo en ese grafo.</li></ul>
+<p>Esta distinción evita un error frecuente: contar el número de cajas del grafo y concluir que faltan módulos. El inventario completo se toma de <code>all-docs.adoc</code> y del código, no solo de <code>components.puml</code>.</p>
+<h2>3. C3 principal</h2>
+<figure><img src="C3_principal.png" alt="Figura 1. C3 principal: inventario de módulos del backend, interfaces principales y contexto externo."><figcaption>Figura 1. C3 principal: inventario de módulos del backend, interfaces principales y contexto externo.</figcaption></figure>
+<p><strong>Figura 1.</strong> C3 principal. Cada caja es un módulo Spring Modulith real, no una tabla. Las dependencias internas están en el Anexo C3-D.</p>
+<h3>3.1 Lectura de la figura</h3>
+<p>La figura agrupa los módulos por color:</p>
+<ul><li><strong>Azul:</strong> núcleo comercial.</li><li><strong>Verde:</strong> soporte de negocio.</li><li><strong>Naranja:</strong> administración.</li><li><strong>Morado:</strong> consulta y lectura.</li><li><strong>Gris:</strong> módulos técnicos.</li></ul>
+<p>Cada caja muestra la interfaz pública principal, el controlador o la ruta base, y una responsabilidad breve. El recuadro amarillo documenta el contexto externo y las convenciones. El frontend Angular consume <code>/api/v1/**</code>; Keycloak emite el JWT y el módulo <code>auth</code> lo valida con Spring Security cuando el perfil <code>keycloak</code> está activo; Oracle es la persistencia JPA/Hibernate; APIsPERU se consulta desde <code>clientes</code> para DNI/RUC.</p>
+<p>El C3 principal no muestra flechas entre módulos. Las dependencias verificadas se encuentran en el Anexo C3-D y en la Tabla 7. Esta separación permite que la figura principal sea legible y que la tabla de dependencias sea auditable fila por fila.</p>
+<h3>3.2 Tabla de módulos y submódulos</h3>
+<table>
+<thead><tr>
+<th>Módulo</th>
+<th>Tipo Modulith</th>
+<th>Responsabilidad e interfaz principal</th>
+<th>Evidencia</th>
+</tr></thead><tbody>
+<tr>
+<td><code>clientes</code></td>
+<td>Comercial, <code>OPEN</code></td>
+<td>Clientes y contactos. <code>ManageClienteUseCase</code>; <code>ClienteController</code> en <code>/api/v1/clientes</code>. Consulta DNI/RUC mediante <code>DocumentoLookupPort</code> y APIsPERU.</td>
+<td><code>clientes/package-info.java</code>, <code>ClienteController</code>, <code>ClienteService</code>, <code>ApisPeruDocumentoAdapter</code></td>
+</tr>
+<tr>
+<td><code>leads</code></td>
+<td>Comercial, <code>OPEN</code></td>
+<td>Leads y fuentes. <code>ManageLeadUseCase</code> y <code>ManageFuenteUseCase</code>; rutas <code>/api/v1/leads</code> y <code>/api/v1/fuentes</code>.</td>
+<td><code>LeadController</code>, <code>FuenteController</code>, <code>LeadService</code>, <code>FuenteService</code></td>
+</tr>
+<tr>
+<td><code>oportunidades</code></td>
+<td>Comercial, <code>OPEN</code></td>
+<td>Pipeline comercial. <code>ManageOportunidadUseCase</code>; <code>/api/v1/oportunidades</code>. Contactos, productos y colaboradores N:M.</td>
+<td><code>OportunidadController</code>, <code>OportunidadService</code>, puertos y adaptadores del módulo</td>
+</tr>
+<tr>
+<td><code>actividades</code></td>
+<td>Comercial, <code>OPEN</code></td>
+<td>Agenda comercial. <code>ManageActividadUseCase</code>; <code>/api/v1/actividades</code>. Participantes y etiquetas N:M.</td>
+<td><code>ActividadController</code>, <code>ActividadService</code>, <code>RelacionValidationAdapter</code></td>
+</tr>
+<tr>
+<td><code>propuestas</code></td>
+<td>Comercial, <code>OPEN</code></td>
+<td>Propuestas y detalles. <code>ManagePropuestaUseCase</code>; <code>/api/v1/propuestas</code>. Valida cliente, oportunidad y producto.</td>
+<td><code>PropuestaController</code>, <code>PropuestaService</code>, <code>PropuestaRelacionValidationAdapter</code></td>
+</tr>
+<tr>
+<td><code>productos</code></td>
+<td>Comercial, <code>OPEN</code></td>
+<td>Catálogo de productos. <code>ManageProductoUseCase</code>; <code>/api/v1/productos</code>.</td>
+<td><code>ProductoController</code>, <code>ProductoService</code>, <code>ProductoPersistenceAdapter</code></td>
+</tr>
+<tr>
+<td><code>marketing</code></td>
+<td>Comercial, <code>OPEN</code></td>
+<td>Campañas y asociación campaña-lead. <code>ManageCampaniaUseCase</code>; <code>/api/v1/campanias</code>.</td>
+<td><code>CampaniaController</code>, <code>CampaniaService</code>, <code>CampaniaLeadPersistenceAdapter</code></td>
+</tr>
+<tr>
+<td><code>equipos</code></td>
+<td>Comercial, <code>CLOSED</code></td>
+<td>Equipos y miembros. <code>ManageEquipoUseCase</code>; <code>/api/v1/equipos</code>. Depende de <code>UsuariosApi</code>.</td>
+<td><code>EquipoController</code>, <code>EquipoService</code>, <code>UsuarioValidationAdapter</code></td>
+</tr>
+<tr>
+<td><code>etiquetas</code></td>
+<td>Soporte, <code>OPEN</code></td>
+<td>Catálogo de etiquetas. <code>ManageEtiquetaUseCase</code> y <code>EtiquetaPersistencePort</code>; <code>/api/v1/etiquetas</code>.</td>
+<td><code>EtiquetaController</code>, <code>EtiquetaService</code>, <code>EtiquetaPersistencePort</code></td>
+</tr>
+<tr>
+<td><code>mensajeria</code></td>
+<td>Soporte, <code>CLOSED</code></td>
+<td>Mensajería interna. <code>ManageMensajeUseCase</code>; <code>/api/v1/mensajeria</code>. Usa <code>UsuariosApi</code>.</td>
+<td><code>MensajeController</code>, <code>MensajeService</code></td>
+</tr>
+<tr>
+<td><code>usuarios</code></td>
+<td>Administración, <code>CLOSED</code></td>
+<td>Usuarios y roles. <code>UsuariosApi</code>, <code>ManageUsuarioUseCase</code> y <code>UsuarioConsultaPort</code>; <code>/api/v1/usuarios</code>.</td>
+<td><code>UsuarioController</code>, <code>UsuarioService</code>, <code>UsuariosApi</code></td>
+</tr>
+<tr>
+<td><code>dashboard</code></td>
+<td>Consulta, <code>OPEN</code></td>
+<td>KPIs y agregados. <code>DashboardUseCase</code>; <code>/api/v1/dashboard</code>. Usa JPQL por nombre de entidad.</td>
+<td><code>DashboardController</code>, <code>DashboardQueryRepository</code></td>
+</tr>
+<tr>
+<td><code>relationshipmap</code></td>
+<td>Consulta, <code>OPEN</code></td>
+<td>Mapa de relaciones entre entidades. <code>ManageRelationshipMapUseCase</code>; <code>/api/v1/relationship-map</code>. Consume cinco casos de uso y <code>UsuariosApi</code>.</td>
+<td><code>RelationshipMapController</code>, <code>RelationshipMapService</code></td>
+</tr>
+<tr>
+<td><code>auth</code></td>
+<td>Técnico, <code>CLOSED</code></td>
+<td>Seguridad OAuth2/OIDC. <code>SecurityFilterChain</code>, conversor JWT y <code>PasswordEncoder</code>; solo activo con perfil <code>keycloak</code>.</td>
+<td><code>KeycloakSecurityConfig</code>, <code>KeycloakJwtAuthenticationConverter</code>, <code>PasswordEncoderConfig</code></td>
+</tr>
+<tr>
+<td><code>shared</code></td>
+<td>Técnico, contenedor</td>
+<td>Infraestructura transversal: <code>OpenApiConfig</code>, <code>CorrelationIdFilter</code>, <code>CacheConfig</code>, <code>CacheRefreshJob</code>.</td>
+<td><code>shared/</code></td>
+</tr>
+<tr>
+<td><code>shared.exception</code></td>
+<td>Técnico, <code>OPEN</code></td>
+<td><code>ResourceNotFoundException</code>, <code>RateLimitExceededException</code>, <code>GlobalExceptionHandler</code>.</td>
+<td><code>shared/exception/</code></td>
+</tr>
+<tr>
+<td><code>shared.ratelimit</code></td>
+<td>Técnico, <code>OPEN</code></td>
+<td><code>ConsultaDocumentoRateLimiter</code>, usado por <code>clientes</code>.</td>
+<td><code>shared/ratelimit/</code></td>
+</tr>
+</tbody></table>
+<p><strong>Tabla 2.</strong> Inventario de módulos y submódulos. La columna de evidencia indica la clase o archivo principal; no sustituye la revisión del paquete completo.</p>
+<h3>3.3 Controladores REST</h3>
+<table>
+<thead><tr>
+<th>Módulo</th>
+<th>Controlador</th>
+<th>Ruta base</th>
+<th>Observación</th>
+</tr></thead><tbody>
+<tr>
+<td><code>actividades</code></td>
+<td><code>ActividadController</code></td>
+<td><code>/api/v1/actividades</code></td>
+<td>CRUD, filtros, estado, participantes</td>
+</tr>
+<tr>
+<td><code>clientes</code></td>
+<td><code>ClienteController</code></td>
+<td><code>/api/v1/clientes</code></td>
+<td>CRUD y consulta de documentos</td>
+</tr>
+<tr>
+<td><code>dashboard</code></td>
+<td><code>DashboardController</code></td>
+<td><code>/api/v1/dashboard</code></td>
+<td>KPIs de lectura</td>
+</tr>
+<tr>
+<td><code>equipos</code></td>
+<td><code>EquipoController</code></td>
+<td><code>/api/v1/equipos</code></td>
+<td>CRUD y miembros</td>
+</tr>
+<tr>
+<td><code>etiquetas</code></td>
+<td><code>EtiquetaController</code></td>
+<td><code>/api/v1/etiquetas</code></td>
+<td>CRUD de catálogo</td>
+</tr>
+<tr>
+<td><code>leads</code></td>
+<td><code>LeadController</code></td>
+<td><code>/api/v1/leads</code></td>
+<td>CRUD y filtros</td>
+</tr>
+<tr>
+<td><code>leads</code></td>
+<td><code>FuenteController</code></td>
+<td><code>/api/v1/fuentes</code></td>
+<td>Catálogo de fuentes</td>
+</tr>
+<tr>
+<td><code>marketing</code></td>
+<td><code>CampaniaController</code></td>
+<td><code>/api/v1/campanias</code></td>
+<td>CRUD y leads asociados</td>
+</tr>
+<tr>
+<td><code>mensajeria</code></td>
+<td><code>MensajeController</code></td>
+<td><code>/api/v1/mensajeria</code></td>
+<td>Bandeja interna</td>
+</tr>
+<tr>
+<td><code>oportunidades</code></td>
+<td><code>OportunidadController</code></td>
+<td><code>/api/v1/oportunidades</code></td>
+<td>CRUD y subrecursos N:M</td>
+</tr>
+<tr>
+<td><code>productos</code></td>
+<td><code>ProductoController</code></td>
+<td><code>/api/v1/productos</code></td>
+<td>CRUD de catálogo</td>
+</tr>
+<tr>
+<td><code>propuestas</code></td>
+<td><code>PropuestaController</code></td>
+<td><code>/api/v1/propuestas</code></td>
+<td>CRUD y transiciones</td>
+</tr>
+<tr>
+<td><code>relationshipmap</code></td>
+<td><code>RelationshipMapController</code></td>
+<td><code>/api/v1/relationship-map</code></td>
+<td>Consulta agregada</td>
+</tr>
+<tr>
+<td><code>usuarios</code></td>
+<td><code>UsuarioController</code></td>
+<td><code>/api/v1/usuarios</code></td>
+<td>Usuarios y roles</td>
+</tr>
+</tbody></table>
+<p><strong>Tabla 3.</strong> Catorce controladores REST identificados. <code>auth</code> no expone controlador; su función es configurar seguridad.</p>
+<h3>3.4 Contexto externo y seguridad</h3>
+<p>El frontend Angular consume la API por HTTPS/JSON. Keycloak emite el token JWT y <code>KeycloakSecurityConfig</code> configura un <code>SecurityFilterChain</code> sin estado, con <code>@Profile("keycloak")</code>. Las reglas principales son:</p>
+<ul><li>Escritura de usuarios: solo <code>ADMIN</code>.</li><li>Aprobación, rechazo o cancelación de propuestas: <code>ADMIN</code> y <code>JEFE</code>.</li><li>Eliminación de clientes, leads, oportunidades, propuestas y actividades: solo <code>ADMIN</code>.</li><li>Escritura de catálogos y estructura comercial (<code>productos</code>, <code>campanias</code>, <code>fuentes</code>, <code>equipos</code>, <code>etiquetas</code>): <code>ADMIN</code> y <code>JEFE</code>.</li><li>Lectura y resto de operaciones autenticadas: cualquier usuario con token válido.</li></ul>
+<p>El módulo <code>auth</code> declara <code>allowedDependencies = {"usuarios"}</code>, pero no importa clases de <code>usuarios</code> en el código actual. Es una dependencia declarada y no usada; se mantiene como permiso de módulo, no como relación efectiva.</p>
+<h2>4. C3 de Oportunidades</h2>
+<figure><img src="C3_oportunidades.png" alt="Figura 2. C3 del módulo Oportunidades: controlador, puerto de entrada, servicio, dominio, puertos, adaptadores y dependencias externas."><figcaption>Figura 2. C3 del módulo Oportunidades: controlador, puerto de entrada, servicio, dominio, puertos, adaptadores y dependencias externas.</figcaption></figure>
+<p><strong>Figura 2.</strong> C3 del módulo Oportunidades. Las flechas entre capas son agregadas; el mapeo exacto puerto-adaptador está alineado y se detalla en la Tabla 6.</p>
+<h3>4.1 Flujo de componentes</h3>
+<p>El controlador <code>OportunidadController</code> depende únicamente de <code>ManageOportunidadUseCase</code>. <code>OportunidadService</code> implementa ese puerto de entrada y orquesta cuatro puertos de persistencia y tres puertos de consulta:</p>
+<ul><li><code>OportunidadPersistencePort</code>: CRUD, filtros, pipeline y búsqueda.</li><li><code>OportunidadContactoPersistencePort</code>, <code>OportunidadProductoPersistencePort</code> y <code>OportunidadColaboradorPersistencePort</code>: asociaciones N:M.</li><li><code>ContactoQueryPort</code>, <code>ProductoQueryPort</code> y <code>UsuarioQueryPort</code>: validación de la contraparte externa.</li></ul>
+<p>Los adaptadores de persistencia usan repositorios Spring Data y entidades JPA con IDs escalares. Los adaptadores de consulta delegan en <code>ManageClienteUseCase</code>, <code>ManageProductoUseCase</code> y <code>UsuariosApi</code>, respectivamente. El servicio lanza <code>ResourceNotFoundException</code> cuando la oportunidad o la contraparte no existe, y <code>IllegalArgumentException</code> cuando la asociación ya existe.</p>
+<h3>4.2 Endpoints principales</h3>
+<table>
+<thead><tr>
+<th>Recurso</th>
+<th>Métodos</th>
+<th>Ruta</th>
+<th>Observación</th>
+</tr></thead><tbody>
+<tr>
+<td>Oportunidades</td>
+<td>GET, POST, PUT, PATCH, DELETE</td>
+<td><code>/api/v1/oportunidades</code>, <code>/{id}</code>, <code>/{id}/etapa</code></td>
+<td>PATCH de etapa con <code>?etapa=...</code></td>
+</tr>
+<tr>
+<td>Contactos</td>
+<td>GET, POST, PUT, DELETE</td>
+<td><code>/{id}/contactos</code>, <code>/{id}/contactos/{contactoId}</code></td>
+<td>PUT actualiza rol y <code>esDecisor</code></td>
+</tr>
+<tr>
+<td>Productos</td>
+<td>GET, POST, DELETE</td>
+<td><code>/{id}/productos</code>, <code>/{id}/productos/{productoId}</code></td>
+<td><code>cantidad</code> es el único dato propio de la asociación</td>
+</tr>
+<tr>
+<td>Colaboradores</td>
+<td>GET, POST, DELETE</td>
+<td><code>/{id}/colaboradores</code>, <code>/{id}/colaboradores/{usuarioId}</code></td>
+<td>Valida usuario con <code>UsuariosApi</code></td>
+</tr>
+</tbody></table>
+<p><strong>Tabla 4.</strong> Endpoints del módulo Oportunidades. La ruta base es <code>/api/v1/oportunidades</code>.</p>
+<h3>4.3 Relaciones N:M de Oportunidades</h3>
+<p>Las tres asociaciones se modelan con entidades puente explícitas:</p>
+<ul><li><code>OportunidadContacto</code>: <code>idOportunidad</code>, <code>idContacto</code>, <code>rol</code>, <code>esDecisor</code>, <code>creadoEn</code>.</li><li><code>OportunidadProducto</code>: <code>idOportunidad</code>, <code>idProducto</code>, <code>cantidad</code>, <code>creadoEn</code>. El precio no se persiste en la asociación: se obtiene de <code>ProductoResponse</code> al construir la respuesta.</li><li><code>OportunidadColaborador</code>: <code>idOportunidad</code>, <code>idUsuario</code>, <code>creadoEn</code>.</li></ul>
+<p>No hay <code>@ManyToMany</code> ni <code>@JoinTable</code>. Cada entidad tiene su repositorio, puerto y adaptador. La Tabla 6 consolida las restricciones Oracle y los endpoints.</p>
+<h2>5. C3 de Actividades</h2>
+<figure><img src="C3_actividades.png" alt="Figura 3. C3 del módulo Actividades: participantes, etiquetas, validaciones externas y persistencia."><figcaption>Figura 3. C3 del módulo Actividades: participantes, etiquetas, validaciones externas y persistencia.</figcaption></figure>
+<p><strong>Figura 3.</strong> C3 del módulo Actividades. El puerto <code>EtiquetaPersistencePort</code> pertenece al módulo Etiquetas y se muestra como dependencia externa.</p>
+<h3>5.1 Flujo de componentes</h3>
+<p><code>ActividadController</code> depende de <code>ManageActividadUseCase</code>; <code>ActividadService</code> implementa el puerto y orquesta cinco puertos internos:</p>
+<ul><li><code>ActividadPersistencePort</code>: CRUD, filtros por estado, cliente, lead, oportunidad, etiqueta, usuario, tipo y vencidas.</li><li><code>ActividadParticipantePersistencePort</code>: asociación actividad-contacto.</li><li><code>ActividadEtiquetaPersistencePort</code>: asociación actividad-etiqueta, con reemplazo en bloque y orden.</li><li><code>ContactoQueryPort</code>: consulta de contactos para participantes.</li><li><code>RelacionValidationPort</code>: validación de cliente, lead, oportunidad y usuario.</li></ul>
+<p>Además, <code>ActividadService</code> depende directamente de <code>EtiquetaPersistencePort</code>, un puerto de salida del módulo <code>etiquetas</code>. Esta es una dependencia entre módulos verificada y se representa como caja externa en la Figura 3.</p>
+<h3>5.2 Endpoints principales</h3>
+<table>
+<thead><tr>
+<th>Recurso</th>
+<th>Métodos</th>
+<th>Ruta</th>
+<th>Observación</th>
+</tr></thead><tbody>
+<tr>
+<td>Actividades</td>
+<td>GET, POST, PUT, PATCH, DELETE</td>
+<td><code>/api/v1/actividades</code>, <code>/{id}</code>, <code>/{id}/estado</code></td>
+<td><code>listar</code> acepta filtros por estado, cliente, lead, oportunidad, etiqueta, usuario y vencidas</td>
+</tr>
+<tr>
+<td>Participantes</td>
+<td>GET, POST, DELETE</td>
+<td><code>/{id}/participantes</code>, <code>/{id}/participantes/{contactoId}</code></td>
+<td>Asociación actividad-contacto</td>
+</tr>
+<tr>
+<td>Etiquetas</td>
+<td>No hay subrecurso</td>
+<td><code>etiquetaIds</code> en <code>ActividadRequest</code></td>
+<td>Máximo 8; se reemplazan en bloque; no existe <code>/etiquetas</code> como subrecurso</td>
+</tr>
+</tbody></table>
+<p><strong>Tabla 5.</strong> Endpoints del módulo Actividades. La ruta base es <code>/api/v1/actividades</code>.</p>
+<h3>5.3 Participantes y etiquetas</h3>
+<p><strong>Participantes.</strong> <code>ActividadParticipante</code> guarda <code>idActividad</code>, <code>idContacto</code> y <code>creadoEn</code>. Al agregar un participante, el servicio verifica que la actividad exista, busca el contacto con <code>ContactoQueryPort</code> y rechaza duplicados con <code>existsByIdActividadAndIdContacto</code>. El adaptador <code>ContactoQueryAdapter</code> usa <code>ManageClienteUseCase</code>; como ese caso de uso no expone una búsqueda directa por ID de contacto, recorre clientes y contactos. Es una decisión de implementación verificada, no una relación conceptual.</p>
+<p><strong>Etiquetas.</strong> <code>ActividadEtiqueta</code> guarda <code>idActividad</code>, <code>idEtiqueta</code>, <code>orden</code> y <code>creadoEn</code>. El servicio recibe <code>etiquetaIds</code> en <code>ActividadRequest</code>, elimina duplicados, valida que existan con <code>EtiquetaPersistencePort</code> y limita el total a ocho. <code>ActividadEtiquetaPersistenceAdapter.reemplazarEtiquetas</code> borra las filas anteriores, hace <code>flush</code> y vuelve a insertar con <code>orden</code> 0..n-1. No hay endpoint de etiquetas por actividad; el reemplazo ocurre al crear o actualizar la actividad.</p>
+<p><strong>Validación externa.</strong> <code>RelacionValidationAdapter</code> implementa <code>RelacionValidationPort</code> y accede directamente a <code>ClienteSpringDataRepository</code>, <code>LeadSpringDataRepository</code>, <code>OportunidadSpringDataRepository</code> y <code>UsuariosApi</code>. Es una dependencia a infraestructura de módulos <code>OPEN</code>, permitida por la declaración de módulo, pero más acoplada que el uso de un caso de uso o de una API nombrada.</p>
+<h3>5.4 Borrado y cascada</h3>
+<p><code>ActividadService.eliminar</code> borra primero las etiquetas, luego los participantes y finalmente la actividad. Oracle también define <code>ON DELETE CASCADE</code> en las tablas puente según <code>oracle_constraints.csv</code>. La aplicación y la base de datos protegen la integridad por dos vías; no se ejecutó una prueba transaccional para verificar el orden efectivo de ambas.</p>
+<h2>6. Relaciones N:M verificadas</h2>
+<p>Las siete relaciones N:M del sistema se materializan con entidades puente explícitas. A nivel JPA no se declara <code>@ManyToMany</code>; las entidades usan IDs escalares y repositorios propios. A nivel Oracle, la metadata muestra claves foráneas y restricciones únicas. Esta separación permite atributos propios en la relación, como <code>rol</code>, <code>esDecisor</code>, <code>cantidad</code> u <code>orden</code>.</p>
+<table>
+<thead><tr>
+<th>Relación</th>
+<th>Entidad puente, puerto y adaptador</th>
+<th>Tabla Oracle y restricción única</th>
+<th>Endpoints o uso</th>
+<th>Evidencia</th>
+</tr></thead><tbody>
+<tr>
+<td>Oportunidad-Contacto</td>
+<td><code>OportunidadContacto</code>; <code>OportunidadContactoPersistencePort</code>; <code>OportunidadContactoPersistenceAdapter</code></td>
+<td><code>CRM_OPORTUNIDAD_CONTACTOS</code>; <code>UK_OPORTUNIDAD_CONTACTO</code> (<code>ID_OPORTUNIDAD</code>, <code>ID_CONTACTO</code>)</td>
+<td>GET/POST <code>/{id}/contactos</code>; PUT/DELETE <code>/{id}/contactos/{contactoId}</code></td>
+<td>Entidad, puerto, adaptador y <code>oracle_constraints.csv</code></td>
+</tr>
+<tr>
+<td>Oportunidad-Producto</td>
+<td><code>OportunidadProducto</code>; <code>OportunidadProductoPersistencePort</code>; <code>OportunidadProductoPersistenceAdapter</code></td>
+<td><code>CRM_OPORTUNIDAD_PRODUCTOS</code>; <code>UK_OPORTUNIDAD_PRODUCTO</code> (<code>ID_OPORTUNIDAD</code>, <code>ID_PRODUCTO</code>)</td>
+<td>GET/POST <code>/{id}/productos</code>; DELETE <code>/{id}/productos/{productoId}</code></td>
+<td>Entidad, puerto, adaptador y <code>oracle_constraints.csv</code></td>
+</tr>
+<tr>
+<td>Oportunidad-Colaborador</td>
+<td><code>OportunidadColaborador</code>; <code>OportunidadColaboradorPersistencePort</code>; <code>OportunidadColaboradorPersistenceAdapter</code></td>
+<td><code>CRM_OPORTUNIDAD_COLABORADORES</code>; <code>UK_OPORTUNIDAD_COLABORADOR</code> (<code>ID_OPORTUNIDAD</code>, <code>ID_USUARIO</code>)</td>
+<td>GET/POST <code>/{id}/colaboradores</code>; DELETE <code>/{id}/colaboradores/{usuarioId}</code></td>
+<td>Entidad, puerto, adaptador y <code>oracle_constraints.csv</code></td>
+</tr>
+<tr>
+<td>Actividad-Participante</td>
+<td><code>ActividadParticipante</code>; <code>ActividadParticipantePersistencePort</code>; <code>ActividadParticipantePersistenceAdapter</code></td>
+<td><code>CRM_ACTIVIDAD_PARTICIPANTES</code>; <code>UK_ACTIVIDAD_CONTACTO</code> (<code>ID_ACTIVIDAD</code>, <code>ID_CONTACTO</code>)</td>
+<td>GET/POST <code>/{id}/participantes</code>; DELETE <code>/{id}/participantes/{contactoId}</code></td>
+<td>Entidad, puerto, adaptador y <code>oracle_constraints.csv</code></td>
+</tr>
+<tr>
+<td>Actividad-Etiqueta</td>
+<td><code>ActividadEtiqueta</code>; <code>ActividadEtiquetaPersistencePort</code>; <code>ActividadEtiquetaPersistenceAdapter</code></td>
+<td><code>CRM_ACTIVIDAD_ETIQUETAS</code>; <code>UK_ACTIVIDAD_ETIQUETA</code> (<code>ID_ACTIVIDAD</code>, <code>ID_ETIQUETA</code>); columna <code>ORDEN</code></td>
+<td><code>etiquetaIds</code> en <code>ActividadRequest</code>, máximo 8; reemplazo en bloque; filtro <code>?etiquetaId=</code></td>
+<td>Entidad, adaptador, DTO y <code>oracle_constraints.csv</code></td>
+</tr>
+<tr>
+<td>Equipo-Usuario</td>
+<td><code>EquipoMiembro</code>; <code>EquipoMiembroPersistencePort</code>; <code>EquipoMiembroPersistenceAdapter</code></td>
+<td><code>CRM_EQUIPO_MIEMBROS</code>; <code>UK_EQUIPO_MIEMBRO</code> (<code>EQUIPO_ID</code>, <code>USUARIO_ID</code>)</td>
+<td>GET/POST <code>/{id}/miembros</code>; DELETE <code>/{id}/miembros/{usuarioId}</code></td>
+<td>Entidad, puerto, adaptador y <code>oracle_constraints.csv</code></td>
+</tr>
+<tr>
+<td>Campaña-Lead</td>
+<td><code>CampaniaLead</code>; <code>CampaniaLeadPersistencePort</code>; <code>CampaniaLeadPersistenceAdapter</code></td>
+<td><code>CRM_CAMPANIA_LEADS</code>; <code>UK_CAMPANIA_LEAD</code> (<code>CAMPANIA_ID</code>, <code>LEAD_ID</code>)</td>
+<td>GET/POST <code>/{id}/leads</code>; DELETE <code>/{id}/leads/{leadId}</code></td>
+<td>Entidad, puerto, adaptador y <code>oracle_constraints.csv</code></td>
+</tr>
+</tbody></table>
+<p><strong>Tabla 6.</strong> Las siete relaciones N:M verificadas. La columna de endpoints usa la ruta base del módulo correspondiente.</p>
+<p><strong>Observación importante.</strong> Varios comentarios de entidades JPA de Oportunidades dicen “sin foreign key física”. Sin embargo, <code>oracle_constraints.csv</code> muestra claves foráneas como <code>FK_OPP_CONTACTO_OPP</code>, <code>FK_OPP_PRODUCTO_PRODUCTO</code> y <code>FK_OPP_COLAB_USUARIO</code>. La lectura correcta es: <strong>JPA no declara la relación ni una FK a nivel de mapeo, pero Oracle sí tiene FK físicas en la metadata consultada</strong>. La contradicción se registra en la Tabla 9.</p>
+<h2>7. Anexo C3-D: dependencias internas verificadas</h2>
+<p>El Anexo C3-D sustituye las flechas cruzadas del C3 principal. Cada fila es una dependencia observada en imports, constructores o llamadas del código actual. La columna “Tipo” distingue el acceso a una API nombrada, a un caso de uso, a un repositorio de un módulo <code>OPEN</code>, a un puerto de salida o a una consulta JPQL.</p>
+<table>
+<thead><tr>
+<th>Origen</th>
+<th>Destino</th>
+<th>Elemento usado</th>
+<th>Tipo</th>
+<th>Evidencia y observación</th>
+</tr></thead><tbody>
+<tr>
+<td><code>equipos</code></td>
+<td><code>usuarios</code></td>
+<td><code>UsuariosApi</code></td>
+<td>API nombrada</td>
+<td><code>UsuarioValidationAdapter</code>; dependencia correcta y declarada</td>
+</tr>
+<tr>
+<td><code>mensajeria</code></td>
+<td><code>usuarios</code></td>
+<td><code>UsuariosApi</code></td>
+<td>API nombrada</td>
+<td><code>MensajeService</code> inyecta <code>UsuariosApi</code></td>
+</tr>
+<tr>
+<td><code>marketing</code></td>
+<td><code>leads</code></td>
+<td><code>ManageLeadUseCase</code></td>
+<td>Caso de uso</td>
+<td><code>CampaniaService</code>; también usa <code>EstadoLead</code> en DTO de respuesta</td>
+</tr>
+<tr>
+<td><code>propuestas</code></td>
+<td><code>clientes</code></td>
+<td><code>ClienteSpringDataRepository</code></td>
+<td>Repositorio de módulo <code>OPEN</code></td>
+<td><code>PropuestaRelacionValidationAdapter</code>; acoplamiento a persistencia</td>
+</tr>
+<tr>
+<td><code>propuestas</code></td>
+<td><code>oportunidades</code></td>
+<td><code>OportunidadSpringDataRepository</code></td>
+<td>Repositorio de módulo <code>OPEN</code></td>
+<td><code>PropuestaRelacionValidationAdapter</code>; acoplamiento a persistencia</td>
+</tr>
+<tr>
+<td><code>propuestas</code></td>
+<td><code>productos</code></td>
+<td><code>ManageProductoUseCase</code></td>
+<td>Caso de uso</td>
+<td><code>PropuestaService</code>; dependencia correcta</td>
+</tr>
+<tr>
+<td><code>actividades</code></td>
+<td><code>clientes</code></td>
+<td><code>ManageClienteUseCase</code></td>
+<td>Caso de uso</td>
+<td><code>ContactoQueryAdapter</code>; recorre clientes y contactos</td>
+</tr>
+<tr>
+<td><code>actividades</code></td>
+<td><code>clientes</code></td>
+<td><code>ClienteSpringDataRepository</code></td>
+<td>Repositorio de módulo <code>OPEN</code></td>
+<td><code>RelacionValidationAdapter</code>; validación de existencia</td>
+</tr>
+<tr>
+<td><code>actividades</code></td>
+<td><code>leads</code></td>
+<td><code>LeadSpringDataRepository</code></td>
+<td>Repositorio de módulo <code>OPEN</code></td>
+<td><code>RelacionValidationAdapter</code></td>
+</tr>
+<tr>
+<td><code>actividades</code></td>
+<td><code>oportunidades</code></td>
+<td><code>OportunidadSpringDataRepository</code></td>
+<td>Repositorio de módulo <code>OPEN</code></td>
+<td><code>RelacionValidationAdapter</code></td>
+</tr>
+<tr>
+<td><code>actividades</code></td>
+<td><code>etiquetas</code></td>
+<td><code>EtiquetaPersistencePort</code></td>
+<td>Puerto de salida de otro módulo</td>
+<td><code>ActividadService</code>; dependencia directa entre módulos</td>
+</tr>
+<tr>
+<td><code>actividades</code></td>
+<td><code>usuarios</code></td>
+<td><code>UsuariosApi</code></td>
+<td>API nombrada</td>
+<td><code>RelacionValidationAdapter</code>; valida <code>idUsuario</code></td>
+</tr>
+<tr>
+<td><code>oportunidades</code></td>
+<td><code>clientes</code></td>
+<td><code>ManageClienteUseCase</code></td>
+<td>Caso de uso</td>
+<td><code>ContactoQueryAdapter</code></td>
+</tr>
+<tr>
+<td><code>oportunidades</code></td>
+<td><code>productos</code></td>
+<td><code>ManageProductoUseCase</code></td>
+<td>Caso de uso</td>
+<td><code>ProductoQueryAdapter</code></td>
+</tr>
+<tr>
+<td><code>oportunidades</code></td>
+<td><code>usuarios</code></td>
+<td><code>UsuariosApi</code></td>
+<td>API nombrada</td>
+<td><code>UsuarioQueryAdapter</code></td>
+</tr>
+<tr>
+<td><code>relationshipmap</code></td>
+<td><code>clientes</code>, <code>oportunidades</code>, <code>actividades</code>, <code>propuestas</code>, <code>productos</code></td>
+<td>Casos de uso respectivos</td>
+<td>Casos de uso</td>
+<td><code>RelationshipMapService</code>; lectura agregada</td>
+</tr>
+<tr>
+<td><code>relationshipmap</code></td>
+<td><code>usuarios</code></td>
+<td><code>UsuariosApi</code></td>
+<td>API nombrada</td>
+<td><code>RelationshipMapService</code></td>
+</tr>
+<tr>
+<td><code>dashboard</code></td>
+<td>Entidades de otros módulos</td>
+<td><code>ClienteEntity</code>, <code>LeadEntity</code>, <code>OportunidadEntity</code>, <code>ActividadEntity</code>, <code>PropuestaEntity</code></td>
+<td>JPQL por nombre de entidad</td>
+<td><code>DashboardQueryRepository</code>; no hay import de clases de otros módulos</td>
+</tr>
+<tr>
+<td><code>auth</code></td>
+<td><code>usuarios</code></td>
+<td>Ninguno</td>
+<td>Dependencia declarada no usada</td>
+<td><code>auth/package-info.java</code> declara <code>usuarios</code>; no se encontraron imports</td>
+</tr>
+<tr>
+<td>Todos los módulos de negocio</td>
+<td><code>shared.exception</code></td>
+<td><code>ResourceNotFoundException</code>, <code>GlobalExceptionHandler</code></td>
+<td>Submódulo <code>OPEN</code></td>
+<td>Uso generalizado de <code>ResourceNotFoundException</code>; el handler es infraestructura</td>
+</tr>
+<tr>
+<td><code>clientes</code></td>
+<td><code>shared.ratelimit</code></td>
+<td><code>ConsultaDocumentoRateLimiter</code></td>
+<td>Submódulo <code>OPEN</code></td>
+<td><code>ClienteController</code></td>
+</tr>
+<tr>
+<td><code>clientes</code></td>
+<td><code>shared.cache</code></td>
+<td><code>CacheConfig</code>, <code>@Cacheable</code></td>
+<td>Configuración transversal</td>
+<td><code>ApisPeruDocumentoAdapter</code></td>
+</tr>
+</tbody></table>
+<p><strong>Tabla 7.</strong> Anexo C3-D. Dependencias internas verificadas y su evidencia.</p>
+<h3>7.1 Lectura arquitectónica de las dependencias</h3>
+<p>La mayoría de las relaciones sigue el patrón deseado: un módulo consume una API nombrada o un caso de uso de otro. Los casos de <code>equipos</code>, <code>mensajeria</code>, <code>marketing</code>, <code>oportunidades</code>, <code>relationshipmap</code> y la validación de productos en <code>propuestas</code> son ejemplos de dependencia por contrato.</p>
+<p>Hay tres acoplamientos que merecen seguimiento:</p>
+<p>1. <strong>Repositorios de módulos <code>OPEN</code>.</strong> <code>propuestas</code> y <code>actividades</code> validan existencia con repositorios Spring Data de <code>clientes</code>, <code>oportunidades</code> y <code>leads</code>. Es legal porque esos módulos son <code>OPEN</code>, pero acopla el adaptador de un módulo a la infraestructura de otro. Una alternativa sería exponer un puerto de consulta estable. 2. <strong><code>EtiquetaPersistencePort</code> en <code>Actividades</code>.</strong> El servicio de aplicación depende de un puerto de salida de otro módulo, no de un caso de uso. La dependencia es explícita y verificada, pero cruza la frontera de aplicación. 3. <strong>Dashboard por JPQL.</strong> No hay import de clases de otros módulos, pero las consultas usan nombres de entidad (<code>ClienteEntity</code>, <code>LeadEntity</code>, etc.). Es un acoplamiento lógico por nombre: si se renombra una entidad, la consulta puede fallar en tiempo de ejecución. No se ejecutó la aplicación para probarlo.</p>
+<h2>8. Tabla de cambios respecto de la documentación anterior</h2>
+<p>La comparación es documental y de código. No se localizó el archivo original del C3 de Lucidchart/Miro en el workspace; solo existen referencias en <code>09_Arquitectura_Software.md</code> y una vista antigua de Leads en <code>arquitectura_codigo.html</code>. Por eso no se afirma que el C3 anterior tuviera o no una relación concreta: se contrastan las referencias disponibles.</p>
+<table>
+<thead><tr>
+<th>Aspecto</th>
+<th>Referencia anterior</th>
+<th>C3 actualizado</th>
+<th>Evidencia</th>
+</tr></thead><tbody>
+<tr>
+<td>Cobertura de módulos</td>
+<td>El informe anterior listaba 16 módulos y advertía que el C3 requería agregar <code>relationshipmap</code>, <code>propuestas</code>, <code>equipos</code> y <code>marketing</code>.</td>
+<td>Se documentan 15 paquetes de nivel superior y 17 módulos Modulith, con los cuatro módulos incorporados.</td>
+<td><code>all-docs.adoc</code>, <code>package-info.java</code>, código</td>
+</tr>
+<tr>
+<td>Clasificación</td>
+<td>No había una separación explícita entre comerciales, soporte, administración y técnicos.</td>
+<td>Ocho comerciales, dos de soporte, tres de administración/consulta y dos técnicos.</td>
+<td>Tabla 1</td>
+</tr>
+<tr>
+<td>Relaciones N:M</td>
+<td>La documentación anterior advertía que los diagramas antiguos podían mostrar <code>@ManyToMany</code>.</td>
+<td>Se representan siete entidades puente con puerto, adaptador, repositorio y tabla propia; no se usa <code>@ManyToMany</code>.</td>
+<td>Entidades, puertos, adaptadores y Tabla 6</td>
+</tr>
+<tr>
+<td>Oportunidades</td>
+<td>El C3 anterior no detallaba contactos, productos y colaboradores como asociaciones explícitas.</td>
+<td>Se documentan tres asociaciones, sus endpoints y sus validaciones.</td>
+<td><code>OportunidadService</code>, controlador y Tabla 6</td>
+</tr>
+<tr>
+<td>Actividades</td>
+<td>No se detallaban participantes ni etiquetas.</td>
+<td>Se documentan participantes y etiquetas, máximo ocho, orden y reemplazo en bloque.</td>
+<td><code>ActividadService</code>, DTO, adaptador y Tabla 6</td>
+</tr>
+<tr>
+<td>Equipos y campañas</td>
+<td>Eran módulos fáciles de omitir en una vista parcial.</td>
+<td>Se incorporan <code>equipos</code> y <code>marketing</code>, con sus N:M equipo-usuario y campaña-lead.</td>
+<td>Controladores, servicios y Tabla 6</td>
+</tr>
+<tr>
+<td>Dependencias</td>
+<td>El C3 anterior podía mezclar relaciones conceptuales y de código.</td>
+<td>El C3 principal no dibuja flechas; el Anexo C3-D contiene solo dependencias verificadas.</td>
+<td>Tabla 7</td>
+</tr>
+<tr>
+<td>Seguridad</td>
+<td>No siempre se aclaraba el alcance de Keycloak.</td>
+<td>Se documenta que <code>KeycloakSecurityConfig</code> solo se activa con el perfil <code>keycloak</code> y se listan las reglas de rol.</td>
+<td><code>KeycloakSecurityConfig</code></td>
+</tr>
+<tr>
+<td>Dashboard</td>
+<td>Podía interpretarse como dependencia directa entre módulos.</td>
+<td>Se documenta como JPQL por nombre de entidad, sin import de clases de otros módulos.</td>
+<td><code>DashboardQueryRepository</code></td>
+</tr>
+<tr>
+<td>Shared</td>
+<td>El conteo anterior no incluía el paquete <code>shared</code> de nivel superior.</td>
+<td>Se separan <code>shared</code>, <code>shared.exception</code> y <code>shared.ratelimit</code>, y se explica su uso.</td>
+<td><code>shared/</code>, <code>package-info.java</code></td>
+</tr>
+<tr>
+<td>Documentación generada</td>
+<td><code>all-docs.adoc</code> omite controladores y servicios de <code>equipos</code> y <code>mensajeria</code>.</td>
+<td>Se verificaron directamente el código y los controladores de esos módulos.</td>
+<td><code>EquipoController</code>, <code>MensajeController</code>, servicios</td>
+</tr>
+<tr>
+<td>C3 original</td>
+<td>No está el archivo Lucidchart/Miro; solo la vista antigua de Leads.</td>
+<td>Se entrega un C3 nuevo y se declara la limitación de comparación visual.</td>
+<td><code>arquitectura_codigo.html</code>, informe anterior</td>
+</tr>
+</tbody></table>
+<p><strong>Tabla 8.</strong> Cambios y correcciones respecto de las referencias anteriores.</p>
+<h2>9. Elementos no verificados y limitaciones</h2>
+<table>
+<thead><tr>
+<th>Elemento</th>
+<th>Motivo y efecto</th>
+<th>Tratamiento en este documento</th>
+</tr></thead><tbody>
+<tr>
+<td>Archivo original del C3 de Lucidchart/Miro</td>
+<td>No está en el workspace; no se puede comparar visualmente ni recuperar el inventario exacto anterior.</td>
+<td>Se declara la limitación y se compara solo con referencias documentales.</td>
+</tr>
+<tr>
+<td>Ejecución de la aplicación</td>
+<td>No se inició el backend; no se probaron endpoints, transacciones ni tiempos de respuesta.</td>
+<td>El análisis es estático.</td>
+</tr>
+<tr>
+<td>Pruebas de integración y <code>ModularityTests</code></td>
+<td>No se ejecutó Maven ni la suite de pruebas.</td>
+<td>Se revisaron <code>package-info.java</code>, imports y código.</td>
+</tr>
+<tr>
+<td>Oracle en vivo</td>
+<td>No se consultó la base; se usó <code>oracle_constraints.csv</code>.</td>
+<td>Las FK/UK se citan como metadata, no como verificación en vivo.</td>
+</tr>
+<tr>
+<td>Keycloak</td>
+<td>No se validaron realm, claims, roles ni el flujo OIDC real.</td>
+<td>Se describe la configuración estática y el perfil <code>keycloak</code>.</td>
+</tr>
+<tr>
+<td>APIsPERU</td>
+<td>No se probó la disponibilidad ni el contrato externo de DNI/RUC.</td>
+<td>Se documenta el adaptador <code>ApisPeruDocumentoAdapter</code> y el puerto.</td>
+</tr>
+<tr>
+<td>Documentación generada en <code>target</code></td>
+<td>Puede ser anterior al último cambio del árbol de trabajo.</td>
+<td>Se usó como evidencia secundaria; la fuente primaria fue el código actual.</td>
+</tr>
+<tr>
+<td><code>components.puml</code></td>
+<td>Muestra 12 módulos, no 17; no incluye <code>auth</code>, <code>dashboard</code> ni los componentes de <code>shared</code>.</td>
+<td>Se explicó la diferencia y se usó <code>all-docs.adoc</code> como inventario.</td>
+</tr>
+<tr>
+<td>Frontend Angular</td>
+<td>No se revisaron rutas, guards ni consumo real de la API.</td>
+<td>Se documenta <code>/api/v1/**</code> a partir de los controladores.</td>
+</tr>
+<tr>
+<td>JPQL de Dashboard</td>
+<td>No se ejecutaron las consultas; un cambio de nombre de entidad podría romperlas.</td>
+<td>Se marca como acoplamiento lógico por nombre.</td>
+</tr>
+<tr>
+<td>Cobertura completa de endpoints</td>
+<td>Solo se tabularon los endpoints principales de Oportunidades y Actividades; no se hizo un diff completo contra OpenAPI.</td>
+<td>Las tablas 4 y 5 son representativas, no un contrato exhaustivo.</td>
+</tr>
+<tr>
+<td>Comentarios “sin foreign key física”</td>
+<td>Contradicen la metadata Oracle, que sí muestra FK.</td>
+<td>Se advierte la contradicción y se prioriza <code>oracle_constraints.csv</code> para la base de datos.</td>
+</tr>
+<tr>
+<td><code>auth</code> y <code>usuarios</code></td>
+<td><code>allowedDependencies</code> declara <code>usuarios</code>, pero no hay imports.</td>
+<td>Se registra como dependencia declarada no usada.</td>
+</tr>
+<tr>
+<td><code>shared</code> como módulo</td>
+<td>El paquete <code>shared</code> no tiene <code>package-info.java</code> de módulo; sus submódulos sí.</td>
+<td>Se representa como contenedor técnico y se separan sus submódulos.</td>
+</tr>
+<tr>
+<td>Orden de borrado y cascada</td>
+<td>La aplicación borra hijos y Oracle define <code>ON DELETE CASCADE</code>; no se probó el orden transaccional.</td>
+<td>Se documenta el doble mecanismo y se marca como no ejecutado.</td>
+</tr>
+</tbody></table>
+<p><strong>Tabla 9.</strong> Elementos no verificados, contradicciones y limitaciones.</p>
+<h2>10. Conclusiones</h2>
+<p>El C3 actualizado permite sostener tres conclusiones académicas:</p>
+<p>1. <strong>La arquitectura es modular y hexagonal en la mayoría de los flujos.</strong> Los controladores dependen de puertos de entrada; los servicios implementan esos puertos; la persistencia y las consultas externas se resuelven con puertos y adaptadores. Oportunidades y Actividades son los casos mejor documentados porque concentran las relaciones N:M y las validaciones externas.</p>
+<p>2. <strong>Las relaciones N:M no son tablas ocultas dentro del C3.</strong> Son entidades puente explícitas, con atributos propios, puerto, adaptador, repositorio y restricción única. Esto mejora la expresividad del modelo y permite cumplir reglas como “máximo ocho etiquetas” u “orden de etiquetas” sin depender de una tabla intermedia generada automáticamente.</p>
+<p>3. <strong>La deuda arquitectónica principal está en los bordes.</strong> El acceso directo a repositorios de módulos <code>OPEN</code>, la dependencia de <code>Actividades</code> a <code>EtiquetaPersistencePort</code> y el JPQL de <code>Dashboard</code> son verificables y acotados, pero muestran que la modularidad todavía depende de disciplina y de la declaración de módulos. El Anexo C3-D deja esa deuda a la vista, en lugar de esconderla en un diagrama.</p>
+<p>El resultado es adecuado para un informe universitario: las figuras son legibles, las tablas separan inventario, endpoints, N:M y dependencias, y las limitaciones están declaradas. La comparación visual con el C3 anterior queda pendiente porque el archivo original no está en el workspace.</p>
+<h2>Anexo A. Archivos entregables</h2>
+<table>
+<thead><tr>
+<th>Archivo</th>
+<th>Uso</th>
+</tr></thead><tbody>
+<tr>
+<td><code>C3_principal.puml</code></td>
+<td>Fuente editable PlantUML del C3 principal</td>
+</tr>
+<tr>
+<td><code>C3_principal.svg</code></td>
+<td>Versión vectorial del C3 principal</td>
+</tr>
+<tr>
+<td><code>C3_principal.png</code></td>
+<td>Versión PNG para insertar en Word</td>
+</tr>
+<tr>
+<td><code>generar_c3_detalle.py</code></td>
+<td>Fuente editable de los C3 de Oportunidades y Actividades; genera SVG y HTML de render</td>
+</tr>
+<tr>
+<td><code>C3_oportunidades.svg</code></td>
+<td>C3 vectorial de Oportunidades</td>
+</tr>
+<tr>
+<td><code>C3_oportunidades.png</code></td>
+<td>PNG del C3 de Oportunidades</td>
+</tr>
+<tr>
+<td><code>C3_actividades.svg</code></td>
+<td>C3 vectorial de Actividades</td>
+</tr>
+<tr>
+<td><code>C3_actividades.png</code></td>
+<td>PNG del C3 de Actividades</td>
+</tr>
+<tr>
+<td><code>09_Componentes_C3.md</code></td>
+<td>Fuente de este documento</td>
+</tr>
+<tr>
+<td><code>09_Componentes_C3.html</code></td>
+<td>Versión HTML con las figuras y tablas, apta para copiar a Word</td>
+</tr>
+<tr>
+<td><code>Texto_para_Word_C3.txt</code></td>
+<td>Versión de texto con tablas separadas por tabulaciones</td>
+</tr>
+<tr>
+<td><code>C3_relaciones_NM.csv</code></td>
+<td>Tabla 6 exportada para revisión</td>
+</tr>
+<tr>
+<td><code>C3_dependencias.csv</code></td>
+<td>Anexo C3-D exportado para revisión</td>
+</tr>
+</tbody></table>
+<p><strong>Tabla 10.</strong> Archivos entregables. Los HTML <code>C3_oportunidades.html</code> y <code>C3_actividades.html</code> son auxiliares de rasterizado y no sustituyen a los SVG.</p>
+<h2>Anexo B. Reproducción de las figuras</h2>
+<p>El C3 principal se renderiza con PlantUML y C4-PlantUML:</p>
+<pre><code>java -jar plantuml.jar -tpng -charset UTF-8 C3_principal.puml
+java -jar plantuml.jar -tsvg -charset UTF-8 C3_principal.puml</code></pre>
+<p>Los C3 de Oportunidades y Actividades se generan con el script y se rasterizan con Chrome headless:</p>
+<pre><code>python generar_c3_detalle.py
+chrome --headless --disable-gpu --no-sandbox --hide-scrollbars \
+  --screenshot=C3_oportunidades.png --window-size=1700,1370 C3_oportunidades.html
+chrome --headless --disable-gpu --no-sandbox --hide-scrollbars \
+  --screenshot=C3_actividades.png --window-size=1700,1450 C3_actividades.html</code></pre>
+<p>Para una versión de impresión, se puede añadir <code>--force-device-scale-factor=2</code> y usar el doble de tamaño de ventana. Los SVG son la fuente vectorial preferida para Word; los PNG son la alternativa si Word no importa SVG.</p>
+<hr>
+<p><strong>Nota final.</strong> Este documento no modifica el código de la aplicación, el esquema Oracle, la configuración de Keycloak, las dependencias ni las migraciones. Solo agrega archivos de documentación y figuras en <code>informe/evidencias_academicas_v3/09_Componentes_C3</code>.</p>
+</body>
+</html>

@@ -1,0 +1,153 @@
+﻿Tabla,Columna,Tipo Java,SQL inferido JPA,Tipo observado Oracle,Longitud caracteres Oracle,Semántica BYTE/CHAR,NULL JPA,NULL Oracle Y/N,FK física Oracle,Fuente JPA:línea
+CRM_ACTIVIDADES,ID_ACTIVIDAD,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,No,N,Sin FK observada en esta columna,actividades/adapters/out/persistence/entity/ActividadEntity.java:15
+CRM_ACTIVIDADES,ID_USUARIO,String,VARCHAR2(255),VARCHAR2(1020 bytes),255,C,Sí (default JPA),Y,Sin FK observada en esta columna,actividades/adapters/out/persistence/entity/ActividadEntity.java:18
+CRM_ACTIVIDADES,ID_CLIENTE,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,Sí (default JPA),Y,Sin FK observada en esta columna,actividades/adapters/out/persistence/entity/ActividadEntity.java:21
+CRM_ACTIVIDADES,ID_LEAD,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,Sí (default JPA),Y,Sin FK observada en esta columna,actividades/adapters/out/persistence/entity/ActividadEntity.java:24
+CRM_ACTIVIDADES,ID_OPORTUNIDAD,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,Sí (default JPA),Y,Sin FK observada en esta columna,actividades/adapters/out/persistence/entity/ActividadEntity.java:27
+CRM_ACTIVIDADES,TIPO,TipoActividad,VARCHAR2(255),VARCHAR2(1020 bytes),255,C,No,N,Sin FK observada en esta columna,actividades/adapters/out/persistence/entity/ActividadEntity.java:31
+CRM_ACTIVIDADES,TITULO,String,VARCHAR2(255),VARCHAR2(1020 bytes),255,C,No,N,Sin FK observada en esta columna,actividades/adapters/out/persistence/entity/ActividadEntity.java:34
+CRM_ACTIVIDADES,DESCRIPCION,String,CLOB,CLOB(4000 bytes),0,,Sí (default JPA),Y,Sin FK observada en esta columna,actividades/adapters/out/persistence/entity/ActividadEntity.java:38
+CRM_ACTIVIDADES,FECHA,LocalDateTime,TIMESTAMP (precisión por proveedor),TIMESTAMP(9)(11 bytes),0,,No,N,Sin FK observada en esta columna,actividades/adapters/out/persistence/entity/ActividadEntity.java:41
+CRM_ACTIVIDADES,ESTADO,EstadoActividad,VARCHAR2(255),VARCHAR2(1020 bytes),255,C,No,N,Sin FK observada en esta columna,actividades/adapters/out/persistence/entity/ActividadEntity.java:45
+CRM_ACTIVIDADES,CREADO_EN,LocalDateTime,TIMESTAMP (precisión por proveedor),TIMESTAMP(9)(11 bytes),0,,No,N,Sin FK observada en esta columna,actividades/adapters/out/persistence/entity/ActividadEntity.java:48
+CRM_ACTIVIDAD_ETIQUETAS,ID_ACTIVIDAD_ETIQUETA,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,No,N,Sin FK observada en esta columna,actividades/adapters/out/persistence/entity/ActividadEtiquetaEntity.java:16
+CRM_ACTIVIDAD_ETIQUETAS,ID_ACTIVIDAD,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,No,N,FK_ACT_ETIQ_ACT → CRM_ACTIVIDADES.ID_ACTIVIDAD [ON DELETE CASCADE],actividades/adapters/out/persistence/entity/ActividadEtiquetaEntity.java:19
+CRM_ACTIVIDAD_ETIQUETAS,ID_ETIQUETA,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,No,N,FK_ACT_ETIQ_ETIQUETA → CRM_ETIQUETAS.ID_ETIQUETA [ON DELETE CASCADE],actividades/adapters/out/persistence/entity/ActividadEtiquetaEntity.java:22
+CRM_ACTIVIDAD_ETIQUETAS,CREADO_EN,LocalDateTime,TIMESTAMP (precisión por proveedor),TIMESTAMP(9)(11 bytes),0,,No,N,Sin FK observada en esta columna,actividades/adapters/out/persistence/entity/ActividadEtiquetaEntity.java:25
+CRM_ACTIVIDAD_ETIQUETAS,ORDEN,Integer,"NUMBER(10,0)","NUMBER(10,0)",0,,Sí (default JPA),Y,Sin FK observada en esta columna,actividades/adapters/out/persistence/entity/ActividadEtiquetaEntity.java:28
+CRM_ACTIVIDAD_PARTICIPANTES,ID_PARTICIPANTE,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,No,N,Sin FK observada en esta columna,actividades/adapters/out/persistence/entity/ActividadParticipanteEntity.java:15
+CRM_ACTIVIDAD_PARTICIPANTES,ID_ACTIVIDAD,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,No,N,FK_ACT_PART_ACT → CRM_ACTIVIDADES.ID_ACTIVIDAD [ON DELETE CASCADE],actividades/adapters/out/persistence/entity/ActividadParticipanteEntity.java:18
+CRM_ACTIVIDAD_PARTICIPANTES,ID_CONTACTO,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,No,N,FK_ACT_PART_CONTACTO → CRM_CONTACTOS.ID [ON DELETE CASCADE],actividades/adapters/out/persistence/entity/ActividadParticipanteEntity.java:22
+CRM_ACTIVIDAD_PARTICIPANTES,CREADO_EN,LocalDateTime,TIMESTAMP (precisión por proveedor),TIMESTAMP(9)(11 bytes),0,,No,N,Sin FK observada en esta columna,actividades/adapters/out/persistence/entity/ActividadParticipanteEntity.java:25
+CRM_CLIENTES,ID,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,No,N,Sin FK observada en esta columna,clientes/adapters/out/persistence/entity/ClienteEntity.java:25
+CRM_CLIENTES,NOMBRE,String,VARCHAR2(150),VARCHAR2(600 bytes),150,C,No,N,Sin FK observada en esta columna,clientes/adapters/out/persistence/entity/ClienteEntity.java:28
+CRM_CLIENTES,EMPRESA,String,VARCHAR2(150),VARCHAR2(600 bytes),150,C,Sí (default JPA),Y,Sin FK observada en esta columna,clientes/adapters/out/persistence/entity/ClienteEntity.java:31
+CRM_CLIENTES,TIPO_DOCUMENTO,TipoDocumento,VARCHAR2(10),VARCHAR2(40 bytes),10,C,Sí (default JPA),Y,Sin FK observada en esta columna,clientes/adapters/out/persistence/entity/ClienteEntity.java:35
+CRM_CLIENTES,NUMERO_DOCUMENTO,String,VARCHAR2(20),VARCHAR2(80 bytes),20,C,Sí (default JPA),Y,Sin FK observada en esta columna,clientes/adapters/out/persistence/entity/ClienteEntity.java:38
+CRM_CLIENTES,CORREO,String,VARCHAR2(150),VARCHAR2(600 bytes),150,C,Sí (default JPA),Y,Sin FK observada en esta columna,clientes/adapters/out/persistence/entity/ClienteEntity.java:41
+CRM_CLIENTES,TELEFONO,String,VARCHAR2(30),VARCHAR2(120 bytes),30,C,Sí (default JPA),Y,Sin FK observada en esta columna,clientes/adapters/out/persistence/entity/ClienteEntity.java:44
+CRM_CLIENTES,ESTADO,EstadoCliente,VARCHAR2(20),VARCHAR2(80 bytes),20,C,No,N,Sin FK observada en esta columna,clientes/adapters/out/persistence/entity/ClienteEntity.java:49
+CRM_CLIENTES,RESPONSABLE,String,VARCHAR2(100),VARCHAR2(400 bytes),100,C,Sí (default JPA),Y,Sin FK observada en esta columna,clientes/adapters/out/persistence/entity/ClienteEntity.java:52
+CRM_CLIENTES,CREADO_EN,LocalDateTime,TIMESTAMP (precisión por proveedor),TIMESTAMP(9)(11 bytes),0,,No,N,Sin FK observada en esta columna,clientes/adapters/out/persistence/entity/ClienteEntity.java:56
+CRM_CONTACTOS,ID,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,No,N,Sin FK observada en esta columna,clientes/adapters/out/persistence/entity/ContactoEntity.java:15
+CRM_CONTACTOS,ID_CLIENTE,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,No,N,FKHPJKSIXSVV6JG3Q3EBLFXPFE5 → CRM_CLIENTES.ID [ON DELETE NO ACTION],clientes/adapters/out/persistence/entity/ContactoEntity.java:19
+CRM_CONTACTOS,NOMBRE,String,VARCHAR2(100),VARCHAR2(400 bytes),100,C,No,N,Sin FK observada en esta columna,clientes/adapters/out/persistence/entity/ContactoEntity.java:26
+CRM_CONTACTOS,APELLIDO,String,VARCHAR2(100),VARCHAR2(400 bytes),100,C,Sí (default JPA),Y,Sin FK observada en esta columna,clientes/adapters/out/persistence/entity/ContactoEntity.java:29
+CRM_CONTACTOS,CARGO,String,VARCHAR2(100),VARCHAR2(400 bytes),100,C,Sí (default JPA),Y,Sin FK observada en esta columna,clientes/adapters/out/persistence/entity/ContactoEntity.java:32
+CRM_CONTACTOS,CORREO,String,VARCHAR2(150),VARCHAR2(600 bytes),150,C,Sí (default JPA),Y,Sin FK observada en esta columna,clientes/adapters/out/persistence/entity/ContactoEntity.java:35
+CRM_CONTACTOS,TELEFONO,String,VARCHAR2(30),VARCHAR2(120 bytes),30,C,Sí (default JPA),Y,Sin FK observada en esta columna,clientes/adapters/out/persistence/entity/ContactoEntity.java:38
+CRM_CONTACTOS,PRINCIPAL,Boolean,"BOOLEAN o NUMBER(1,0), depende del dialecto",BOOLEAN(1 bytes),0,,Sí (default JPA),Y,Sin FK observada en esta columna,clientes/adapters/out/persistence/entity/ContactoEntity.java:42
+CRM_CONTACTOS,CREADO_EN,LocalDateTime,TIMESTAMP (precisión por proveedor),TIMESTAMP(9)(11 bytes),0,,No,N,Sin FK observada en esta columna,clientes/adapters/out/persistence/entity/ContactoEntity.java:46
+CRM_EQUIPOS,ID,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,No,N,Sin FK observada en esta columna,equipos/adapters/out/persistence/entity/EquipoEntity.java:16
+CRM_EQUIPOS,NOMBRE,String,VARCHAR2(120),VARCHAR2(480 bytes),120,C,No,N,Sin FK observada en esta columna,equipos/adapters/out/persistence/entity/EquipoEntity.java:19
+CRM_EQUIPOS,DESCRIPCION,String,VARCHAR2(500),VARCHAR2(2000 bytes),500,C,Sí (default JPA),Y,Sin FK observada en esta columna,equipos/adapters/out/persistence/entity/EquipoEntity.java:22
+CRM_EQUIPOS,ESTADO,EstadoEquipo,VARCHAR2(20),VARCHAR2(80 bytes),20,C,No,N,Sin FK observada en esta columna,equipos/adapters/out/persistence/entity/EquipoEntity.java:27
+CRM_EQUIPOS,CREADO_EN,LocalDateTime,TIMESTAMP (precisión por proveedor),TIMESTAMP(9)(11 bytes),0,,No,N,Sin FK observada en esta columna,equipos/adapters/out/persistence/entity/EquipoEntity.java:31
+CRM_EQUIPO_MIEMBROS,ID,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,No,N,Sin FK observada en esta columna,equipos/adapters/out/persistence/entity/EquipoMiembroEntity.java:16
+CRM_EQUIPO_MIEMBROS,EQUIPO_ID,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,No,N,FK_EQUIPO_MIEMBRO_EQUIPO → CRM_EQUIPOS.ID [ON DELETE CASCADE],equipos/adapters/out/persistence/entity/EquipoMiembroEntity.java:19
+CRM_EQUIPO_MIEMBROS,USUARIO_ID,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,No,N,FK_EQUIPO_MIEMBRO_USUARIO → CRM_USUARIOS.ID [ON DELETE CASCADE],equipos/adapters/out/persistence/entity/EquipoMiembroEntity.java:22
+CRM_EQUIPO_MIEMBROS,CREADO_EN,LocalDateTime,TIMESTAMP (precisión por proveedor),TIMESTAMP(9)(11 bytes),0,,No,N,Sin FK observada en esta columna,equipos/adapters/out/persistence/entity/EquipoMiembroEntity.java:26
+CRM_ETIQUETAS,ID_ETIQUETA,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,No,N,Sin FK observada en esta columna,etiquetas/adapters/out/persistence/entity/EtiquetaEntity.java:22
+CRM_ETIQUETAS,NOMBRE,String,VARCHAR2(40),VARCHAR2(160 bytes),40,C,No,N,Sin FK observada en esta columna,etiquetas/adapters/out/persistence/entity/EtiquetaEntity.java:25
+CRM_ETIQUETAS,NOMBRE_NORMALIZADO,String,VARCHAR2(80),VARCHAR2(320 bytes),80,C,No,N,Sin FK observada en esta columna,etiquetas/adapters/out/persistence/entity/EtiquetaEntity.java:28
+CRM_ETIQUETAS,COLOR,String,VARCHAR2(7),VARCHAR2(28 bytes),7,C,No,N,Sin FK observada en esta columna,etiquetas/adapters/out/persistence/entity/EtiquetaEntity.java:31
+CRM_ETIQUETAS,DESCRIPCION,String,VARCHAR2(160),VARCHAR2(640 bytes),160,C,Sí (default JPA),Y,Sin FK observada en esta columna,etiquetas/adapters/out/persistence/entity/EtiquetaEntity.java:34
+CRM_ETIQUETAS,ACTIVA,Boolean,"BOOLEAN o NUMBER(1,0), depende del dialecto",BOOLEAN(1 bytes),0,,No,N,Sin FK observada en esta columna,etiquetas/adapters/out/persistence/entity/EtiquetaEntity.java:37
+CRM_ETIQUETAS,CREADO_EN,LocalDateTime,TIMESTAMP (precisión por proveedor),TIMESTAMP(9)(11 bytes),0,,No,N,Sin FK observada en esta columna,etiquetas/adapters/out/persistence/entity/EtiquetaEntity.java:40
+CRM_FUENTES,ID,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,No,N,Sin FK observada en esta columna,leads/adapters/out/persistence/entity/FuenteEntity.java:15
+CRM_FUENTES,CODIGO,String,VARCHAR2(50),VARCHAR2(200 bytes),50,C,No,N,Sin FK observada en esta columna,leads/adapters/out/persistence/entity/FuenteEntity.java:18
+CRM_FUENTES,NOMBRE,String,VARCHAR2(120),VARCHAR2(480 bytes),120,C,No,N,Sin FK observada en esta columna,leads/adapters/out/persistence/entity/FuenteEntity.java:21
+CRM_FUENTES,DESCRIPCION,String,VARCHAR2(500),VARCHAR2(2000 bytes),500,C,Sí (default JPA),Y,Sin FK observada en esta columna,leads/adapters/out/persistence/entity/FuenteEntity.java:24
+CRM_FUENTES,ACTIVA,Boolean,"BOOLEAN o NUMBER(1,0), depende del dialecto",BOOLEAN(1 bytes),0,,No,N,Sin FK observada en esta columna,leads/adapters/out/persistence/entity/FuenteEntity.java:28
+CRM_FUENTES,CREADO_EN,LocalDateTime,TIMESTAMP (precisión por proveedor),TIMESTAMP(9)(11 bytes),0,,No,N,Sin FK observada en esta columna,leads/adapters/out/persistence/entity/FuenteEntity.java:32
+CRM_LEADS,ID,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,No,N,Sin FK observada en esta columna,leads/adapters/out/persistence/entity/LeadEntity.java:17
+CRM_LEADS,NOMBRE,String,VARCHAR2(150),VARCHAR2(600 bytes),150,C,No,N,Sin FK observada en esta columna,leads/adapters/out/persistence/entity/LeadEntity.java:20
+CRM_LEADS,EMPRESA,String,VARCHAR2(150),VARCHAR2(600 bytes),150,C,Sí (default JPA),Y,Sin FK observada en esta columna,leads/adapters/out/persistence/entity/LeadEntity.java:23
+CRM_LEADS,CORREO,String,VARCHAR2(150),VARCHAR2(600 bytes),150,C,Sí (default JPA),Y,Sin FK observada en esta columna,leads/adapters/out/persistence/entity/LeadEntity.java:26
+CRM_LEADS,TELEFONO,String,VARCHAR2(30),VARCHAR2(120 bytes),30,C,Sí (default JPA),Y,Sin FK observada en esta columna,leads/adapters/out/persistence/entity/LeadEntity.java:29
+CRM_LEADS,FUENTE,String,VARCHAR2(80),VARCHAR2(320 bytes),80,C,Sí (default JPA),Y,Sin FK observada en esta columna,leads/adapters/out/persistence/entity/LeadEntity.java:32
+CRM_LEADS,FUENTE_ID,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,Sí (default JPA),Y,Sin FK observada en esta columna,leads/adapters/out/persistence/entity/LeadEntity.java:35
+CRM_LEADS,ESTADO,EstadoLead,VARCHAR2(20),VARCHAR2(80 bytes),20,C,No,N,Sin FK observada en esta columna,leads/adapters/out/persistence/entity/LeadEntity.java:40
+CRM_LEADS,RESPONSABLE,String,VARCHAR2(100),VARCHAR2(400 bytes),100,C,Sí (default JPA),Y,Sin FK observada en esta columna,leads/adapters/out/persistence/entity/LeadEntity.java:43
+CRM_LEADS,FECHA,LocalDate,DATE,DATE(7 bytes),0,,Sí (default JPA),Y,Sin FK observada en esta columna,leads/adapters/out/persistence/entity/LeadEntity.java:46
+CRM_LEADS,CREADO_EN,LocalDateTime,TIMESTAMP (precisión por proveedor),TIMESTAMP(9)(11 bytes),0,,No,N,Sin FK observada en esta columna,leads/adapters/out/persistence/entity/LeadEntity.java:50
+CRM_CAMPANIAS,ID,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,No,N,Sin FK observada en esta columna,marketing/adapters/out/persistence/entity/CampaniaEntity.java:17
+CRM_CAMPANIAS,NOMBRE,String,VARCHAR2(150),VARCHAR2(600 bytes),150,C,No,N,Sin FK observada en esta columna,marketing/adapters/out/persistence/entity/CampaniaEntity.java:20
+CRM_CAMPANIAS,DESCRIPCION,String,VARCHAR2(1000),VARCHAR2(4000 bytes),1000,C,Sí (default JPA),Y,Sin FK observada en esta columna,marketing/adapters/out/persistence/entity/CampaniaEntity.java:23
+CRM_CAMPANIAS,FECHA_INICIO,LocalDate,DATE,DATE(7 bytes),0,,Sí (default JPA),Y,Sin FK observada en esta columna,marketing/adapters/out/persistence/entity/CampaniaEntity.java:26
+CRM_CAMPANIAS,FECHA_FIN,LocalDate,DATE,DATE(7 bytes),0,,Sí (default JPA),Y,Sin FK observada en esta columna,marketing/adapters/out/persistence/entity/CampaniaEntity.java:29
+CRM_CAMPANIAS,ESTADO,EstadoCampania,VARCHAR2(20),VARCHAR2(80 bytes),20,C,No,N,Sin FK observada en esta columna,marketing/adapters/out/persistence/entity/CampaniaEntity.java:34
+CRM_CAMPANIAS,CREADO_EN,LocalDateTime,TIMESTAMP (precisión por proveedor),TIMESTAMP(9)(11 bytes),0,,No,N,Sin FK observada en esta columna,marketing/adapters/out/persistence/entity/CampaniaEntity.java:38
+CRM_CAMPANIA_LEADS,ID,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,No,N,Sin FK observada en esta columna,marketing/adapters/out/persistence/entity/CampaniaLeadEntity.java:16
+CRM_CAMPANIA_LEADS,CAMPANIA_ID,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,No,N,FK_CAMPANIA_LEAD_CAMP → CRM_CAMPANIAS.ID [ON DELETE CASCADE],marketing/adapters/out/persistence/entity/CampaniaLeadEntity.java:19
+CRM_CAMPANIA_LEADS,LEAD_ID,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,No,N,FK_CAMPANIA_LEAD_LEAD → CRM_LEADS.ID [ON DELETE CASCADE],marketing/adapters/out/persistence/entity/CampaniaLeadEntity.java:22
+CRM_CAMPANIA_LEADS,CREADO_EN,LocalDateTime,TIMESTAMP (precisión por proveedor),TIMESTAMP(9)(11 bytes),0,,No,N,Sin FK observada en esta columna,marketing/adapters/out/persistence/entity/CampaniaLeadEntity.java:26
+CRM_MENSAJES,ID,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,No,N,Sin FK observada en esta columna,mensajeria/adapters/out/persistence/entity/MensajeEntity.java:20
+CRM_MENSAJES,USUARIO_CORREO,String,VARCHAR2(150),VARCHAR2(600 bytes),150,C,No,N,Sin FK observada en esta columna,mensajeria/adapters/out/persistence/entity/MensajeEntity.java:23
+CRM_MENSAJES,USUARIO_NOMBRE,String,VARCHAR2(200),VARCHAR2(800 bytes),200,C,No,N,Sin FK observada en esta columna,mensajeria/adapters/out/persistence/entity/MensajeEntity.java:26
+CRM_MENSAJES,CONTENIDO,String,VARCHAR2(2000),VARCHAR2(4000 bytes),2000,C,No,N,Sin FK observada en esta columna,mensajeria/adapters/out/persistence/entity/MensajeEntity.java:29
+CRM_MENSAJES,CREADO_EN,LocalDateTime,TIMESTAMP (precisión por proveedor),TIMESTAMP(9)(11 bytes),0,,No,N,Sin FK observada en esta columna,mensajeria/adapters/out/persistence/entity/MensajeEntity.java:32
+CRM_OPORTUNIDAD_COLABORADORES,ID,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,No,N,Sin FK observada en esta columna,oportunidades/adapters/out/persistence/entity/OportunidadColaboradorEntity.java:17
+CRM_OPORTUNIDAD_COLABORADORES,ID_OPORTUNIDAD,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,No,N,FK_OPP_COLAB_OPP → CRM_OPORTUNIDADES.ID [ON DELETE CASCADE],oportunidades/adapters/out/persistence/entity/OportunidadColaboradorEntity.java:20
+CRM_OPORTUNIDAD_COLABORADORES,ID_USUARIO,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,No,N,FK_OPP_COLAB_USUARIO → CRM_USUARIOS.ID [ON DELETE CASCADE],oportunidades/adapters/out/persistence/entity/OportunidadColaboradorEntity.java:24
+CRM_OPORTUNIDAD_COLABORADORES,CREADO_EN,LocalDateTime,TIMESTAMP (precisión por proveedor),TIMESTAMP(9)(11 bytes),0,,No,N,Sin FK observada en esta columna,oportunidades/adapters/out/persistence/entity/OportunidadColaboradorEntity.java:28
+CRM_OPORTUNIDAD_CONTACTOS,ID,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,No,N,Sin FK observada en esta columna,oportunidades/adapters/out/persistence/entity/OportunidadContactoEntity.java:17
+CRM_OPORTUNIDAD_CONTACTOS,ID_OPORTUNIDAD,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,No,N,FK_OPP_CONTACTO_OPP → CRM_OPORTUNIDADES.ID [ON DELETE CASCADE],oportunidades/adapters/out/persistence/entity/OportunidadContactoEntity.java:20
+CRM_OPORTUNIDAD_CONTACTOS,ID_CONTACTO,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,No,N,FK_OPP_CONTACTO_CONTACTO → CRM_CONTACTOS.ID [ON DELETE CASCADE],oportunidades/adapters/out/persistence/entity/OportunidadContactoEntity.java:24
+CRM_OPORTUNIDAD_CONTACTOS,ROL,String,VARCHAR2(100),VARCHAR2(400 bytes),100,C,Sí (default JPA),Y,Sin FK observada en esta columna,oportunidades/adapters/out/persistence/entity/OportunidadContactoEntity.java:27
+CRM_OPORTUNIDAD_CONTACTOS,ES_DECISOR,Boolean,"BOOLEAN o NUMBER(1,0), depende del dialecto",BOOLEAN(1 bytes),0,,Sí (default JPA),Y,Sin FK observada en esta columna,oportunidades/adapters/out/persistence/entity/OportunidadContactoEntity.java:31
+CRM_OPORTUNIDAD_CONTACTOS,CREADO_EN,LocalDateTime,TIMESTAMP (precisión por proveedor),TIMESTAMP(9)(11 bytes),0,,No,N,Sin FK observada en esta columna,oportunidades/adapters/out/persistence/entity/OportunidadContactoEntity.java:35
+CRM_OPORTUNIDADES,ID,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,No,N,Sin FK observada en esta columna,oportunidades/adapters/out/persistence/entity/OportunidadEntity.java:18
+CRM_OPORTUNIDADES,NOMBRE,String,VARCHAR2(200),VARCHAR2(800 bytes),200,C,No,N,Sin FK observada en esta columna,oportunidades/adapters/out/persistence/entity/OportunidadEntity.java:21
+CRM_OPORTUNIDADES,CLIENTE_NOMBRE,String,VARCHAR2(150),VARCHAR2(600 bytes),150,C,Sí (default JPA),Y,Sin FK observada en esta columna,oportunidades/adapters/out/persistence/entity/OportunidadEntity.java:24
+CRM_OPORTUNIDADES,VALOR,BigDecimal,"NUMBER(14,2)","NUMBER(14,2)",0,,Sí (default JPA),Y,Sin FK observada en esta columna,oportunidades/adapters/out/persistence/entity/OportunidadEntity.java:27
+CRM_OPORTUNIDADES,PROBABILIDAD,Integer,"NUMBER(10,0)","NUMBER(10,0)",0,,Sí (default JPA),Y,Sin FK observada en esta columna,oportunidades/adapters/out/persistence/entity/OportunidadEntity.java:30
+CRM_OPORTUNIDADES,ETAPA,EtapaOportunidad,VARCHAR2(20),VARCHAR2(80 bytes),20,C,No,N,Sin FK observada en esta columna,oportunidades/adapters/out/persistence/entity/OportunidadEntity.java:35
+CRM_OPORTUNIDADES,RESPONSABLE,String,VARCHAR2(100),VARCHAR2(400 bytes),100,C,Sí (default JPA),Y,Sin FK observada en esta columna,oportunidades/adapters/out/persistence/entity/OportunidadEntity.java:38
+CRM_OPORTUNIDADES,FECHA_CIERRE,LocalDate,DATE,DATE(7 bytes),0,,Sí (default JPA),Y,Sin FK observada en esta columna,oportunidades/adapters/out/persistence/entity/OportunidadEntity.java:41
+CRM_OPORTUNIDADES,DESCRIPCION,String,VARCHAR2(500),VARCHAR2(2000 bytes),500,C,Sí (default JPA),Y,Sin FK observada en esta columna,oportunidades/adapters/out/persistence/entity/OportunidadEntity.java:44
+CRM_OPORTUNIDADES,CREADO_EN,LocalDateTime,TIMESTAMP (precisión por proveedor),TIMESTAMP(9)(11 bytes),0,,No,N,Sin FK observada en esta columna,oportunidades/adapters/out/persistence/entity/OportunidadEntity.java:48
+CRM_OPORTUNIDAD_PRODUCTOS,ID,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,No,N,Sin FK observada en esta columna,oportunidades/adapters/out/persistence/entity/OportunidadProductoEntity.java:17
+CRM_OPORTUNIDAD_PRODUCTOS,ID_OPORTUNIDAD,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,No,N,FK_OPP_PRODUCTO_OPP → CRM_OPORTUNIDADES.ID [ON DELETE CASCADE],oportunidades/adapters/out/persistence/entity/OportunidadProductoEntity.java:20
+CRM_OPORTUNIDAD_PRODUCTOS,ID_PRODUCTO,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,No,N,FK_OPP_PRODUCTO_PRODUCTO → CRM_PRODUCTOS.ID [ON DELETE CASCADE],oportunidades/adapters/out/persistence/entity/OportunidadProductoEntity.java:24
+CRM_OPORTUNIDAD_PRODUCTOS,CANTIDAD,Integer,"NUMBER(10,0)","NUMBER(10,0)",0,,Sí (default JPA),Y,Sin FK observada en esta columna,oportunidades/adapters/out/persistence/entity/OportunidadProductoEntity.java:27
+CRM_OPORTUNIDAD_PRODUCTOS,CREADO_EN,LocalDateTime,TIMESTAMP (precisión por proveedor),TIMESTAMP(9)(11 bytes),0,,No,N,Sin FK observada en esta columna,oportunidades/adapters/out/persistence/entity/OportunidadProductoEntity.java:31
+CRM_PRODUCTOS,ID,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,No,N,Sin FK observada en esta columna,productos/adapters/out/persistence/entity/ProductoEntity.java:17
+CRM_PRODUCTOS,CODIGO,String,VARCHAR2(50),VARCHAR2(200 bytes),50,C,No,N,Sin FK observada en esta columna,productos/adapters/out/persistence/entity/ProductoEntity.java:20
+CRM_PRODUCTOS,NOMBRE,String,VARCHAR2(200),VARCHAR2(800 bytes),200,C,No,N,Sin FK observada en esta columna,productos/adapters/out/persistence/entity/ProductoEntity.java:23
+CRM_PRODUCTOS,DESCRIPCION,String,VARCHAR2(1000),VARCHAR2(4000 bytes),1000,C,Sí (default JPA),Y,Sin FK observada en esta columna,productos/adapters/out/persistence/entity/ProductoEntity.java:26
+CRM_PRODUCTOS,CATEGORIA,String,VARCHAR2(100),VARCHAR2(400 bytes),100,C,Sí (default JPA),Y,Sin FK observada en esta columna,productos/adapters/out/persistence/entity/ProductoEntity.java:29
+CRM_PRODUCTOS,PRECIO_BASE,BigDecimal,"NUMBER(14,2)","NUMBER(14,2)",0,,No,N,Sin FK observada en esta columna,productos/adapters/out/persistence/entity/ProductoEntity.java:32
+CRM_PRODUCTOS,ESTADO,EstadoProducto,VARCHAR2(20),VARCHAR2(80 bytes),20,C,No,N,Sin FK observada en esta columna,productos/adapters/out/persistence/entity/ProductoEntity.java:37
+CRM_PRODUCTOS,CREADO_EN,LocalDateTime,TIMESTAMP (precisión por proveedor),TIMESTAMP(9)(11 bytes),0,,No,N,Sin FK observada en esta columna,productos/adapters/out/persistence/entity/ProductoEntity.java:41
+CRM_PROPUESTA_DETALLES,ID,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,No,N,Sin FK observada en esta columna,propuestas/adapters/out/persistence/entity/DetallePropuestaEntity.java:15
+CRM_PROPUESTA_DETALLES,ID_PRODUCTO,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,Sí (default JPA),Y,Sin FK observada en esta columna,propuestas/adapters/out/persistence/entity/DetallePropuestaEntity.java:18
+CRM_PROPUESTA_DETALLES,DESCRIPCION,String,VARCHAR2(500),VARCHAR2(2000 bytes),500,C,No,N,Sin FK observada en esta columna,propuestas/adapters/out/persistence/entity/DetallePropuestaEntity.java:21
+CRM_PROPUESTA_DETALLES,CANTIDAD,Integer,"NUMBER(10,0)","NUMBER(10,0)",0,,No,N,Sin FK observada en esta columna,propuestas/adapters/out/persistence/entity/DetallePropuestaEntity.java:24
+CRM_PROPUESTA_DETALLES,PRECIO_UNITARIO,BigDecimal,"NUMBER(14,2)","NUMBER(14,2)",0,,No,N,Sin FK observada en esta columna,propuestas/adapters/out/persistence/entity/DetallePropuestaEntity.java:27
+CRM_PROPUESTA_DETALLES,SUBTOTAL,BigDecimal,"NUMBER(14,2)","NUMBER(14,2)",0,,No,N,Sin FK observada en esta columna,propuestas/adapters/out/persistence/entity/DetallePropuestaEntity.java:30
+CRM_PROPUESTA_DETALLES,ID_PROPUESTA,Long (ID del padre),"NUMBER(19,0)","NUMBER(19,0)",0,,No,N,FKLUH9M8DOGREC8EECWYQNGXIRH → CRM_PROPUESTAS.ID [ON DELETE NO ACTION],propuestas/adapters/out/persistence/entity/PropuestaEntity.java:71
+CRM_PROPUESTAS,ID,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,No,N,Sin FK observada en esta columna,propuestas/adapters/out/persistence/entity/PropuestaEntity.java:20
+CRM_PROPUESTAS,NUMERO_PROPUESTA,String,VARCHAR2(50),VARCHAR2(200 bytes),50,C,No,N,Sin FK observada en esta columna,propuestas/adapters/out/persistence/entity/PropuestaEntity.java:23
+CRM_PROPUESTAS,ID_OPORTUNIDAD,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,No,N,Sin FK observada en esta columna,propuestas/adapters/out/persistence/entity/PropuestaEntity.java:26
+CRM_PROPUESTAS,ID_CLIENTE,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,No,N,Sin FK observada en esta columna,propuestas/adapters/out/persistence/entity/PropuestaEntity.java:29
+CRM_PROPUESTAS,CLIENTE_NOMBRE,String,VARCHAR2(150),VARCHAR2(600 bytes),150,C,Sí (default JPA),Y,Sin FK observada en esta columna,propuestas/adapters/out/persistence/entity/PropuestaEntity.java:32
+CRM_PROPUESTAS,ESTADO,EstadoPropuesta,VARCHAR2(20),VARCHAR2(80 bytes),20,C,No,N,Sin FK observada en esta columna,propuestas/adapters/out/persistence/entity/PropuestaEntity.java:37
+CRM_PROPUESTAS,VERSION,Integer,"NUMBER(10,0)","NUMBER(10,0)",0,,No,N,Sin FK observada en esta columna,propuestas/adapters/out/persistence/entity/PropuestaEntity.java:41
+CRM_PROPUESTAS,SUBTOTAL,BigDecimal,"NUMBER(14,2)","NUMBER(14,2)",0,,No,N,Sin FK observada en esta columna,propuestas/adapters/out/persistence/entity/PropuestaEntity.java:44
+CRM_PROPUESTAS,DESCUENTO,BigDecimal,"NUMBER(14,2)","NUMBER(14,2)",0,,No,N,Sin FK observada en esta columna,propuestas/adapters/out/persistence/entity/PropuestaEntity.java:48
+CRM_PROPUESTAS,TOTAL,BigDecimal,"NUMBER(14,2)","NUMBER(14,2)",0,,No,N,Sin FK observada en esta columna,propuestas/adapters/out/persistence/entity/PropuestaEntity.java:51
+CRM_PROPUESTAS,RESPONSABLE,String,VARCHAR2(100),VARCHAR2(400 bytes),100,C,Sí (default JPA),Y,Sin FK observada en esta columna,propuestas/adapters/out/persistence/entity/PropuestaEntity.java:54
+CRM_PROPUESTAS,FECHA_EMISION,LocalDate,DATE,DATE(7 bytes),0,,No,N,Sin FK observada en esta columna,propuestas/adapters/out/persistence/entity/PropuestaEntity.java:57
+CRM_PROPUESTAS,FECHA_VENCIMIENTO,LocalDate,DATE,DATE(7 bytes),0,,Sí (default JPA),Y,Sin FK observada en esta columna,propuestas/adapters/out/persistence/entity/PropuestaEntity.java:60
+CRM_PROPUESTAS,OBSERVACIONES,String,CLOB,CLOB(4000 bytes),0,,Sí (default JPA),Y,Sin FK observada en esta columna,propuestas/adapters/out/persistence/entity/PropuestaEntity.java:64
+CRM_PROPUESTAS,CREADO_EN,LocalDateTime,TIMESTAMP (precisión por proveedor),TIMESTAMP(9)(11 bytes),0,,No,N,Sin FK observada en esta columna,propuestas/adapters/out/persistence/entity/PropuestaEntity.java:68
+CRM_USUARIOS,ID,Long,"NUMBER(19,0)","NUMBER(19,0)",0,,No,N,Sin FK observada en esta columna,usuarios/adapters/out/persistence/entity/UsuarioEntity.java:17
+CRM_USUARIOS,NOMBRE,String,VARCHAR2(100),VARCHAR2(400 bytes),100,C,No,N,Sin FK observada en esta columna,usuarios/adapters/out/persistence/entity/UsuarioEntity.java:20
+CRM_USUARIOS,APELLIDO,String,VARCHAR2(100),VARCHAR2(400 bytes),100,C,No,N,Sin FK observada en esta columna,usuarios/adapters/out/persistence/entity/UsuarioEntity.java:23
+CRM_USUARIOS,CORREO,String,VARCHAR2(150),VARCHAR2(600 bytes),150,C,No,N,Sin FK observada en esta columna,usuarios/adapters/out/persistence/entity/UsuarioEntity.java:26
+CRM_USUARIOS,PASSWORD_HASH,String,VARCHAR2(255),VARCHAR2(1020 bytes),255,C,No,N,Sin FK observada en esta columna,usuarios/adapters/out/persistence/entity/UsuarioEntity.java:29
+CRM_USUARIOS,ROL,RolUsuario,VARCHAR2(20),VARCHAR2(80 bytes),20,C,No,N,Sin FK observada en esta columna,usuarios/adapters/out/persistence/entity/UsuarioEntity.java:33
+CRM_USUARIOS,ESTADO,EstadoUsuario,VARCHAR2(20),VARCHAR2(80 bytes),20,C,No,N,Sin FK observada en esta columna,usuarios/adapters/out/persistence/entity/UsuarioEntity.java:38
+CRM_USUARIOS,CREADO_EN,LocalDateTime,TIMESTAMP (precisión por proveedor),TIMESTAMP(9)(11 bytes),0,,No,N,Sin FK observada en esta columna,usuarios/adapters/out/persistence/entity/UsuarioEntity.java:42
+CRM_USUARIOS,ACTUALIZADO_EN,LocalDateTime,TIMESTAMP (precisión por proveedor),TIMESTAMP(9)(11 bytes),0,,Sí (default JPA),Y,Sin FK observada en esta columna,usuarios/adapters/out/persistence/entity/UsuarioEntity.java:45

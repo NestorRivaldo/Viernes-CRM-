@@ -1,0 +1,58 @@
+@startuml
+!pragma layout smetana
+skinparam defaultFontName Segoe UI
+skinparam defaultFontSize 13
+skinparam shadowing false
+title Casos de uso — alcance implementado y permisos HTTP (perfil keycloak)
+left to right direction
+actor "Usuario autenticado" as U
+actor VENDEDOR as V
+actor JEFE as J
+actor ADMIN as A
+actor Keycloak as K
+actor APIsPERU as P
+U <|-- V
+U <|-- J
+J <|-- A
+rectangle "Viernes CRM V1" {
+ usecase "Iniciar/cerrar sesión" as Sesion
+ usecase "Consultar clientes, leads, oportunidades,\npropuestas, actividades y catálogos" as Lectura
+ usecase "Crear/editar clientes y contactos;\nconsultar DNI/RUC" as Clientes
+ usecase "Crear/editar leads y cambiar estado" as Leads
+ usecase "Crear/editar oportunidades y etapa;\nasociar contactos/productos/colaboradores" as Opp
+ usecase "Crear/editar borrador y enviar propuesta" as Prop
+ usecase "Crear/editar actividades;\nasignar participantes y etiquetas" as Act
+ usecase "Consultar dashboard y mapa de relaciones" as Mapa
+ usecase "Enviar/consultar mensajes internos" as Chat
+ usecase "Mantener productos, fuentes, equipos,\ncampañas y etiquetas" as Catalogos
+ usecase "Aprobar/rechazar/cancelar propuesta" as Aprobar
+ usecase "Escribir usuarios CRM" as Usuarios
+ usecase "Eliminar registros de negocio" as Borrar
+}
+U --> Sesion
+K --> Sesion
+U --> Lectura
+U --> Clientes
+P --> Clientes : consulta documental
+U --> Leads
+U --> Opp
+U --> Prop
+U --> Act
+U --> Mapa
+U --> Chat
+J --> Catalogos
+J --> Aprobar
+A --> Usuarios
+A --> Borrar
+note bottom of U
+ Usuario autenticado resume la regla HTTP final.
+ ADMIN hereda aquí capacidades de JEFE,
+ no una jerarquía declarada en Keycloak.
+ Las reglas de estado siguen aplicando a todos.
+end note
+note bottom of Prop
+ Enviar = cambiar estado; no envío de correo.
+ No se modela conversión automática de lead.
+ No se asignan RF/HU originales no localizados.
+end note
+@enduml

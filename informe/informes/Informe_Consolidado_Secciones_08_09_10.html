@@ -1,0 +1,621 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Viernes CRM V1 — Cierre Documental Secciones 08, 09 y 10</title>
+  <style>
+    body { font: 15px/1.6 Calibri, Segoe UI, sans-serif; color: #163047; background: #f2f5f8; margin: 0; padding: 20px; }
+    main { max-width: 1140px; margin: auto; background: white; padding: 40px 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.06); border-radius: 4px; }
+    h1, h2, h3 { color: #153e63; line-height: 1.25; }
+    h1 { border-bottom: 3px solid #1e8293; padding-bottom: 12px; margin-top: 0; font-size: 26px; }
+    h2 { border-bottom: 1px solid #d3dce4; padding-bottom: 6px; margin-top: 36px; font-size: 20px; }
+    h3 { margin-top: 24px; font-size: 16px; color: #086b94; }
+    table { border-collapse: collapse; width: 100%; font-size: 13px; margin: 18px 0; }
+    td, th { border: 1px solid #d3dce4; padding: 8px 10px; text-align: left; vertical-align: top; }
+    th { background: #e7eef5; color: #153e63; font-weight: bold; }
+    tr:nth-child(even) { background: #fbfcfd; }
+    code { font-family: Consolas, monospace; font-size: 12px; background: #eef2f6; padding: 2px 4px; border-radius: 3px; color: #b02a37; }
+    pre { background: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #1e8293; padding: 12px; font-family: Consolas, monospace; font-size: 12px; overflow-x: auto; white-space: pre-wrap; }
+    .banner { font-size: 12px; color: #526c83; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .alerta { border-left: 4px solid #dc9b35; background: #fff8eb; padding: 12px 16px; margin: 16px 0; font-size: 13px; }
+    .badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+    .badge-core { background: #d1e7dd; color: #0f5132; }
+    .badge-soporte { background: #cfe2ff; color: #084298; }
+    .badge-generico { background: #f8d7da; color: #842029; }
+    .tag-propio { background: #d1e7dd; color: #0f5132; padding: 2px 6px; border-radius: 3px; font-size: 11px; }
+    .tag-spring { background: #cff4fc; color: #055160; padding: 2px 6px; border-radius: 3px; font-size: 11px; }
+    .tag-hibrido { background: #fff3cd; color: #664d03; padding: 2px 6px; border-radius: 3px; font-size: 11px; }
+    @media print { body { background: white; padding: 0; } main { box-shadow: none; padding: 0; max-width: none; } }
+  </style>
+</head>
+<body>
+<main>
+
+<div class="banner">VIERNES CRM V1 · PROYECTO INTEGRADOR DE ANÁLISIS Y DISEÑO DE SOFTWARE · 11/11/2026</div>
+<h1>Cierre Documental Académico — Secciones 08, 09 y 10</h1>
+<p>Documento preparado para su inserción directa en el borrador oficial Word de 40 páginas. Elaborado con base estricta en el código fuente actual de <code>E:\Viernes\Viernes</code>, la base de datos Oracle Free y la infraestructura de autenticación Keycloak.</p>
+
+<!-- SECCIÓN 08 -->
+<h2>08. Análisis del Dominio (DDD)</h2>
+
+<h3>8.1 Dominio Principal y Subdominios</h3>
+<p>El dominio principal de <strong>Viernes CRM V1</strong> corresponde a la <strong>Gestión Comercial CRM y Marketing B2B</strong> para el sector corporativo peruano. Sus subdominios se clasifican formalmente en:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Subdominio</th>
+      <th>Clasificación DDD</th>
+      <th>Paquete Java</th>
+      <th>Responsabilidad en el Sistema</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Clientes</strong></td>
+      <td><span class="badge badge-core">Core Domain</span></td>
+      <td><code>com.viernes.clientes</code></td>
+      <td>Gestión integral de empresas clientes, sus contactos clave y consultas automáticas oficiales a fuentes públicas (RENIEC para DNI, SUNAT para RUC).</td>
+    </tr>
+    <tr>
+      <td><strong>Oportunidades</strong></td>
+      <td><span class="badge badge-core">Core Domain</span></td>
+      <td><code>com.viernes.oportunidades</code></td>
+      <td>Embudo y pipeline de ventas. Administra el ciclo de vida de cada negociación comercial, cálculo de valor ponderado y vínculos N:M.</td>
+    </tr>
+    <tr>
+      <td><strong>Propuestas</strong></td>
+      <td><span class="badge badge-core">Core Domain</span></td>
+      <td><code>com.viernes.propuestas</code></td>
+      <td>Generación y cotización formal de propuestas económicas. Controla transiciones de estado, cálculo de subtotales, totales y descuentos.</td>
+    </tr>
+    <tr>
+      <td><strong>Actividades</strong></td>
+      <td><span class="badge badge-core">Core Domain</span></td>
+      <td><code>com.viernes.actividades</code></td>
+      <td>Seguimiento operativo de llamadas, reuniones y tareas. Integra relaciones N:M con participantes de contactos y etiquetas clasificadoras.</td>
+    </tr>
+    <tr>
+      <td><strong>Leads</strong></td>
+      <td><span class="badge badge-core">Core Domain</span></td>
+      <td><code>com.viernes.leads</code></td>
+      <td>Captación, calificación y ciclo de conversión inicial de prospectos comerciales organizados por fuentes de origen.</td>
+    </tr>
+    <tr>
+      <td><strong>Marketing</strong></td>
+      <td><span class="badge badge-soporte">Supporting Domain</span></td>
+      <td><code>com.viernes.marketing</code></td>
+      <td>Administración de campañas comerciales asociadas a leads mediante relación N:M (CampaniaLead).</td>
+    </tr>
+    <tr>
+      <td><strong>Productos</strong></td>
+      <td><span class="badge badge-soporte">Supporting Domain</span></td>
+      <td><code>com.viernes.productos</code></td>
+      <td>Catálogo maestro de productos y servicios cotizables con precios base.</td>
+    </tr>
+    <tr>
+      <td><strong>Etiquetas</strong></td>
+      <td><span class="badge badge-soporte">Supporting Domain</span></td>
+      <td><code>com.viernes.etiquetas</code></td>
+      <td>Taxonomía transversal con nombre normalizado para clasificación de actividades comerciales.</td>
+    </tr>
+    <tr>
+      <td><strong>Equipos</strong></td>
+      <td><span class="badge badge-soporte">Supporting Domain</span></td>
+      <td><code>com.viernes.equipos</code></td>
+      <td>Agrupación de colaboradores y usuarios en equipos comerciales estructurados (relación N:M).</td>
+    </tr>
+    <tr>
+      <td><strong>Usuarios</strong></td>
+      <td><span class="badge badge-soporte">Supporting Domain</span></td>
+      <td><code>com.viernes.usuarios</code></td>
+      <td>Gestión interna de colaboradores, roles (ADMIN, JEFE, VENDEDOR) y estados de acceso.</td>
+    </tr>
+    <tr>
+      <td><strong>Mensajería</strong></td>
+      <td><span class="badge badge-soporte">Supporting Domain</span></td>
+      <td><code>com.viernes.mensajeria</code></td>
+      <td>Canal de chat y comunicación colaborativa interna entre usuarios comerciales.</td>
+    </tr>
+    <tr>
+      <td><strong>Dashboard</strong></td>
+      <td><span class="badge badge-generico">Generic Subdomain</span></td>
+      <td><code>com.viernes.dashboard</code></td>
+      <td>Agregación de KPIs de lectura y métricas de desempeño comercial en memoria y caché Caffeine.</td>
+    </tr>
+    <tr>
+      <td><strong>Relationship Map</strong></td>
+      <td><span class="badge badge-generico">Generic Subdomain</span></td>
+      <td><code>com.viernes.relationshipmap</code></td>
+      <td>Servicio transversal de construcción y navegación de grafos contextuales multicapa entre clientes, oportunidades y colaboradores.</td>
+    </tr>
+    <tr>
+      <td><strong>Auth</strong></td>
+      <td><span class="badge badge-generico">Generic Subdomain</span></td>
+      <td><code>com.viernes.auth</code></td>
+      <td>Seguridad perimetral, configuración de Resource Server OAuth2 y capa anticorrupción de Keycloak.</td>
+    </tr>
+    <tr>
+      <td><strong>Shared</strong></td>
+      <td><span class="badge badge-generico">Generic Subdomain</span></td>
+      <td><code>com.viernes.shared</code></td>
+      <td>Componentes transversales: manejo unificado de excepciones, rate limiting, caché Caffeine, OpenAPI y Correlation ID.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>8.2 Entidades, Objetos de Valor y Agregados</h3>
+<p>El backend preserva una estricta separación entre el modelo conceptual de dominio y el modelo relacional físico. Las clases en <code>domain/</code> son POJOs puros sin dependencias de JPA:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Agregado</th>
+      <th>Raíz del Agregado</th>
+      <th>Entidades Subordinadas</th>
+      <th>Objetos de Valor (Value Objects)</th>
+      <th>Invariantes de Negocio Comprobadas</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Propuesta</strong></td>
+      <td><code>Propuesta</code></td>
+      <td><code>DetallePropuesta</code></td>
+      <td><code>EstadoPropuesta</code> (Enum)</td>
+      <td>
+        • El detalle solo existe dentro del contexto de su propuesta raíz.<br>
+        • Modificación prohibida en estados terminales APROBADA, RECHAZADA o CANCELADA (<code>esEstadoTerminal()</code>).<br>
+        • Recálculo automático de total: subtotal menos descuentos (<code>recalcularTotales()</code>).
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Oportunidad</strong></td>
+      <td><code>Oportunidad</code></td>
+      <td><code>OportunidadContacto</code>, <code>OportunidadProducto</code>, <code>OportunidadColaborador</code></td>
+      <td><code>EtapaOportunidad</code> (Enum)</td>
+      <td>
+        • El valor ponderado se calcula como <code>(valor * probabilidad) / 100</code> (<code>getValorPonderado()</code>).<br>
+        • Las relaciones N:M subordinadas se orquestan mediante subrecursos REST de la oportunidad.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Actividad</strong></td>
+      <td><code>Actividad</code></td>
+      <td><code>ActividadParticipante</code>, <code>ActividadEtiqueta</code></td>
+      <td><code>TipoActividad</code>, <code>EstadoActividad</code></td>
+      <td>
+        • Límite estricto de máximo 8 etiquetas por actividad (<code>MAX_ETIQUETAS = 8</code>).<br>
+        • Validación de existencia previa de entidades foráneas antes de crear o actualizar (<code>RelacionValidationPort</code>).
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Cliente</strong></td>
+      <td><code>Cliente</code></td>
+      <td><code>Contacto</code></td>
+      <td><code>TipoDocumento</code>, <code>EstadoCliente</code>, <code>DocumentoConsultado</code> (Record)</td>
+      <td>
+        • Los contactos pertenecen a un cliente específico y su ciclo de vida se gestiona a través de <code>ManageClienteUseCase</code>.<br>
+        • Unicidad de número de documento por tipo (DNI/RUC).
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Lead</strong></td>
+      <td><code>Lead</code></td>
+      <td>—</td>
+      <td><code>EstadoLead</code> (Enum)</td>
+      <td>• Asignación obligatoria a una <code>Fuente</code> válida. Marcar como CONVERTIDO no genera registros secundarios automáticamente.</td>
+    </tr>
+    <tr>
+      <td><strong>Equipo</strong></td>
+      <td><code>Equipo</code></td>
+      <td><code>EquipoMiembro</code></td>
+      <td><code>EstadoEquipo</code> (Enum)</td>
+      <td>• Validación obligatoria de existencia del usuario en el módulo Usuarios antes de incorporarlo como miembro.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>8.3 Implementación de Relaciones N:M — Contraste Java vs. Oracle</h3>
+<p>La implementación descarta el uso de anotaciones <code>@ManyToMany</code> opacas de JPA. En su lugar, cada relación muchos a muchos fue elevada a una <strong>entidad intermedia formal con tabla física propia en Oracle</strong>, dotándola de identidad y atributos contextuales:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Relación Muchos a Muchos</th>
+      <th>Entidad de Dominio</th>
+      <th>Entidad JPA</th>
+      <th>Tabla Física Oracle</th>
+      <th>Atributos Propios / Constraints</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Oportunidades ↔ Contactos</td>
+      <td><code>OportunidadContacto</code></td>
+      <td><code>OportunidadContactoEntity</code></td>
+      <td><code>CRM_OPORTUNIDAD_CONTACTOS</code></td>
+      <td><code>rol</code> (String), <code>esDecisor</code> (Boolean), Unique(id_oportunidad, id_contacto)</td>
+    </tr>
+    <tr>
+      <td>Oportunidades ↔ Productos</td>
+      <td><code>OportunidadProducto</code></td>
+      <td><code>OportunidadProductoEntity</code></td>
+      <td><code>CRM_OPORTUNIDAD_PRODUCTOS</code></td>
+      <td><code>cantidad</code> (Integer), Unique(id_oportunidad, id_producto)</td>
+    </tr>
+    <tr>
+      <td>Oportunidades ↔ Colaboradores</td>
+      <td><code>OportunidadColaborador</code></td>
+      <td><code>OportunidadColaboradorEntity</code></td>
+      <td><code>CRM_OPORTUNIDAD_COLABORADORES</code></td>
+      <td><code>idUsuario</code>, <code>creadoEn</code>, Unique(id_oportunidad, id_usuario)</td>
+    </tr>
+    <tr>
+      <td>Actividades ↔ Participantes</td>
+      <td><code>ActividadParticipante</code></td>
+      <td><code>ActividadParticipanteEntity</code></td>
+      <td><code>CRM_ACTIVIDAD_PARTICIPANTES</code></td>
+      <td><code>idContacto</code>, <code>creadoEn</code>, Unique(id_actividad, id_contacto)</td>
+    </tr>
+    <tr>
+      <td>Actividades ↔ Etiquetas</td>
+      <td><code>ActividadEtiqueta</code></td>
+      <td><code>ActividadEtiquetaEntity</code></td>
+      <td><code>CRM_ACTIVIDAD_ETIQUETAS</code></td>
+      <td><code>orden</code> (Integer), <code>creadoEn</code>, Unique(id_actividad, id_etiqueta)</td>
+    </tr>
+    <tr>
+      <td>Equipos ↔ Usuarios</td>
+      <td><code>EquipoMiembro</code></td>
+      <td><code>EquipoMiembroEntity</code></td>
+      <td><code>CRM_EQUIPO_MIEMBROS</code></td>
+      <td><code>usuarioId</code>, <code>creadoEn</code>, Unique(equipo_id, usuario_id)</td>
+    </tr>
+    <tr>
+      <td>Campañas ↔ Leads</td>
+      <td><code>CampaniaLead</code></td>
+      <td><code>CampaniaLeadEntity</code></td>
+      <td><code>CRM_CAMPANIA_LEADS</code></td>
+      <td><code>leadId</code>, <code>creadoEn</code>, Unique(campania_id, lead_id)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>8.4 Puertos, Servicios y Capa Anticorrupción con Keycloak</h3>
+<p>La arquitectura hexagonal desacopla completamente el núcleo de negocio mediante puertos de entrada (<code>Manage*UseCase</code>) y puertos de salida (<code>*PersistencePort</code>). El módulo <code>auth</code> actúa como una <strong>Capa Anticorrupción (ACL)</strong> frente al servidor de identidad externo:</p>
+<ul>
+  <li><code>KeycloakJwtAuthenticationConverter</code> traduce los roles emitidos en el JWT (claim <code>realm_access.roles</code>) hacia las autoridades de Spring Security (<code>ROLE_ADMIN</code>, <code>ROLE_JEFE</code>, <code>ROLE_VENDEDOR</code>), descartando roles técnicos de Keycloak.</li>
+  <li>El frontend implementa <code>AuthService</code> como una fachada que desacopla los componentes Angular de la librería <code>keycloak-js</code>.</li>
+  <li>El módulo <code>usuarios</code> expone <code>UsuariosApi</code> como Named Interface pública para que otros módulos validen existencia de cuentas sin violar la encapsulación de Spring Modulith.</li>
+</ul>
+
+<div class="alerta">
+  <strong>[VALIDACIÓN REQUERIDA CON EL EQUIPO]:</strong> Verificar si las representaciones históricas de Miro y Lucidchart que graficaban <code>@ManyToMany</code> directa entre Clientes y Oportunidades se mantendrán como antecedentes de diseño o si serán reemplazadas por el modelo físico de 26 tablas Oracle documentado en <code>erd_oracle_26.svg</code>.
+</div>
+
+<!-- SECCIÓN 09 -->
+<h2>09. Arquitectura de Software</h2>
+
+<h3>9.1 Estilo Arquitectónico: Monolito Modular</h3>
+<p>El backend se estructura como un <strong>Monolito Modular</strong> gobernado por <strong>Spring Modulith 2.0.7</strong> sobre <strong>Spring Boot 4.0.7</strong> y <strong>Java 21 LTS</strong>. La arquitectura modular combina la simplicidad operativa de un único artefacto ejecutable (un único archivo JAR) con la disciplina de límites y aislamiento de responsabilidades propia de los microservicios.</p>
+
+<p>La integridad arquitectónica es verificada automáticamente en tiempo de compilación por la clase de prueba <code>com.viernes.ModularityTests</code>:</p>
+<pre><code>class ModularityTests {
+    ApplicationModules modules = ApplicationModules.of(ViernesApplication.class);
+
+    @Test
+    void verifiesModularStructure() {
+        modules.verify(); // Falla si se detectan violaciones de encapsulamiento o dependencias cíclicas
+    }
+}</code></pre>
+
+<h3>9.2 Organización Hexagonal por Módulo</h3>
+<p>Cada módulo funcional implementa de manera uniforme el patrón de Arquitectura Hexagonal (Puertos y Adaptadores):</p>
+<pre><code>com.viernes.&lt;modulo&gt;/
+├── domain/                      ← POJOs de dominio y enumeraciones puras (sin JPA)
+├── application/
+│   ├── dto/                     ← Contratos inmutables de petición y respuesta (Records)
+│   ├── port/
+│   │   ├── in/                  ← Puertos primarios: Casos de Uso (Manage*UseCase)
+│   │   └── out/                 ← Puertos secundarios: Persistencia y validación (*PersistencePort)
+│   └── service/                 ← Servicios orquestadores (@Service, @Transactional)
+├── adapters/
+│   ├── in/web/                  ← Adaptadores primarios: Controladores REST (@RestController)
+│   └── out/persistence/         ← Adaptadores secundarios: Implementaciones JPA hacia Oracle
+│       ├── entity/              ← Entidades JPA mapeadas a tablas CRM_* (@Entity)
+│       └── repository/          ← Repositorios de datos Spring Data JPA
+└── package-info.java            ← Metadatos de módulo y reglas de acoplamiento de Spring Modulith</code></pre>
+
+<h3>9.3 Stack Tecnológico e Infraestructura de Despliegue</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Capa / Componente</th>
+      <th>Tecnología / Versión</th>
+      <th>Rol en la Arquitectura</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Lenguaje Backend</td>
+      <td>Java 21 LTS</td>
+      <td>Plataforma moderna con Records, Pattern Matching y Virtual Threads disponibles.</td>
+    </tr>
+    <tr>
+      <td>Framework Backend</td>
+      <td>Spring Boot 4.0.7</td>
+      <td>Contenedor de Inversión de Control (IoC), configuración y servidor WebMVC embebido.</td>
+    </tr>
+    <tr>
+      <td>Modularidad</td>
+      <td>Spring Modulith 2.0.7</td>
+      <td>Gobernanza de módulos, análisis de límites y generación de documentación de arquitectura.</td>
+    </tr>
+    <tr>
+      <td>Base de Datos</td>
+      <td>Oracle Database Free 23c</td>
+      <td>Persistencia transaccional ACID en puerto 1521 (PDB FREEPDB1, esquema BOM_VENTAS, 26 tablas).</td>
+    </tr>
+    <tr>
+      <td>Identidad y Seguridad</td>
+      <td>Keycloak 25.0.6 (Docker)</td>
+      <td>Proveedor de Identidad OAuth2 / OIDC en puerto 8180 (realm viernes-realm) con PostgreSQL 16.</td>
+    </tr>
+    <tr>
+      <td>Caché en Memoria</td>
+      <td>Caffeine Cache</td>
+      <td>Caché multiescala: catálogos (5 min), dashboard (30 seg), DNI/RUC (24 hrs) y caché negativa (3 min).</td>
+    </tr>
+    <tr>
+      <td>Observabilidad</td>
+      <td>Prometheus + Grafana + Loki</td>
+      <td>Recolección de métricas desde <code>/actuator/prometheus</code> y agregación de logs con Correlation ID.</td>
+    </tr>
+    <tr>
+      <td>Frontend SPA</td>
+      <td>Angular 22.1.0</td>
+      <td>Interfaz web standalone, detección de cambios zoneless y carga diferida (lazy loading).</td>
+    </tr>
+    <tr>
+      <td>Componentes UI</td>
+      <td>Angular Material 22.2.0</td>
+      <td>Sistema de diseño visual corporativo accesible.</td>
+    </tr>
+    <tr>
+      <td>Visualización de Grafos</td>
+      <td>Cytoscape.js 3.34.4</td>
+      <td>Lienzo interactivo de relaciones comerciales en el módulo Relationship Map.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>9.4 Decisiones Arquitectónicas (ADRs)</h3>
+<ul>
+  <li><strong>ADR-01: Monolito Modular sobre Microservicios:</strong> Se adoptó un solo despliegue con Spring Modulith para evitar la sobrecarga de orquestación de red y particionamiento distribuido en un equipo pequeño.</li>
+  <li><strong>ADR-02: Arquitectura Hexagonal Estricta:</strong> Desacoplamiento total del dominio respecto a JPA/Oracle. Facilita la creación de pruebas unitarias mediante dobles de prueba (mocks) en los puertos.</li>
+  <li><strong>ADR-03: Keycloak como Resource Server Desacoplado:</strong> Flujo Authorization Code con PKCE S256 en la SPA y validación de tokens JWT en el backend sin almacenar sesiones en memoria (arquitectura stateless).</li>
+  <li><strong>ADR-04: Trazabilidad Distribuida con Correlation ID:</strong> Inyección del encabezado <code>X-Trace-ID</code> en frontend y propagación en el MDC de Logback para correlacionar eventos entre cliente, backend y logs.</li>
+</ul>
+
+<h3>9.5 Evaluación y Validez de Diagramas C4</h3>
+<ul>
+  <li><strong>C1 (Contexto del Sistema): VÁLIDO.</strong> Refleja con precisión la interacción de los tres roles de usuario (Admin, Jefe, Vendedor) y las dependencias externas (Keycloak, APIsPerú y Oracle).</li>
+  <li><strong>C2 (Contenedores): VÁLIDO.</strong> La topología física de contenedores (SPA Angular :4200, Spring Boot :8080, Keycloak :8180 y Oracle :1521) coincide con los manifiestos de Docker Compose vigentes.</li>
+  <li><strong>C3 (Componentes): REQUIERE ACTUALIZACIÓN.</strong> Los diagramas antiguos omitían los módulos de <code>relationshipmap</code>, <code>propuestas</code>, <code>equipos</code> y <code>marketing</code>, y no reflejaban la separación de puertos de entrada/salida. Deben reemplazarse con el inventario de 16 módulos de Spring Modulith.</li>
+</ul>
+
+<!-- SECCIÓN 10 -->
+<h2>10. Patrones GRASP y GoF</h2>
+
+<h3>10.1 Los Nueve Principios GRASP</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Principio GRASP</th>
+      <th>Estado</th>
+      <th>Clase y Método Concreto</th>
+      <th>Ruta del Archivo</th>
+      <th>Problema Resuelto y Justificación</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Information Expert</strong></td>
+      <td><span class="tag-propio">Implementado (Propio)</span></td>
+      <td><code>Oportunidad.getValorPonderado()</code></td>
+      <td><code>oportunidades/domain/Oportunidad.java</code></td>
+      <td>Calcula el valor ponderado del negocio multiplicando valor por probabilidad. La responsabilidad reside en la entidad dueña de los datos.</td>
+    </tr>
+    <tr>
+      <td><strong>Information Expert</strong></td>
+      <td><span class="tag-propio">Implementado (Propio)</span></td>
+      <td><code>Propuesta.recalcularTotales()</code></td>
+      <td><code>propuestas/domain/Propuesta.java</code></td>
+      <td>Calcula la sumatoria de subtotales y resta de descuentos de la propuesta.</td>
+    </tr>
+    <tr>
+      <td><strong>Creator</strong></td>
+      <td><span class="tag-propio">Implementado (Propio)</span></td>
+      <td><code>ActividadService.crear()</code></td>
+      <td><code>actividades/application/service/ActividadService.java</code></td>
+      <td>El servicio de aplicación asume la creación de la entidad <code>Actividad</code> y sincroniza sus enlaces de etiquetas asociados.</td>
+    </tr>
+    <tr>
+      <td><strong>Controller</strong></td>
+      <td><span class="tag-hibrido">Implementado (Híbrido)</span></td>
+      <td>14 controladores REST (ej. <code>ActividadController</code>)</td>
+      <td><code>*/adapters/in/web/*Controller.java</code></td>
+      <td>Puntos de entrada no-UI que reciben las peticiones HTTP y delegan la ejecución en los casos de uso (<code>Manage*UseCase</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>Low Coupling</strong></td>
+      <td><span class="tag-propio">Implementado (Propio)</span></td>
+      <td><code>RelacionValidationPort</code></td>
+      <td><code>actividades/application/port/out/RelacionValidationPort.java</code></td>
+      <td>Desacopla la validación de entidades foráneas de implementaciones concretas de otros módulos.</td>
+    </tr>
+    <tr>
+      <td><strong>High Cohesion</strong></td>
+      <td><span class="tag-propio">Implementado (Propio)</span></td>
+      <td>Servicios especializados (ej. <code>ClienteService</code>)</td>
+      <td><code>clientes/application/service/ClienteService.java</code></td>
+      <td>Cada servicio de aplicación concentra exclusivamente las operaciones de su agregado correspondiente.</td>
+    </tr>
+    <tr>
+      <td><strong>Polymorphism</strong></td>
+      <td><span class="tag-hibrido">Implementado (Híbrido)</span></td>
+      <td><code>DocumentoLookupPort</code></td>
+      <td><code>clientes/application/port/out/DocumentoLookupPort.java</code></td>
+      <td>Permite sustituir o simular la consulta externa DNI/RUC sin alterar el código de los servicios comerciales.</td>
+    </tr>
+    <tr>
+      <td><strong>Pure Fabrication</strong></td>
+      <td><span class="tag-propio">Implementado (Propio)</span></td>
+      <td><code>CorrelationIdFilter</code>, <code>ConsultaDocumentoRateLimiter</code></td>
+      <td><code>shared/filter/CorrelationIdFilter.java</code></td>
+      <td>Clases de soporte técnico no pertenecientes al dominio comercial creadas para mantener alta cohesión.</td>
+    </tr>
+    <tr>
+      <td><strong>Indirection</strong></td>
+      <td><span class="tag-propio">Implementado (Propio)</span></td>
+      <td>Puertos de persistencia y <code>AuthService</code></td>
+      <td><code>actividades/application/port/out/ActividadPersistencePort.java</code></td>
+      <td>Intermediario entre los servicios y la base de datos Oracle, aislando la lógica de negocio de la tecnología de persistencia.</td>
+    </tr>
+    <tr>
+      <td><strong>Protected Variations</strong></td>
+      <td><span class="tag-propio">Implementado (Propio)</span></td>
+      <td>Contratos estables y <code>UsuariosApi</code></td>
+      <td><code>usuarios/UsuariosApi.java</code></td>
+      <td>Protege a los módulos consumidores de cualquier cambio interno en el esquema relacional del módulo Usuarios.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>10.2 Patrones GoF (Gang of Four)</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Patrón GoF</th>
+      <th>Categoría</th>
+      <th>Estado</th>
+      <th>Clase / Método Concreto</th>
+      <th>Origen</th>
+      <th>Problema Resuelto</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Builder</strong></td>
+      <td>Creacional</td>
+      <td>Implementado</td>
+      <td><code>@Builder</code> en 17 entidades y DTOs</td>
+      <td><span class="tag-propio">Lombok (Código propio)</span></td>
+      <td>Construcción legible de objetos complejos con parámetros opcionales sin constructores telescópicos.</td>
+    </tr>
+    <tr>
+      <td><strong>Singleton</strong></td>
+      <td>Creacional</td>
+      <td>Implementado</td>
+      <td>Beans de Spring (<code>@Service</code>, <code>@Component</code>)</td>
+      <td><span class="tag-spring">Spring Framework</span></td>
+      <td>Instancia única compartida por inyección de dependencias para servicios sin estado interno.</td>
+    </tr>
+    <tr>
+      <td><strong>Factory Method</strong></td>
+      <td>Creacional</td>
+      <td>Parcial</td>
+      <td>Métodos <code>@Bean</code> en clases de configuración</td>
+      <td><span class="tag-hibrido">Híbrido (Spring + Propio)</span></td>
+      <td>Centraliza la creación e inicialización de beans de infraestructura (<code>PasswordEncoder</code>, <code>CacheManager</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>Adapter</strong></td>
+      <td>Estructural</td>
+      <td>Implementado</td>
+      <td>12 clases <code>*PersistenceAdapter</code> y <code>ApisPeruDocumentoAdapter</code></td>
+      <td><span class="tag-propio">Código Propio</span></td>
+      <td>Adapta las interfaces de dominio a la API concreta de Spring Data JPA o servicios REST externos de consulta.</td>
+    </tr>
+    <tr>
+      <td><strong>Facade</strong></td>
+      <td>Estructural</td>
+      <td>Implementado</td>
+      <td><code>DashboardService.getResumen()</code> y <code>AuthService</code> en Angular</td>
+      <td><span class="tag-propio">Código Propio</span></td>
+      <td>Interfaz unificada y simplificada sobre un subsistema complejo (múltiples agregaciones o API de Keycloak).</td>
+    </tr>
+    <tr>
+      <td><strong>Proxy</strong></td>
+      <td>Estructural</td>
+      <td>Implementado</td>
+      <td>Proxies dinámicos para <code>@Transactional</code> y <code>@Cacheable</code></td>
+      <td><span class="tag-spring">Spring Framework</span></td>
+      <td>Intercepta llamadas para control transaccional en Oracle y resolución de consultas desde caché Caffeine.</td>
+    </tr>
+    <tr>
+      <td><strong>Template Method</strong></td>
+      <td>Comportamental</td>
+      <td>Implementado</td>
+      <td><code>CorrelationIdFilter extends OncePerRequestFilter</code></td>
+      <td><span class="tag-hibrido">Híbrido (Spring + Propio)</span></td>
+      <td>La clase base define la estructura del ciclo de filtrado y delega la lógica de trazabilidad a <code>doFilterInternal()</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>Strategy</strong></td>
+      <td>Comportamental</td>
+      <td>Implementado</td>
+      <td>Puertos inyectados polimórficamente (<code>DocumentoLookupPort</code>)</td>
+      <td><span class="tag-hibrido">Híbrido (Spring DI)</span></td>
+      <td>Permite intercambiar algoritmos o proveedores de datos manteniendo inalterada la lógica consumidora.</td>
+    </tr>
+    <tr>
+      <td><strong>Observer</strong></td>
+      <td>Comportamental</td>
+      <td>Implementado</td>
+      <td><code>BehaviorSubject&lt;boolean&gt;</code> en <code>KeycloakAuthService</code></td>
+      <td><span class="tag-propio">Código Propio (RxJS)</span></td>
+      <td>Notifica cambios reactivos de autenticación a guards y componentes visuales en Angular.</td>
+    </tr>
+    <tr>
+      <td><strong>Chain of Responsibility</strong></td>
+      <td>Comportamental</td>
+      <td>Implementado</td>
+      <td><code>SecurityFilterChain</code> y <code>HttpInterceptorFn</code></td>
+      <td><span class="tag-spring">Spring / Angular</span></td>
+      <td>Encadenamiento secuencial de filtros de seguridad HTTP e interceptores de cabeceras.</td>
+    </tr>
+    <tr>
+      <td><strong>Repository</strong></td>
+      <td>DDD / PoEAA</td>
+      <td>Implementado</td>
+      <td><code>*SpringDataRepository</code> encapsulados por <code>*PersistenceAdapter</code></td>
+      <td><span class="tag-hibrido">Híbrido (Spring Data + Propio)</span></td>
+      <td>Abstracción orientada a colecciones en memoria para la persistencia física en Oracle.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>10.3 Patrones GoF Formalmente Declarados como No Identificados</h3>
+<p>Con el fin de evitar invenciones académicas o clasificaciones forzadas, se declara formalmente que los siguientes 12 patrones GoF no están implementados en el sistema actual:</p>
+<ul>
+  <li><code>Abstract Factory</code>: No existen familias de productos polimórficos que justifiquen fábricas abstractas.</li>
+  <li><code>Prototype</code>: No se utiliza clonación de instancias en memoria.</li>
+  <li><code>Bridge</code>: El desacoplamiento dominio/persistencia se resuelve como Adapter hexagonal.</li>
+  <li><code>Composite</code>: No existen estructuras en árbol recursivo de parte-todo.</li>
+  <li><code>Decorator</code>: Las responsabilidades dinámicas se gestionan mediante Proxies de Spring AOP.</li>
+  <li><code>Flyweight</code>: No se implementa compartición de estado intrínseco en memoria.</li>
+  <li><code>Command</code>: Los casos de uso se invocan directamente como métodos de servicio, sin encapsularlos en objetos de comando con cola o reversión.</li>
+  <li><code>Iterator</code>: Se consumen los iteradores estándar del JDK y Streams; no hay un iterador propio del proyecto.</li>
+  <li><code>Mediator</code>: El acoplamiento entre módulos se gestiona mediante puertos dedicados, sin un mediador centralizado.</li>
+  <li><code>Memento</code>: No se almacena historial de estados internos para operaciones de deshacer/rehacer.</li>
+  <li><code>State</code>: Las transiciones de estados en propuestas y leads se implementan mediante enumeraciones y estructuras condicionales (<code>switch</code>/<code>if</code>).</li>
+  <li><code>Visitor</code>: No hay jerarquías de clases que requieran operaciones visitantes independientes.</li>
+</ul>
+
+</main>
+</body>
+</html>
+

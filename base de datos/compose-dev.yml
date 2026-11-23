@@ -1,0 +1,32 @@
+name: viernes-db-dev
+
+services:
+  oracle:
+    image: gvenzl/oracle-free:23-slim
+    container_name: viernes-oracle
+    restart: unless-stopped
+    ports:
+      - "1521:1521"
+    environment:
+      # Credenciales para desarrollo.
+      ORACLE_PASSWORD: "123456"
+      APP_USER: BOM_VENTAS
+      APP_USER_PASSWORD: "123456"
+    volumes:
+      # Datos persistentes del contenedor.
+      - viernes-oracle-data:/opt/oracle/oradata
+      # Scripts de inicialización ejecutados la primera vez.
+      - ./init:/container-entrypoint-initdb.d:ro
+      # Carpeta para backups Data Pump (expdp/impdp).
+      - ./backups:/opt/oracle/backup
+    healthcheck:
+      test: ["CMD", "healthcheck.sh"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 120s
+      start_interval: 5s
+
+volumes:
+  viernes-oracle-data:
+    name: viernes-oracle-data

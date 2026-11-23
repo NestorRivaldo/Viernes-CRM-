@@ -1,0 +1,45 @@
+EVIDENCIA EXTRAÍDA; no es una ejecución nueva.
+Comando registrado: cmd.exe //c "mvnw.cmd test"
+Directorio: E:/Viernes/Viernes/viernes-backend
+Fuente: C:\Users\Nesto\AppData\Local\Temp\qoder-cli\E--Viernes\05e6f361-8cf2-4ee5-a424-8b1d08e19865\tasks\b6ga2mr2p.output
+SHA256 fuente: 84f2120419191dcebdbf5cb99466e6c107f149b6d2b1840e7535e352b4e972a1
+
+77: [INFO] Tests run: 14, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 9.150 s -- in com.viernes.actividades.adapters.in.web.ActividadControllerTest
+79: [INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.219 s -- in com.viernes.actividades.adapters.out.persistence.ActividadEtiquetaPersistenceAdapterTest
+81: [INFO] Tests run: 18, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.346 s -- in com.viernes.actividades.application.service.ActividadServiceTest
+134: [INFO] Tests run: 17, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.906 s -- in com.viernes.clientes.adapters.in.web.ClienteControllerTest
+136: [INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.538 s -- in com.viernes.clientes.adapters.out.external.ApisPeruDocumentoAdapterTest
+138: [INFO] Tests run: 25, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.284 s -- in com.viernes.clientes.application.service.ClienteServiceTest
+155: [INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.173 s -- in com.viernes.dashboard.adapters.in.web.DashboardControllerTest
+157: [INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.099 s -- in com.viernes.dashboard.application.service.DashboardServiceTest
+198: [INFO] Tests run: 13, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.285 s -- in com.viernes.equipos.adapters.in.web.EquipoControllerTest
+200: [INFO] Tests run: 13, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.166 s -- in com.viernes.equipos.application.service.EquipoServiceTest
+202: [INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.023 s -- in com.viernes.etiquetas.application.service.EtiquetaServiceTest
+231: [INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.164 s -- in com.viernes.leads.adapters.in.web.FuenteControllerTest
+266: [INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.221 s -- in com.viernes.leads.adapters.in.web.LeadControllerTest
+268: [INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.073 s -- in com.viernes.leads.application.service.FuenteServiceTest
+270: [INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.073 s -- in com.viernes.leads.application.service.LeadServiceTest
+311: [INFO] Tests run: 13, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.258 s -- in com.viernes.marketing.adapters.in.web.CampaniaControllerTest
+313: [INFO] Tests run: 13, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.147 s -- in com.viernes.marketing.application.service.CampaniaServiceTest
+330: [INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.145 s -- in com.viernes.mensajeria.adapters.in.web.MensajeControllerTest
+332: [INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.124 s -- in com.viernes.mensajeria.application.service.MensajeServiceTest
+335: [INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.301 s -- in com.viernes.ModularityTests
+367: [INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.184 s -- in com.viernes.oportunidades.adapters.in.web.OportunidadControllerTest
+369: [INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.287 s -- in com.viernes.oportunidades.application.service.OportunidadServiceTest
+371: [INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.003 s -- in com.viernes.oportunidades.domain.OportunidadTest
+406: [INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.138 s -- in com.viernes.productos.adapters.in.web.ProductoControllerTest
+408: [INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.048 s -- in com.viernes.productos.application.service.ProductoServiceTest
+431: [INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.189 s -- in com.viernes.propuestas.adapters.in.web.PropuestaControllerTest
+433: [INFO] Tests run: 15, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.112 s -- in com.viernes.propuestas.application.service.PropuestaServiceTest
+435: [INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.020 s -- in com.viernes.relationshipmap.RelationshipMapServiceTest
+437: [INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.012 s -- in com.viernes.shared.ratelimit.ConsultaDocumentoRateLimiterTest
+466: [INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.127 s -- in com.viernes.usuarios.adapters.in.web.UsuarioControllerTest
+468: [INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.096 s -- in com.viernes.usuarios.application.service.UsuarioServiceTest
+487: 2026-11-11 09:45:57.924 [] INFO  com.viernes.ViernesApplicationTests - The following 2 profiles are active: "dev", "keycloak"
+494: 2026-11-11 09:46:00.660 [] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection oracle.jdbc.driver.T4CConnection@50dfb752
+501: 	Database version: 23.26.2
+518: [INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 11.25 s -- in com.viernes.ViernesApplicationTests
+522: [INFO] Tests run: 291, Failures: 0, Errors: 0, Skipped: 0
+525: [INFO] BUILD SUCCESS
+527: [INFO] Total time:  38.405 s
+528: [INFO] Finished at: 2026-11-11T09:46:08-05:00

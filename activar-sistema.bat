@@ -44,7 +44,34 @@ if %ERRORLEVEL% NEQ 0 (
 
 :: 2. Iniciar Bases de Datos y Keycloak en Docker
 echo [2/5] Iniciando Oracle Database 23c en puerto 1521...
-docker compose -f viernes-backend\compose-dev.yml up -d
+if exist "%~dp0base de datos\compose-dev.yml" (
+    docker compose -f "%~dp0base de datos\compose-dev.yml" up -d
+) else (
+    docker compose -f "%~dp0viernes-backend\compose-dev.yml" up -d
+)
+if %ERRORLEVEL% NEQ 0 (
+    echo [ERROR] Falló el inicio de Oracle. Verifica los logs de Docker.
+    pause
+    exit /b 1
+)
+
+:: Esperar a que Oracle quede healthy (primera vez tarda varios minutos)
+set /a ORACLE_TRIES=0
+:wait_oracle
+set /a ORACLE_TRIES+=1
+for /f "tokens=*" %%s in ('docker inspect -f "{{.State.Health.Status}}" viernes-oracle 2^>nul') do set "ORACLE_HEALTH=%%s"
+if /i "%ORACLE_HEALTH%"=="healthy" goto oracle_ok
+if %ORACLE_TRIES% GEQ 60 (
+    echo [ERROR] Oracle no quedo healthy en el tiempo esperado.
+    echo Revisa con: docker logs viernes-oracle
+    pause
+    exit /b 1
+)
+echo        Oracle: %ORACLE_HEALTH% (intento %ORACLE_TRIES%/60)...
+timeout /t 5 >nul
+goto wait_oracle
+:oracle_ok
+echo [OK] Oracle healthy.
 
 echo [3/5] Iniciando Keycloak 25 (OAuth2 / OIDC) en puerto 8180...
 docker compose -f compose-keycloak.yml up -d

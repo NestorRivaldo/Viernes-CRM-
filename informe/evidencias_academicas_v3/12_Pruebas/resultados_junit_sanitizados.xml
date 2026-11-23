@@ -1,0 +1,358 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuites description="Extracto sanitizado de Surefire. Sin properties, system-out ni credenciales.">
+  <testsuite name="com.viernes.actividades.adapters.in.web.ActividadControllerTest" tests="14" failures="0" errors="0" skipped="0" time="9.15">
+    <testcase classname="com.viernes.actividades.adapters.in.web.ActividadControllerTest" name="quitarParticipanteExistente" time="8.086" result="PASS" />
+    <testcase classname="com.viernes.actividades.adapters.in.web.ActividadControllerTest" name="agregarParticipanteActividadInexistente" time="0.437" result="PASS" />
+    <testcase classname="com.viernes.actividades.adapters.in.web.ActividadControllerTest" name="obtenerActividadExistente" time="0.138" result="PASS" />
+    <testcase classname="com.viernes.actividades.adapters.in.web.ActividadControllerTest" name="actualizarActividad" time="0.08" result="PASS" />
+    <testcase classname="com.viernes.actividades.adapters.in.web.ActividadControllerTest" name="quitarParticipanteInexistente" time="0.024" result="PASS" />
+    <testcase classname="com.viernes.actividades.adapters.in.web.ActividadControllerTest" name="listarVencidas" time="0.034" result="PASS" />
+    <testcase classname="com.viernes.actividades.adapters.in.web.ActividadControllerTest" name="agregarParticipanteValido" time="0.032" result="PASS" />
+    <testcase classname="com.viernes.actividades.adapters.in.web.ActividadControllerTest" name="agregarParticipanteSinContactoId" time="0.093" result="PASS" />
+    <testcase classname="com.viernes.actividades.adapters.in.web.ActividadControllerTest" name="listarActividades" time="0.033" result="PASS" />
+    <testcase classname="com.viernes.actividades.adapters.in.web.ActividadControllerTest" name="agregarParticipanteDuplicado" time="0.036" result="PASS" />
+    <testcase classname="com.viernes.actividades.adapters.in.web.ActividadControllerTest" name="listarParticipantes" time="0.022" result="PASS" />
+    <testcase classname="com.viernes.actividades.adapters.in.web.ActividadControllerTest" name="crearActividadInvalida" time="0.032" result="PASS" />
+    <testcase classname="com.viernes.actividades.adapters.in.web.ActividadControllerTest" name="crearActividadValida" time="0.043" result="PASS" />
+    <testcase classname="com.viernes.actividades.adapters.in.web.ActividadControllerTest" name="obtenerActividadInexistente" time="0.018" result="PASS" />
+  </testsuite>
+  <testsuite name="com.viernes.actividades.adapters.out.persistence.ActividadEtiquetaPersistenceAdapterTest" tests="2" failures="0" errors="0" skipped="0" time="0.219">
+    <testcase classname="com.viernes.actividades.adapters.out.persistence.ActividadEtiquetaPersistenceAdapterTest" name="findByIdActividadDevuelveElOrdenPersistido" time="0.202" result="PASS" />
+    <testcase classname="com.viernes.actividades.adapters.out.persistence.ActividadEtiquetaPersistenceAdapterTest" name="reemplazarEtiquetasAsignaElOrdenRecibido" time="0.014" result="PASS" />
+  </testsuite>
+  <testsuite name="com.viernes.actividades.application.service.ActividadServiceTest" tests="18" failures="0" errors="0" skipped="0" time="0.346">
+    <testcase classname="com.viernes.actividades.application.service.ActividadServiceTest" name="crearActividadRechazaMasDeOchoEtiquetas" time="0.25" result="PASS" />
+    <testcase classname="com.viernes.actividades.application.service.ActividadServiceTest" name="quitarParticipanteFallaSiNoExisteLaAsociacion" time="0.004" result="PASS" />
+    <testcase classname="com.viernes.actividades.application.service.ActividadServiceTest" name="quitarParticipanteExitosamente" time="0.004" result="PASS" />
+    <testcase classname="com.viernes.actividades.application.service.ActividadServiceTest" name="eliminarActividadEliminaSusParticipantes" time="0.005" result="PASS" />
+    <testcase classname="com.viernes.actividades.application.service.ActividadServiceTest" name="agregarParticipanteFallaPorActividadInexistente" time="0.004" result="PASS" />
+    <testcase classname="com.viernes.actividades.application.service.ActividadServiceTest" name="filtrarActividadesPorEtiqueta" time="0.012" result="PASS" />
+    <testcase classname="com.viernes.actividades.application.service.ActividadServiceTest" name="crearActividadExitosamente" time="0.007" result="PASS" />
+    <testcase classname="com.viernes.actividades.application.service.ActividadServiceTest" name="agregarParticipanteFallaPorContactoInexistente" time="0.008" result="PASS" />
+    <testcase classname="com.viernes.actividades.application.service.ActividadServiceTest" name="crearActividadFallaPorClienteInexistente" time="0.004" result="PASS" />
+    <testcase classname="com.viernes.actividades.application.service.ActividadServiceTest" name="verificarActividadVencida" time="0.004" result="PASS" />
+    <testcase classname="com.viernes.actividades.application.service.ActividadServiceTest" name="crearActividadConEtiquetas" time="0.006" result="PASS" />
+    <testcase classname="com.viernes.actividades.application.service.ActividadServiceTest" name="verificarActividadNoVencidaSiCompletada" time="0.003" result="PASS" />
+    <testcase classname="com.viernes.actividades.application.service.ActividadServiceTest" name="listarParticipantesEnriquecidosConDatosDelContacto" time="0.003" result="PASS" />
+    <testcase classname="com.viernes.actividades.application.service.ActividadServiceTest" name="actualizarActividadFallaSiNoExiste" time="0.003" result="PASS" />
+    <testcase classname="com.viernes.actividades.application.service.ActividadServiceTest" name="listarParticipantesFallaPorActividadInexistente" time="0.003" result="PASS" />
+    <testcase classname="com.viernes.actividades.application.service.ActividadServiceTest" name="agregarParticipanteExitosamente" time="0.004" result="PASS" />
+    <testcase classname="com.viernes.actividades.application.service.ActividadServiceTest" name="crearActividadConservaElOrdenElegidoDeEtiquetas" time="0.005" result="PASS" />
+    <testcase classname="com.viernes.actividades.application.service.ActividadServiceTest" name="agregarParticipanteFallaPorDuplicado" time="0.004" result="PASS" />
+  </testsuite>
+  <testsuite name="com.viernes.clientes.adapters.in.web.ClienteControllerTest" tests="17" failures="0" errors="0" skipped="0" time="0.906">
+    <testcase classname="com.viernes.clientes.adapters.in.web.ClienteControllerTest" name="listar_porDocumento_retornaOk" time="0.265" result="PASS" />
+    <testcase classname="com.viernes.clientes.adapters.in.web.ClienteControllerTest" name="consultarDocumento_dni_retornaDatosOficiales" time="0.05" result="PASS" />
+    <testcase classname="com.viernes.clientes.adapters.in.web.ClienteControllerTest" name="eliminar_clienteExistente_retornaNoContent" time="0.024" result="PASS" />
+    <testcase classname="com.viernes.clientes.adapters.in.web.ClienteControllerTest" name="desactivar_clienteExistente_retornaNoContent" time="0.032" result="PASS" />
+    <testcase classname="com.viernes.clientes.adapters.in.web.ClienteControllerTest" name="obtener_clienteExistente_retornaOk" time="0.03" result="PASS" />
+    <testcase classname="com.viernes.clientes.adapters.in.web.ClienteControllerTest" name="eliminarContacto_contactoExistente_retornaNoContent" time="0.023" result="PASS" />
+    <testcase classname="com.viernes.clientes.adapters.in.web.ClienteControllerTest" name="obtener_clienteInexistente_retornaNotFound" time="0.023" result="PASS" />
+    <testcase classname="com.viernes.clientes.adapters.in.web.ClienteControllerTest" name="consultarDocumento_aplicaLimitePorUsuarioAutenticado" time="0.03" result="PASS" />
+    <testcase classname="com.viernes.clientes.adapters.in.web.ClienteControllerTest" name="agregarContacto_clienteExistente_retornaCreated" time="0.041" result="PASS" />
+    <testcase classname="com.viernes.clientes.adapters.in.web.ClienteControllerTest" name="actualizar_clienteExistente_retornaOk" time="0.096" result="PASS" />
+    <testcase classname="com.viernes.clientes.adapters.in.web.ClienteControllerTest" name="listar_clientes_retornaOk" time="0.02" result="PASS" />
+    <testcase classname="com.viernes.clientes.adapters.in.web.ClienteControllerTest" name="crear_clienteInvalido_nombreEnBlanco_retornaBadRequest" time="0.063" result="PASS" />
+    <testcase classname="com.viernes.clientes.adapters.in.web.ClienteControllerTest" name="actualizarContacto_contactoExistente_retornaOk" time="0.036" result="PASS" />
+    <testcase classname="com.viernes.clientes.adapters.in.web.ClienteControllerTest" name="consultarDocumento_limiteSuperado_retorna429ConRetryAfter" time="0.036" result="PASS" />
+    <testcase classname="com.viernes.clientes.adapters.in.web.ClienteControllerTest" name="listarContactos_clienteExistente_retornaOk" time="0.04" result="PASS" />
+    <testcase classname="com.viernes.clientes.adapters.in.web.ClienteControllerTest" name="consultarDocumento_noEncontrado_retornaNotFound" time="0.025" result="PASS" />
+    <testcase classname="com.viernes.clientes.adapters.in.web.ClienteControllerTest" name="crear_clienteValido_retornaCreated" time="0.043" result="PASS" />
+  </testsuite>
+  <testsuite name="com.viernes.clientes.adapters.out.external.ApisPeruDocumentoAdapterTest" tests="8" failures="0" errors="0" skipped="0" time="0.538">
+    <testcase classname="com.viernes.clientes.adapters.out.external.ApisPeruDocumentoAdapterTest" name="sinToken_fallaSinConsumirCuota" time="0.318" result="PASS" />
+    <testcase classname="com.viernes.clientes.adapters.out.external.ApisPeruDocumentoAdapterTest" name="dniNoEncontrado_seCacheaYNoVuelveAGastarCuota" time="0.096" result="PASS" />
+    <testcase classname="com.viernes.clientes.adapters.out.external.ApisPeruDocumentoAdapterTest" name="dniEncontrado_devuelveNombreCompleto" time="0.014" result="PASS" />
+    <testcase classname="com.viernes.clientes.adapters.out.external.ApisPeruDocumentoAdapterTest" name="elNegativoEsPorDocumento_noAfectaAOtro" time="0.013" result="PASS" />
+    <testcase classname="com.viernes.clientes.adapters.out.external.ApisPeruDocumentoAdapterTest" name="http404_seCacheaComoNegativo" time="0.019" result="PASS" />
+    <testcase classname="com.viernes.clientes.adapters.out.external.ApisPeruDocumentoAdapterTest" name="agotadaLaCuota_noSeCacheaYPermiteRecuperarse" time="0.023" result="PASS" />
+    <testcase classname="com.viernes.clientes.adapters.out.external.ApisPeruDocumentoAdapterTest" name="rucEncontrado_devuelveRazonSocialYTelefonos" time="0.027" result="PASS" />
+    <testcase classname="com.viernes.clientes.adapters.out.external.ApisPeruDocumentoAdapterTest" name="errorDelProveedor_noSeCachea" time="0.022" result="PASS" />
+  </testsuite>
+  <testsuite name="com.viernes.clientes.application.service.ClienteServiceTest" tests="25" failures="0" errors="0" skipped="0" time="0.284">
+    <testcase classname="com.viernes.clientes.application.service.ClienteServiceTest" name="eliminarContacto_contactoExistente_eliminaCorrectamente" time="0.149" result="PASS" />
+    <testcase classname="com.viernes.clientes.application.service.ClienteServiceTest" name="consultarDocumento_dni_retornaDatosOficiales" time="0.013" result="PASS" />
+    <testcase classname="com.viernes.clientes.application.service.ClienteServiceTest" name="eliminarContacto_contactoInexistente_lanzaNotFound" time="0.005" result="PASS" />
+    <testcase classname="com.viernes.clientes.application.service.ClienteServiceTest" name="actualizarContacto_contactoExistente_retornaActualizado" time="0.005" result="PASS" />
+    <testcase classname="com.viernes.clientes.application.service.ClienteServiceTest" name="eliminar_clienteExistente_eliminaCorrectamente" time="0.004" result="PASS" />
+    <testcase classname="com.viernes.clientes.application.service.ClienteServiceTest" name="agregarContacto_clienteInexistente_lanzaNotFound" time="0.004" result="PASS" />
+    <testcase classname="com.viernes.clientes.application.service.ClienteServiceTest" name="crear_conDniInvalido_lanzaIllegalArgument" time="0.002" result="PASS" />
+    <testcase classname="com.viernes.clientes.application.service.ClienteServiceTest" name="crear_conRucInvalido_lanzaIllegalArgument" time="0.002" result="PASS" />
+    <testcase classname="com.viernes.clientes.application.service.ClienteServiceTest" name="consultarDocumento_conNumeroInvalido_lanzaIllegalArgument" time="0.002" result="PASS" />
+    <testcase classname="com.viernes.clientes.application.service.ClienteServiceTest" name="crear_conDocumentoDuplicado_lanzaIllegalArgument" time="0.005" result="PASS" />
+    <testcase classname="com.viernes.clientes.application.service.ClienteServiceTest" name="obtener_clienteExistente_retornaResponse" time="0.003" result="PASS" />
+    <testcase classname="com.viernes.clientes.application.service.ClienteServiceTest" name="actualizar_clienteExistente_retornaActualizado" time="0.005" result="PASS" />
+    <testcase classname="com.viernes.clientes.application.service.ClienteServiceTest" name="actualizar_clienteInexistente_lanzaNotFound" time="0.008" result="PASS" />
+    <testcase classname="com.viernes.clientes.application.service.ClienteServiceTest" name="consultarDocumento_ruc_retornaDatosOficiales" time="0.003" result="PASS" />
+    <testcase classname="com.viernes.clientes.application.service.ClienteServiceTest" name="eliminar_clienteInexistente_lanzaNotFound" time="0.005" result="PASS" />
+    <testcase classname="com.viernes.clientes.application.service.ClienteServiceTest" name="desactivar_clienteInexistente_lanzaNotFound" time="0.005" result="PASS" />
+    <testcase classname="com.viernes.clientes.application.service.ClienteServiceTest" name="obtener_clienteInexistente_lanzaNotFound" time="0.006" result="PASS" />
+    <testcase classname="com.viernes.clientes.application.service.ClienteServiceTest" name="crear_conDatosValidos_asignaEstadoActivoYCreadoEn" time="0.004" result="PASS" />
+    <testcase classname="com.viernes.clientes.application.service.ClienteServiceTest" name="actualizarContacto_contactoInexistente_lanzaNotFound" time="0.002" result="PASS" />
+    <testcase classname="com.viernes.clientes.application.service.ClienteServiceTest" name="listar_retornaTodosLosClientes" time="0.003" result="PASS" />
+    <testcase classname="com.viernes.clientes.application.service.ClienteServiceTest" name="agregarContacto_clienteExistente_retornaContacto" time="0.003" result="PASS" />
+    <testcase classname="com.viernes.clientes.application.service.ClienteServiceTest" name="buscar_conTexto_retornaCoincidencias" time="0.002" result="PASS" />
+    <testcase classname="com.viernes.clientes.application.service.ClienteServiceTest" name="buscarPorDocumento_retornaCoincidencias" time="0.003" result="PASS" />
+    <testcase classname="com.viernes.clientes.application.service.ClienteServiceTest" name="desactivar_clienteExistente_cambiaEstadoAInactivo" time="0.004" result="PASS" />
+    <testcase classname="com.viernes.clientes.application.service.ClienteServiceTest" name="filtrarPorEstado_retornaClientesDelEstado" time="0.002" result="PASS" />
+  </testsuite>
+  <testsuite name="com.viernes.dashboard.adapters.in.web.DashboardControllerTest" tests="5" failures="0" errors="0" skipped="0" time="0.173">
+    <testcase classname="com.viernes.dashboard.adapters.in.web.DashboardControllerTest" name="testActividades" time="0.079" result="PASS" />
+    <testcase classname="com.viernes.dashboard.adapters.in.web.DashboardControllerTest" name="testLeads" time="0.017" result="PASS" />
+    <testcase classname="com.viernes.dashboard.adapters.in.web.DashboardControllerTest" name="testKpis" time="0.017" result="PASS" />
+    <testcase classname="com.viernes.dashboard.adapters.in.web.DashboardControllerTest" name="testPipeline" time="0.031" result="PASS" />
+    <testcase classname="com.viernes.dashboard.adapters.in.web.DashboardControllerTest" name="testResumen" time="0.022" result="PASS" />
+  </testsuite>
+  <testsuite name="com.viernes.dashboard.application.service.DashboardServiceTest" tests="3" failures="0" errors="0" skipped="0" time="0.099">
+    <testcase classname="com.viernes.dashboard.application.service.DashboardServiceTest" name="testPropuestas" time="0.087" result="PASS" />
+    <testcase classname="com.viernes.dashboard.application.service.DashboardServiceTest" name="testResumenVacio" time="0.005" result="PASS" />
+    <testcase classname="com.viernes.dashboard.application.service.DashboardServiceTest" name="testResumenConDatos" time="0.005" result="PASS" />
+  </testsuite>
+  <testsuite name="com.viernes.equipos.adapters.in.web.EquipoControllerTest" tests="13" failures="0" errors="0" skipped="0" time="0.285">
+    <testcase classname="com.viernes.equipos.adapters.in.web.EquipoControllerTest" name="actualizarEquipo" time="0.103" result="PASS" />
+    <testcase classname="com.viernes.equipos.adapters.in.web.EquipoControllerTest" name="eliminarEquipo" time="0.016" result="PASS" />
+    <testcase classname="com.viernes.equipos.adapters.in.web.EquipoControllerTest" name="obtenerEquipoInexistente" time="0.015" result="PASS" />
+    <testcase classname="com.viernes.equipos.adapters.in.web.EquipoControllerTest" name="quitarMiembro" time="0.011" result="PASS" />
+    <testcase classname="com.viernes.equipos.adapters.in.web.EquipoControllerTest" name="activarEquipo" time="0.015" result="PASS" />
+    <testcase classname="com.viernes.equipos.adapters.in.web.EquipoControllerTest" name="crearEquipoInvalido_sinNombre" time="0.013" result="PASS" />
+    <testcase classname="com.viernes.equipos.adapters.in.web.EquipoControllerTest" name="desactivarEquipo" time="0.009" result="PASS" />
+    <testcase classname="com.viernes.equipos.adapters.in.web.EquipoControllerTest" name="listarEquipos" time="0.013" result="PASS" />
+    <testcase classname="com.viernes.equipos.adapters.in.web.EquipoControllerTest" name="listarEquipos_conParametroActivo_llamaListarPorEstado" time="0.016" result="PASS" />
+    <testcase classname="com.viernes.equipos.adapters.in.web.EquipoControllerTest" name="agregarMiembro" time="0.019" result="PASS" />
+    <testcase classname="com.viernes.equipos.adapters.in.web.EquipoControllerTest" name="crearEquipoValido" time="0.016" result="PASS" />
+    <testcase classname="com.viernes.equipos.adapters.in.web.EquipoControllerTest" name="listarMiembros" time="0.014" result="PASS" />
+    <testcase classname="com.viernes.equipos.adapters.in.web.EquipoControllerTest" name="obtenerEquipoExistente" time="0.014" result="PASS" />
+  </testsuite>
+  <testsuite name="com.viernes.equipos.application.service.EquipoServiceTest" tests="13" failures="0" errors="0" skipped="0" time="0.166">
+    <testcase classname="com.viernes.equipos.application.service.EquipoServiceTest" name="agregarMiembro_usuarioInexistente_lanzaNotFound" time="0.126" result="PASS" />
+    <testcase classname="com.viernes.equipos.application.service.EquipoServiceTest" name="crear_nombreDisponible_creaEquipoActivo" time="0.002" result="PASS" />
+    <testcase classname="com.viernes.equipos.application.service.EquipoServiceTest" name="quitarMiembro_existente_eliminaSoloLaAsociacion" time="0.002" result="PASS" />
+    <testcase classname="com.viernes.equipos.application.service.EquipoServiceTest" name="agregarMiembro_duplicado_lanzaIllegalArgument" time="0.002" result="PASS" />
+    <testcase classname="com.viernes.equipos.application.service.EquipoServiceTest" name="desactivar_existente_marcaInactivo" time="0.003" result="PASS" />
+    <testcase classname="com.viernes.equipos.application.service.EquipoServiceTest" name="agregarMiembro_datosValidos_agregaCorrectamente" time="0.004" result="PASS" />
+    <testcase classname="com.viernes.equipos.application.service.EquipoServiceTest" name="obtener_inexistente_lanzaNotFound" time="0.003" result="PASS" />
+    <testcase classname="com.viernes.equipos.application.service.EquipoServiceTest" name="agregarMiembro_equipoInexistente_lanzaNotFound" time="0.003" result="PASS" />
+    <testcase classname="com.viernes.equipos.application.service.EquipoServiceTest" name="quitarMiembro_asociacionInexistente_lanzaNotFound" time="0.002" result="PASS" />
+    <testcase classname="com.viernes.equipos.application.service.EquipoServiceTest" name="eliminar_existente_eliminaMiembrosYEquipo" time="0.002" result="PASS" />
+    <testcase classname="com.viernes.equipos.application.service.EquipoServiceTest" name="activar_existente_marcaActivo" time="0.002" result="PASS" />
+    <testcase classname="com.viernes.equipos.application.service.EquipoServiceTest" name="listarMiembros_equipoExistente_retornaMiembros" time="0.003" result="PASS" />
+    <testcase classname="com.viernes.equipos.application.service.EquipoServiceTest" name="crear_nombreDuplicado_lanzaIllegalArgument" time="0.003" result="PASS" />
+  </testsuite>
+  <testsuite name="com.viernes.etiquetas.application.service.EtiquetaServiceTest" tests="5" failures="0" errors="0" skipped="0" time="0.023">
+    <testcase classname="com.viernes.etiquetas.application.service.EtiquetaServiceTest" name="obtenerFallaSiNoExiste" time="0.004" result="PASS" />
+    <testcase classname="com.viernes.etiquetas.application.service.EtiquetaServiceTest" name="crearNormalizaNombreYColor" time="0.011" result="PASS" />
+    <testcase classname="com.viernes.etiquetas.application.service.EtiquetaServiceTest" name="eliminarArchivaEnLugarDeBorrar" time="0.001" result="PASS" />
+    <testcase classname="com.viernes.etiquetas.application.service.EtiquetaServiceTest" name="listarFiltraPorTextoYOrdena" time="0.002" result="PASS" />
+    <testcase classname="com.viernes.etiquetas.application.service.EtiquetaServiceTest" name="crearRechazaNombreDuplicado" time="0.002" result="PASS" />
+  </testsuite>
+  <testsuite name="com.viernes.leads.adapters.in.web.FuenteControllerTest" tests="9" failures="0" errors="0" skipped="0" time="0.164">
+    <testcase classname="com.viernes.leads.adapters.in.web.FuenteControllerTest" name="crearFuenteDuplicada" time="0.044" result="PASS" />
+    <testcase classname="com.viernes.leads.adapters.in.web.FuenteControllerTest" name="actualizarFuente" time="0.022" result="PASS" />
+    <testcase classname="com.viernes.leads.adapters.in.web.FuenteControllerTest" name="eliminarFuente" time="0.008" result="PASS" />
+    <testcase classname="com.viernes.leads.adapters.in.web.FuenteControllerTest" name="crearFuenteValida" time="0.017" result="PASS" />
+    <testcase classname="com.viernes.leads.adapters.in.web.FuenteControllerTest" name="obtenerFuenteInexistente" time="0.012" result="PASS" />
+    <testcase classname="com.viernes.leads.adapters.in.web.FuenteControllerTest" name="listarFuentes_conParametroActiva_llamaListarConFiltro" time="0.021" result="PASS" />
+    <testcase classname="com.viernes.leads.adapters.in.web.FuenteControllerTest" name="listarFuentes" time="0.01" result="PASS" />
+    <testcase classname="com.viernes.leads.adapters.in.web.FuenteControllerTest" name="crearFuenteInvalida_sinCodigo" time="0.016" result="PASS" />
+    <testcase classname="com.viernes.leads.adapters.in.web.FuenteControllerTest" name="obtenerFuenteExistente" time="0.01" result="PASS" />
+  </testsuite>
+  <testsuite name="com.viernes.leads.adapters.in.web.LeadControllerTest" tests="11" failures="0" errors="0" skipped="0" time="0.221">
+    <testcase classname="com.viernes.leads.adapters.in.web.LeadControllerTest" name="listarLeads" time="0.05" result="PASS" />
+    <testcase classname="com.viernes.leads.adapters.in.web.LeadControllerTest" name="listarLeads_conParametroEstado_llamaFiltrarPorEstado" time="0.01" result="PASS" />
+    <testcase classname="com.viernes.leads.adapters.in.web.LeadControllerTest" name="cambiarEstadoLead" time="0.012" result="PASS" />
+    <testcase classname="com.viernes.leads.adapters.in.web.LeadControllerTest" name="obtenerLeadConFuente" time="0.013" result="PASS" />
+    <testcase classname="com.viernes.leads.adapters.in.web.LeadControllerTest" name="listarLeads_conParametroQ_llamaBuscar" time="0.011" result="PASS" />
+    <testcase classname="com.viernes.leads.adapters.in.web.LeadControllerTest" name="obtenerLeadExistente" time="0.012" result="PASS" />
+    <testcase classname="com.viernes.leads.adapters.in.web.LeadControllerTest" name="actualizarLead" time="0.036" result="PASS" />
+    <testcase classname="com.viernes.leads.adapters.in.web.LeadControllerTest" name="eliminarLead" time="0.015" result="PASS" />
+    <testcase classname="com.viernes.leads.adapters.in.web.LeadControllerTest" name="crearLeadInvalido_sinNombre" time="0.021" result="PASS" />
+    <testcase classname="com.viernes.leads.adapters.in.web.LeadControllerTest" name="obtenerLeadInexistente" time="0.01" result="PASS" />
+    <testcase classname="com.viernes.leads.adapters.in.web.LeadControllerTest" name="crearLeadValido" time="0.022" result="PASS" />
+  </testsuite>
+  <testsuite name="com.viernes.leads.application.service.FuenteServiceTest" tests="8" failures="0" errors="0" skipped="0" time="0.073">
+    <testcase classname="com.viernes.leads.application.service.FuenteServiceTest" name="actualizar_existente_retornaActualizado" time="0.054" result="PASS" />
+    <testcase classname="com.viernes.leads.application.service.FuenteServiceTest" name="crear_sinActiva_asignaActivaPorDefecto" time="0.001" result="PASS" />
+    <testcase classname="com.viernes.leads.application.service.FuenteServiceTest" name="crear_codigoDuplicado_lanzaIllegalArgument" time="0.002" result="PASS" />
+    <testcase classname="com.viernes.leads.application.service.FuenteServiceTest" name="listar_conActiva_filtraPorEstado" time="0.002" result="PASS" />
+    <testcase classname="com.viernes.leads.application.service.FuenteServiceTest" name="obtener_inexistente_lanzaNotFound" time="0.001" result="PASS" />
+    <testcase classname="com.viernes.leads.application.service.FuenteServiceTest" name="eliminar_inexistente_lanzaNotFound" time="0.001" result="PASS" />
+    <testcase classname="com.viernes.leads.application.service.FuenteServiceTest" name="listar_sinFiltro_retornaTodas" time="0.002" result="PASS" />
+    <testcase classname="com.viernes.leads.application.service.FuenteServiceTest" name="eliminar_existente_eliminaCorrectamente" time="0.002" result="PASS" />
+  </testsuite>
+  <testsuite name="com.viernes.leads.application.service.LeadServiceTest" tests="8" failures="0" errors="0" skipped="0" time="0.073">
+    <testcase classname="com.viernes.leads.application.service.LeadServiceTest" name="actualizar_existente_retornaActualizado" time="0.053" result="PASS" />
+    <testcase classname="com.viernes.leads.application.service.LeadServiceTest" name="obtener_inexistente_lanzaNotFound" time="0.002" result="PASS" />
+    <testcase classname="com.viernes.leads.application.service.LeadServiceTest" name="eliminar_inexistente_lanzaNotFound" time="0.003" result="PASS" />
+    <testcase classname="com.viernes.leads.application.service.LeadServiceTest" name="crear_sinEstado_asignaNuevoPorDefecto" time="0.002" result="PASS" />
+    <testcase classname="com.viernes.leads.application.service.LeadServiceTest" name="eliminar_existente_eliminaCorrectamente" time="0.002" result="PASS" />
+    <testcase classname="com.viernes.leads.application.service.LeadServiceTest" name="crear_conFuenteId_validaYEnriqueceRespuesta" time="0.002" result="PASS" />
+    <testcase classname="com.viernes.leads.application.service.LeadServiceTest" name="crear_conFuenteIdInexistente_lanzaNotFound" time="0.002" result="PASS" />
+    <testcase classname="com.viernes.leads.application.service.LeadServiceTest" name="cambiarEstado_existente_cambiaEstado" time="0.003" result="PASS" />
+  </testsuite>
+  <testsuite name="com.viernes.marketing.adapters.in.web.CampaniaControllerTest" tests="13" failures="0" errors="0" skipped="0" time="0.258">
+    <testcase classname="com.viernes.marketing.adapters.in.web.CampaniaControllerTest" name="crearCampaniaInvalida_sinNombre" time="0.07" result="PASS" />
+    <testcase classname="com.viernes.marketing.adapters.in.web.CampaniaControllerTest" name="cambiarEstadoCampania" time="0.013" result="PASS" />
+    <testcase classname="com.viernes.marketing.adapters.in.web.CampaniaControllerTest" name="asociarLeadInvalido_sinLeadId" time="0.014" result="PASS" />
+    <testcase classname="com.viernes.marketing.adapters.in.web.CampaniaControllerTest" name="desasociarLead" time="0.012" result="PASS" />
+    <testcase classname="com.viernes.marketing.adapters.in.web.CampaniaControllerTest" name="crearCampaniaValida" time="0.016" result="PASS" />
+    <testcase classname="com.viernes.marketing.adapters.in.web.CampaniaControllerTest" name="eliminarCampania" time="0.01" result="PASS" />
+    <testcase classname="com.viernes.marketing.adapters.in.web.CampaniaControllerTest" name="listarCampanias" time="0.015" result="PASS" />
+    <testcase classname="com.viernes.marketing.adapters.in.web.CampaniaControllerTest" name="actualizarCampania" time="0.02" result="PASS" />
+    <testcase classname="com.viernes.marketing.adapters.in.web.CampaniaControllerTest" name="asociarLeadValido" time="0.022" result="PASS" />
+    <testcase classname="com.viernes.marketing.adapters.in.web.CampaniaControllerTest" name="obtenerCampaniaExistente" time="0.016" result="PASS" />
+    <testcase classname="com.viernes.marketing.adapters.in.web.CampaniaControllerTest" name="obtenerCampaniaInexistente" time="0.01" result="PASS" />
+    <testcase classname="com.viernes.marketing.adapters.in.web.CampaniaControllerTest" name="asociarLeadDuplicado" time="0.015" result="PASS" />
+    <testcase classname="com.viernes.marketing.adapters.in.web.CampaniaControllerTest" name="listarLeadsDeCampania" time="0.013" result="PASS" />
+  </testsuite>
+  <testsuite name="com.viernes.marketing.application.service.CampaniaServiceTest" tests="13" failures="0" errors="0" skipped="0" time="0.147">
+    <testcase classname="com.viernes.marketing.application.service.CampaniaServiceTest" name="actualizar_existente_retornaActualizado" time="0.105" result="PASS" />
+    <testcase classname="com.viernes.marketing.application.service.CampaniaServiceTest" name="asociarLead_leadInexistente_lanzaNotFound" time="0.003" result="PASS" />
+    <testcase classname="com.viernes.marketing.application.service.CampaniaServiceTest" name="desasociarLead_inexistente_lanzaNotFound" time="0.003" result="PASS" />
+    <testcase classname="com.viernes.marketing.application.service.CampaniaServiceTest" name="asociarLead_valido_guardaYRetornaEnriquecido" time="0.004" result="PASS" />
+    <testcase classname="com.viernes.marketing.application.service.CampaniaServiceTest" name="obtener_inexistente_lanzaNotFound" time="0.003" result="PASS" />
+    <testcase classname="com.viernes.marketing.application.service.CampaniaServiceTest" name="asociarLead_campaniaInexistente_lanzaNotFound" time="0.002" result="PASS" />
+    <testcase classname="com.viernes.marketing.application.service.CampaniaServiceTest" name="eliminar_inexistente_lanzaNotFound" time="0.002" result="PASS" />
+    <testcase classname="com.viernes.marketing.application.service.CampaniaServiceTest" name="eliminar_existente_eliminaAsociacionesYCampania" time="0.001" result="PASS" />
+    <testcase classname="com.viernes.marketing.application.service.CampaniaServiceTest" name="desasociarLead_existente_eliminaAsociacion" time="0.001" result="PASS" />
+    <testcase classname="com.viernes.marketing.application.service.CampaniaServiceTest" name="asociarLead_duplicado_lanzaIllegalArgument" time="0.002" result="PASS" />
+    <testcase classname="com.viernes.marketing.application.service.CampaniaServiceTest" name="listarLeads_retornaAsociacionesEnriquecidas" time="0.003" result="PASS" />
+    <testcase classname="com.viernes.marketing.application.service.CampaniaServiceTest" name="crear_sinEstado_asignaBorradorPorDefecto" time="0.002" result="PASS" />
+    <testcase classname="com.viernes.marketing.application.service.CampaniaServiceTest" name="cambiarEstado_existente_cambiaEstado" time="0.002" result="PASS" />
+  </testsuite>
+  <testsuite name="com.viernes.mensajeria.adapters.in.web.MensajeControllerTest" tests="5" failures="0" errors="0" skipped="0" time="0.145">
+    <testcase classname="com.viernes.mensajeria.adapters.in.web.MensajeControllerTest" name="enviar_contenidoEnBlanco_retornaBadRequest" time="0.072" result="PASS" />
+    <testcase classname="com.viernes.mensajeria.adapters.in.web.MensajeControllerTest" name="enviar_conJwt_usaNombreDelToken" time="0.027" result="PASS" />
+    <testcase classname="com.viernes.mensajeria.adapters.in.web.MensajeControllerTest" name="listar_retornaMensajes" time="0.014" result="PASS" />
+    <testcase classname="com.viernes.mensajeria.adapters.in.web.MensajeControllerTest" name="enviar_conAuthentication_retornaCreated" time="0.018" result="PASS" />
+    <testcase classname="com.viernes.mensajeria.adapters.in.web.MensajeControllerTest" name="resumen_retornaTotalYUltimoId" time="0.011" result="PASS" />
+  </testsuite>
+  <testsuite name="com.viernes.mensajeria.application.service.MensajeServiceTest" tests="6" failures="0" errors="0" skipped="0" time="0.124">
+    <testcase classname="com.viernes.mensajeria.application.service.MensajeServiceTest" name="enviar_contenidoEnBlanco_lanzaExcepcion" time="0.106" result="PASS" />
+    <testcase classname="com.viernes.mensajeria.application.service.MensajeServiceTest" name="listar_sinDespuesDeId_retornaRecientes" time="0.005" result="PASS" />
+    <testcase classname="com.viernes.mensajeria.application.service.MensajeServiceTest" name="listar_conDespuesDeId_usaConsultaIncremental" time="0.002" result="PASS" />
+    <testcase classname="com.viernes.mensajeria.application.service.MensajeServiceTest" name="enviar_conUsuarioConocido_guardaNombreCompleto" time="0.003" result="PASS" />
+    <testcase classname="com.viernes.mensajeria.application.service.MensajeServiceTest" name="enviar_conNombrePreferido_usaNombreDelToken" time="0.002" result="PASS" />
+    <testcase classname="com.viernes.mensajeria.application.service.MensajeServiceTest" name="resumen_retornaTotalYUltimoId" time="0.003" result="PASS" />
+  </testsuite>
+  <testsuite name="com.viernes.ModularityTests" tests="2" failures="0" errors="0" skipped="0" time="4.301">
+    <testcase classname="com.viernes.ModularityTests" name="verifiesModularStructure" time="0.184" result="PASS" />
+    <testcase classname="com.viernes.ModularityTests" name="writesModuleDocumentation" time="0.981" result="PASS" />
+  </testsuite>
+  <testsuite name="com.viernes.oportunidades.adapters.in.web.OportunidadControllerTest" tests="10" failures="0" errors="0" skipped="0" time="0.184">
+    <testcase classname="com.viernes.oportunidades.adapters.in.web.OportunidadControllerTest" name="obtenerOportunidadInexistente" time="0.069" result="PASS" />
+    <testcase classname="com.viernes.oportunidades.adapters.in.web.OportunidadControllerTest" name="actualizarOportunidad" time="0.025" result="PASS" />
+    <testcase classname="com.viernes.oportunidades.adapters.in.web.OportunidadControllerTest" name="crearOportunidadInvalida_nombreEnBlanco" time="0.014" result="PASS" />
+    <testcase classname="com.viernes.oportunidades.adapters.in.web.OportunidadControllerTest" name="listarOportunidades" time="0.01" result="PASS" />
+    <testcase classname="com.viernes.oportunidades.adapters.in.web.OportunidadControllerTest" name="crearOportunidadValida" time="0.014" result="PASS" />
+    <testcase classname="com.viernes.oportunidades.adapters.in.web.OportunidadControllerTest" name="cambiarEtapaOportunidad" time="0.01" result="PASS" />
+    <testcase classname="com.viernes.oportunidades.adapters.in.web.OportunidadControllerTest" name="eliminarOportunidad" time="0.007" result="PASS" />
+    <testcase classname="com.viernes.oportunidades.adapters.in.web.OportunidadControllerTest" name="obtenerOportunidadExistente" time="0.011" result="PASS" />
+    <testcase classname="com.viernes.oportunidades.adapters.in.web.OportunidadControllerTest" name="filtrarOportunidades_conEtapa" time="0.009" result="PASS" />
+    <testcase classname="com.viernes.oportunidades.adapters.in.web.OportunidadControllerTest" name="buscarOportunidades_conQ" time="0.009" result="PASS" />
+  </testsuite>
+  <testsuite name="com.viernes.oportunidades.application.service.OportunidadServiceTest" tests="5" failures="0" errors="0" skipped="0" time="0.287">
+    <testcase classname="com.viernes.oportunidades.application.service.OportunidadServiceTest" name="obtener_inexistente_lanzaNotFound" time="0.28" result="PASS" />
+    <testcase classname="com.viernes.oportunidades.application.service.OportunidadServiceTest" name="crear_sinEtapa_asignaProspeccionPorDefecto" time="0.002" result="PASS" />
+    <testcase classname="com.viernes.oportunidades.application.service.OportunidadServiceTest" name="cambiarEtapa_existente_cambiaEtapa" time="0.001" result="PASS" />
+    <testcase classname="com.viernes.oportunidades.application.service.OportunidadServiceTest" name="eliminar_existente_eliminaCorrectamente" time="0.001" result="PASS" />
+    <testcase classname="com.viernes.oportunidades.application.service.OportunidadServiceTest" name="actualizar_existente_actualizaCampos" time="0.0" result="PASS" />
+  </testsuite>
+  <testsuite name="com.viernes.oportunidades.domain.OportunidadTest" tests="5" failures="0" errors="0" skipped="0" time="0.003">
+    <testcase classname="com.viernes.oportunidades.domain.OportunidadTest" name="getValorPonderado_valorNull_devuelveZero" time="0.001" result="PASS" />
+    <testcase classname="com.viernes.oportunidades.domain.OportunidadTest" name="getValorPonderado_decimalesNoExactos_redondeaHalfUp" time="0.0" result="PASS" />
+    <testcase classname="com.viernes.oportunidades.domain.OportunidadTest" name="getValorPonderado_valoresExactos_devuelveEscalaDos" time="0.0" result="PASS" />
+    <testcase classname="com.viernes.oportunidades.domain.OportunidadTest" name="getValorPonderado_ambosNull_devuelveZero" time="0.0" result="PASS" />
+    <testcase classname="com.viernes.oportunidades.domain.OportunidadTest" name="getValorPonderado_probabilidadNull_devuelveZero" time="0.0" result="PASS" />
+  </testsuite>
+  <testsuite name="com.viernes.productos.adapters.in.web.ProductoControllerTest" tests="11" failures="0" errors="0" skipped="0" time="0.138">
+    <testcase classname="com.viernes.productos.adapters.in.web.ProductoControllerTest" name="eliminarProducto" time="0.046" result="PASS" />
+    <testcase classname="com.viernes.productos.adapters.in.web.ProductoControllerTest" name="listarProductos" time="0.007" result="PASS" />
+    <testcase classname="com.viernes.productos.adapters.in.web.ProductoControllerTest" name="obtenerProductoInexistente" time="0.007" result="PASS" />
+    <testcase classname="com.viernes.productos.adapters.in.web.ProductoControllerTest" name="actualizarProducto" time="0.015" result="PASS" />
+    <testcase classname="com.viernes.productos.adapters.in.web.ProductoControllerTest" name="crearProductoInvalido_precioNegativo" time="0.008" result="PASS" />
+    <testcase classname="com.viernes.productos.adapters.in.web.ProductoControllerTest" name="listarProductos_conParametroEstado_llamaListarPorEstado" time="0.006" result="PASS" />
+    <testcase classname="com.viernes.productos.adapters.in.web.ProductoControllerTest" name="listarProductos_conParametroQ_llamaBuscar" time="0.006" result="PASS" />
+    <testcase classname="com.viernes.productos.adapters.in.web.ProductoControllerTest" name="obtenerProductoExistente" time="0.008" result="PASS" />
+    <testcase classname="com.viernes.productos.adapters.in.web.ProductoControllerTest" name="crearProductoInvalido_sinNombre" time="0.01" result="PASS" />
+    <testcase classname="com.viernes.productos.adapters.in.web.ProductoControllerTest" name="crearProductoValido" time="0.011" result="PASS" />
+    <testcase classname="com.viernes.productos.adapters.in.web.ProductoControllerTest" name="crearProducto_codigoDuplicado_retornaBadRequest" time="0.01" result="PASS" />
+  </testsuite>
+  <testsuite name="com.viernes.productos.application.service.ProductoServiceTest" tests="9" failures="0" errors="0" skipped="0" time="0.048">
+    <testcase classname="com.viernes.productos.application.service.ProductoServiceTest" name="listar_retornaTodosLosProductos" time="0.038" result="PASS" />
+    <testcase classname="com.viernes.productos.application.service.ProductoServiceTest" name="actualizar_existente_retornaActualizado" time="0.002" result="PASS" />
+    <testcase classname="com.viernes.productos.application.service.ProductoServiceTest" name="crear_codigoDuplicado_lanzaIllegalArgument" time="0.001" result="PASS" />
+    <testcase classname="com.viernes.productos.application.service.ProductoServiceTest" name="obtener_inexistente_lanzaNotFound" time="0.001" result="PASS" />
+    <testcase classname="com.viernes.productos.application.service.ProductoServiceTest" name="eliminar_inexistente_lanzaNotFound" time="0.003" result="PASS" />
+    <testcase classname="com.viernes.productos.application.service.ProductoServiceTest" name="crear_sinEstado_asignaActivoPorDefecto" time="0.001" result="PASS" />
+    <testcase classname="com.viernes.productos.application.service.ProductoServiceTest" name="eliminar_existente_eliminaCorrectamente" time="0.0" result="PASS" />
+    <testcase classname="com.viernes.productos.application.service.ProductoServiceTest" name="obtener_existente_retornaProducto" time="0.001" result="PASS" />
+    <testcase classname="com.viernes.productos.application.service.ProductoServiceTest" name="actualizar_codigoDuplicado_lanzaIllegalArgument" time="0.001" result="PASS" />
+  </testsuite>
+  <testsuite name="com.viernes.propuestas.adapters.in.web.PropuestaControllerTest" tests="7" failures="0" errors="0" skipped="0" time="0.189">
+    <testcase classname="com.viernes.propuestas.adapters.in.web.PropuestaControllerTest" name="crearPropuestaValida" time="0.109" result="PASS" />
+    <testcase classname="com.viernes.propuestas.adapters.in.web.PropuestaControllerTest" name="actualizarPropuesta" time="0.023" result="PASS" />
+    <testcase classname="com.viernes.propuestas.adapters.in.web.PropuestaControllerTest" name="obtenerPropuestaInexistente" time="0.007" result="PASS" />
+    <testcase classname="com.viernes.propuestas.adapters.in.web.PropuestaControllerTest" name="enviarPropuesta" time="0.008" result="PASS" />
+    <testcase classname="com.viernes.propuestas.adapters.in.web.PropuestaControllerTest" name="listarPropuestas" time="0.008" result="PASS" />
+    <testcase classname="com.viernes.propuestas.adapters.in.web.PropuestaControllerTest" name="obtenerPropuestaExistente" time="0.01" result="PASS" />
+    <testcase classname="com.viernes.propuestas.adapters.in.web.PropuestaControllerTest" name="crearPropuestaInvalida_sinDetalles" time="0.022" result="PASS" />
+  </testsuite>
+  <testsuite name="com.viernes.propuestas.application.service.PropuestaServiceTest" tests="15" failures="0" errors="0" skipped="0" time="0.112">
+    <testcase classname="com.viernes.propuestas.application.service.PropuestaServiceTest" name="crear_oportunidadInexistente_lanzaNotFound" time="0.09" result="PASS" />
+    <testcase classname="com.viernes.propuestas.application.service.PropuestaServiceTest" name="aprobar_desdeEnviada_cambiaEstado" time="0.001" result="PASS" />
+    <testcase classname="com.viernes.propuestas.application.service.PropuestaServiceTest" name="crear_conDatosValidos_retornaResponse" time="0.001" result="PASS" />
+    <testcase classname="com.viernes.propuestas.application.service.PropuestaServiceTest" name="crear_detalleLibreSinProducto_noConsultaCatalogo" time="0.001" result="PASS" />
+    <testcase classname="com.viernes.propuestas.application.service.PropuestaServiceTest" name="crear_conProductoValido_prefillDesdeCatalogo" time="0.002" result="PASS" />
+    <testcase classname="com.viernes.propuestas.application.service.PropuestaServiceTest" name="actualizar_enEnviada_lanzaConflict" time="0.001" result="PASS" />
+    <testcase classname="com.viernes.propuestas.application.service.PropuestaServiceTest" name="rechazar_desdeBorrador_lanzaException" time="0.001" result="PASS" />
+    <testcase classname="com.viernes.propuestas.application.service.PropuestaServiceTest" name="crear_conProductoYOverride_respetaValoresEnviados" time="0.001" result="PASS" />
+    <testcase classname="com.viernes.propuestas.application.service.PropuestaServiceTest" name="crear_detalleLibreSinDescripcion_lanzaIllegalArgument" time="0.001" result="PASS" />
+    <testcase classname="com.viernes.propuestas.application.service.PropuestaServiceTest" name="actualizar_enBorrador_exitoso" time="0.0" result="PASS" />
+    <testcase classname="com.viernes.propuestas.application.service.PropuestaServiceTest" name="enviar_desdeBorrador_cambiaEstado" time="0.001" result="PASS" />
+    <testcase classname="com.viernes.propuestas.application.service.PropuestaServiceTest" name="cancelar_desdeAprobada_lanzaException" time="0.0" result="PASS" />
+    <testcase classname="com.viernes.propuestas.application.service.PropuestaServiceTest" name="cancelar_desdeBorrador_cambiaEstado" time="0.001" result="PASS" />
+    <testcase classname="com.viernes.propuestas.application.service.PropuestaServiceTest" name="actualizar_conProductoNuevo_aplicaPrefillYRecalculaTotales" time="0.001" result="PASS" />
+    <testcase classname="com.viernes.propuestas.application.service.PropuestaServiceTest" name="crear_conProductoInexistente_lanzaNotFound" time="0.001" result="PASS" />
+  </testsuite>
+  <testsuite name="com.viernes.relationshipmap.RelationshipMapServiceTest" tests="7" failures="0" errors="0" skipped="0" time="0.02">
+    <testcase classname="com.viernes.relationshipmap.RelationshipMapServiceTest" name="obtenerDetalleNodo_Cliente_Exitoso" time="0.004" result="PASS" />
+    <testcase classname="com.viernes.relationshipmap.RelationshipMapServiceTest" name="expandirNodo_Contacto_Exitoso" time="0.006" result="PASS" />
+    <testcase classname="com.viernes.relationshipmap.RelationshipMapServiceTest" name="expandirNodo_Actividad_Exitoso" time="0.002" result="PASS" />
+    <testcase classname="com.viernes.relationshipmap.RelationshipMapServiceTest" name="obtenerMapaCliente_NoEncontrado_LanzaExcepcion" time="0.0" result="PASS" />
+    <testcase classname="com.viernes.relationshipmap.RelationshipMapServiceTest" name="obtenerMapaOportunidad_Exitoso" time="0.001" result="PASS" />
+    <testcase classname="com.viernes.relationshipmap.RelationshipMapServiceTest" name="obtenerMapaCliente_Exitoso" time="0.002" result="PASS" />
+    <testcase classname="com.viernes.relationshipmap.RelationshipMapServiceTest" name="expandirNodo_Propuesta_Exitoso" time="0.002" result="PASS" />
+  </testsuite>
+  <testsuite name="com.viernes.shared.ratelimit.ConsultaDocumentoRateLimiterTest" tests="4" failures="0" errors="0" skipped="0" time="0.012">
+    <testcase classname="com.viernes.shared.ratelimit.ConsultaDocumentoRateLimiterTest" name="peticionesConcurrentes_respetanElLimiteExacto" time="0.006" result="PASS" />
+    <testcase classname="com.viernes.shared.ratelimit.ConsultaDocumentoRateLimiterTest" name="permiteHastaElLimiteConfigurado" time="0.001" result="PASS" />
+    <testcase classname="com.viernes.shared.ratelimit.ConsultaDocumentoRateLimiterTest" name="elLimiteEsIndependientePorUsuario" time="0.001" result="PASS" />
+    <testcase classname="com.viernes.shared.ratelimit.ConsultaDocumentoRateLimiterTest" name="superadoElLimite_lanzaExcepcionConLaVentana" time="0.0" result="PASS" />
+  </testsuite>
+  <testsuite name="com.viernes.usuarios.adapters.in.web.UsuarioControllerTest" tests="9" failures="0" errors="0" skipped="0" time="0.127">
+    <testcase classname="com.viernes.usuarios.adapters.in.web.UsuarioControllerTest" name="desactivarUsuario" time="0.05" result="PASS" />
+    <testcase classname="com.viernes.usuarios.adapters.in.web.UsuarioControllerTest" name="actualizarUsuario" time="0.012" result="PASS" />
+    <testcase classname="com.viernes.usuarios.adapters.in.web.UsuarioControllerTest" name="listarUsuarios" time="0.007" result="PASS" />
+    <testcase classname="com.viernes.usuarios.adapters.in.web.UsuarioControllerTest" name="activarUsuario" time="0.005" result="PASS" />
+    <testcase classname="com.viernes.usuarios.adapters.in.web.UsuarioControllerTest" name="crearUsuarioInvalido" time="0.011" result="PASS" />
+    <testcase classname="com.viernes.usuarios.adapters.in.web.UsuarioControllerTest" name="actualizarUsuarioConCorreoDuplicado" time="0.011" result="PASS" />
+    <testcase classname="com.viernes.usuarios.adapters.in.web.UsuarioControllerTest" name="crearUsuarioValido" time="0.012" result="PASS" />
+    <testcase classname="com.viernes.usuarios.adapters.in.web.UsuarioControllerTest" name="obtenerUsuarioExistente" time="0.007" result="PASS" />
+    <testcase classname="com.viernes.usuarios.adapters.in.web.UsuarioControllerTest" name="obtenerUsuarioInexistente" time="0.007" result="PASS" />
+  </testsuite>
+  <testsuite name="com.viernes.usuarios.application.service.UsuarioServiceTest" tests="10" failures="0" errors="0" skipped="0" time="0.096">
+    <testcase classname="com.viernes.usuarios.application.service.UsuarioServiceTest" name="activar_usuarioInactivo_cambiaEstadoAActivo" time="0.078" result="PASS" />
+    <testcase classname="com.viernes.usuarios.application.service.UsuarioServiceTest" name="crear_conDatosValidos_codificaPasswordYFuerzaActivo" time="0.002" result="PASS" />
+    <testcase classname="com.viernes.usuarios.application.service.UsuarioServiceTest" name="desactivar_usuarioActivo_cambiaEstadoAInactivo" time="0.001" result="PASS" />
+    <testcase classname="com.viernes.usuarios.application.service.UsuarioServiceTest" name="obtener_idInexistente_lanzaNotFound" time="0.001" result="PASS" />
+    <testcase classname="com.viernes.usuarios.application.service.UsuarioServiceTest" name="buscarPorCorreo_usuarioExistente_devuelveResumenConRolYEstadoComoString" time="0.001" result="PASS" />
+    <testcase classname="com.viernes.usuarios.application.service.UsuarioServiceTest" name="actualizar_conDatosValidos_retornaResponseActualizado" time="0.004" result="PASS" />
+    <testcase classname="com.viernes.usuarios.application.service.UsuarioServiceTest" name="crear_sinPassword_lanzaIllegalArgument" time="0.002" result="PASS" />
+    <testcase classname="com.viernes.usuarios.application.service.UsuarioServiceTest" name="buscarPorCorreo_inexistente_devuelveVacio" time="0.002" result="PASS" />
+    <testcase classname="com.viernes.usuarios.application.service.UsuarioServiceTest" name="actualizar_idInexistente_lanzaNotFound" time="0.001" result="PASS" />
+    <testcase classname="com.viernes.usuarios.application.service.UsuarioServiceTest" name="crear_conCorreoDuplicado_lanzaIllegalArgument" time="0.001" result="PASS" />
+  </testsuite>
+  <testsuite name="com.viernes.ViernesApplicationTests" tests="1" failures="0" errors="0" skipped="0" time="11.251">
+    <testcase classname="com.viernes.ViernesApplicationTests" name="contextLoads" time="0.011" result="PASS" />
+  </testsuite>
+</testsuites>

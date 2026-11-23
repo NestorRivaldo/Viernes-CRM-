@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><style>
+html,body{margin:0;padding:0;background:#fff;width:1700px;height:1370px;overflow:hidden}
+</style></head><body><?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1700" height="1370" viewBox="0 0 1700 1370">
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2.2" flood-color="#101828" flood-opacity="0.16"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#42526E"/>
+    </marker>
+  </defs>
+  <rect width="1700" height="1370" fill="#FFFFFF"/>
+  <text x="850.0" y="27.0" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:22px;font-weight:700;fill:#101828;opacity:1.0;">
+<tspan x="850.0" dy="0.0">C3 - Módulo Oportunidades</tspan>
+</text>
+<text x="850.0" y="53.0" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:12.5px;font-weight:normal;fill:#475467;opacity:1.0;">
+<tspan x="850.0" dy="0.0">Vista de componentes internos y relaciones N:M verificadas - paquete com.viernes.oportunidades</tspan>
+</text>
+<rect x="30.0" y="85.0" width="1640.0" height="1030.0" rx="12" fill="#F7F9FC" stroke="#8A94A6" stroke-width="1.2" stroke-dasharray="8 5"/>
+<text x="48.0" y="105.0" text-anchor="start" style="font-family:Segoe UI, Arial, sans-serif;font-size:13px;font-weight:600;fill:#344054;opacity:1.0;">
+<tspan x="48.0" dy="0.0">Módulo Oportunidades (com.viernes.oportunidades)</tspan>
+</text>
+<rect x="55.0" y="120.0" width="1590.0" height="150.0" rx="12" fill="#FFFFFF" stroke="#8A94A6" stroke-width="1.2" stroke-dasharray="8 5"/>
+<text x="73.0" y="140.0" text-anchor="start" style="font-family:Segoe UI, Arial, sans-serif;font-size:13px;font-weight:600;fill:#344054;opacity:1.0;">
+<tspan x="73.0" dy="0.0">Entrada REST</tspan>
+</text>
+<g class="c3-box">
+<rect x="700.0" y="145.0" width="300.0" height="110.0" rx="9" fill="#2F6FA8" stroke="#173F61" stroke-width="1.4" filter="url(#shadow)"/>
+<text x="850.0" y="175.0" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:15px;font-weight:600;fill:#FFFFFF;opacity:1.0;">
+<tspan x="850.0" dy="0.0">OportunidadController</tspan>
+</text>
+<text x="850.0" y="193.7" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:10.5px;font-weight:normal;fill:#FFFFFF;font-style:italic;opacity:0.88;">
+<tspan x="850.0" dy="0.0">@RestController</tspan>
+</text>
+<text x="850.0" y="223.3" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:11.5px;font-weight:normal;fill:#FFFFFF;opacity:0.96;">
+<tspan x="850.0" dy="0.0">CRUD en /api/v1/oportunidades</tspan>
+<tspan x="850.0" dy="14.4">Subrecursos: /{id}/contactos,</tspan>
+<tspan x="850.0" dy="14.4">/{id}/productos y /{id}/colaboradores</tspan>
+</text>
+</g>
+<rect x="55.0" y="300.0" width="1590.0" height="150.0" rx="12" fill="#FFFFFF" stroke="#8A94A6" stroke-width="1.2" stroke-dasharray="8 5"/>
+<text x="73.0" y="320.0" text-anchor="start" style="font-family:Segoe UI, Arial, sans-serif;font-size:13px;font-weight:600;fill:#344054;opacity:1.0;">
+<tspan x="73.0" dy="0.0">Aplicación</tspan>
+</text>
+<g class="c3-box">
+<rect x="505.0" y="320.0" width="310.0" height="110.0" rx="9" fill="#2E7D8C" stroke="#194A54" stroke-width="1.4" filter="url(#shadow)"/>
+<text x="660.0" y="357.2" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:15px;font-weight:600;fill:#FFFFFF;opacity:1.0;">
+<tspan x="660.0" dy="0.0">ManageOportunidadUseCase</tspan>
+</text>
+<text x="660.0" y="375.9" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:10.5px;font-weight:normal;fill:#FFFFFF;font-style:italic;opacity:0.88;">
+<tspan x="660.0" dy="0.0">puerto de entrada · interface</tspan>
+</text>
+<text x="660.0" y="405.5" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:11.5px;font-weight:normal;fill:#FFFFFF;opacity:0.96;">
+<tspan x="660.0" dy="0.0">CRUD, etapa, contactos,</tspan>
+<tspan x="660.0" dy="14.4">productos y colaboradores</tspan>
+</text>
+</g>
+<g class="c3-box">
+<rect x="885.0" y="320.0" width="310.0" height="110.0" rx="9" fill="#2E7D8C" stroke="#194A54" stroke-width="1.4" filter="url(#shadow)"/>
+<text x="1040.0" y="350.0" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:15px;font-weight:600;fill:#FFFFFF;opacity:1.0;">
+<tspan x="1040.0" dy="0.0">OportunidadService</tspan>
+</text>
+<text x="1040.0" y="368.7" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:10.5px;font-weight:normal;fill:#FFFFFF;font-style:italic;opacity:0.88;">
+<tspan x="1040.0" dy="0.0">@Service</tspan>
+</text>
+<text x="1040.0" y="398.3" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:11.5px;font-weight:normal;fill:#FFFFFF;opacity:0.96;">
+<tspan x="1040.0" dy="0.0">Implementa el puerto de entrada</tspan>
+<tspan x="1040.0" dy="14.4">Orquesta 4 puertos de persistencia</tspan>
+<tspan x="1040.0" dy="14.4">y 3 puertos de consulta</tspan>
+</text>
+</g>
+<rect x="55.0" y="480.0" width="1590.0" height="175.0" rx="12" fill="#FFFFFF" stroke="#8A94A6" stroke-width="1.2" stroke-dasharray="8 5"/>
+<text x="73.0" y="500.0" text-anchor="start" style="font-family:Segoe UI, Arial, sans-serif;font-size:13px;font-weight:600;fill:#344054;opacity:1.0;">
+<tspan x="73.0" dy="0.0">Dominio</tspan>
+</text>
+<g class="c3-box">
+<rect x="95.0" y="505.0" width="320.0" height="120.0" rx="9" fill="#6A4C93" stroke="#3F2C58" stroke-width="1.4" filter="url(#shadow)"/>
+<text x="255.0" y="547.2" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:15px;font-weight:600;fill:#FFFFFF;opacity:1.0;">
+<tspan x="255.0" dy="0.0">Oportunidad</tspan>
+</text>
+<text x="255.0" y="565.9" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:10.5px;font-weight:normal;fill:#FFFFFF;font-style:italic;opacity:0.88;">
+<tspan x="255.0" dy="0.0">entidad de dominio</tspan>
+</text>
+<text x="255.0" y="595.5" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:11.5px;font-weight:normal;fill:#FFFFFF;opacity:0.96;">
+<tspan x="255.0" dy="0.0">Datos de la oportunidad</tspan>
+<tspan x="255.0" dy="14.4">EtapaOportunidad</tspan>
+</text>
+</g>
+<g class="c3-box">
+<rect x="455.0" y="505.0" width="320.0" height="120.0" rx="9" fill="#6A4C93" stroke="#3F2C58" stroke-width="1.4" filter="url(#shadow)"/>
+<text x="615.0" y="547.2" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:15px;font-weight:600;fill:#FFFFFF;opacity:1.0;">
+<tspan x="615.0" dy="0.0">OportunidadContacto</tspan>
+</text>
+<text x="615.0" y="565.9" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:10.5px;font-weight:normal;fill:#FFFFFF;font-style:italic;opacity:0.88;">
+<tspan x="615.0" dy="0.0">entidad puente N:M</tspan>
+</text>
+<text x="615.0" y="595.5" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:11.5px;font-weight:normal;fill:#FFFFFF;opacity:0.96;">
+<tspan x="615.0" dy="0.0">idOportunidad + idContacto</tspan>
+<tspan x="615.0" dy="14.4">rol + esDecisor</tspan>
+</text>
+</g>
+<g class="c3-box">
+<rect x="815.0" y="505.0" width="320.0" height="120.0" rx="9" fill="#6A4C93" stroke="#3F2C58" stroke-width="1.4" filter="url(#shadow)"/>
+<text x="975.0" y="547.2" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:15px;font-weight:600;fill:#FFFFFF;opacity:1.0;">
+<tspan x="975.0" dy="0.0">OportunidadProducto</tspan>
+</text>
+<text x="975.0" y="565.9" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:10.5px;font-weight:normal;fill:#FFFFFF;font-style:italic;opacity:0.88;">
+<tspan x="975.0" dy="0.0">entidad puente N:M</tspan>
+</text>
+<text x="975.0" y="595.5" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:11.5px;font-weight:normal;fill:#FFFFFF;opacity:0.96;">
+<tspan x="975.0" dy="0.0">idOportunidad + idProducto</tspan>
+<tspan x="975.0" dy="14.4">cantidad + precio</tspan>
+</text>
+</g>
+<g class="c3-box">
+<rect x="1175.0" y="505.0" width="340.0" height="120.0" rx="9" fill="#6A4C93" stroke="#3F2C58" stroke-width="1.4" filter="url(#shadow)"/>
+<text x="1345.0" y="547.2" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:15px;font-weight:600;fill:#FFFFFF;opacity:1.0;">
+<tspan x="1345.0" dy="0.0">OportunidadColaborador</tspan>
+</text>
+<text x="1345.0" y="565.9" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:10.5px;font-weight:normal;fill:#FFFFFF;font-style:italic;opacity:0.88;">
+<tspan x="1345.0" dy="0.0">entidad puente N:M</tspan>
+</text>
+<text x="1345.0" y="595.5" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:11.5px;font-weight:normal;fill:#FFFFFF;opacity:0.96;">
+<tspan x="1345.0" dy="0.0">idOportunidad + idUsuario</tspan>
+<tspan x="1345.0" dy="14.4">rol</tspan>
+</text>
+</g>
+<rect x="55.0" y="685.0" width="1590.0" height="155.0" rx="12" fill="#FFFFFF" stroke="#8A94A6" stroke-width="1.2" stroke-dasharray="8 5"/>
+<text x="73.0" y="705.0" text-anchor="start" style="font-family:Segoe UI, Arial, sans-serif;font-size:13px;font-weight:600;fill:#344054;opacity:1.0;">
+<tspan x="73.0" dy="0.0">Puertos de salida (7 interfaces)</tspan>
+</text>
+<g class="c3-box">
+<rect x="75.0" y="715.0" width="205.0" height="105.0" rx="9" fill="#A15C00" stroke="#623800" stroke-width="1.4" filter="url(#shadow)"/>
+<text x="177.5" y="756.6" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:13.5px;font-weight:600;fill:#FFFFFF;opacity:1.0;">
+<tspan x="177.5" dy="0.0">ContactoQueryPort</tspan>
+</text>
+<text x="177.5" y="773.5" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:10.5px;font-weight:normal;fill:#FFFFFF;font-style:italic;opacity:0.88;">
+<tspan x="177.5" dy="0.0">interface</tspan>
+</text>
+<text x="177.5" y="802.7" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:11px;font-weight:normal;fill:#FFFFFF;opacity:0.96;">
+<tspan x="177.5" dy="0.0">buscarPorId(idContacto)</tspan>
+</text>
+</g>
+<g class="c3-box">
+<rect x="297.0" y="715.0" width="205.0" height="105.0" rx="9" fill="#A15C00" stroke="#623800" stroke-width="1.4" filter="url(#shadow)"/>
+<text x="399.5" y="756.6" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:13.5px;font-weight:600;fill:#FFFFFF;opacity:1.0;">
+<tspan x="399.5" dy="0.0">ProductoQueryPort</tspan>
+</text>
+<text x="399.5" y="773.5" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:10.5px;font-weight:normal;fill:#FFFFFF;font-style:italic;opacity:0.88;">
+<tspan x="399.5" dy="0.0">interface</tspan>
+</text>
+<text x="399.5" y="802.7" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:11px;font-weight:normal;fill:#FFFFFF;opacity:0.96;">
+<tspan x="399.5" dy="0.0">buscarPorId(idProducto)</tspan>
+</text>
+</g>
+<g class="c3-box">
+<rect x="519.0" y="715.0" width="205.0" height="105.0" rx="9" fill="#A15C00" stroke="#623800" stroke-width="1.4" filter="url(#shadow)"/>
+<text x="621.5" y="756.6" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:13.5px;font-weight:600;fill:#FFFFFF;opacity:1.0;">
+<tspan x="621.5" dy="0.0">UsuarioQueryPort</tspan>
+</text>
+<text x="621.5" y="773.5" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:10.5px;font-weight:normal;fill:#FFFFFF;font-style:italic;opacity:0.88;">
+<tspan x="621.5" dy="0.0">interface</tspan>
+</text>
+<text x="621.5" y="802.7" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:11px;font-weight:normal;fill:#FFFFFF;opacity:0.96;">
+<tspan x="621.5" dy="0.0">buscarPorId(idUsuario)</tspan>
+</text>
+</g>
+<g class="c3-box">
+<rect x="741.0" y="715.0" width="205.0" height="105.0" rx="9" fill="#A15C00" stroke="#623800" stroke-width="1.4" filter="url(#shadow)"/>
+<text x="843.5" y="743.5" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:13.5px;font-weight:600;fill:#FFFFFF;opacity:1.0;">
+<tspan x="843.5" dy="0.0">OportunidadContacto</tspan>
+<tspan x="843.5" dy="15.9">PersistencePort</tspan>
+</text>
+<text x="843.5" y="776.4" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:10.5px;font-weight:normal;fill:#FFFFFF;font-style:italic;opacity:0.88;">
+<tspan x="843.5" dy="0.0">interface</tspan>
+</text>
+<text x="843.5" y="805.5" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:11px;font-weight:normal;fill:#FFFFFF;opacity:0.96;">
+<tspan x="843.5" dy="0.0">save · find · exists</tspan>
+<tspan x="843.5" dy="13.8">deleteByIdOportunidad</tspan>
+</text>
+</g>
+<g class="c3-box">
+<rect x="963.0" y="715.0" width="205.0" height="105.0" rx="9" fill="#A15C00" stroke="#623800" stroke-width="1.4" filter="url(#shadow)"/>
+<text x="1065.5" y="743.5" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:13.5px;font-weight:600;fill:#FFFFFF;opacity:1.0;">
+<tspan x="1065.5" dy="0.0">OportunidadProducto</tspan>
+<tspan x="1065.5" dy="15.9">PersistencePort</tspan>
+</text>
+<text x="1065.5" y="776.4" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:10.5px;font-weight:normal;fill:#FFFFFF;font-style:italic;opacity:0.88;">
+<tspan x="1065.5" dy="0.0">interface</tspan>
+</text>
+<text x="1065.5" y="805.5" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:11px;font-weight:normal;fill:#FFFFFF;opacity:0.96;">
+<tspan x="1065.5" dy="0.0">save · find · exists</tspan>
+<tspan x="1065.5" dy="13.8">deleteByIdOportunidad</tspan>
+</text>
+</g>
+<g class="c3-box">
+<rect x="1185.0" y="715.0" width="205.0" height="105.0" rx="9" fill="#A15C00" stroke="#623800" stroke-width="1.4" filter="url(#shadow)"/>
+<text x="1287.5" y="743.5" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:13.5px;font-weight:600;fill:#FFFFFF;opacity:1.0;">
+<tspan x="1287.5" dy="0.0">OportunidadColaborador</tspan>
+<tspan x="1287.5" dy="15.9">PersistencePort</tspan>
+</text>
+<text x="1287.5" y="776.4" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:10.5px;font-weight:normal;fill:#FFFFFF;font-style:italic;opacity:0.88;">
+<tspan x="1287.5" dy="0.0">interface</tspan>
+</text>
+<text x="1287.5" y="805.5" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:11px;font-weight:normal;fill:#FFFFFF;opacity:0.96;">
+<tspan x="1287.5" dy="0.0">save · find · exists</tspan>
+<tspan x="1287.5" dy="13.8">deleteByIdOportunidad</tspan>
+</text>
+</g>
+<g class="c3-box">
+<rect x="1407.0" y="715.0" width="205.0" height="105.0" rx="9" fill="#A15C00" stroke="#623800" stroke-width="1.4" filter="url(#shadow)"/>
+<text x="1509.5" y="748.6" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:13.5px;font-weight:600;fill:#FFFFFF;opacity:1.0;">
+<tspan x="1509.5" dy="0.0">OportunidadPersistence</tspan>
+<tspan x="1509.5" dy="15.9">Port</tspan>
+</text>
+<text x="1509.5" y="781.5" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:10.5px;font-weight:normal;fill:#FFFFFF;font-style:italic;opacity:0.88;">
+<tspan x="1509.5" dy="0.0">interface</tspan>
+</text>
+<text x="1509.5" y="810.6" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:11px;font-weight:normal;fill:#FFFFFF;opacity:0.96;">
+<tspan x="1509.5" dy="0.0">CRUD de la oportunidad</tspan>
+</text>
+</g>
+<rect x="55.0" y="875.0" width="1590.0" height="165.0" rx="12" fill="#FFFFFF" stroke="#8A94A6" stroke-width="1.2" stroke-dasharray="8 5"/>
+<text x="73.0" y="895.0" text-anchor="start" style="font-family:Segoe UI, Arial, sans-serif;font-size:13px;font-weight:600;fill:#344054;opacity:1.0;">
+<tspan x="73.0" dy="0.0">Adaptadores de salida (7 clases)</tspan>
+</text>
+<g class="c3-box">
+<rect x="75.0" y="905.0" width="205.0" height="115.0" rx="9" fill="#2E7D5B" stroke="#194A36" stroke-width="1.4" filter="url(#shadow)"/>
+<text x="177.5" y="951.9" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:13.5px;font-weight:600;fill:#FFFFFF;opacity:1.0;">
+<tspan x="177.5" dy="0.0">ContactoQueryAdapter</tspan>
+</text>
+<text x="177.5" y="968.8" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:10.5px;font-weight:normal;fill:#FFFFFF;font-style:italic;opacity:0.88;">
+<tspan x="177.5" dy="0.0">@Component</tspan>
+</text>
+<text x="177.5" y="997.5" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:10.5px;font-weight:normal;fill:#FFFFFF;opacity:0.96;">
+<tspan x="177.5" dy="0.0">-&gt; ManageClienteUseCase</tspan>
+</text>
+</g>
+<g class="c3-box">
+<rect x="297.0" y="905.0" width="205.0" height="115.0" rx="9" fill="#2E7D5B" stroke="#194A36" stroke-width="1.4" filter="url(#shadow)"/>
+<text x="399.5" y="951.9" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:13.5px;font-weight:600;fill:#FFFFFF;opacity:1.0;">
+<tspan x="399.5" dy="0.0">ProductoQueryAdapter</tspan>
+</text>
+<text x="399.5" y="968.8" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:10.5px;font-weight:normal;fill:#FFFFFF;font-style:italic;opacity:0.88;">
+<tspan x="399.5" dy="0.0">@Component</tspan>
+</text>
+<text x="399.5" y="997.5" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:10.5px;font-weight:normal;fill:#FFFFFF;opacity:0.96;">
+<tspan x="399.5" dy="0.0">-&gt; ManageProductoUseCase</tspan>
+</text>
+</g>
+<g class="c3-box">
+<rect x="519.0" y="905.0" width="205.0" height="115.0" rx="9" fill="#2E7D5B" stroke="#194A36" stroke-width="1.4" filter="url(#shadow)"/>
+<text x="621.5" y="951.9" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:13.5px;font-weight:600;fill:#FFFFFF;opacity:1.0;">
+<tspan x="621.5" dy="0.0">UsuarioQueryAdapter</tspan>
+</text>
+<text x="621.5" y="968.8" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:10.5px;font-weight:normal;fill:#FFFFFF;font-style:italic;opacity:0.88;">
+<tspan x="621.5" dy="0.0">@Component</tspan>
+</text>
+<text x="621.5" y="997.5" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:10.5px;font-weight:normal;fill:#FFFFFF;opacity:0.96;">
+<tspan x="621.5" dy="0.0">-&gt; UsuariosApi</tspan>
+</text>
+</g>
+<g class="c3-box">
+<rect x="741.0" y="905.0" width="205.0" height="115.0" rx="9" fill="#2E7D5B" stroke="#194A36" stroke-width="1.4" filter="url(#shadow)"/>
+<text x="843.5" y="937.4" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:13.5px;font-weight:600;fill:#FFFFFF;opacity:1.0;">
+<tspan x="843.5" dy="0.0">OportunidadContacto</tspan>
+<tspan x="843.5" dy="15.9">PersistenceAdapter</tspan>
+</text>
+<text x="843.5" y="970.2" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:10.5px;font-weight:normal;fill:#FFFFFF;font-style:italic;opacity:0.88;">
+<tspan x="843.5" dy="0.0">@Component</tspan>
+</text>
+<text x="843.5" y="998.9" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:10.5px;font-weight:normal;fill:#FFFFFF;opacity:0.96;">
+<tspan x="843.5" dy="0.0">Repository -&gt; Entity</tspan>
+<tspan x="843.5" dy="13.1">CRM_OPORTUNIDAD_CONTACTOS</tspan>
+</text>
+</g>
+<g class="c3-box">
+<rect x="963.0" y="905.0" width="205.0" height="115.0" rx="9" fill="#2E7D5B" stroke="#194A36" stroke-width="1.4" filter="url(#shadow)"/>
+<text x="1065.5" y="937.4" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:13.5px;font-weight:600;fill:#FFFFFF;opacity:1.0;">
+<tspan x="1065.5" dy="0.0">OportunidadProducto</tspan>
+<tspan x="1065.5" dy="15.9">PersistenceAdapter</tspan>
+</text>
+<text x="1065.5" y="970.2" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:10.5px;font-weight:normal;fill:#FFFFFF;font-style:italic;opacity:0.88;">
+<tspan x="1065.5" dy="0.0">@Component</tspan>
+</text>
+<text x="1065.5" y="998.9" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:10.5px;font-weight:normal;fill:#FFFFFF;opacity:0.96;">
+<tspan x="1065.5" dy="0.0">Repository -&gt; Entity</tspan>
+<tspan x="1065.5" dy="13.1">CRM_OPORTUNIDAD_PRODUCTOS</tspan>
+</text>
+</g>
+<g class="c3-box">
+<rect x="1185.0" y="905.0" width="205.0" height="115.0" rx="9" fill="#2E7D5B" stroke="#194A36" stroke-width="1.4" filter="url(#shadow)"/>
+<text x="1287.5" y="937.4" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:13.5px;font-weight:600;fill:#FFFFFF;opacity:1.0;">
+<tspan x="1287.5" dy="0.0">OportunidadColaborador</tspan>
+<tspan x="1287.5" dy="15.9">PersistenceAdapter</tspan>
+</text>
+<text x="1287.5" y="970.2" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:10.5px;font-weight:normal;fill:#FFFFFF;font-style:italic;opacity:0.88;">
+<tspan x="1287.5" dy="0.0">@Component</tspan>
+</text>
+<text x="1287.5" y="998.9" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:10.5px;font-weight:normal;fill:#FFFFFF;opacity:0.96;">
+<tspan x="1287.5" dy="0.0">Repository -&gt; Entity</tspan>
+<tspan x="1287.5" dy="13.1">CRM_OPORTUNIDAD_COLABORADORES</tspan>
+</text>
+</g>
+<g class="c3-box">
+<rect x="1407.0" y="905.0" width="205.0" height="115.0" rx="9" fill="#2E7D5B" stroke="#194A36" stroke-width="1.4" filter="url(#shadow)"/>
+<text x="1509.5" y="937.4" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:13.5px;font-weight:600;fill:#FFFFFF;opacity:1.0;">
+<tspan x="1509.5" dy="0.0">OportunidadPersistence</tspan>
+<tspan x="1509.5" dy="15.9">Adapter</tspan>
+</text>
+<text x="1509.5" y="970.2" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:10.5px;font-weight:normal;fill:#FFFFFF;font-style:italic;opacity:0.88;">
+<tspan x="1509.5" dy="0.0">@Component</tspan>
+</text>
+<text x="1509.5" y="998.9" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:10.5px;font-weight:normal;fill:#FFFFFF;opacity:0.96;">
+<tspan x="1509.5" dy="0.0">Repository -&gt; Entity</tspan>
+<tspan x="1509.5" dy="13.1">CRM_OPORTUNIDADES</tspan>
+</text>
+</g>
+<path d="M 850.0 255.0 L 850.0 320.0" fill="none" stroke="#42526E" stroke-width="1.4" marker-end="url(#arrow)" stroke-linejoin="round"/>
+<rect x="896.0" y="279.0" width="38.0" height="15" rx="4" fill="#FFFFFF" stroke="#D0D5DD" stroke-width="0.7"/>
+<text x="915.0" y="290.0" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:10.5px;font-weight:600;fill:#42526E;opacity:1.0;">
+<tspan x="915.0" dy="0.0">invoca</tspan>
+</text>
+<path d="M 885.0 375.0 L 815.0 375.0" fill="none" stroke="#42526E" stroke-width="1.4" marker-end="url(#arrow)" stroke-linejoin="round"/>
+<rect x="820.6" y="351.0" width="58.8" height="15" rx="4" fill="#FFFFFF" stroke="#D0D5DD" stroke-width="0.7"/>
+<text x="850.0" y="362.0" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:10.5px;font-weight:600;fill:#42526E;opacity:1.0;">
+<tspan x="850.0" dy="0.0">implementa</tspan>
+</text>
+<path d="M 1040.0 430.0 L 1000.0 480.0" fill="none" stroke="#42526E" stroke-width="1.4" marker-end="url(#arrow)" stroke-linejoin="round"/>
+<rect x="1040.0" y="453.0" width="100.0" height="15" rx="4" fill="#FFFFFF" stroke="#D0D5DD" stroke-width="0.7"/>
+<text x="1090.0" y="464.0" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:10.5px;font-weight:600;fill:#42526E;opacity:1.0;">
+<tspan x="1090.0" dy="0.0">orquesta 4 clases</tspan>
+</text>
+<path d="M 1195.0 395.0 L 1645.0 395.0 L 1645.0 685.0" fill="none" stroke="#42526E" stroke-width="1.4" marker-end="url(#arrow)" stroke-linejoin="round"/>
+<rect x="1559.8" y="591.0" width="76.4" height="15" rx="4" fill="#FFFFFF" stroke="#D0D5DD" stroke-width="0.7"/>
+<text x="1598.0" y="602.0" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:10.5px;font-weight:600;fill:#42526E;opacity:1.0;">
+<tspan x="1598.0" dy="0.0">usa 7 puertos</tspan>
+</text>
+<path d="M 177.0 820.0 L 177.0 905.0" fill="none" stroke="#42526E" stroke-width="1.2" marker-end="url(#arrow)" stroke-linejoin="round"/>
+<path d="M 399.0 820.0 L 399.0 905.0" fill="none" stroke="#42526E" stroke-width="1.2" marker-end="url(#arrow)" stroke-linejoin="round"/>
+<path d="M 621.0 820.0 L 621.0 905.0" fill="none" stroke="#42526E" stroke-width="1.2" marker-end="url(#arrow)" stroke-linejoin="round"/>
+<path d="M 843.0 820.0 L 843.0 905.0" fill="none" stroke="#42526E" stroke-width="1.2" marker-end="url(#arrow)" stroke-linejoin="round"/>
+<path d="M 1065.0 820.0 L 1065.0 905.0" fill="none" stroke="#42526E" stroke-width="1.2" marker-end="url(#arrow)" stroke-linejoin="round"/>
+<path d="M 1287.0 820.0 L 1287.0 905.0" fill="none" stroke="#42526E" stroke-width="1.2" marker-end="url(#arrow)" stroke-linejoin="round"/>
+<path d="M 1509.0 820.0 L 1509.0 905.0" fill="none" stroke="#42526E" stroke-width="1.2" marker-end="url(#arrow)" stroke-linejoin="round"/>
+<g class="c3-box">
+<rect x="95.0" y="1120.0" width="240.0" height="95.0" rx="9" fill="#5B6770" stroke="#333B41" stroke-width="1.4" filter="url(#shadow)"/>
+<text x="215.0" y="1156.9" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:15px;font-weight:600;fill:#FFFFFF;opacity:1.0;">
+<tspan x="215.0" dy="0.0">Clientes</tspan>
+</text>
+<text x="215.0" y="1175.6" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:10.5px;font-weight:normal;fill:#FFFFFF;font-style:italic;opacity:0.88;">
+<tspan x="215.0" dy="0.0">módulo externo</tspan>
+</text>
+<text x="215.0" y="1205.2" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:11.5px;font-weight:normal;fill:#FFFFFF;opacity:0.96;">
+<tspan x="215.0" dy="0.0">ManageClienteUseCase</tspan>
+</text>
+</g>
+<g class="c3-box">
+<rect x="365.0" y="1120.0" width="240.0" height="95.0" rx="9" fill="#5B6770" stroke="#333B41" stroke-width="1.4" filter="url(#shadow)"/>
+<text x="485.0" y="1156.9" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:15px;font-weight:600;fill:#FFFFFF;opacity:1.0;">
+<tspan x="485.0" dy="0.0">Productos</tspan>
+</text>
+<text x="485.0" y="1175.6" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:10.5px;font-weight:normal;fill:#FFFFFF;font-style:italic;opacity:0.88;">
+<tspan x="485.0" dy="0.0">módulo externo</tspan>
+</text>
+<text x="485.0" y="1205.2" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:11.5px;font-weight:normal;fill:#FFFFFF;opacity:0.96;">
+<tspan x="485.0" dy="0.0">ManageProductoUseCase</tspan>
+</text>
+</g>
+<g class="c3-box">
+<rect x="635.0" y="1120.0" width="240.0" height="95.0" rx="9" fill="#5B6770" stroke="#333B41" stroke-width="1.4" filter="url(#shadow)"/>
+<text x="755.0" y="1156.9" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:15px;font-weight:600;fill:#FFFFFF;opacity:1.0;">
+<tspan x="755.0" dy="0.0">Usuarios</tspan>
+</text>
+<text x="755.0" y="1175.6" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:10.5px;font-weight:normal;fill:#FFFFFF;font-style:italic;opacity:0.88;">
+<tspan x="755.0" dy="0.0">módulo externo</tspan>
+</text>
+<text x="755.0" y="1205.2" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:11.5px;font-weight:normal;fill:#FFFFFF;opacity:0.96;">
+<tspan x="755.0" dy="0.0">UsuariosApi</tspan>
+</text>
+</g>
+<g class="c3-box">
+<rect x="1359.0" y="1120.0" width="300.0" height="95.0" rx="9" fill="#5B6770" stroke="#333B41" stroke-width="1.4" filter="url(#shadow)"/>
+<text x="1509.0" y="1156.9" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:15px;font-weight:600;fill:#FFFFFF;opacity:1.0;">
+<tspan x="1509.0" dy="0.0">Oracle Database</tspan>
+</text>
+<text x="1509.0" y="1175.6" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:10.5px;font-weight:normal;fill:#FFFFFF;font-style:italic;opacity:0.88;">
+<tspan x="1509.0" dy="0.0">sistema externo</tspan>
+</text>
+<text x="1509.0" y="1205.2" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:11.5px;font-weight:normal;fill:#FFFFFF;opacity:0.96;">
+<tspan x="1509.0" dy="0.0">Tablas CRM_* - JPA/Hibernate</tspan>
+</text>
+</g>
+<path d="M 177.0 1020.0 L 177.0 1060.0 L 215.0 1060.0 L 215.0 1120.0" fill="none" stroke="#42526E" stroke-width="1.2" marker-end="url(#arrow)" stroke-linejoin="round"/>
+<path d="M 399.0 1020.0 L 399.0 1060.0 L 485.0 1060.0 L 485.0 1120.0" fill="none" stroke="#42526E" stroke-width="1.2" marker-end="url(#arrow)" stroke-linejoin="round"/>
+<path d="M 621.0 1020.0 L 621.0 1060.0 L 755.0 1060.0 L 755.0 1120.0" fill="none" stroke="#42526E" stroke-width="1.2" marker-end="url(#arrow)" stroke-linejoin="round"/>
+<path d="M 843 1020 L 843 1070" fill="none" stroke="#42526E" stroke-width="1.4"/>
+<path d="M 1065 1020 L 1065 1070" fill="none" stroke="#42526E" stroke-width="1.4"/>
+<path d="M 1287 1020 L 1287 1070" fill="none" stroke="#42526E" stroke-width="1.4"/>
+<path d="M 1509 1020 L 1509 1070" fill="none" stroke="#42526E" stroke-width="1.4"/>
+<path d="M 843 1070 L 1509 1070 L 1509 1120" fill="none" stroke="#42526E" stroke-width="1.4" marker-end="url(#arrow)"/>
+<text x="1176.0" y="1088.0" text-anchor="middle" style="font-family:Segoe UI, Arial, sans-serif;font-size:10.5px;font-weight:600;fill:#42526E;opacity:1.0;">
+<tspan x="1176.0" dy="0.0">4 adaptadores JPA</tspan>
+</text>
+<g class="c3-note">
+<rect x="75.0" y="1240.0" width="760.0" height="105.0" rx="8" fill="#FFF8D6" stroke="#B8A24A" stroke-width="1.1"/>
+<path d="M 817.0 1240.0 L 835.0 1240.0 L 835.0 1258.0 Z" fill="#E8D98D" stroke="#B8A24A" stroke-width="1"/>
+<text x="87.0" y="1259.0" text-anchor="start" style="font-family:Segoe UI, Arial, sans-serif;font-size:11.8px;font-weight:700;fill:#3B3420;opacity:1.0;">
+<tspan x="87.0" dy="0.0">Materialización N:M verificada</tspan>
+</text>
+<text x="87.0" y="1278.0" text-anchor="start" style="font-family:Segoe UI, Arial, sans-serif;font-size:11px;font-weight:normal;fill:#3B3420;opacity:1.0;">
+<tspan x="87.0" dy="0.0">No existe @ManyToMany ni @JoinTable. Cada relación usa entidad puente con IDs escalares,</tspan>
+<tspan x="87.0" dy="14.9">puerto de persistencia, adaptador JPA y repositorio Spring Data. Oracle define FK físicas</tspan>
+<tspan x="87.0" dy="14.9">y restricción única (oportunidad, contraparte) en las tres tablas. El mapeo exacto consta</tspan>
+<tspan x="87.0" dy="14.9">en la Tabla 5. Este C3 no representa tablas: solo clases, interfaces y módulos reales.</tspan>
+</text>
+</g>
+<g class="c3-note">
+<rect x="860.0" y="1240.0" width="760.0" height="105.0" rx="8" fill="#FFF8D6" stroke="#B8A24A" stroke-width="1.1"/>
+<path d="M 1602.0 1240.0 L 1620.0 1240.0 L 1620.0 1258.0 Z" fill="#E8D98D" stroke="#B8A24A" stroke-width="1"/>
+<text x="872.0" y="1259.0" text-anchor="start" style="font-family:Segoe UI, Arial, sans-serif;font-size:11.8px;font-weight:700;fill:#3B3420;opacity:1.0;">
+<tspan x="872.0" dy="0.0">Lectura de la figura</tspan>
+</text>
+<text x="872.0" y="1278.0" text-anchor="start" style="font-family:Segoe UI, Arial, sans-serif;font-size:11px;font-weight:normal;fill:#3B3420;opacity:1.0;">
+<tspan x="872.0" dy="0.0">Azul: entrada REST. Turquesa: aplicación. Morado: dominio. Naranja: puertos de salida.</tspan>
+<tspan x="872.0" dy="14.9">Verde: adaptadores. Gris: módulos o sistemas externos. Las flechas entre capas son</tspan>
+<tspan x="872.0" dy="14.9">agregadas; el detalle puerto -&gt; adaptador esta alineado verticalmente y en la Tabla 5.</tspan>
+<tspan x="872.0" dy="14.9">El servicio usa shared.exception.ResourceNotFoundException para respuestas 404.</tspan>
+</text>
+</g>
+</svg>
+</body></html>

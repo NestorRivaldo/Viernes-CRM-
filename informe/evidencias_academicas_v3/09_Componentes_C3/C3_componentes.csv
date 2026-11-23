@@ -1,0 +1,18 @@
+﻿Módulo,Tipo Modulith,Responsabilidad e interfaz principal,Evidencia
+`clientes`,"Comercial, `OPEN`",Clientes y contactos. `ManageClienteUseCase`; `ClienteController` en `/api/v1/clientes`. Consulta DNI/RUC mediante `DocumentoLookupPort` y APIsPERU.,"`clientes/package-info.java`, `ClienteController`, `ClienteService`, `ApisPeruDocumentoAdapter`"
+`leads`,"Comercial, `OPEN`",Leads y fuentes. `ManageLeadUseCase` y `ManageFuenteUseCase`; rutas `/api/v1/leads` y `/api/v1/fuentes`.,"`LeadController`, `FuenteController`, `LeadService`, `FuenteService`"
+`oportunidades`,"Comercial, `OPEN`","Pipeline comercial. `ManageOportunidadUseCase`; `/api/v1/oportunidades`. Contactos, productos y colaboradores N:M.","`OportunidadController`, `OportunidadService`, puertos y adaptadores del módulo"
+`actividades`,"Comercial, `OPEN`",Agenda comercial. `ManageActividadUseCase`; `/api/v1/actividades`. Participantes y etiquetas N:M.,"`ActividadController`, `ActividadService`, `RelacionValidationAdapter`"
+`propuestas`,"Comercial, `OPEN`","Propuestas y detalles. `ManagePropuestaUseCase`; `/api/v1/propuestas`. Valida cliente, oportunidad y producto.","`PropuestaController`, `PropuestaService`, `PropuestaRelacionValidationAdapter`"
+`productos`,"Comercial, `OPEN`",Catálogo de productos. `ManageProductoUseCase`; `/api/v1/productos`.,"`ProductoController`, `ProductoService`, `ProductoPersistenceAdapter`"
+`marketing`,"Comercial, `OPEN`",Campañas y asociación campaña-lead. `ManageCampaniaUseCase`; `/api/v1/campanias`.,"`CampaniaController`, `CampaniaService`, `CampaniaLeadPersistenceAdapter`"
+`equipos`,"Comercial, `CLOSED`",Equipos y miembros. `ManageEquipoUseCase`; `/api/v1/equipos`. Depende de `UsuariosApi`.,"`EquipoController`, `EquipoService`, `UsuarioValidationAdapter`"
+`etiquetas`,"Soporte, `OPEN`",Catálogo de etiquetas. `ManageEtiquetaUseCase` y `EtiquetaPersistencePort`; `/api/v1/etiquetas`.,"`EtiquetaController`, `EtiquetaService`, `EtiquetaPersistencePort`"
+`mensajeria`,"Soporte, `CLOSED`",Mensajería interna. `ManageMensajeUseCase`; `/api/v1/mensajeria`. Usa `UsuariosApi`.,"`MensajeController`, `MensajeService`"
+`usuarios`,"Administración, `CLOSED`","Usuarios y roles. `UsuariosApi`, `ManageUsuarioUseCase` y `UsuarioConsultaPort`; `/api/v1/usuarios`.","`UsuarioController`, `UsuarioService`, `UsuariosApi`"
+`dashboard`,"Consulta, `OPEN`",KPIs y agregados. `DashboardUseCase`; `/api/v1/dashboard`. Usa JPQL por nombre de entidad.,"`DashboardController`, `DashboardQueryRepository`"
+`relationshipmap`,"Consulta, `OPEN`",Mapa de relaciones entre entidades. `ManageRelationshipMapUseCase`; `/api/v1/relationship-map`. Consume cinco casos de uso y `UsuariosApi`.,"`RelationshipMapController`, `RelationshipMapService`"
+`auth`,"Técnico, `CLOSED`","Seguridad OAuth2/OIDC. `SecurityFilterChain`, conversor JWT y `PasswordEncoder`; solo activo con perfil `keycloak`.","`KeycloakSecurityConfig`, `KeycloakJwtAuthenticationConverter`, `PasswordEncoderConfig`"
+`shared`,"Técnico, contenedor","Infraestructura transversal: `OpenApiConfig`, `CorrelationIdFilter`, `CacheConfig`, `CacheRefreshJob`.",`shared/`
+`shared.exception`,"Técnico, `OPEN`","`ResourceNotFoundException`, `RateLimitExceededException`, `GlobalExceptionHandler`.",`shared/exception/`
+`shared.ratelimit`,"Técnico, `OPEN`","`ConsultaDocumentoRateLimiter`, usado por `clientes`.",`shared/ratelimit/`

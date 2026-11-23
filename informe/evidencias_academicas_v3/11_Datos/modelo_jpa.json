@@ -1,0 +1,2468 @@
+{
+  "entities": [
+    {
+      "table": "CRM_ACTIVIDADES",
+      "entity": "ActividadEntity",
+      "module": "actividades",
+      "source": "actividades/adapters/out/persistence/entity/ActividadEntity.java",
+      "fields": [
+        {
+          "column": "ID_ACTIVIDAD",
+          "java": "id",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "No",
+          "flags": "PK; IDENTITY",
+          "default": "Sin inicializador Java",
+          "line": 15,
+          "source": "actividades/adapters/out/persistence/entity/ActividadEntity.java",
+          "pk": true,
+          "enum": ""
+        },
+        {
+          "column": "ID_USUARIO",
+          "java": "idUsuario",
+          "type": "String",
+          "sql": "VARCHAR2(255)",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 18,
+          "source": "actividades/adapters/out/persistence/entity/ActividadEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "ID_CLIENTE",
+          "java": "idCliente",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 21,
+          "source": "actividades/adapters/out/persistence/entity/ActividadEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "ID_LEAD",
+          "java": "idLead",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 24,
+          "source": "actividades/adapters/out/persistence/entity/ActividadEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "ID_OPORTUNIDAD",
+          "java": "idOportunidad",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 27,
+          "source": "actividades/adapters/out/persistence/entity/ActividadEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "TIPO",
+          "java": "tipo",
+          "type": "TipoActividad",
+          "sql": "VARCHAR2(255)",
+          "nullable": "No",
+          "flags": "Enum STRING: LLAMADA, REUNION, TAREA, SEGUIMIENTO; CHECK físico no comprobado",
+          "default": "Sin inicializador Java",
+          "line": 31,
+          "source": "actividades/adapters/out/persistence/entity/ActividadEntity.java",
+          "pk": false,
+          "enum": "LLAMADA, REUNION, TAREA, SEGUIMIENTO"
+        },
+        {
+          "column": "TITULO",
+          "java": "titulo",
+          "type": "String",
+          "sql": "VARCHAR2(255)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 34,
+          "source": "actividades/adapters/out/persistence/entity/ActividadEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "DESCRIPCION",
+          "java": "descripcion",
+          "type": "String",
+          "sql": "CLOB",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 38,
+          "source": "actividades/adapters/out/persistence/entity/ActividadEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "FECHA",
+          "java": "fecha",
+          "type": "LocalDateTime",
+          "sql": "TIMESTAMP (precisión por proveedor)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 41,
+          "source": "actividades/adapters/out/persistence/entity/ActividadEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "ESTADO",
+          "java": "estado",
+          "type": "EstadoActividad",
+          "sql": "VARCHAR2(255)",
+          "nullable": "No",
+          "flags": "Enum STRING: PENDIENTE, EN_PROCESO, COMPLETADA, CANCELADA; CHECK físico no comprobado",
+          "default": "Sin inicializador Java",
+          "line": 45,
+          "source": "actividades/adapters/out/persistence/entity/ActividadEntity.java",
+          "pk": false,
+          "enum": "PENDIENTE, EN_PROCESO, COMPLETADA, CANCELADA"
+        },
+        {
+          "column": "CREADO_EN",
+          "java": "creadoEn",
+          "type": "LocalDateTime",
+          "sql": "TIMESTAMP (precisión por proveedor)",
+          "nullable": "No",
+          "flags": "updatable=false",
+          "default": "Sin inicializador Java",
+          "line": 48,
+          "source": "actividades/adapters/out/persistence/entity/ActividadEntity.java",
+          "pk": false,
+          "enum": ""
+        }
+      ],
+      "uniques": []
+    },
+    {
+      "table": "CRM_ACTIVIDAD_ETIQUETAS",
+      "entity": "ActividadEtiquetaEntity",
+      "module": "actividades",
+      "source": "actividades/adapters/out/persistence/entity/ActividadEtiquetaEntity.java",
+      "fields": [
+        {
+          "column": "ID_ACTIVIDAD_ETIQUETA",
+          "java": "id",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "No",
+          "flags": "PK; IDENTITY",
+          "default": "Sin inicializador Java",
+          "line": 16,
+          "source": "actividades/adapters/out/persistence/entity/ActividadEtiquetaEntity.java",
+          "pk": true,
+          "enum": ""
+        },
+        {
+          "column": "ID_ACTIVIDAD",
+          "java": "idActividad",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 19,
+          "source": "actividades/adapters/out/persistence/entity/ActividadEtiquetaEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "ID_ETIQUETA",
+          "java": "idEtiqueta",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 22,
+          "source": "actividades/adapters/out/persistence/entity/ActividadEtiquetaEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "CREADO_EN",
+          "java": "creadoEn",
+          "type": "LocalDateTime",
+          "sql": "TIMESTAMP (precisión por proveedor)",
+          "nullable": "No",
+          "flags": "updatable=false",
+          "default": "Sin inicializador Java",
+          "line": 25,
+          "source": "actividades/adapters/out/persistence/entity/ActividadEtiquetaEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "ORDEN",
+          "java": "orden",
+          "type": "Integer",
+          "sql": "NUMBER(10,0)",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 28,
+          "source": "actividades/adapters/out/persistence/entity/ActividadEtiquetaEntity.java",
+          "pk": false,
+          "enum": ""
+        }
+      ],
+      "uniques": [
+        [
+          "uk_actividad_etiqueta",
+          "ID_ACTIVIDAD, ID_ETIQUETA"
+        ]
+      ]
+    },
+    {
+      "table": "CRM_ACTIVIDAD_PARTICIPANTES",
+      "entity": "ActividadParticipanteEntity",
+      "module": "actividades",
+      "source": "actividades/adapters/out/persistence/entity/ActividadParticipanteEntity.java",
+      "fields": [
+        {
+          "column": "ID_PARTICIPANTE",
+          "java": "id",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "No",
+          "flags": "PK; IDENTITY",
+          "default": "Sin inicializador Java",
+          "line": 15,
+          "source": "actividades/adapters/out/persistence/entity/ActividadParticipanteEntity.java",
+          "pk": true,
+          "enum": ""
+        },
+        {
+          "column": "ID_ACTIVIDAD",
+          "java": "idActividad",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 18,
+          "source": "actividades/adapters/out/persistence/entity/ActividadParticipanteEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "ID_CONTACTO",
+          "java": "idContacto",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 22,
+          "source": "actividades/adapters/out/persistence/entity/ActividadParticipanteEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "CREADO_EN",
+          "java": "creadoEn",
+          "type": "LocalDateTime",
+          "sql": "TIMESTAMP (precisión por proveedor)",
+          "nullable": "No",
+          "flags": "updatable=false",
+          "default": "Sin inicializador Java",
+          "line": 25,
+          "source": "actividades/adapters/out/persistence/entity/ActividadParticipanteEntity.java",
+          "pk": false,
+          "enum": ""
+        }
+      ],
+      "uniques": [
+        [
+          "uk_actividad_contacto",
+          "ID_ACTIVIDAD, ID_CONTACTO"
+        ]
+      ]
+    },
+    {
+      "table": "CRM_CLIENTES",
+      "entity": "ClienteEntity",
+      "module": "clientes",
+      "source": "clientes/adapters/out/persistence/entity/ClienteEntity.java",
+      "fields": [
+        {
+          "column": "ID",
+          "java": "id",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "No",
+          "flags": "PK; IDENTITY",
+          "default": "Sin inicializador Java",
+          "line": 25,
+          "source": "clientes/adapters/out/persistence/entity/ClienteEntity.java",
+          "pk": true,
+          "enum": ""
+        },
+        {
+          "column": "NOMBRE",
+          "java": "nombre",
+          "type": "String",
+          "sql": "VARCHAR2(150)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 28,
+          "source": "clientes/adapters/out/persistence/entity/ClienteEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "EMPRESA",
+          "java": "empresa",
+          "type": "String",
+          "sql": "VARCHAR2(150)",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 31,
+          "source": "clientes/adapters/out/persistence/entity/ClienteEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "TIPO_DOCUMENTO",
+          "java": "tipoDocumento",
+          "type": "TipoDocumento",
+          "sql": "VARCHAR2(10)",
+          "nullable": "Sí (default JPA)",
+          "flags": "Enum STRING: DNI, RUC; CHECK físico no comprobado",
+          "default": "Sin inicializador Java",
+          "line": 35,
+          "source": "clientes/adapters/out/persistence/entity/ClienteEntity.java",
+          "pk": false,
+          "enum": "DNI, RUC"
+        },
+        {
+          "column": "NUMERO_DOCUMENTO",
+          "java": "numeroDocumento",
+          "type": "String",
+          "sql": "VARCHAR2(20)",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 38,
+          "source": "clientes/adapters/out/persistence/entity/ClienteEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "CORREO",
+          "java": "correo",
+          "type": "String",
+          "sql": "VARCHAR2(150)",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 41,
+          "source": "clientes/adapters/out/persistence/entity/ClienteEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "TELEFONO",
+          "java": "telefono",
+          "type": "String",
+          "sql": "VARCHAR2(30)",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 44,
+          "source": "clientes/adapters/out/persistence/entity/ClienteEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "ESTADO",
+          "java": "estado",
+          "type": "EstadoCliente",
+          "sql": "VARCHAR2(20)",
+          "nullable": "No",
+          "flags": "Enum STRING: ACTIVO, INACTIVO; CHECK físico no comprobado",
+          "default": "EstadoCliente.ACTIVO",
+          "line": 49,
+          "source": "clientes/adapters/out/persistence/entity/ClienteEntity.java",
+          "pk": false,
+          "enum": "ACTIVO, INACTIVO"
+        },
+        {
+          "column": "RESPONSABLE",
+          "java": "responsable",
+          "type": "String",
+          "sql": "VARCHAR2(100)",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 52,
+          "source": "clientes/adapters/out/persistence/entity/ClienteEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "CREADO_EN",
+          "java": "creadoEn",
+          "type": "LocalDateTime",
+          "sql": "TIMESTAMP (precisión por proveedor)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "LocalDateTime.now()",
+          "line": 56,
+          "source": "clientes/adapters/out/persistence/entity/ClienteEntity.java",
+          "pk": false,
+          "enum": ""
+        }
+      ],
+      "uniques": [
+        [
+          "UK_CRM_CLIENTES_DOCUMENTO",
+          "TIPO_DOCUMENTO, NUMERO_DOCUMENTO"
+        ]
+      ]
+    },
+    {
+      "table": "CRM_CONTACTOS",
+      "entity": "ContactoEntity",
+      "module": "clientes",
+      "source": "clientes/adapters/out/persistence/entity/ContactoEntity.java",
+      "fields": [
+        {
+          "column": "ID",
+          "java": "id",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "No",
+          "flags": "PK; IDENTITY",
+          "default": "Sin inicializador Java",
+          "line": 15,
+          "source": "clientes/adapters/out/persistence/entity/ContactoEntity.java",
+          "pk": true,
+          "enum": ""
+        },
+        {
+          "column": "ID_CLIENTE",
+          "java": "idCliente",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "No",
+          "flags": "updatable=false; insertable=false (escritura por asociación)",
+          "default": "Sin inicializador Java",
+          "line": 19,
+          "source": "clientes/adapters/out/persistence/entity/ContactoEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "NOMBRE",
+          "java": "nombre",
+          "type": "String",
+          "sql": "VARCHAR2(100)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 26,
+          "source": "clientes/adapters/out/persistence/entity/ContactoEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "APELLIDO",
+          "java": "apellido",
+          "type": "String",
+          "sql": "VARCHAR2(100)",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 29,
+          "source": "clientes/adapters/out/persistence/entity/ContactoEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "CARGO",
+          "java": "cargo",
+          "type": "String",
+          "sql": "VARCHAR2(100)",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 32,
+          "source": "clientes/adapters/out/persistence/entity/ContactoEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "CORREO",
+          "java": "correo",
+          "type": "String",
+          "sql": "VARCHAR2(150)",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 35,
+          "source": "clientes/adapters/out/persistence/entity/ContactoEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "TELEFONO",
+          "java": "telefono",
+          "type": "String",
+          "sql": "VARCHAR2(30)",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 38,
+          "source": "clientes/adapters/out/persistence/entity/ContactoEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "PRINCIPAL",
+          "java": "principal",
+          "type": "Boolean",
+          "sql": "BOOLEAN o NUMBER(1,0), depende del dialecto",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "false",
+          "line": 42,
+          "source": "clientes/adapters/out/persistence/entity/ContactoEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "CREADO_EN",
+          "java": "creadoEn",
+          "type": "LocalDateTime",
+          "sql": "TIMESTAMP (precisión por proveedor)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "LocalDateTime.now()",
+          "line": 46,
+          "source": "clientes/adapters/out/persistence/entity/ContactoEntity.java",
+          "pk": false,
+          "enum": ""
+        }
+      ],
+      "uniques": []
+    },
+    {
+      "table": "CRM_EQUIPOS",
+      "entity": "EquipoEntity",
+      "module": "equipos",
+      "source": "equipos/adapters/out/persistence/entity/EquipoEntity.java",
+      "fields": [
+        {
+          "column": "ID",
+          "java": "id",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "No",
+          "flags": "PK; IDENTITY",
+          "default": "Sin inicializador Java",
+          "line": 16,
+          "source": "equipos/adapters/out/persistence/entity/EquipoEntity.java",
+          "pk": true,
+          "enum": ""
+        },
+        {
+          "column": "NOMBRE",
+          "java": "nombre",
+          "type": "String",
+          "sql": "VARCHAR2(120)",
+          "nullable": "No",
+          "flags": "UNIQUE",
+          "default": "Sin inicializador Java",
+          "line": 19,
+          "source": "equipos/adapters/out/persistence/entity/EquipoEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "DESCRIPCION",
+          "java": "descripcion",
+          "type": "String",
+          "sql": "VARCHAR2(500)",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 22,
+          "source": "equipos/adapters/out/persistence/entity/EquipoEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "ESTADO",
+          "java": "estado",
+          "type": "EstadoEquipo",
+          "sql": "VARCHAR2(20)",
+          "nullable": "No",
+          "flags": "Enum STRING: ACTIVO, INACTIVO; CHECK físico no comprobado",
+          "default": "EstadoEquipo.ACTIVO",
+          "line": 27,
+          "source": "equipos/adapters/out/persistence/entity/EquipoEntity.java",
+          "pk": false,
+          "enum": "ACTIVO, INACTIVO"
+        },
+        {
+          "column": "CREADO_EN",
+          "java": "creadoEn",
+          "type": "LocalDateTime",
+          "sql": "TIMESTAMP (precisión por proveedor)",
+          "nullable": "No",
+          "flags": "updatable=false",
+          "default": "LocalDateTime.now()",
+          "line": 31,
+          "source": "equipos/adapters/out/persistence/entity/EquipoEntity.java",
+          "pk": false,
+          "enum": ""
+        }
+      ],
+      "uniques": [
+        [
+          "Nombre por proveedor",
+          "NOMBRE"
+        ]
+      ]
+    },
+    {
+      "table": "CRM_EQUIPO_MIEMBROS",
+      "entity": "EquipoMiembroEntity",
+      "module": "equipos",
+      "source": "equipos/adapters/out/persistence/entity/EquipoMiembroEntity.java",
+      "fields": [
+        {
+          "column": "ID",
+          "java": "id",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "No",
+          "flags": "PK; IDENTITY",
+          "default": "Sin inicializador Java",
+          "line": 16,
+          "source": "equipos/adapters/out/persistence/entity/EquipoMiembroEntity.java",
+          "pk": true,
+          "enum": ""
+        },
+        {
+          "column": "EQUIPO_ID",
+          "java": "equipoId",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 19,
+          "source": "equipos/adapters/out/persistence/entity/EquipoMiembroEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "USUARIO_ID",
+          "java": "usuarioId",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 22,
+          "source": "equipos/adapters/out/persistence/entity/EquipoMiembroEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "CREADO_EN",
+          "java": "creadoEn",
+          "type": "LocalDateTime",
+          "sql": "TIMESTAMP (precisión por proveedor)",
+          "nullable": "No",
+          "flags": "updatable=false",
+          "default": "LocalDateTime.now()",
+          "line": 26,
+          "source": "equipos/adapters/out/persistence/entity/EquipoMiembroEntity.java",
+          "pk": false,
+          "enum": ""
+        }
+      ],
+      "uniques": [
+        [
+          "UK_EQUIPO_MIEMBRO",
+          "EQUIPO_ID, USUARIO_ID"
+        ]
+      ]
+    },
+    {
+      "table": "CRM_ETIQUETAS",
+      "entity": "EtiquetaEntity",
+      "module": "etiquetas",
+      "source": "etiquetas/adapters/out/persistence/entity/EtiquetaEntity.java",
+      "fields": [
+        {
+          "column": "ID_ETIQUETA",
+          "java": "id",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "No",
+          "flags": "PK; IDENTITY",
+          "default": "Sin inicializador Java",
+          "line": 22,
+          "source": "etiquetas/adapters/out/persistence/entity/EtiquetaEntity.java",
+          "pk": true,
+          "enum": ""
+        },
+        {
+          "column": "NOMBRE",
+          "java": "nombre",
+          "type": "String",
+          "sql": "VARCHAR2(40)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 25,
+          "source": "etiquetas/adapters/out/persistence/entity/EtiquetaEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "NOMBRE_NORMALIZADO",
+          "java": "nombreNormalizado",
+          "type": "String",
+          "sql": "VARCHAR2(80)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 28,
+          "source": "etiquetas/adapters/out/persistence/entity/EtiquetaEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "COLOR",
+          "java": "color",
+          "type": "String",
+          "sql": "VARCHAR2(7)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 31,
+          "source": "etiquetas/adapters/out/persistence/entity/EtiquetaEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "DESCRIPCION",
+          "java": "descripcion",
+          "type": "String",
+          "sql": "VARCHAR2(160)",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 34,
+          "source": "etiquetas/adapters/out/persistence/entity/EtiquetaEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "ACTIVA",
+          "java": "activa",
+          "type": "Boolean",
+          "sql": "BOOLEAN o NUMBER(1,0), depende del dialecto",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 37,
+          "source": "etiquetas/adapters/out/persistence/entity/EtiquetaEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "CREADO_EN",
+          "java": "creadoEn",
+          "type": "LocalDateTime",
+          "sql": "TIMESTAMP (precisión por proveedor)",
+          "nullable": "No",
+          "flags": "updatable=false",
+          "default": "Sin inicializador Java",
+          "line": 40,
+          "source": "etiquetas/adapters/out/persistence/entity/EtiquetaEntity.java",
+          "pk": false,
+          "enum": ""
+        }
+      ],
+      "uniques": [
+        [
+          "uk_etiqueta_nombre_normalizado",
+          "NOMBRE_NORMALIZADO"
+        ]
+      ]
+    },
+    {
+      "table": "CRM_FUENTES",
+      "entity": "FuenteEntity",
+      "module": "leads",
+      "source": "leads/adapters/out/persistence/entity/FuenteEntity.java",
+      "fields": [
+        {
+          "column": "ID",
+          "java": "id",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "No",
+          "flags": "PK; IDENTITY",
+          "default": "Sin inicializador Java",
+          "line": 15,
+          "source": "leads/adapters/out/persistence/entity/FuenteEntity.java",
+          "pk": true,
+          "enum": ""
+        },
+        {
+          "column": "CODIGO",
+          "java": "codigo",
+          "type": "String",
+          "sql": "VARCHAR2(50)",
+          "nullable": "No",
+          "flags": "UNIQUE",
+          "default": "Sin inicializador Java",
+          "line": 18,
+          "source": "leads/adapters/out/persistence/entity/FuenteEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "NOMBRE",
+          "java": "nombre",
+          "type": "String",
+          "sql": "VARCHAR2(120)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 21,
+          "source": "leads/adapters/out/persistence/entity/FuenteEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "DESCRIPCION",
+          "java": "descripcion",
+          "type": "String",
+          "sql": "VARCHAR2(500)",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 24,
+          "source": "leads/adapters/out/persistence/entity/FuenteEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "ACTIVA",
+          "java": "activa",
+          "type": "Boolean",
+          "sql": "BOOLEAN o NUMBER(1,0), depende del dialecto",
+          "nullable": "No",
+          "flags": "—",
+          "default": "true",
+          "line": 28,
+          "source": "leads/adapters/out/persistence/entity/FuenteEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "CREADO_EN",
+          "java": "creadoEn",
+          "type": "LocalDateTime",
+          "sql": "TIMESTAMP (precisión por proveedor)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "LocalDateTime.now()",
+          "line": 32,
+          "source": "leads/adapters/out/persistence/entity/FuenteEntity.java",
+          "pk": false,
+          "enum": ""
+        }
+      ],
+      "uniques": [
+        [
+          "Nombre por proveedor",
+          "CODIGO"
+        ]
+      ]
+    },
+    {
+      "table": "CRM_LEADS",
+      "entity": "LeadEntity",
+      "module": "leads",
+      "source": "leads/adapters/out/persistence/entity/LeadEntity.java",
+      "fields": [
+        {
+          "column": "ID",
+          "java": "id",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "No",
+          "flags": "PK; IDENTITY",
+          "default": "Sin inicializador Java",
+          "line": 17,
+          "source": "leads/adapters/out/persistence/entity/LeadEntity.java",
+          "pk": true,
+          "enum": ""
+        },
+        {
+          "column": "NOMBRE",
+          "java": "nombre",
+          "type": "String",
+          "sql": "VARCHAR2(150)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 20,
+          "source": "leads/adapters/out/persistence/entity/LeadEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "EMPRESA",
+          "java": "empresa",
+          "type": "String",
+          "sql": "VARCHAR2(150)",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 23,
+          "source": "leads/adapters/out/persistence/entity/LeadEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "CORREO",
+          "java": "correo",
+          "type": "String",
+          "sql": "VARCHAR2(150)",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 26,
+          "source": "leads/adapters/out/persistence/entity/LeadEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "TELEFONO",
+          "java": "telefono",
+          "type": "String",
+          "sql": "VARCHAR2(30)",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 29,
+          "source": "leads/adapters/out/persistence/entity/LeadEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "FUENTE",
+          "java": "fuente",
+          "type": "String",
+          "sql": "VARCHAR2(80)",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 32,
+          "source": "leads/adapters/out/persistence/entity/LeadEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "FUENTE_ID",
+          "java": "fuenteId",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 35,
+          "source": "leads/adapters/out/persistence/entity/LeadEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "ESTADO",
+          "java": "estado",
+          "type": "EstadoLead",
+          "sql": "VARCHAR2(20)",
+          "nullable": "No",
+          "flags": "Enum STRING: NUEVO, CONTACTADO, CALIFICADO, CONVERTIDO, DESCARTADO; CHECK físico no comprobado",
+          "default": "EstadoLead.NUEVO",
+          "line": 40,
+          "source": "leads/adapters/out/persistence/entity/LeadEntity.java",
+          "pk": false,
+          "enum": "NUEVO, CONTACTADO, CALIFICADO, CONVERTIDO, DESCARTADO"
+        },
+        {
+          "column": "RESPONSABLE",
+          "java": "responsable",
+          "type": "String",
+          "sql": "VARCHAR2(100)",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 43,
+          "source": "leads/adapters/out/persistence/entity/LeadEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "FECHA",
+          "java": "fecha",
+          "type": "LocalDate",
+          "sql": "DATE",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 46,
+          "source": "leads/adapters/out/persistence/entity/LeadEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "CREADO_EN",
+          "java": "creadoEn",
+          "type": "LocalDateTime",
+          "sql": "TIMESTAMP (precisión por proveedor)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "LocalDateTime.now()",
+          "line": 50,
+          "source": "leads/adapters/out/persistence/entity/LeadEntity.java",
+          "pk": false,
+          "enum": ""
+        }
+      ],
+      "uniques": []
+    },
+    {
+      "table": "CRM_CAMPANIAS",
+      "entity": "CampaniaEntity",
+      "module": "marketing",
+      "source": "marketing/adapters/out/persistence/entity/CampaniaEntity.java",
+      "fields": [
+        {
+          "column": "ID",
+          "java": "id",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "No",
+          "flags": "PK; IDENTITY",
+          "default": "Sin inicializador Java",
+          "line": 17,
+          "source": "marketing/adapters/out/persistence/entity/CampaniaEntity.java",
+          "pk": true,
+          "enum": ""
+        },
+        {
+          "column": "NOMBRE",
+          "java": "nombre",
+          "type": "String",
+          "sql": "VARCHAR2(150)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 20,
+          "source": "marketing/adapters/out/persistence/entity/CampaniaEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "DESCRIPCION",
+          "java": "descripcion",
+          "type": "String",
+          "sql": "VARCHAR2(1000)",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 23,
+          "source": "marketing/adapters/out/persistence/entity/CampaniaEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "FECHA_INICIO",
+          "java": "fechaInicio",
+          "type": "LocalDate",
+          "sql": "DATE",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 26,
+          "source": "marketing/adapters/out/persistence/entity/CampaniaEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "FECHA_FIN",
+          "java": "fechaFin",
+          "type": "LocalDate",
+          "sql": "DATE",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 29,
+          "source": "marketing/adapters/out/persistence/entity/CampaniaEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "ESTADO",
+          "java": "estado",
+          "type": "EstadoCampania",
+          "sql": "VARCHAR2(20)",
+          "nullable": "No",
+          "flags": "Enum STRING: BORRADOR, ACTIVA, FINALIZADA, CANCELADA; CHECK físico no comprobado",
+          "default": "EstadoCampania.BORRADOR",
+          "line": 34,
+          "source": "marketing/adapters/out/persistence/entity/CampaniaEntity.java",
+          "pk": false,
+          "enum": "BORRADOR, ACTIVA, FINALIZADA, CANCELADA"
+        },
+        {
+          "column": "CREADO_EN",
+          "java": "creadoEn",
+          "type": "LocalDateTime",
+          "sql": "TIMESTAMP (precisión por proveedor)",
+          "nullable": "No",
+          "flags": "updatable=false",
+          "default": "LocalDateTime.now()",
+          "line": 38,
+          "source": "marketing/adapters/out/persistence/entity/CampaniaEntity.java",
+          "pk": false,
+          "enum": ""
+        }
+      ],
+      "uniques": []
+    },
+    {
+      "table": "CRM_CAMPANIA_LEADS",
+      "entity": "CampaniaLeadEntity",
+      "module": "marketing",
+      "source": "marketing/adapters/out/persistence/entity/CampaniaLeadEntity.java",
+      "fields": [
+        {
+          "column": "ID",
+          "java": "id",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "No",
+          "flags": "PK; IDENTITY",
+          "default": "Sin inicializador Java",
+          "line": 16,
+          "source": "marketing/adapters/out/persistence/entity/CampaniaLeadEntity.java",
+          "pk": true,
+          "enum": ""
+        },
+        {
+          "column": "CAMPANIA_ID",
+          "java": "campaniaId",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 19,
+          "source": "marketing/adapters/out/persistence/entity/CampaniaLeadEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "LEAD_ID",
+          "java": "leadId",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 22,
+          "source": "marketing/adapters/out/persistence/entity/CampaniaLeadEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "CREADO_EN",
+          "java": "creadoEn",
+          "type": "LocalDateTime",
+          "sql": "TIMESTAMP (precisión por proveedor)",
+          "nullable": "No",
+          "flags": "updatable=false",
+          "default": "LocalDateTime.now()",
+          "line": 26,
+          "source": "marketing/adapters/out/persistence/entity/CampaniaLeadEntity.java",
+          "pk": false,
+          "enum": ""
+        }
+      ],
+      "uniques": [
+        [
+          "UK_CAMPANIA_LEAD",
+          "CAMPANIA_ID, LEAD_ID"
+        ]
+      ]
+    },
+    {
+      "table": "CRM_MENSAJES",
+      "entity": "MensajeEntity",
+      "module": "mensajeria",
+      "source": "mensajeria/adapters/out/persistence/entity/MensajeEntity.java",
+      "fields": [
+        {
+          "column": "ID",
+          "java": "id",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "No",
+          "flags": "PK; IDENTITY",
+          "default": "Sin inicializador Java",
+          "line": 20,
+          "source": "mensajeria/adapters/out/persistence/entity/MensajeEntity.java",
+          "pk": true,
+          "enum": ""
+        },
+        {
+          "column": "USUARIO_CORREO",
+          "java": "usuarioCorreo",
+          "type": "String",
+          "sql": "VARCHAR2(150)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 23,
+          "source": "mensajeria/adapters/out/persistence/entity/MensajeEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "USUARIO_NOMBRE",
+          "java": "usuarioNombre",
+          "type": "String",
+          "sql": "VARCHAR2(200)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 26,
+          "source": "mensajeria/adapters/out/persistence/entity/MensajeEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "CONTENIDO",
+          "java": "contenido",
+          "type": "String",
+          "sql": "VARCHAR2(2000)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 29,
+          "source": "mensajeria/adapters/out/persistence/entity/MensajeEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "CREADO_EN",
+          "java": "creadoEn",
+          "type": "LocalDateTime",
+          "sql": "TIMESTAMP (precisión por proveedor)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 32,
+          "source": "mensajeria/adapters/out/persistence/entity/MensajeEntity.java",
+          "pk": false,
+          "enum": ""
+        }
+      ],
+      "uniques": []
+    },
+    {
+      "table": "CRM_OPORTUNIDAD_COLABORADORES",
+      "entity": "OportunidadColaboradorEntity",
+      "module": "oportunidades",
+      "source": "oportunidades/adapters/out/persistence/entity/OportunidadColaboradorEntity.java",
+      "fields": [
+        {
+          "column": "ID",
+          "java": "id",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "No",
+          "flags": "PK; IDENTITY",
+          "default": "Sin inicializador Java",
+          "line": 17,
+          "source": "oportunidades/adapters/out/persistence/entity/OportunidadColaboradorEntity.java",
+          "pk": true,
+          "enum": ""
+        },
+        {
+          "column": "ID_OPORTUNIDAD",
+          "java": "idOportunidad",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 20,
+          "source": "oportunidades/adapters/out/persistence/entity/OportunidadColaboradorEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "ID_USUARIO",
+          "java": "idUsuario",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 24,
+          "source": "oportunidades/adapters/out/persistence/entity/OportunidadColaboradorEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "CREADO_EN",
+          "java": "creadoEn",
+          "type": "LocalDateTime",
+          "sql": "TIMESTAMP (precisión por proveedor)",
+          "nullable": "No",
+          "flags": "updatable=false",
+          "default": "LocalDateTime.now()",
+          "line": 28,
+          "source": "oportunidades/adapters/out/persistence/entity/OportunidadColaboradorEntity.java",
+          "pk": false,
+          "enum": ""
+        }
+      ],
+      "uniques": [
+        [
+          "uk_oportunidad_colaborador",
+          "ID_OPORTUNIDAD, ID_USUARIO"
+        ]
+      ]
+    },
+    {
+      "table": "CRM_OPORTUNIDAD_CONTACTOS",
+      "entity": "OportunidadContactoEntity",
+      "module": "oportunidades",
+      "source": "oportunidades/adapters/out/persistence/entity/OportunidadContactoEntity.java",
+      "fields": [
+        {
+          "column": "ID",
+          "java": "id",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "No",
+          "flags": "PK; IDENTITY",
+          "default": "Sin inicializador Java",
+          "line": 17,
+          "source": "oportunidades/adapters/out/persistence/entity/OportunidadContactoEntity.java",
+          "pk": true,
+          "enum": ""
+        },
+        {
+          "column": "ID_OPORTUNIDAD",
+          "java": "idOportunidad",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 20,
+          "source": "oportunidades/adapters/out/persistence/entity/OportunidadContactoEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "ID_CONTACTO",
+          "java": "idContacto",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 24,
+          "source": "oportunidades/adapters/out/persistence/entity/OportunidadContactoEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "ROL",
+          "java": "rol",
+          "type": "String",
+          "sql": "VARCHAR2(100)",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 27,
+          "source": "oportunidades/adapters/out/persistence/entity/OportunidadContactoEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "ES_DECISOR",
+          "java": "esDecisor",
+          "type": "Boolean",
+          "sql": "BOOLEAN o NUMBER(1,0), depende del dialecto",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "false",
+          "line": 31,
+          "source": "oportunidades/adapters/out/persistence/entity/OportunidadContactoEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "CREADO_EN",
+          "java": "creadoEn",
+          "type": "LocalDateTime",
+          "sql": "TIMESTAMP (precisión por proveedor)",
+          "nullable": "No",
+          "flags": "updatable=false",
+          "default": "LocalDateTime.now()",
+          "line": 35,
+          "source": "oportunidades/adapters/out/persistence/entity/OportunidadContactoEntity.java",
+          "pk": false,
+          "enum": ""
+        }
+      ],
+      "uniques": [
+        [
+          "uk_oportunidad_contacto",
+          "ID_OPORTUNIDAD, ID_CONTACTO"
+        ]
+      ]
+    },
+    {
+      "table": "CRM_OPORTUNIDADES",
+      "entity": "OportunidadEntity",
+      "module": "oportunidades",
+      "source": "oportunidades/adapters/out/persistence/entity/OportunidadEntity.java",
+      "fields": [
+        {
+          "column": "ID",
+          "java": "id",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "No",
+          "flags": "PK; IDENTITY",
+          "default": "Sin inicializador Java",
+          "line": 18,
+          "source": "oportunidades/adapters/out/persistence/entity/OportunidadEntity.java",
+          "pk": true,
+          "enum": ""
+        },
+        {
+          "column": "NOMBRE",
+          "java": "nombre",
+          "type": "String",
+          "sql": "VARCHAR2(200)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 21,
+          "source": "oportunidades/adapters/out/persistence/entity/OportunidadEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "CLIENTE_NOMBRE",
+          "java": "clienteNombre",
+          "type": "String",
+          "sql": "VARCHAR2(150)",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 24,
+          "source": "oportunidades/adapters/out/persistence/entity/OportunidadEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "VALOR",
+          "java": "valor",
+          "type": "BigDecimal",
+          "sql": "NUMBER(14,2)",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 27,
+          "source": "oportunidades/adapters/out/persistence/entity/OportunidadEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "PROBABILIDAD",
+          "java": "probabilidad",
+          "type": "Integer",
+          "sql": "NUMBER(10,0)",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 30,
+          "source": "oportunidades/adapters/out/persistence/entity/OportunidadEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "ETAPA",
+          "java": "etapa",
+          "type": "EtapaOportunidad",
+          "sql": "VARCHAR2(20)",
+          "nullable": "No",
+          "flags": "Enum STRING: PROSPECCION, CONTACTO, CALIFICACION, PROPUESTA, NEGOCIACION, GANADA, PERDIDA; CHECK físico no comprobado",
+          "default": "EtapaOportunidad.PROSPECCION",
+          "line": 35,
+          "source": "oportunidades/adapters/out/persistence/entity/OportunidadEntity.java",
+          "pk": false,
+          "enum": "PROSPECCION, CONTACTO, CALIFICACION, PROPUESTA, NEGOCIACION, GANADA, PERDIDA"
+        },
+        {
+          "column": "RESPONSABLE",
+          "java": "responsable",
+          "type": "String",
+          "sql": "VARCHAR2(100)",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 38,
+          "source": "oportunidades/adapters/out/persistence/entity/OportunidadEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "FECHA_CIERRE",
+          "java": "fechaCierre",
+          "type": "LocalDate",
+          "sql": "DATE",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 41,
+          "source": "oportunidades/adapters/out/persistence/entity/OportunidadEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "DESCRIPCION",
+          "java": "descripcion",
+          "type": "String",
+          "sql": "VARCHAR2(500)",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 44,
+          "source": "oportunidades/adapters/out/persistence/entity/OportunidadEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "CREADO_EN",
+          "java": "creadoEn",
+          "type": "LocalDateTime",
+          "sql": "TIMESTAMP (precisión por proveedor)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "LocalDateTime.now()",
+          "line": 48,
+          "source": "oportunidades/adapters/out/persistence/entity/OportunidadEntity.java",
+          "pk": false,
+          "enum": ""
+        }
+      ],
+      "uniques": []
+    },
+    {
+      "table": "CRM_OPORTUNIDAD_PRODUCTOS",
+      "entity": "OportunidadProductoEntity",
+      "module": "oportunidades",
+      "source": "oportunidades/adapters/out/persistence/entity/OportunidadProductoEntity.java",
+      "fields": [
+        {
+          "column": "ID",
+          "java": "id",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "No",
+          "flags": "PK; IDENTITY",
+          "default": "Sin inicializador Java",
+          "line": 17,
+          "source": "oportunidades/adapters/out/persistence/entity/OportunidadProductoEntity.java",
+          "pk": true,
+          "enum": ""
+        },
+        {
+          "column": "ID_OPORTUNIDAD",
+          "java": "idOportunidad",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 20,
+          "source": "oportunidades/adapters/out/persistence/entity/OportunidadProductoEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "ID_PRODUCTO",
+          "java": "idProducto",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 24,
+          "source": "oportunidades/adapters/out/persistence/entity/OportunidadProductoEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "CANTIDAD",
+          "java": "cantidad",
+          "type": "Integer",
+          "sql": "NUMBER(10,0)",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 27,
+          "source": "oportunidades/adapters/out/persistence/entity/OportunidadProductoEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "CREADO_EN",
+          "java": "creadoEn",
+          "type": "LocalDateTime",
+          "sql": "TIMESTAMP (precisión por proveedor)",
+          "nullable": "No",
+          "flags": "updatable=false",
+          "default": "LocalDateTime.now()",
+          "line": 31,
+          "source": "oportunidades/adapters/out/persistence/entity/OportunidadProductoEntity.java",
+          "pk": false,
+          "enum": ""
+        }
+      ],
+      "uniques": [
+        [
+          "uk_oportunidad_producto",
+          "ID_OPORTUNIDAD, ID_PRODUCTO"
+        ]
+      ]
+    },
+    {
+      "table": "CRM_PRODUCTOS",
+      "entity": "ProductoEntity",
+      "module": "productos",
+      "source": "productos/adapters/out/persistence/entity/ProductoEntity.java",
+      "fields": [
+        {
+          "column": "ID",
+          "java": "id",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "No",
+          "flags": "PK; IDENTITY",
+          "default": "Sin inicializador Java",
+          "line": 17,
+          "source": "productos/adapters/out/persistence/entity/ProductoEntity.java",
+          "pk": true,
+          "enum": ""
+        },
+        {
+          "column": "CODIGO",
+          "java": "codigo",
+          "type": "String",
+          "sql": "VARCHAR2(50)",
+          "nullable": "No",
+          "flags": "UNIQUE",
+          "default": "Sin inicializador Java",
+          "line": 20,
+          "source": "productos/adapters/out/persistence/entity/ProductoEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "NOMBRE",
+          "java": "nombre",
+          "type": "String",
+          "sql": "VARCHAR2(200)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 23,
+          "source": "productos/adapters/out/persistence/entity/ProductoEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "DESCRIPCION",
+          "java": "descripcion",
+          "type": "String",
+          "sql": "VARCHAR2(1000)",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 26,
+          "source": "productos/adapters/out/persistence/entity/ProductoEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "CATEGORIA",
+          "java": "categoria",
+          "type": "String",
+          "sql": "VARCHAR2(100)",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 29,
+          "source": "productos/adapters/out/persistence/entity/ProductoEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "PRECIO_BASE",
+          "java": "precioBase",
+          "type": "BigDecimal",
+          "sql": "NUMBER(14,2)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 32,
+          "source": "productos/adapters/out/persistence/entity/ProductoEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "ESTADO",
+          "java": "estado",
+          "type": "EstadoProducto",
+          "sql": "VARCHAR2(20)",
+          "nullable": "No",
+          "flags": "Enum STRING: ACTIVO, INACTIVO, DESCONTINUADO; CHECK físico no comprobado",
+          "default": "EstadoProducto.ACTIVO",
+          "line": 37,
+          "source": "productos/adapters/out/persistence/entity/ProductoEntity.java",
+          "pk": false,
+          "enum": "ACTIVO, INACTIVO, DESCONTINUADO"
+        },
+        {
+          "column": "CREADO_EN",
+          "java": "creadoEn",
+          "type": "LocalDateTime",
+          "sql": "TIMESTAMP (precisión por proveedor)",
+          "nullable": "No",
+          "flags": "updatable=false",
+          "default": "LocalDateTime.now()",
+          "line": 41,
+          "source": "productos/adapters/out/persistence/entity/ProductoEntity.java",
+          "pk": false,
+          "enum": ""
+        }
+      ],
+      "uniques": [
+        [
+          "Nombre por proveedor",
+          "CODIGO"
+        ]
+      ]
+    },
+    {
+      "table": "CRM_PROPUESTA_DETALLES",
+      "entity": "DetallePropuestaEntity",
+      "module": "propuestas",
+      "source": "propuestas/adapters/out/persistence/entity/DetallePropuestaEntity.java",
+      "fields": [
+        {
+          "column": "ID",
+          "java": "id",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "No",
+          "flags": "PK; IDENTITY",
+          "default": "Sin inicializador Java",
+          "line": 15,
+          "source": "propuestas/adapters/out/persistence/entity/DetallePropuestaEntity.java",
+          "pk": true,
+          "enum": ""
+        },
+        {
+          "column": "ID_PRODUCTO",
+          "java": "idProducto",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 18,
+          "source": "propuestas/adapters/out/persistence/entity/DetallePropuestaEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "DESCRIPCION",
+          "java": "descripcion",
+          "type": "String",
+          "sql": "VARCHAR2(500)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 21,
+          "source": "propuestas/adapters/out/persistence/entity/DetallePropuestaEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "CANTIDAD",
+          "java": "cantidad",
+          "type": "Integer",
+          "sql": "NUMBER(10,0)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 24,
+          "source": "propuestas/adapters/out/persistence/entity/DetallePropuestaEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "PRECIO_UNITARIO",
+          "java": "precioUnitario",
+          "type": "BigDecimal",
+          "sql": "NUMBER(14,2)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 27,
+          "source": "propuestas/adapters/out/persistence/entity/DetallePropuestaEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "SUBTOTAL",
+          "java": "subtotal",
+          "type": "BigDecimal",
+          "sql": "NUMBER(14,2)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 30,
+          "source": "propuestas/adapters/out/persistence/entity/DetallePropuestaEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "ID_PROPUESTA",
+          "java": "PropuestaEntity.detalles (join)",
+          "type": "Long (ID del padre)",
+          "sql": "NUMBER(19,0)",
+          "nullable": "No",
+          "flags": "FK declarada por @OneToMany + @JoinColumn",
+          "default": "Sin default DDL declarado",
+          "line": 71,
+          "source": "propuestas/adapters/out/persistence/entity/PropuestaEntity.java",
+          "pk": false,
+          "enum": ""
+        }
+      ],
+      "uniques": []
+    },
+    {
+      "table": "CRM_PROPUESTAS",
+      "entity": "PropuestaEntity",
+      "module": "propuestas",
+      "source": "propuestas/adapters/out/persistence/entity/PropuestaEntity.java",
+      "fields": [
+        {
+          "column": "ID",
+          "java": "id",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "No",
+          "flags": "PK; IDENTITY",
+          "default": "Sin inicializador Java",
+          "line": 20,
+          "source": "propuestas/adapters/out/persistence/entity/PropuestaEntity.java",
+          "pk": true,
+          "enum": ""
+        },
+        {
+          "column": "NUMERO_PROPUESTA",
+          "java": "numeroPropuesta",
+          "type": "String",
+          "sql": "VARCHAR2(50)",
+          "nullable": "No",
+          "flags": "UNIQUE",
+          "default": "Sin inicializador Java",
+          "line": 23,
+          "source": "propuestas/adapters/out/persistence/entity/PropuestaEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "ID_OPORTUNIDAD",
+          "java": "idOportunidad",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 26,
+          "source": "propuestas/adapters/out/persistence/entity/PropuestaEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "ID_CLIENTE",
+          "java": "idCliente",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 29,
+          "source": "propuestas/adapters/out/persistence/entity/PropuestaEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "CLIENTE_NOMBRE",
+          "java": "clienteNombre",
+          "type": "String",
+          "sql": "VARCHAR2(150)",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 32,
+          "source": "propuestas/adapters/out/persistence/entity/PropuestaEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "ESTADO",
+          "java": "estado",
+          "type": "EstadoPropuesta",
+          "sql": "VARCHAR2(20)",
+          "nullable": "No",
+          "flags": "Enum STRING: BORRADOR, ENVIADA, APROBADA, RECHAZADA, CANCELADA; CHECK físico no comprobado",
+          "default": "EstadoPropuesta.BORRADOR",
+          "line": 37,
+          "source": "propuestas/adapters/out/persistence/entity/PropuestaEntity.java",
+          "pk": false,
+          "enum": "BORRADOR, ENVIADA, APROBADA, RECHAZADA, CANCELADA"
+        },
+        {
+          "column": "VERSION",
+          "java": "version",
+          "type": "Integer",
+          "sql": "NUMBER(10,0)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "1",
+          "line": 41,
+          "source": "propuestas/adapters/out/persistence/entity/PropuestaEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "SUBTOTAL",
+          "java": "subtotal",
+          "type": "BigDecimal",
+          "sql": "NUMBER(14,2)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 44,
+          "source": "propuestas/adapters/out/persistence/entity/PropuestaEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "DESCUENTO",
+          "java": "descuento",
+          "type": "BigDecimal",
+          "sql": "NUMBER(14,2)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "BigDecimal.ZERO",
+          "line": 48,
+          "source": "propuestas/adapters/out/persistence/entity/PropuestaEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "TOTAL",
+          "java": "total",
+          "type": "BigDecimal",
+          "sql": "NUMBER(14,2)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 51,
+          "source": "propuestas/adapters/out/persistence/entity/PropuestaEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "RESPONSABLE",
+          "java": "responsable",
+          "type": "String",
+          "sql": "VARCHAR2(100)",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 54,
+          "source": "propuestas/adapters/out/persistence/entity/PropuestaEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "FECHA_EMISION",
+          "java": "fechaEmision",
+          "type": "LocalDate",
+          "sql": "DATE",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 57,
+          "source": "propuestas/adapters/out/persistence/entity/PropuestaEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "FECHA_VENCIMIENTO",
+          "java": "fechaVencimiento",
+          "type": "LocalDate",
+          "sql": "DATE",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 60,
+          "source": "propuestas/adapters/out/persistence/entity/PropuestaEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "OBSERVACIONES",
+          "java": "observaciones",
+          "type": "String",
+          "sql": "CLOB",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 64,
+          "source": "propuestas/adapters/out/persistence/entity/PropuestaEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "CREADO_EN",
+          "java": "creadoEn",
+          "type": "LocalDateTime",
+          "sql": "TIMESTAMP (precisión por proveedor)",
+          "nullable": "No",
+          "flags": "updatable=false",
+          "default": "LocalDateTime.now()",
+          "line": 68,
+          "source": "propuestas/adapters/out/persistence/entity/PropuestaEntity.java",
+          "pk": false,
+          "enum": ""
+        }
+      ],
+      "uniques": [
+        [
+          "Nombre por proveedor",
+          "NUMERO_PROPUESTA"
+        ]
+      ]
+    },
+    {
+      "table": "CRM_USUARIOS",
+      "entity": "UsuarioEntity",
+      "module": "usuarios",
+      "source": "usuarios/adapters/out/persistence/entity/UsuarioEntity.java",
+      "fields": [
+        {
+          "column": "ID",
+          "java": "id",
+          "type": "Long",
+          "sql": "NUMBER(19,0)",
+          "nullable": "No",
+          "flags": "PK; IDENTITY",
+          "default": "Sin inicializador Java",
+          "line": 17,
+          "source": "usuarios/adapters/out/persistence/entity/UsuarioEntity.java",
+          "pk": true,
+          "enum": ""
+        },
+        {
+          "column": "NOMBRE",
+          "java": "nombre",
+          "type": "String",
+          "sql": "VARCHAR2(100)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 20,
+          "source": "usuarios/adapters/out/persistence/entity/UsuarioEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "APELLIDO",
+          "java": "apellido",
+          "type": "String",
+          "sql": "VARCHAR2(100)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 23,
+          "source": "usuarios/adapters/out/persistence/entity/UsuarioEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "CORREO",
+          "java": "correo",
+          "type": "String",
+          "sql": "VARCHAR2(150)",
+          "nullable": "No",
+          "flags": "UNIQUE",
+          "default": "Sin inicializador Java",
+          "line": 26,
+          "source": "usuarios/adapters/out/persistence/entity/UsuarioEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "PASSWORD_HASH",
+          "java": "passwordHash",
+          "type": "String",
+          "sql": "VARCHAR2(255)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 29,
+          "source": "usuarios/adapters/out/persistence/entity/UsuarioEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "ROL",
+          "java": "rol",
+          "type": "RolUsuario",
+          "sql": "VARCHAR2(20)",
+          "nullable": "No",
+          "flags": "Enum STRING: ADMIN, JEFE, VENDEDOR; CHECK físico no comprobado",
+          "default": "Sin inicializador Java",
+          "line": 33,
+          "source": "usuarios/adapters/out/persistence/entity/UsuarioEntity.java",
+          "pk": false,
+          "enum": "ADMIN, JEFE, VENDEDOR"
+        },
+        {
+          "column": "ESTADO",
+          "java": "estado",
+          "type": "EstadoUsuario",
+          "sql": "VARCHAR2(20)",
+          "nullable": "No",
+          "flags": "Enum STRING: ACTIVO, INACTIVO; CHECK físico no comprobado",
+          "default": "EstadoUsuario.ACTIVO",
+          "line": 38,
+          "source": "usuarios/adapters/out/persistence/entity/UsuarioEntity.java",
+          "pk": false,
+          "enum": "ACTIVO, INACTIVO"
+        },
+        {
+          "column": "CREADO_EN",
+          "java": "creadoEn",
+          "type": "LocalDateTime",
+          "sql": "TIMESTAMP (precisión por proveedor)",
+          "nullable": "No",
+          "flags": "—",
+          "default": "LocalDateTime.now()",
+          "line": 42,
+          "source": "usuarios/adapters/out/persistence/entity/UsuarioEntity.java",
+          "pk": false,
+          "enum": ""
+        },
+        {
+          "column": "ACTUALIZADO_EN",
+          "java": "actualizadoEn",
+          "type": "LocalDateTime",
+          "sql": "TIMESTAMP (precisión por proveedor)",
+          "nullable": "Sí (default JPA)",
+          "flags": "—",
+          "default": "Sin inicializador Java",
+          "line": 45,
+          "source": "usuarios/adapters/out/persistence/entity/UsuarioEntity.java",
+          "pk": false,
+          "enum": ""
+        }
+      ],
+      "uniques": [
+        [
+          "Nombre por proveedor",
+          "CORREO"
+        ]
+      ]
+    }
+  ],
+  "relationships": [
+    [
+      "CRM_CONTACTOS",
+      "ID_CLIENTE",
+      "CRM_CLIENTES",
+      "ID",
+      "FK JPA"
+    ],
+    [
+      "CRM_PROPUESTA_DETALLES",
+      "ID_PROPUESTA",
+      "CRM_PROPUESTAS",
+      "ID",
+      "FK JPA"
+    ],
+    [
+      "CRM_LEADS",
+      "FUENTE_ID",
+      "CRM_FUENTES",
+      "ID",
+      "Lógica"
+    ],
+    [
+      "CRM_PROPUESTAS",
+      "ID_CLIENTE",
+      "CRM_CLIENTES",
+      "ID",
+      "Lógica"
+    ],
+    [
+      "CRM_PROPUESTAS",
+      "ID_OPORTUNIDAD",
+      "CRM_OPORTUNIDADES",
+      "ID",
+      "Lógica"
+    ],
+    [
+      "CRM_PROPUESTA_DETALLES",
+      "ID_PRODUCTO",
+      "CRM_PRODUCTOS",
+      "ID",
+      "Lógica"
+    ],
+    [
+      "CRM_ACTIVIDADES",
+      "ID_CLIENTE",
+      "CRM_CLIENTES",
+      "ID",
+      "Lógica"
+    ],
+    [
+      "CRM_ACTIVIDADES",
+      "ID_LEAD",
+      "CRM_LEADS",
+      "ID",
+      "Lógica"
+    ],
+    [
+      "CRM_ACTIVIDADES",
+      "ID_OPORTUNIDAD",
+      "CRM_OPORTUNIDADES",
+      "ID",
+      "Lógica"
+    ],
+    [
+      "CRM_ACTIVIDAD_ETIQUETAS",
+      "ID_ACTIVIDAD",
+      "CRM_ACTIVIDADES",
+      "ID_ACTIVIDAD",
+      "Lógica"
+    ],
+    [
+      "CRM_ACTIVIDAD_ETIQUETAS",
+      "ID_ETIQUETA",
+      "CRM_ETIQUETAS",
+      "ID_ETIQUETA",
+      "Lógica"
+    ],
+    [
+      "CRM_ACTIVIDAD_PARTICIPANTES",
+      "ID_ACTIVIDAD",
+      "CRM_ACTIVIDADES",
+      "ID_ACTIVIDAD",
+      "Lógica"
+    ],
+    [
+      "CRM_ACTIVIDAD_PARTICIPANTES",
+      "ID_CONTACTO",
+      "CRM_CONTACTOS",
+      "ID",
+      "Lógica"
+    ],
+    [
+      "CRM_OPORTUNIDAD_CONTACTOS",
+      "ID_OPORTUNIDAD",
+      "CRM_OPORTUNIDADES",
+      "ID",
+      "Lógica"
+    ],
+    [
+      "CRM_OPORTUNIDAD_CONTACTOS",
+      "ID_CONTACTO",
+      "CRM_CONTACTOS",
+      "ID",
+      "Lógica"
+    ],
+    [
+      "CRM_OPORTUNIDAD_PRODUCTOS",
+      "ID_OPORTUNIDAD",
+      "CRM_OPORTUNIDADES",
+      "ID",
+      "Lógica"
+    ],
+    [
+      "CRM_OPORTUNIDAD_PRODUCTOS",
+      "ID_PRODUCTO",
+      "CRM_PRODUCTOS",
+      "ID",
+      "Lógica"
+    ],
+    [
+      "CRM_OPORTUNIDAD_COLABORADORES",
+      "ID_OPORTUNIDAD",
+      "CRM_OPORTUNIDADES",
+      "ID",
+      "Lógica"
+    ],
+    [
+      "CRM_OPORTUNIDAD_COLABORADORES",
+      "ID_USUARIO",
+      "CRM_USUARIOS",
+      "ID",
+      "Lógica"
+    ],
+    [
+      "CRM_EQUIPO_MIEMBROS",
+      "EQUIPO_ID",
+      "CRM_EQUIPOS",
+      "ID",
+      "Lógica"
+    ],
+    [
+      "CRM_EQUIPO_MIEMBROS",
+      "USUARIO_ID",
+      "CRM_USUARIOS",
+      "ID",
+      "Lógica"
+    ],
+    [
+      "CRM_CAMPANIA_LEADS",
+      "CAMPANIA_ID",
+      "CRM_CAMPANIAS",
+      "ID",
+      "Lógica"
+    ],
+    [
+      "CRM_CAMPANIA_LEADS",
+      "LEAD_ID",
+      "CRM_LEADS",
+      "ID",
+      "Lógica"
+    ]
+  ],
+  "bridges": [
+    [
+      "CRM_ACTIVIDAD_ETIQUETAS",
+      "ID_ACTIVIDAD",
+      "CRM_ACTIVIDADES",
+      "ID_ACTIVIDAD",
+      "ID_ETIQUETA",
+      "CRM_ETIQUETAS",
+      "ID_ETIQUETA"
+    ],
+    [
+      "CRM_ACTIVIDAD_PARTICIPANTES",
+      "ID_ACTIVIDAD",
+      "CRM_ACTIVIDADES",
+      "ID_ACTIVIDAD",
+      "ID_CONTACTO",
+      "CRM_CONTACTOS",
+      "ID"
+    ],
+    [
+      "CRM_OPORTUNIDAD_CONTACTOS",
+      "ID_OPORTUNIDAD",
+      "CRM_OPORTUNIDADES",
+      "ID",
+      "ID_CONTACTO",
+      "CRM_CONTACTOS",
+      "ID"
+    ],
+    [
+      "CRM_OPORTUNIDAD_PRODUCTOS",
+      "ID_OPORTUNIDAD",
+      "CRM_OPORTUNIDADES",
+      "ID",
+      "ID_PRODUCTO",
+      "CRM_PRODUCTOS",
+      "ID"
+    ],
+    [
+      "CRM_OPORTUNIDAD_COLABORADORES",
+      "ID_OPORTUNIDAD",
+      "CRM_OPORTUNIDADES",
+      "ID",
+      "ID_USUARIO",
+      "CRM_USUARIOS",
+      "ID"
+    ],
+    [
+      "CRM_EQUIPO_MIEMBROS",
+      "EQUIPO_ID",
+      "CRM_EQUIPOS",
+      "ID",
+      "USUARIO_ID",
+      "CRM_USUARIOS",
+      "ID"
+    ],
+    [
+      "CRM_CAMPANIA_LEADS",
+      "CAMPANIA_ID",
+      "CRM_CAMPANIAS",
+      "ID",
+      "LEAD_ID",
+      "CRM_LEADS",
+      "ID"
+    ]
+  ],
+  "oracle_verified": false
+}

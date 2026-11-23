@@ -1,0 +1,63 @@
+@startuml
+!pragma layout smetana
+skinparam defaultFontName Segoe UI
+skinparam defaultFontSize 13
+skinparam shadowing false
+title Secuencia — POST /api/v1/propuestas (ruta de éxito y errores)
+autonumber
+actor Usuario as U
+participant "Angular / PropuestasService" as UI
+participant "PropuestaController" as C
+participant "ManagePropuestaUseCase\nPropuestaService" as S
+participant "PropuestaRelacionValidationPort\n(adaptador de consulta)" as V
+participant "ManageProductoUseCase" as P
+participant "PropuestaPersistencePort\nPropuestaPersistenceAdapter" as A
+participant "PropuestaSpringDataRepository\nJPA / Hibernate" as R
+database Oracle as DB
+U -> UI : Guardar formulario
+UI -> C : POST + PropuestaRequest
+C -> C : @Valid (DTO y detalles)
+C -> S : crear(request)
+group @Transactional — PropuestaService.crear
+ S -> V : existeOportunidad(id)
+ V --> S : boolean
+ S -> V : existeCliente(id)
+ V --> S : boolean
+ S -> S : validarFechas()
+ S -> A : countByNumeroPropuestaStartsWith(prefijo)
+ A -> R : countByNumeroPropuestaStartsWith(prefijo)
+ R -> DB : consulta de conteo
+ DB --> R : count
+ R --> A : count
+ A --> S : count
+ S -> S : construir BORRADOR con número count+1
+ loop Cada detalle
+  opt productoId != null
+   S -> P : obtener(productoId)
+   P --> S : ProductoResponse
+   S -> S : completar descripción/precio ausentes
+  end
+  S -> S : exigir descripción/precio y calcular subtotal
+ end
+ S -> S : recalcularTotales()
+ S -> A : save(propuesta)
+ A -> A : toEntity()
+ A -> R : save(entity)
+ R -> DB : persistencia cabecera + detalles (cascada JPA)
+ DB --> R : datos persistidos
+ R --> A : entity
+ A -> A : toDomain()
+ A --> S : Propuesta
+ S -> S : toResponse()
+end
+S --> C : PropuestaResponse
+C --> UI : 201 Created
+UI --> U : Mostrar resultado
+note over C,DB
+ Errores abortan la ruta: DTO inválido 400; relación/producto inexistente 404;
+ fechas/detalle inválidos 400; integridad UNIQUE 409 si el esquema la aplica.
+ La transacción debe confirmarse antes de responder exitosamente.
+ COUNT+1 puede colisionar: no es secuencia ni reintento automático.
+ No se ha observado SQL Oracle en esta revisión; se modela el mapeo.
+end note
+@enduml

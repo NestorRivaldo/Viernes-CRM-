@@ -1,0 +1,194 @@
+[
+  {
+    "archivo": "TEST-com.viernes.actividades.adapters.in.web.ActividadControllerTest.xml",
+    "sha256_original": "b2134b970da345445401f4a4ab03c4e53daaf3b888ebdc334849f59e7139ab94",
+    "fecha_archivo": "2026-11-11T09:45:47.624498",
+    "testcases": 14
+  },
+  {
+    "archivo": "TEST-com.viernes.actividades.adapters.out.persistence.ActividadEtiquetaPersistenceAdapterTest.xml",
+    "sha256_original": "16bf33334fa56f5453bf8d51709e7ebd0e354734c383ae4b1ccb55be39d8eeee",
+    "fecha_archivo": "2026-11-11T09:45:47.804697",
+    "testcases": 2
+  },
+  {
+    "archivo": "TEST-com.viernes.actividades.application.service.ActividadServiceTest.xml",
+    "sha256_original": "00a65fde755ec14d6341c006954ceaa0bd9124e4c5325cc1a769dd232f3cb418",
+    "fecha_archivo": "2026-11-11T09:45:48.154205",
+    "testcases": 18
+  },
+  {
+    "archivo": "TEST-com.viernes.clientes.adapters.in.web.ClienteControllerTest.xml",
+    "sha256_original": "0efe1b18ff04cddc3b49f7e8abcb49d727c5a851d924ff09a507be8e04d24c33",
+    "fecha_archivo": "2026-11-11T09:45:49.096990",
+    "testcases": 17
+  },
+  {
+    "archivo": "TEST-com.viernes.clientes.adapters.out.external.ApisPeruDocumentoAdapterTest.xml",
+    "sha256_original": "fd27e0cbf25a8a51abe06cb02ad1813495e03d5fef40855ca81da0185a285fde",
+    "fecha_archivo": "2026-11-11T09:45:49.609283",
+    "testcases": 8
+  },
+  {
+    "archivo": "TEST-com.viernes.clientes.application.service.ClienteServiceTest.xml",
+    "sha256_original": "8a6c5f927848aa1013ad6430a54d91c27001b41496159998de45b9a9453c5edb",
+    "fecha_archivo": "2026-11-11T09:45:49.904645",
+    "testcases": 25
+  },
+  {
+    "archivo": "TEST-com.viernes.dashboard.adapters.in.web.DashboardControllerTest.xml",
+    "sha256_original": "c4383a09b0f4b7ca83303f47165a83483e871eec676b89f9ac8156594c13d2a2",
+    "fecha_archivo": "2026-11-11T09:45:50.087528",
+    "testcases": 5
+  },
+  {
+    "archivo": "TEST-com.viernes.dashboard.application.service.DashboardServiceTest.xml",
+    "sha256_original": "025cb87b45dc7d4c828b9f2e8d15f5e45158376c34cae5074f4ac6652ea82200",
+    "fecha_archivo": "2026-11-11T09:45:50.187120",
+    "testcases": 3
+  },
+  {
+    "archivo": "TEST-com.viernes.equipos.adapters.in.web.EquipoControllerTest.xml",
+    "sha256_original": "51fc251bbb221d6d4bdc645c4b57870c7926ddbbe488cbcc9d9a7c970de04f83",
+    "fecha_archivo": "2026-11-11T09:45:50.483744",
+    "testcases": 13
+  },
+  {
+    "archivo": "TEST-com.viernes.equipos.application.service.EquipoServiceTest.xml",
+    "sha256_original": "240d9cc52fd5c36c259e8d2e6b2262425b2f7d0fa2df81b96cef1076692ed13d",
+    "fecha_archivo": "2026-11-11T09:45:50.652029",
+    "testcases": 13
+  },
+  {
+    "archivo": "TEST-com.viernes.etiquetas.application.service.EtiquetaServiceTest.xml",
+    "sha256_original": "0414ae4866a55df3df6b118055456f7f671f73df229f65c4b6c35db87c61c328",
+    "fecha_archivo": "2026-11-11T09:45:50.673394",
+    "testcases": 5
+  },
+  {
+    "archivo": "TEST-com.viernes.leads.adapters.in.web.FuenteControllerTest.xml",
+    "sha256_original": "b61d786f3f16444fa9f1f560d5d00beccef74b60f8e40b7a50598e823035895b",
+    "fecha_archivo": "2026-11-11T09:45:50.851627",
+    "testcases": 9
+  },
+  {
+    "archivo": "TEST-com.viernes.leads.adapters.in.web.LeadControllerTest.xml",
+    "sha256_original": "02d9993a579a535fbf68999dcf3d1e8a255ecca1c008d04131932d5dfd1dab37",
+    "fecha_archivo": "2026-11-11T09:45:51.084565",
+    "testcases": 11
+  },
+  {
+    "archivo": "TEST-com.viernes.leads.application.service.FuenteServiceTest.xml",
+    "sha256_original": "25402dbd6377dac238746b24416dd9e436bbda709e03505a7ef3f58d8917a327",
+    "fecha_archivo": "2026-11-11T09:45:51.161634",
+    "testcases": 8
+  },
+  {
+    "archivo": "TEST-com.viernes.leads.application.service.LeadServiceTest.xml",
+    "sha256_original": "ef71341830128684099c1f186c75a9fc91e50df3e0522b7242c15254575eeb52",
+    "fecha_archivo": "2026-11-11T09:45:51.239572",
+    "testcases": 8
+  },
+  {
+    "archivo": "TEST-com.viernes.marketing.adapters.in.web.CampaniaControllerTest.xml",
+    "sha256_original": "a5534b1c09e079e52221c2fe84adadf28b97a99a621eb239a43a8d4969aae168",
+    "fecha_archivo": "2026-11-11T09:45:51.518397",
+    "testcases": 13
+  },
+  {
+    "archivo": "TEST-com.viernes.marketing.application.service.CampaniaServiceTest.xml",
+    "sha256_original": "0c33ced99c7ca82fb0002478272371bfbb54142ab94849dd5815dc988776a2a3",
+    "fecha_archivo": "2026-11-11T09:45:51.657885",
+    "testcases": 13
+  },
+  {
+    "archivo": "TEST-com.viernes.mensajeria.adapters.in.web.MensajeControllerTest.xml",
+    "sha256_original": "2da01ab2c250585efc75218ff0abc5121add8d5371912a02726f1247ea477ae9",
+    "fecha_archivo": "2026-11-11T09:45:51.807733",
+    "testcases": 5
+  },
+  {
+    "archivo": "TEST-com.viernes.mensajeria.application.service.MensajeServiceTest.xml",
+    "sha256_original": "c9c0087de9998041c5f286f9f654d8444d266e62c88dfec0ce646aa59983e938",
+    "fecha_archivo": "2026-11-11T09:45:51.936094",
+    "testcases": 6
+  },
+  {
+    "archivo": "TEST-com.viernes.ModularityTests.xml",
+    "sha256_original": "7dff3c1f6e7ebf9d973646ff4ead20e0dfaaa03c71b964fc47cff8c705647973",
+    "fecha_archivo": "2026-11-11T09:45:56.236210",
+    "testcases": 2
+  },
+  {
+    "archivo": "TEST-com.viernes.oportunidades.adapters.in.web.OportunidadControllerTest.xml",
+    "sha256_original": "85708f4d697379d3e0fb72d734981638f323772e27f84bd3d2be03a3050ccc3f",
+    "fecha_archivo": "2026-11-11T09:45:56.424187",
+    "testcases": 10
+  },
+  {
+    "archivo": "TEST-com.viernes.oportunidades.application.service.OportunidadServiceTest.xml",
+    "sha256_original": "7501a4dcdf5ce0d7d73b3bd37280f15c4756f6f6ff023a0876a71967c972c3c1",
+    "fecha_archivo": "2026-11-11T09:45:56.710542",
+    "testcases": 5
+  },
+  {
+    "archivo": "TEST-com.viernes.oportunidades.domain.OportunidadTest.xml",
+    "sha256_original": "7ab43b506c2b625994389d2f33b9364e6328285f5ad5a463da79c9367dac8c92",
+    "fecha_archivo": "2026-11-11T09:45:56.715194",
+    "testcases": 5
+  },
+  {
+    "archivo": "TEST-com.viernes.productos.adapters.in.web.ProductoControllerTest.xml",
+    "sha256_original": "32224b22954c277a956de7f91fffdcacf8ddbb83f199dc5b2dee69f47a1c98df",
+    "fecha_archivo": "2026-11-11T09:45:56.856865",
+    "testcases": 11
+  },
+  {
+    "archivo": "TEST-com.viernes.productos.application.service.ProductoServiceTest.xml",
+    "sha256_original": "6f17e38723a1b5ae367525e60b1f62b5cca958c4a618cce78049788d2531550f",
+    "fecha_archivo": "2026-11-11T09:45:56.901119",
+    "testcases": 9
+  },
+  {
+    "archivo": "TEST-com.viernes.propuestas.adapters.in.web.PropuestaControllerTest.xml",
+    "sha256_original": "9c8342cef1a2626db62eb8a393f00e476958c565d0ae7ce13a2f83ea22945c36",
+    "fecha_archivo": "2026-11-11T09:45:57.094341",
+    "testcases": 7
+  },
+  {
+    "archivo": "TEST-com.viernes.propuestas.application.service.PropuestaServiceTest.xml",
+    "sha256_original": "8c2bb9436714370b80e782fe7e4be3d04cadb5ed72fe2220c6dd86bbb1f257fa",
+    "fecha_archivo": "2026-11-11T09:45:57.204993",
+    "testcases": 15
+  },
+  {
+    "archivo": "TEST-com.viernes.relationshipmap.RelationshipMapServiceTest.xml",
+    "sha256_original": "abccfee03dcd384749937518141c24178bb92ddabd079d41dda29f23b4df7ff4",
+    "fecha_archivo": "2026-11-11T09:45:57.224421",
+    "testcases": 7
+  },
+  {
+    "archivo": "TEST-com.viernes.shared.ratelimit.ConsultaDocumentoRateLimiterTest.xml",
+    "sha256_original": "abfad002fb6a30b4c7e52ba3e9d16ac3914757871d402f494feb1d86f7398b94",
+    "fecha_archivo": "2026-11-11T09:45:57.235478",
+    "testcases": 4
+  },
+  {
+    "archivo": "TEST-com.viernes.usuarios.adapters.in.web.UsuarioControllerTest.xml",
+    "sha256_original": "f32f4ccff2cecbc1ec3d5f4a35295b4864c7be7dcc47145f301336eea1e02533",
+    "fecha_archivo": "2026-11-11T09:45:57.368637",
+    "testcases": 9
+  },
+  {
+    "archivo": "TEST-com.viernes.usuarios.application.service.UsuarioServiceTest.xml",
+    "sha256_original": "95cdd51819284eb6002f996d7564b8ef7ad0e1cd29554aa74ec6353956e4980f",
+    "fecha_archivo": "2026-11-11T09:45:57.462667",
+    "testcases": 10
+  },
+  {
+    "archivo": "TEST-com.viernes.ViernesApplicationTests.xml",
+    "sha256_original": "b8269201353611f281a7c937de38ddf3dc50012fa67a6e6d3cd73d88207115c1",
+    "fecha_archivo": "2026-11-11T09:46:08.714047",
+    "testcases": 1
+  }
+]

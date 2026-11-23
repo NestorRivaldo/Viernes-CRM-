@@ -1,0 +1,134 @@
+@startuml c3_principal_backend
+!include <C4/C4_Component>
+
+title Viernes CRM V1 — Arquitectura C4 Nivel 3 (Componentes del Backend Spring Boot)
+caption Diagrama de Componentes C4 Nivel 3 del Backend Monolítico Modular (Spring Modulith 2.0 / Spring Boot 4.0.7)
+
+LAYOUT_WITH_LEGEND()
+
+' Sistemas y Contenedores Externos
+Container(spa, "Viernes Frontend SPA", "Angular 22.1 / Material", "Aplicación web cliente con componentes standalone y zoneless change detection")
+System_Ext(keycloak, "Keycloak 25.0.6", "IdP OAuth2 / OIDC", "Emisión y firma de tokens JWT Bearer (realm: viernes-realm) en puerto 8180")
+ContainerDb(db, "Oracle Database Free 23c", "Oracle DB :1521", "Almacenamiento relacional ACID en esquema BOM_VENTAS (26 tablas físicas CRM_*)")
+System_Ext(apisperu, "APIsPerú", "Servicio Externo REST", "Consulta de padrón oficial DNI (RENIEC) y RUC (SUNAT)")
+
+' Límite del Contenedor Backend
+Container_Boundary(backend, "Viernes Backend — Monolito Modular (Spring Boot 4.0.7 / Java 21)") {
+
+    ' Módulo de Seguridad y Capa Anticorrupción
+    Boundary(b_auth, "Módulo Auth (Seguridad & ACL)") {
+        Component(sec_config, "KeycloakSecurityConfig", "Spring Security 6", "Resource Server sin estado; control de acceso basado en roles (ADMIN, JEFE, VENDEDOR)")
+        Component(jwt_conv, "KeycloakJwtAuthenticationConverter", "ACL Component", "Traduce claims 'realm_access.roles' de Keycloak a autoridades del dominio Spring Security")
+    }
+
+    ' Módulos Core Comerciales
+    Boundary(b_clientes, "Módulo Clientes (Core)") {
+        Component(c_clientes, "ClienteController", "Spring REST Controller", "Endpoints /api/v1/clientes para gestión de cuentas, contactos y consultas oficiales")
+        Component(s_clientes, "ClienteService", "ManageClienteUseCase", "Orquesta la gestión de clientes y contactos; consulta padrón externo DNI/RUC")
+        Component(a_clientes, "ClientePersistenceAdapter", "JPA Adapter", "Persistencia de empresas y contactos en tablas CRM_CLIENTES y CRM_CONTACTOS")
+        Component(a_apisperu, "ApisPeruDocumentoAdapter", "DocumentoLookupPort", "Cliente HTTP REST con caché Caffeine para consultas DNI/RUC")
+    }
+
+    Boundary(b_oportunidades, "Módulo Oportunidades (Core)") {
+        Component(c_oportunidades, "OportunidadController", "Spring REST Controller", "Endpoints /api/v1/oportunidades y subrecursos N:M (/contactos, /productos, /colaboradores)")
+        Component(s_oportunidades, "OportunidadService", "ManageOportunidadUseCase", "Lógica de pipeline comercial, cálculo de valor ponderado y orquestación de relaciones N:M")
+        Component(a_oportunidades, "OportunidadPersistenceAdapters", "JPA Adapters (x4)", "Persistencia de oportunidad y tablas intermedias N:M (CRM_OPORTUNIDADES, CRM_OPORTUNIDAD_*)")
+    }
+
+    Boundary(b_propuestas, "Módulo Propuestas (Core)") {
+        Component(c_propuestas, "PropuestaController", "Spring REST Controller", "Endpoints /api/v1/propuestas para cotizaciones y transiciones de estado")
+        Component(s_propuestas, "PropuestaService", "ManagePropuestaUseCase", "Cálculo de totales/descuentos y máquina de estados (BORRADOR, ENVIADA, APROBADA, etc.)")
+        Component(a_propuestas, "PropuestaPersistenceAdapter", "JPA Adapter", "Persiste agregados en CRM_PROPUESTAS y CRM_PROPUESTA_DETALLES")
+    }
+
+    Boundary(b_actividades, "Módulo Actividades (Core)") {
+        Component(c_actividades, "ActividadController", "Spring REST Controller", "Endpoints /api/v1/actividades y subrecursos N:M (/participantes, /etiquetas)")
+        Component(s_actividades, "ActividadService", "ManageActividadUseCase", "Gestión de bitácora comercial, regla MAX_ETIQUETAS=8 y cálculo de vencidas")
+        Component(a_actividades, "ActividadPersistenceAdapters", "JPA Adapters (x3)", "Persistencia en CRM_ACTIVIDADES, CRM_ACTIVIDAD_PARTICIPANTES y CRM_ACTIVIDAD_ETIQUETAS")
+    }
+
+    Boundary(b_leads, "Módulo Leads (Core)") {
+        Component(c_leads, "LeadController & FuenteController", "Spring REST Controllers", "Endpoints /api/v1/leads y /api/v1/fuentes para prospección comercial")
+        Component(s_leads, "LeadService & FuenteService", "Use Cases", "Administra ciclo de vida de prospectos y fuentes comerciales")
+        Component(a_leads, "LeadPersistenceAdapters", "JPA Adapters", "Persistencia en CRM_LEADS y CRM_FUENTES")
+    }
+
+    ' Módulos de Soporte
+    Boundary(b_catalogos, "Módulos de Soporte (Catálogos & Estructura)") {
+        Component(m_productos, "Módulo Productos", "Hexagonal Module", "Gestión de catálogo de productos cotizables (CRM_PRODUCTOS)")
+        Component(m_etiquetas, "Módulo Etiquetas", "Hexagonal Module", "Taxonomía transversal normalizada para clasificación (CRM_ETIQUETAS)")
+        Component(m_equipos, "Módulo Equipos", "Hexagonal Module", "Fuerzas de ventas y relación N:M con usuarios (CRM_EQUIPOS, CRM_EQUIPO_MIEMBROS)")
+        Component(m_usuarios, "Módulo Usuarios", "Spring Modulith Module", "Gestión de identidad, roles RBAC (CRM_USUARIOS) y API pública UsuariosApi")
+        Component(m_marketing, "Módulo Marketing", "Hexagonal Module", "Gestión de campañas y enlace N:M con leads (CRM_CAMPANIAS, CRM_CAMPANIA_LEADS)")
+        Component(m_mensajeria, "Módulo Mensajería", "Hexagonal Module", "Chat colaborativo interno del equipo de ventas (CRM_MENSAJES)")
+    }
+
+    ' Módulos Genéricos y de Análisis
+    Boundary(b_analitica, "Módulos Genéricos & Analítica") {
+        Component(s_dashboard, "DashboardService", "Facade / Analytics", "Agregación y cálculo de KPIs comerciales; optimizado con caché Caffeine (30s TTL)")
+        Component(s_relmap, "RelationshipMapService", "Graph Engine", "Construcción de grafos multicapa cliente/oportunidad para Cytoscape.js")
+    }
+
+    ' Infraestructura Transversal Shared
+    Boundary(b_shared, "Capa Transversal (Shared)") {
+        Component(cache_mgr, "CacheConfig (Caffeine)", "In-Memory Cache", "Gestión de cachés multiescala: catálogos (5m), dashboard (30s), DNI/RUC (24h)")
+        Component(rate_limiter, "ConsultaDocumentoRateLimiter", "Rate Limiting", "Control de consumo de API externa (máx. 20 peticiones/minuto por usuario)")
+        Component(corr_filter, "CorrelationIdFilter", "Servlet Filter", "Propagación de X-Trace-ID hacia MDC de SLF4J para trazabilidad distribuida")
+    }
+}
+
+' Relaciones Externas hacia Backend
+Rel(spa, sec_config, "Peticiones HTTP con Bearer JWT y X-Trace-ID", "JSON / REST")
+Rel(sec_config, jwt_conv, "Valida y delega claims de identidad", "Spring Security")
+Rel(jwt_conv, keycloak, "Verifica firma criptográfica de tokens", "JWK Set URI / HTTP")
+
+' Interacciones de Entrada Web hacia Servicios de Aplicación
+Rel(spa, c_clientes, "CRUD cuentas y consulta DNI/RUC", "REST / JSON")
+Rel(spa, c_oportunidades, "Pipeline y subrecursos N:M", "REST / JSON")
+Rel(spa, c_propuestas, "Cotizaciones y transiciones de estado", "REST / JSON")
+Rel(spa, c_actividades, "Bitácora, participantes y etiquetas", "REST / JSON")
+Rel(spa, c_leads, "Prospección y fuentes", "REST / JSON")
+
+Rel(c_clientes, s_clientes, "Invoca caso de uso", "ManageClienteUseCase")
+Rel(c_oportunidades, s_oportunidades, "Invoca caso de uso", "ManageOportunidadUseCase")
+Rel(c_propuestas, s_propuestas, "Invoca caso de uso", "ManagePropuestaUseCase")
+Rel(c_actividades, s_actividades, "Invoca caso de uso", "ManageActividadUseCase")
+Rel(c_leads, s_leads, "Invoca caso de uso", "ManageLeadUseCase")
+
+' Colaboraciones Inter-Módulo Desacopladas
+Rel(s_actividades, m_usuarios, "Valida usuario", "UsuariosApi")
+Rel(s_actividades, s_clientes, "Consulta datos de contacto participante", "ContactoQueryPort")
+Rel(s_actividades, m_etiquetas, "Valida y sincroniza etiquetas N:M", "EtiquetaPersistencePort")
+Rel(s_oportunidades, s_clientes, "Valida contactos de oportunidad", "ContactoQueryPort")
+Rel(s_oportunidades, m_productos, "Valida productos cotizados", "ProductoQueryPort")
+Rel(s_oportunidades, m_usuarios, "Valida colaboradores asignados", "UsuarioQueryPort")
+Rel(s_propuestas, s_oportunidades, "Verifica oportunidad existente", "PropuestaRelacionValidationPort")
+Rel(s_propuestas, s_clientes, "Verifica cliente de propuesta", "PropuestaRelacionValidationPort")
+
+' Servicios Analíticos hacia Módulos Comerciales
+Rel(s_dashboard, a_clientes, "Consulta agregada", "SQL / JPA")
+Rel(s_dashboard, a_oportunidades, "Consulta pipeline", "SQL / JPA")
+Rel(s_dashboard, a_propuestas, "Consulta montos aprobados", "SQL / JPA")
+Rel(s_relmap, a_clientes, "Obtiene subgrafo de cliente", "Query Ports")
+Rel(s_relmap, a_oportunidades, "Obtiene subgrafo de oportunidad", "Query Ports")
+
+' Servicios a Infraestructura y Servicios Externos
+Rel(s_clientes, a_apisperu, "Consulta oficial de documento", "DocumentoLookupPort")
+Rel(a_apisperu, rate_limiter, "Verifica cuota por usuario", "Java API")
+Rel(a_apisperu, cache_mgr, "Almacena/recupera respuesta oficial", "Spring Cache")
+Rel(a_apisperu, apisperu, "GET /api/v1/dni/{num} o /ruc/{num}", "HTTPS / REST")
+
+' Persistencia a Base de Datos Oracle
+Rel(a_clientes, db, "Lectura y escritura", "JDBC / JPA")
+Rel(a_oportunidades, db, "Lectura y escritura (incluye N:M)", "JDBC / JPA")
+Rel(a_propuestas, db, "Lectura y escritura", "JDBC / JPA")
+Rel(a_actividades, db, "Lectura y escritura (incluye N:M)", "JDBC / JPA")
+Rel(a_leads, db, "Lectura y escritura", "JDBC / JPA")
+Rel(m_productos, db, "Lectura y escritura", "JDBC / JPA")
+Rel(m_etiquetas, db, "Lectura y escritura", "JDBC / JPA")
+Rel(m_equipos, db, "Lectura y escritura", "JDBC / JPA")
+Rel(m_usuarios, db, "Lectura y escritura", "JDBC / JPA")
+Rel(m_marketing, db, "Lectura y escritura", "JDBC / JPA")
+Rel(m_mensajeria, db, "Lectura y escritura", "JDBC / JPA")
+
+@enduml

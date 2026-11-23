@@ -1,0 +1,94 @@
+﻿@startuml C3_principal
+' =====================================================================
+' C3 principal - Viernes CRM V1
+' Fuente editable: PlantUML + C4-PlantUML.
+' Render: java -jar plantuml.jar -tpng -tsvg -charset UTF-8 C3_principal.puml
+' Alcance: inventario de componentes del backend.
+' Las dependencias internas se detallan en el Anexo C3-D (Tabla 7)
+' del documento; no se dibujan flechas cruzadas para preservar legibilidad.
+' =====================================================================
+!include <C4/C4>
+!include <C4/C4_Context>
+!include <C4/C4_Component>
+
+title **C3 principal - Componentes del backend**\nViernes CRM V1 - Spring Boot 4.0.7 / Java 21 / Spring Modulith 2.0.7\n15 paquetes de nivel superior - 17 módulos Modulith - 14 controladores REST
+
+LAYOUT_TOP_DOWN()
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 17
+skinparam shadowing false
+skinparam nodesep 24
+skinparam ranksep 18
+
+UpdateElementStyle("comercial", $bgColor="#2F6FA8", $fontColor="#FFFFFF", $borderColor="#173F61")
+UpdateElementStyle("soporte", $bgColor="#2E7D5B", $fontColor="#FFFFFF", $borderColor="#194A36")
+UpdateElementStyle("administracion", $bgColor="#A15C00", $fontColor="#FFFFFF", $borderColor="#623800")
+UpdateElementStyle("consulta", $bgColor="#6A4C93", $fontColor="#FFFFFF", $borderColor="#3F2C58")
+UpdateElementStyle("tecnico", $bgColor="#5B6770", $fontColor="#FFFFFF", $borderColor="#333B41")
+
+System_Boundary(backend, "Backend Spring Boot - Viernes CRM V1\n14 controladores REST en /api/v1/**") {
+  Container_Boundary(modules, "Módulos del backend") {
+    ' Fila 1 - núcleo comercial (se escribe en orden inverso para que C4 los muestre de izquierda a derecha)
+    Together {
+      Component(actividades, "Actividades", "módulo comercial", "ManageActividadUseCase\nN:M participantes y etiquetas\n/actividades", $tags="comercial")
+      Component(oportunidades, "Oportunidades", "módulo comercial", "ManageOportunidadUseCase\nN:M contactos, productos y colaboradores\n/oportunidades", $tags="comercial")
+      Component(leads, "Leads y fuentes", "módulo comercial", "ManageLeadUseCase\nManageFuenteUseCase\n/leads - /fuentes", $tags="comercial")
+      Component(clientes, "Clientes", "módulo comercial", "ManageClienteUseCase\nClienteService - ClientePersistenceAdapter\n/clientes", $tags="comercial")
+    }
+    ' Fila 2 - núcleo comercial
+    Together {
+      Component(equipos, "Equipos comerciales", "módulo comercial", "ManageEquipoUseCase\nN:M equipo-usuario\n/equipos", $tags="comercial")
+      Component(marketing, "Marketing / Campañas", "módulo comercial", "ManageCampaniaUseCase\nN:M campania-lead\n/campanias", $tags="comercial")
+      Component(productos, "Productos", "módulo comercial", "ManageProductoUseCase\nProductoPersistenceAdapter\n/productos", $tags="comercial")
+      Component(propuestas, "Propuestas", "módulo comercial", "ManagePropuestaUseCase\ncabecera y detalles\n/propuestas", $tags="comercial")
+    }
+    ' Fila 3 - soporte y administracion
+    Together {
+      Component(dashboard, "Dashboard / KPIs", "módulo de consulta", "DashboardUseCase\nJPQL sobre entidades CRM_*\n/dashboard", $tags="consulta")
+      Component(usuarios, "Usuarios y roles", "módulo de administración", "UsuariosApi\nManageUsuarioUseCase\n/usuarios", $tags="administracion")
+      Component(mensajeria, "Mensajería interna", "módulo de soporte", "ManageMensajeUseCase\nUsuariosApi\n/mensajeria", $tags="soporte")
+      Component(etiquetas, "Etiquetas", "módulo de soporte", "ManageEtiquetaUseCase\nEtiquetaPersistencePort\n/etiquetas", $tags="soporte")
+    }
+    ' Fila 4 - consulta y tecnico
+    Together {
+      Component(shared, "Shared", "módulo técnico", "shared.exception - shared.ratelimit\ncache - OpenAPI - CorrelationIdFilter", $tags="tecnico")
+      Component(auth, "Auth / Keycloak", "módulo técnico", "SecurityFilterChain - JWT converter\nPasswordEncoder - perfil keycloak", $tags="tecnico")
+      Component(relationshipmap, "Mapa de relaciones", "módulo de consulta", "ManageRelationshipMapUseCase\n6 casos de uso publicos\n/relationship-map", $tags="consulta")
+    }
+
+    ' Enlaces invisibles para fijar la cuadricula 4x4
+    clientes -[hidden]down-> propuestas
+    leads -[hidden]down-> productos
+    oportunidades -[hidden]down-> marketing
+    actividades -[hidden]down-> equipos
+    propuestas -[hidden]down-> etiquetas
+    productos -[hidden]down-> mensajeria
+    marketing -[hidden]down-> usuarios
+    equipos -[hidden]down-> dashboard
+    etiquetas -[hidden]down-> relationshipmap
+    usuarios -[hidden]down-> auth
+    dashboard -[hidden]down-> shared
+  }
+}
+
+note right of modules
+  **Convenciones**
+  Azul: núcleo comercial. Verde: soporte de negocio.
+  Naranja: administración. Morado: consulta/lectura.
+  Gris: módulo técnico. Cada caja es un módulo
+  Spring Modulith real; no representa una tabla.
+  **Contexto externo**
+  Frontend Angular: consume /api/v1/** por HTTPS/JSON.
+  Keycloak: emite JWT; el módulo Auth valida con
+  Spring Security solo con el perfil "keycloak".
+  Oracle Database: persistencia JPA/Hibernate;
+  Dashboard usa JPQL por nombre de entidad.
+  APIsPERU: consulta DNI/RUC desde Clientes.
+  **Dependencias internas verificadas:** Tabla 3
+  y Anexo C3-D. No se dibujan flechas cruzadas.
+end note
+
+hide stereotypes
+@enduml
+
+

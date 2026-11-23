@@ -1,0 +1,10 @@
+﻿ID,RF-HU derivados,Caso,Evidencia pendiente
+CP-F01,RF-D01 / HU-D01,JWT ausente/expirado y VENDEDOR contra aprobación o escritura de usuarios,E2E/seguridad con cadena real Keycloak; MockMvc standalone no acredita roles
+CP-F02,RF-D10 / HU-D10,Dos creaciones concurrentes con el mismo correlativo COUNT+1,Concurrencia con Oracle y captura de conflicto/reintento; sin evidencia específica localizada
+CP-F03,RF-D10 / HU-D10,"Vencimiento anterior a emisión, descuento mayor al subtotal y detalles al límite",Casos de borde; decidir con equipo si total negativo debe prohibirse antes de cambiar expectativa
+CP-F04,RF-D06 / HU-D06,Marcar lead CONVERTIDO y comprobar que no crea oportunidad,Integración de módulos; ausencia de endpoint de conversión no sustituye ejecución
+CP-F05,RF-D08 / HU-D08,Cambiar etapa GANADA a PROSPECCION y verificar probabilidad independiente,Caso alternativo de negocio; sin aceptación ejecutada documentada
+CP-F06,RF-D19 / HU-D19,"Expandir, colapsar y reexpandir grafo sin duplicar nodos en Angular",E2E frontend; los siete tests backend no prueban interacción visual
+CP-F07,RF-D05 / HU-D05,"Caché con proxy real, expiración, rate-limit y errores del proveedor",Integración controlada con servidor simulado; no consumir cuota sin autorización
+CP-F08,RF-D09 / HU-D09,Eliminar entidades con FK reales de Oracle y verificar CASCADE/NO ACTION,Integración sobre base de prueba aislada; jamás contra datos operativos
+CP-F09,Todas las HU originales,Validación de aceptación por el equipo/usuario,"Pendiente catálogo original, testigo, fecha y evidencia; no reemplazable por JUnit"

@@ -1,0 +1,1527 @@
+﻿VIERNES CRM V1 · Evidencias académicas · 11/11/2026
+Encargo docente ↔ implementación comprobada en E:\Viernes\Viernes
+Informe académico consolidado
+
+Continuación de entrega_analisis_v2, conservada sin sobrescribir. Se revisaron los entregables pendientes contra el árbol real; no se repitió la auditoría general ni se implementaron funcionalidades.
+
+Pendiente académico: los enunciados originales de HU-004, HU-005, HU-008, HU-016, HU-017 y del resto del catálogo no se localizaron. Se entregan 20 historias derivadas y 60 escenarios propuestos, pero no se inventa correspondencia ni aprobación. AS-IS se entrega solo como plantilla, tal como pide el encargo.
+
+SecciónAntesEntregable de esta continuaciónEstado
+
+	06 BPMN	Propuesta exportada y plantilla sin levantamiento	TO-BE comercial + detalle, dos BPMN 2.0/SVG, plantilla AS-IS CSV	BPMN validado contra XSD oficial; AS-IS real no afirmado
+
+	07 UML	8 fuentes e imágenes, con errores semánticos	8 PlantUML revisados, 8 SVG y 8 PNG; explicaciones con código	Seis bloques cubiertos; estados desglosados en tres
+
+	11 Datos	Inventarios parciales	Diccionario JPA 152 campos y conciliación Oracle 194 columnas; ERD físicos; 7 puentes	Oracle: 26 tablas, 22 FK y 51 índices; distinguir de 21 entidades
+
+	05 Criterios	Sin catálogo original localizable	20 HU-D / 60 escenarios; registro de las 5 HU pendientes	Propuesto; correspondencia original y validación pendientes
+
+	12 Pruebas	Conteos y ejecución disponible	Inventario 291 tests / 32 clases; matriz 60 casos; extracto y hashes	291 PASS previos; 12 vínculos puntuales revisados; no UAT
+
+VIERNES CRM V1 · Evidencias académicas · 11/11/2026
+Encargo docente ↔ implementación comprobada en E:\Viernes\Viernes
+06. BPMN
+
+TO-BE analítico fundamentado en capacidades del código. No es una ejecución de un motor BPMN, una observación del AS-IS ni una aprobación de usuarios. Los archivos son BPMN 2.0 XML con elementos semánticos y BPMNDI, no diagramas Mermaid rebautizados.
+
+06.1 Proceso comercial TO-BE
+
+La comunicación de una necesidad ocurre fuera del CRM (participante cliente potencial). El equipo comercial registra el lead, realiza contacto y calificación como trabajo humano, decide si continúa y registra o selecciona separadamente cliente y oportunidad. Marcar un lead CONVERTIDO no crea estos registros. Desde una oportunidad existente se prepara una propuesta, se valida y se conserva un borrador o se solicita su envío. JEFE/ADMIN puede aprobar, rechazar o cancelar según estado. El cierre de la oportunidad es una decisión posterior e independiente.
+
+Los carriles expresan responsabilidad analítica, no una orquestación implementada. Las tareas de servicio muestran apoyo automático del backend invocado por una acción HTTP. “Enviar” solo actualiza ENVIADA: no está acreditado un canal de entrega por correo. El TO-BE propone un recorrido de trabajo; las etapas del lead/oportunidad no están impuestas por el servicio.
+
+BPMN editable · SVG comercial
+
+06.2 Detalle de propuestas reutilizado
+
+Se conserva la estructura del BPMN anterior y se corrige manualTask por userTask: registrar una oportunidad en el sistema es una acción humana asistida por software. Se corrige el helper de construcción de detalle y las condiciones en flujos por defecto. El subproceso representa el camino habitual de revisión, no todos los endpoints: cancelar también se admite desde BORRADOR y la eliminación por ADMIN no se dibuja aquí. Errores 401/403, conflicto 409 o disponibilidad interrumpen la operación; no hay reintentos automáticos modelados.
+
+BPMN editable · SVG de propuesta
+
+06.3 Elementos BPMN y fundamento
+
+ElementoInterpretación
+
+	Participantes	Cliente potencial (caja negra) y equipo/CRM (proceso).
+
+	Carriles	Vendedor/usuario, CRM y JEFE/ADMIN. No son servicios distribuidos.
+
+	Eventos	Inicio por necesidad externa y finales por descarte, borrador o resolución de propuesta.
+
+	Tareas de usuario	Decisiones y registros explícitos; no se asume conversión automática.
+
+	Tareas de servicio	Validación, cálculos y persistencia invocados por la aplicación.
+
+	Compuertas exclusivas	Continuar, validez de solicitud, enviar y decisión. Las ramas son opciones mutuamente excluyentes.
+
+	Flujo de mensaje	Necesidad del cliente por canal externo, no integración implementada.
+
+	Flujo de secuencia	Orden TO-BE dentro del participante equipo.
+
+viernes-backend/src/main/java/com/viernes/leads/application/service/LeadService.java:66
+viernes-backend/src/main/java/com/viernes/oportunidades/application/service/OportunidadService.java:69
+viernes-backend/src/main/java/com/viernes/propuestas/application/service/PropuestaService.java:118
+viernes-backend/src/main/java/com/viernes/auth/keycloak/KeycloakSecurityConfig.java:127
+
+06.4 AS-IS: exclusivamente plantilla de levantamiento
+
+No existe evidencia suficiente para dibujar el proceso actual de la organización. Por ello no se presenta un AS-IS inventado ni se confunde el código con una observación operativa. El equipo debe completar la plantilla editable y adjuntar evidencia antes de diagramarlo.
+
+TemaInformación a aportarSoporte
+
+	Inicio y final	¿Qué hecho inicia el caso y cuándo se considera cerrado?	Caso real anonimizado y responsable
+
+	Participantes	¿Quién registra, valida, aprueba, entrega y recibe?	Entrevistas y responsabilidades
+
+	Secuencia actual	¿Qué pasos se realizan realmente, incluso fuera del CRM?	Observación y documentos utilizados
+
+	Canales	¿Correo, llamada, Excel, papel o aplicación?	Ejemplos anonimizados
+
+	Decisiones	¿Quién decide calificación, precio, aprobación y excepciones?	Regla vigente y autoridad
+
+	Lead y oportunidad	¿Se transcriben datos? ¿Quién registra cada entidad?	Recorrido de un caso
+
+	Errores y retrabajo	¿Qué se devuelve, corrige, cancela o reabre?	Incidencias y motivos
+
+	Tiempos y volumen	¿Cuánto dura y cuántos casos se tramitan?	Muestra, período y método
+
+	Datos y privacidad	¿Qué campos son imprescindibles y quién accede?	Formatos sin datos personales
+
+	Validación	¿Quién revisó y aprobó el levantamiento y en qué fecha?	Acta o confirmación verificable
+
+Regla de cierre: identificar fuentes, contrastar variantes con los actores, separar hechos de propuestas y obtener revisión documentada. Solo entonces crear el BPMN AS-IS. La plantilla antigua con campos “completar” se mantiene en entrega_analisis_v2 como antecedente, no como evidencia de un proceso observado.
+Documentación técnica, no aprobación de usuarios. Archivos fuente y líneas corresponden al árbol de trabajo local; no se atribuyen al último commit.
+VIERNES CRM V1 · Evidencias académicas · 11/11/2026
+Encargo docente ↔ implementación comprobada en E:\Viernes\Viernes
+07. UML
+
+Se entregan los seis bloques solicitados como ocho figuras: el bloque de estados se desglosa en tres. Cada figura tiene PlantUML editable y SVG/PNG regenerados. Reutiliza y corrige entrega_analisis_v2; no modifica los originales.
+
+Casos de uso generales
+
+Agrupa capacidades existentes y diferencia permisos por operación. La política depende del perfil keycloak. Se eliminaron HU/RF no trazables y funcionalidades deseadas del diagrama de alcance implementado.
+
+PUML · SVG · PNG
+
+viernes-backend/src/main/java/com/viernes/auth/keycloak/KeycloakSecurityConfig.java:121
+viernes-backend/src/main/java/com/viernes/clientes/adapters/in/web/ClienteController.java:1
+
+Actividad del proceso de propuestas
+
+Representa validación, cálculo y decisiones de usuario. Un BORRADOR puede conservarse o editarse; solo ADMIN puede eliminarlo. JEFE/ADMIN deciden las transiciones críticas. Enviar significa cambiar estado y no demuestra entrega de un documento al cliente.
+
+PUML · SVG · PNG
+
+viernes-backend/src/main/java/com/viernes/propuestas/application/service/PropuestaService.java:32
+viernes-backend/src/main/java/com/viernes/propuestas/application/dto/PropuestaRequest.java:12
+
+Clases del dominio comercial
+
+Extracto de 14 clases de dominio: no inventario de todas las clases Java. Las siete asociaciones entre extremos son N:M y se materializan en entidades puente. Se retiraron métodos desactivar/cambiarEstado inexistentes en Cliente y Lead. La composición de detalles exige uno o más en el contrato de creación, no por cardinalidad SQL.
+
+PUML · SVG · PNG
+
+viernes-backend/src/main/java/com/viernes/clientes/domain/Cliente.java:9
+viernes-backend/src/main/java/com/viernes/leads/domain/Lead.java:8
+viernes-backend/src/main/java/com/viernes/propuestas/domain/Propuesta.java:35
+viernes-backend/src/main/java/com/viernes/oportunidades/domain/Oportunidad.java:22
+
+Secuencia de creación
+
+Distingue entrada REST, puerto de entrada, servicio, validación, catálogo y adapter de persistencia. El SQL es conceptual: no se conectó Oracle. Numeración COUNT+1 y persistencia dentro de @Transactional; la asociación padre-detalle usa cascada JPA.
+
+PUML · SVG · PNG
+
+viernes-backend/src/main/java/com/viernes/propuestas/adapters/in/web/PropuestaController.java:27
+viernes-backend/src/main/java/com/viernes/propuestas/application/service/PropuestaService.java:209
+viernes-backend/src/main/java/com/viernes/propuestas/adapters/out/persistence/PropuestaPersistenceAdapter.java:25
+
+Secuencia de consulta del mapa
+
+La raíz agrupa contactos, oportunidades inferidas, actividades y propuestas. Expandir pide un subgrafo; el cliente combina nodos/aristas. El DTO contiene totalNodes/totalEdges, no un campo counts. La asociación por nombre es heurística y no integridad relacional.
+
+PUML · SVG · PNG
+
+viernes-backend/src/main/java/com/viernes/relationshipmap/adapters/in/web/RelationshipMapController.java:21
+viernes-backend/src/main/java/com/viernes/relationshipmap/application/service/RelationshipMapService.java:47
+viernes-backend/src/main/java/com/viernes/relationshipmap/application/service/RelationshipMapService.java:677
+
+Estados de propuesta
+
+BORRADOR→ENVIADA; ENVIADA→APROBADA/RECHAZADA; BORRADOR o ENVIADA→CANCELADA. Los tres últimos son terminales. Eliminar se representa como fin de existencia, no como un bucle. Estado incompatible devuelve 409.
+
+PUML · SVG · PNG
+
+viernes-backend/src/main/java/com/viernes/propuestas/application/service/PropuestaService.java:118
+viernes-backend/src/main/java/com/viernes/propuestas/domain/Propuesta.java:45
+
+Estados de lead
+
+El enum enumera valores pero no impone un ciclo. Cualquier valor válido se asigna desde cualquier estado. CONVERTIDO no genera oportunidad, contacto ni venta.
+
+PUML · SVG · PNG
+
+viernes-backend/src/main/java/com/viernes/leads/application/service/LeadService.java:47
+viernes-backend/src/main/java/com/viernes/leads/application/service/LeadService.java:66
+
+Etapas de oportunidad
+
+La asignación de etapa carece de guardas de transición. Crear una propuesta no avanza el pipeline ni aprobarla gana la oportunidad. La probabilidad y etapa son independientes.
+
+PUML · SVG · PNG
+
+viernes-backend/src/main/java/com/viernes/oportunidades/application/service/OportunidadService.java:69
+viernes-backend/src/main/java/com/viernes/oportunidades/application/service/OportunidadService.java:88
+Documentación técnica, no aprobación de usuarios. Archivos fuente y líneas corresponden al árbol de trabajo local; no se atribuyen al último commit.
+VIERNES CRM V1 · Evidencias académicas · 11/11/2026
+Encargo docente ↔ implementación comprobada en E:\Viernes\Viernes
+11. Datos — JPA y Oracle conciliados
+
+Dos fuentes de evidencia, sin confundirlas. JPA: 21 entidades y 152 columnas previstas. Oracle: consulta SELECT en transacciones READ ONLY al esquema BOM_VENTAS, fecha del servidor 2026-11-11 15:06:46 +00:00. Se observaron 26 tablas CRM y 194 columnas; 21 tablas corresponden al código actual y 5 no tienen entidad JPA en este árbol. No se ejecutaron DDL/DML en esta extracción.
+
+11.1 Conciliación del modelo y diferencias comprobadas
+
+MedidaJPA / árbol de códigoOracle observado
+
+	Tablas / entidades	21	26
+
+	Columnas de las 21 entidades (incluye join del padre)	152	159
+
+	PK	21 @Id IDENTITY	26
+
+	FK	2 JoinColumn	22 totales; 18 en tablas mapeadas
+
+	UNIQUE	14 declaradas	18
+
+	CHECK / NOT NULL	Sin @Check explícito	148
+
+	Índices	Sin @Index explícito	51 índices; 61 filas de columnas indexadas
+
+La diferencia no autoriza a borrar objetos ni a afirmar que pertenecen a funcionalidades implementadas. Las tablas no mapeadas son CRM_CANALES, CRM_CANAL_MIEMBROS, CRM_INTEGRACIONES, CRM_INTEGRACION_AUDITORIA, CRM_INTEGRACION_CONFIG. Pueden ser históricas o externas; su propósito no se certifica con nombres solamente.
+
+Columnas físicas adicionales en tablas mapeadas
+
+TablaColumna OracleTipoNULL Y/N
+
+	CRM_ACTIVIDADES	ID_USUARIO_NUM	NUMBER	Y
+
+	CRM_CAMPANIAS	CANAL	VARCHAR2	Y
+
+	CRM_CAMPANIAS	PRESUPUESTO	BINARY_DOUBLE	Y
+
+	CRM_CAMPANIAS	RESPONSABLE	VARCHAR2	Y
+
+	CRM_MENSAJES	CANAL_ID	NUMBER	Y
+
+	CRM_OPORTUNIDADES	ID_CLIENTE	NUMBER	Y
+
+	CRM_USUARIOS	KEYCLOAK_SUB	VARCHAR2	Y
+
+En particular, Oracle sí tiene CRM_OPORTUNIDADES.ID_CLIENTE y CRM_ACTIVIDADES.ID_USUARIO_NUM con FK, pero las entidades actuales no los mapean: Oportunidad usa clienteNombre y Actividad usa idUsuario String (ID o correo). No se infiere que el código mantenga esas columnas adicionales.
+
+11.2 ERD físico observado de las 21 tablas mapeadas
+
+ERD físico SVG · PlantUML editable · Anexo: las 26 tablas Oracle · Vista de asociaciones inferidas de JPA
+
+11.3 FK físicas comprobadas
+
+Tabla/columna hijaConstraintTabla/columna padreBorradoEstado
+
+	CRM_ACTIVIDADES.ID_USUARIO_NUM	FK_ACTIVIDAD_USUARIO_NUM	CRM_USUARIOS.ID	SET NULL	ENABLED / VALIDATED
+
+	CRM_ACTIVIDAD_ETIQUETAS.ID_ACTIVIDAD	FK_ACT_ETIQ_ACT	CRM_ACTIVIDADES.ID_ACTIVIDAD	CASCADE	ENABLED / VALIDATED
+
+	CRM_ACTIVIDAD_ETIQUETAS.ID_ETIQUETA	FK_ACT_ETIQ_ETIQUETA	CRM_ETIQUETAS.ID_ETIQUETA	CASCADE	ENABLED / VALIDATED
+
+	CRM_ACTIVIDAD_PARTICIPANTES.ID_ACTIVIDAD	FK_ACT_PART_ACT	CRM_ACTIVIDADES.ID_ACTIVIDAD	CASCADE	ENABLED / VALIDATED
+
+	CRM_ACTIVIDAD_PARTICIPANTES.ID_CONTACTO	FK_ACT_PART_CONTACTO	CRM_CONTACTOS.ID	CASCADE	ENABLED / VALIDATED
+
+	CRM_CAMPANIA_LEADS.CAMPANIA_ID	FK_CAMPANIA_LEAD_CAMP	CRM_CAMPANIAS.ID	CASCADE	ENABLED / VALIDATED
+
+	CRM_CAMPANIA_LEADS.LEAD_ID	FK_CAMPANIA_LEAD_LEAD	CRM_LEADS.ID	CASCADE	ENABLED / VALIDATED
+
+	CRM_CANAL_MIEMBROS.CANAL_ID	FK_CANAL_MIEMBRO_CANAL	CRM_CANALES.ID	CASCADE	ENABLED / VALIDATED
+
+	CRM_CANAL_MIEMBROS.USUARIO_CORREO	FK_CANAL_MIEMBRO_USUARIO	CRM_USUARIOS.CORREO	CASCADE	ENABLED / VALIDATED
+
+	CRM_CONTACTOS.ID_CLIENTE	FKHPJKSIXSVV6JG3Q3EBLFXPFE5	CRM_CLIENTES.ID	NO ACTION	ENABLED / VALIDATED
+
+	CRM_EQUIPO_MIEMBROS.EQUIPO_ID	FK_EQUIPO_MIEMBRO_EQUIPO	CRM_EQUIPOS.ID	CASCADE	ENABLED / VALIDATED
+
+	CRM_EQUIPO_MIEMBROS.USUARIO_ID	FK_EQUIPO_MIEMBRO_USUARIO	CRM_USUARIOS.ID	CASCADE	ENABLED / VALIDATED
+
+	CRM_INTEGRACION_AUDITORIA.INTEGRACION_ID	FK_INT_AUDIT_INT	CRM_INTEGRACIONES.ID	CASCADE	ENABLED / VALIDATED
+
+	CRM_INTEGRACION_CONFIG.INTEGRACION_ID	FK_INT_CONFIG_INT	CRM_INTEGRACIONES.ID	CASCADE	ENABLED / VALIDATED
+
+	CRM_OPORTUNIDADES.ID_CLIENTE	FK_OPORTUNIDAD_CLIENTE	CRM_CLIENTES.ID	SET NULL	ENABLED / VALIDATED
+
+	CRM_OPORTUNIDAD_COLABORADORES.ID_OPORTUNIDAD	FK_OPP_COLAB_OPP	CRM_OPORTUNIDADES.ID	CASCADE	ENABLED / VALIDATED
+
+	CRM_OPORTUNIDAD_COLABORADORES.ID_USUARIO	FK_OPP_COLAB_USUARIO	CRM_USUARIOS.ID	CASCADE	ENABLED / VALIDATED
+
+	CRM_OPORTUNIDAD_CONTACTOS.ID_CONTACTO	FK_OPP_CONTACTO_CONTACTO	CRM_CONTACTOS.ID	CASCADE	ENABLED / VALIDATED
+
+	CRM_OPORTUNIDAD_CONTACTOS.ID_OPORTUNIDAD	FK_OPP_CONTACTO_OPP	CRM_OPORTUNIDADES.ID	CASCADE	ENABLED / VALIDATED
+
+	CRM_OPORTUNIDAD_PRODUCTOS.ID_OPORTUNIDAD	FK_OPP_PRODUCTO_OPP	CRM_OPORTUNIDADES.ID	CASCADE	ENABLED / VALIDATED
+
+	CRM_OPORTUNIDAD_PRODUCTOS.ID_PRODUCTO	FK_OPP_PRODUCTO_PRODUCTO	CRM_PRODUCTOS.ID	CASCADE	ENABLED / VALIDATED
+
+	CRM_PROPUESTA_DETALLES.ID_PROPUESTA	FKLUH9M8DOGREC8EECWYQNGXIRH	CRM_PROPUESTAS.ID	NO ACTION	ENABLED / VALIDATED
+
+Las siete tablas puente solicitadas tienen ambos extremos respaldados por FK físicas observadas, aunque sus entidades usan IDs escalares. Esa diferencia es central: “sin asociación JPA” no significa “sin FK en Oracle”. Los IDs de cliente/oportunidad en propuestas, producto en detalles y otros vínculos lógicos se documentan por separado; no se convierten en FK por aparecer en un DTO.
+
+11.4 Relaciones lógicas y puentes N:M
+
+OrigenDestinoDeclaración de códigoComprobación Oracle
+
+	CRM_CONTACTOS.ID_CLIENTE	CRM_CLIENTES.ID	FK JPA	FKHPJKSIXSVV6JG3Q3EBLFXPFE5
+
+	CRM_PROPUESTA_DETALLES.ID_PROPUESTA	CRM_PROPUESTAS.ID	FK JPA	FKLUH9M8DOGREC8EECWYQNGXIRH
+
+	CRM_LEADS.FUENTE_ID	CRM_FUENTES.ID	Lógica	Relación lógica; sin FK física observada
+
+	CRM_PROPUESTAS.ID_CLIENTE	CRM_CLIENTES.ID	Lógica	Relación lógica; sin FK física observada
+
+	CRM_PROPUESTAS.ID_OPORTUNIDAD	CRM_OPORTUNIDADES.ID	Lógica	Relación lógica; sin FK física observada
+
+	CRM_PROPUESTA_DETALLES.ID_PRODUCTO	CRM_PRODUCTOS.ID	Lógica	Relación lógica; sin FK física observada
+
+	CRM_ACTIVIDADES.ID_CLIENTE	CRM_CLIENTES.ID	Lógica	Relación lógica; sin FK física observada
+
+	CRM_ACTIVIDADES.ID_LEAD	CRM_LEADS.ID	Lógica	Relación lógica; sin FK física observada
+
+	CRM_ACTIVIDADES.ID_OPORTUNIDAD	CRM_OPORTUNIDADES.ID	Lógica	Relación lógica; sin FK física observada
+
+	CRM_ACTIVIDAD_ETIQUETAS.ID_ACTIVIDAD	CRM_ACTIVIDADES.ID_ACTIVIDAD	Lógica	FK_ACT_ETIQ_ACT
+
+	CRM_ACTIVIDAD_ETIQUETAS.ID_ETIQUETA	CRM_ETIQUETAS.ID_ETIQUETA	Lógica	FK_ACT_ETIQ_ETIQUETA
+
+	CRM_ACTIVIDAD_PARTICIPANTES.ID_ACTIVIDAD	CRM_ACTIVIDADES.ID_ACTIVIDAD	Lógica	FK_ACT_PART_ACT
+
+	CRM_ACTIVIDAD_PARTICIPANTES.ID_CONTACTO	CRM_CONTACTOS.ID	Lógica	FK_ACT_PART_CONTACTO
+
+	CRM_OPORTUNIDAD_CONTACTOS.ID_OPORTUNIDAD	CRM_OPORTUNIDADES.ID	Lógica	FK_OPP_CONTACTO_OPP
+
+	CRM_OPORTUNIDAD_CONTACTOS.ID_CONTACTO	CRM_CONTACTOS.ID	Lógica	FK_OPP_CONTACTO_CONTACTO
+
+	CRM_OPORTUNIDAD_PRODUCTOS.ID_OPORTUNIDAD	CRM_OPORTUNIDADES.ID	Lógica	FK_OPP_PRODUCTO_OPP
+
+	CRM_OPORTUNIDAD_PRODUCTOS.ID_PRODUCTO	CRM_PRODUCTOS.ID	Lógica	FK_OPP_PRODUCTO_PRODUCTO
+
+	CRM_OPORTUNIDAD_COLABORADORES.ID_OPORTUNIDAD	CRM_OPORTUNIDADES.ID	Lógica	FK_OPP_COLAB_OPP
+
+	CRM_OPORTUNIDAD_COLABORADORES.ID_USUARIO	CRM_USUARIOS.ID	Lógica	FK_OPP_COLAB_USUARIO
+
+	CRM_EQUIPO_MIEMBROS.EQUIPO_ID	CRM_EQUIPOS.ID	Lógica	FK_EQUIPO_MIEMBRO_EQUIPO
+
+	CRM_EQUIPO_MIEMBROS.USUARIO_ID	CRM_USUARIOS.ID	Lógica	FK_EQUIPO_MIEMBRO_USUARIO
+
+	CRM_CAMPANIA_LEADS.CAMPANIA_ID	CRM_CAMPANIAS.ID	Lógica	FK_CAMPANIA_LEAD_CAMP
+
+	CRM_CAMPANIA_LEADS.LEAD_ID	CRM_LEADS.ID	Lógica	FK_CAMPANIA_LEAD_LEAD
+
+PuenteExtremosUnicidad del par
+
+	CRM_ACTIVIDAD_ETIQUETAS	CRM_ACTIVIDADES ↔ CRM_ETIQUETAS	ID_ACTIVIDAD + ID_ETIQUETA
+
+	CRM_ACTIVIDAD_PARTICIPANTES	CRM_ACTIVIDADES ↔ CRM_CONTACTOS	ID_ACTIVIDAD + ID_CONTACTO
+
+	CRM_OPORTUNIDAD_CONTACTOS	CRM_OPORTUNIDADES ↔ CRM_CONTACTOS	ID_OPORTUNIDAD + ID_CONTACTO
+
+	CRM_OPORTUNIDAD_PRODUCTOS	CRM_OPORTUNIDADES ↔ CRM_PRODUCTOS	ID_OPORTUNIDAD + ID_PRODUCTO
+
+	CRM_OPORTUNIDAD_COLABORADORES	CRM_OPORTUNIDADES ↔ CRM_USUARIOS	ID_OPORTUNIDAD + ID_USUARIO
+
+	CRM_EQUIPO_MIEMBROS	CRM_EQUIPOS ↔ CRM_USUARIOS	EQUIPO_ID + USUARIO_ID
+
+	CRM_CAMPANIA_LEADS	CRM_CAMPANIAS ↔ CRM_LEADS	CAMPANIA_ID + LEAD_ID
+
+11.5 Diccionario campo por campo conciliado
+
+CSV conciliado (152 columnas JPA) · CSV físico completo (194 columnas) · Detalle JPA: inicializadores, enums y reglas de mapeo. Los tipos inferidos nunca sustituyen al tipo físico observado. NULL de Oracle usa Y/N; CHAR_USED refleja B/C. Longitud de NUMBER en bytes no es su precisión decimal. Las 7 columnas adicionales y las 5 tablas no mapeadas permanecen en el inventario físico.
+
+CRM_ACTIVIDADES
+
+ColumnaJavaOracle observadoCaracteres / B-CNULL OracleRelaciónFuente
+
+	ID_ACTIVIDAD	Long	NUMBER(19,0)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/actividades/adapters/out/persistence/entity/ActividadEntity.java:15
+
+	ID_USUARIO	String	VARCHAR2(1020 bytes)	255 / C	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/actividades/adapters/out/persistence/entity/ActividadEntity.java:18
+
+	ID_CLIENTE	Long	NUMBER(19,0)	0 / 	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/actividades/adapters/out/persistence/entity/ActividadEntity.java:21
+
+	ID_LEAD	Long	NUMBER(19,0)	0 / 	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/actividades/adapters/out/persistence/entity/ActividadEntity.java:24
+
+	ID_OPORTUNIDAD	Long	NUMBER(19,0)	0 / 	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/actividades/adapters/out/persistence/entity/ActividadEntity.java:27
+
+	TIPO	TipoActividad	VARCHAR2(1020 bytes)	255 / C	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/actividades/adapters/out/persistence/entity/ActividadEntity.java:31
+
+	TITULO	String	VARCHAR2(1020 bytes)	255 / C	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/actividades/adapters/out/persistence/entity/ActividadEntity.java:34
+
+	DESCRIPCION	String	CLOB(4000 bytes)	0 / 	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/actividades/adapters/out/persistence/entity/ActividadEntity.java:38
+
+	FECHA	LocalDateTime	TIMESTAMP(9)(11 bytes)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/actividades/adapters/out/persistence/entity/ActividadEntity.java:41
+
+	ESTADO	EstadoActividad	VARCHAR2(1020 bytes)	255 / C	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/actividades/adapters/out/persistence/entity/ActividadEntity.java:45
+
+	CREADO_EN	LocalDateTime	TIMESTAMP(9)(11 bytes)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/actividades/adapters/out/persistence/entity/ActividadEntity.java:48
+
+CRM_ACTIVIDAD_ETIQUETAS
+
+ColumnaJavaOracle observadoCaracteres / B-CNULL OracleRelaciónFuente
+
+	ID_ACTIVIDAD_ETIQUETA	Long	NUMBER(19,0)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/actividades/adapters/out/persistence/entity/ActividadEtiquetaEntity.java:16
+
+	ID_ACTIVIDAD	Long	NUMBER(19,0)	0 / 	N	FK_ACT_ETIQ_ACT → CRM_ACTIVIDADES.ID_ACTIVIDAD [ON DELETE CASCADE]	viernes-backend/src/main/java/com/viernes/actividades/adapters/out/persistence/entity/ActividadEtiquetaEntity.java:19
+
+	ID_ETIQUETA	Long	NUMBER(19,0)	0 / 	N	FK_ACT_ETIQ_ETIQUETA → CRM_ETIQUETAS.ID_ETIQUETA [ON DELETE CASCADE]	viernes-backend/src/main/java/com/viernes/actividades/adapters/out/persistence/entity/ActividadEtiquetaEntity.java:22
+
+	CREADO_EN	LocalDateTime	TIMESTAMP(9)(11 bytes)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/actividades/adapters/out/persistence/entity/ActividadEtiquetaEntity.java:25
+
+	ORDEN	Integer	NUMBER(10,0)	0 / 	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/actividades/adapters/out/persistence/entity/ActividadEtiquetaEntity.java:28
+
+CRM_ACTIVIDAD_PARTICIPANTES
+
+ColumnaJavaOracle observadoCaracteres / B-CNULL OracleRelaciónFuente
+
+	ID_PARTICIPANTE	Long	NUMBER(19,0)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/actividades/adapters/out/persistence/entity/ActividadParticipanteEntity.java:15
+
+	ID_ACTIVIDAD	Long	NUMBER(19,0)	0 / 	N	FK_ACT_PART_ACT → CRM_ACTIVIDADES.ID_ACTIVIDAD [ON DELETE CASCADE]	viernes-backend/src/main/java/com/viernes/actividades/adapters/out/persistence/entity/ActividadParticipanteEntity.java:18
+
+	ID_CONTACTO	Long	NUMBER(19,0)	0 / 	N	FK_ACT_PART_CONTACTO → CRM_CONTACTOS.ID [ON DELETE CASCADE]	viernes-backend/src/main/java/com/viernes/actividades/adapters/out/persistence/entity/ActividadParticipanteEntity.java:22
+
+	CREADO_EN	LocalDateTime	TIMESTAMP(9)(11 bytes)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/actividades/adapters/out/persistence/entity/ActividadParticipanteEntity.java:25
+
+CRM_CLIENTES
+
+ColumnaJavaOracle observadoCaracteres / B-CNULL OracleRelaciónFuente
+
+	ID	Long	NUMBER(19,0)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/clientes/adapters/out/persistence/entity/ClienteEntity.java:25
+
+	NOMBRE	String	VARCHAR2(600 bytes)	150 / C	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/clientes/adapters/out/persistence/entity/ClienteEntity.java:28
+
+	EMPRESA	String	VARCHAR2(600 bytes)	150 / C	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/clientes/adapters/out/persistence/entity/ClienteEntity.java:31
+
+	TIPO_DOCUMENTO	TipoDocumento	VARCHAR2(40 bytes)	10 / C	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/clientes/adapters/out/persistence/entity/ClienteEntity.java:35
+
+	NUMERO_DOCUMENTO	String	VARCHAR2(80 bytes)	20 / C	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/clientes/adapters/out/persistence/entity/ClienteEntity.java:38
+
+	CORREO	String	VARCHAR2(600 bytes)	150 / C	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/clientes/adapters/out/persistence/entity/ClienteEntity.java:41
+
+	TELEFONO	String	VARCHAR2(120 bytes)	30 / C	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/clientes/adapters/out/persistence/entity/ClienteEntity.java:44
+
+	ESTADO	EstadoCliente	VARCHAR2(80 bytes)	20 / C	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/clientes/adapters/out/persistence/entity/ClienteEntity.java:49
+
+	RESPONSABLE	String	VARCHAR2(400 bytes)	100 / C	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/clientes/adapters/out/persistence/entity/ClienteEntity.java:52
+
+	CREADO_EN	LocalDateTime	TIMESTAMP(9)(11 bytes)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/clientes/adapters/out/persistence/entity/ClienteEntity.java:56
+
+CRM_CONTACTOS
+
+ColumnaJavaOracle observadoCaracteres / B-CNULL OracleRelaciónFuente
+
+	ID	Long	NUMBER(19,0)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/clientes/adapters/out/persistence/entity/ContactoEntity.java:15
+
+	ID_CLIENTE	Long	NUMBER(19,0)	0 / 	N	FKHPJKSIXSVV6JG3Q3EBLFXPFE5 → CRM_CLIENTES.ID [ON DELETE NO ACTION]	viernes-backend/src/main/java/com/viernes/clientes/adapters/out/persistence/entity/ContactoEntity.java:19
+
+	NOMBRE	String	VARCHAR2(400 bytes)	100 / C	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/clientes/adapters/out/persistence/entity/ContactoEntity.java:26
+
+	APELLIDO	String	VARCHAR2(400 bytes)	100 / C	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/clientes/adapters/out/persistence/entity/ContactoEntity.java:29
+
+	CARGO	String	VARCHAR2(400 bytes)	100 / C	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/clientes/adapters/out/persistence/entity/ContactoEntity.java:32
+
+	CORREO	String	VARCHAR2(600 bytes)	150 / C	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/clientes/adapters/out/persistence/entity/ContactoEntity.java:35
+
+	TELEFONO	String	VARCHAR2(120 bytes)	30 / C	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/clientes/adapters/out/persistence/entity/ContactoEntity.java:38
+
+	PRINCIPAL	Boolean	BOOLEAN(1 bytes)	0 / 	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/clientes/adapters/out/persistence/entity/ContactoEntity.java:42
+
+	CREADO_EN	LocalDateTime	TIMESTAMP(9)(11 bytes)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/clientes/adapters/out/persistence/entity/ContactoEntity.java:46
+
+CRM_EQUIPOS
+
+ColumnaJavaOracle observadoCaracteres / B-CNULL OracleRelaciónFuente
+
+	ID	Long	NUMBER(19,0)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/equipos/adapters/out/persistence/entity/EquipoEntity.java:16
+
+	NOMBRE	String	VARCHAR2(480 bytes)	120 / C	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/equipos/adapters/out/persistence/entity/EquipoEntity.java:19
+
+	DESCRIPCION	String	VARCHAR2(2000 bytes)	500 / C	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/equipos/adapters/out/persistence/entity/EquipoEntity.java:22
+
+	ESTADO	EstadoEquipo	VARCHAR2(80 bytes)	20 / C	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/equipos/adapters/out/persistence/entity/EquipoEntity.java:27
+
+	CREADO_EN	LocalDateTime	TIMESTAMP(9)(11 bytes)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/equipos/adapters/out/persistence/entity/EquipoEntity.java:31
+
+CRM_EQUIPO_MIEMBROS
+
+ColumnaJavaOracle observadoCaracteres / B-CNULL OracleRelaciónFuente
+
+	ID	Long	NUMBER(19,0)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/equipos/adapters/out/persistence/entity/EquipoMiembroEntity.java:16
+
+	EQUIPO_ID	Long	NUMBER(19,0)	0 / 	N	FK_EQUIPO_MIEMBRO_EQUIPO → CRM_EQUIPOS.ID [ON DELETE CASCADE]	viernes-backend/src/main/java/com/viernes/equipos/adapters/out/persistence/entity/EquipoMiembroEntity.java:19
+
+	USUARIO_ID	Long	NUMBER(19,0)	0 / 	N	FK_EQUIPO_MIEMBRO_USUARIO → CRM_USUARIOS.ID [ON DELETE CASCADE]	viernes-backend/src/main/java/com/viernes/equipos/adapters/out/persistence/entity/EquipoMiembroEntity.java:22
+
+	CREADO_EN	LocalDateTime	TIMESTAMP(9)(11 bytes)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/equipos/adapters/out/persistence/entity/EquipoMiembroEntity.java:26
+
+CRM_ETIQUETAS
+
+ColumnaJavaOracle observadoCaracteres / B-CNULL OracleRelaciónFuente
+
+	ID_ETIQUETA	Long	NUMBER(19,0)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/etiquetas/adapters/out/persistence/entity/EtiquetaEntity.java:22
+
+	NOMBRE	String	VARCHAR2(160 bytes)	40 / C	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/etiquetas/adapters/out/persistence/entity/EtiquetaEntity.java:25
+
+	NOMBRE_NORMALIZADO	String	VARCHAR2(320 bytes)	80 / C	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/etiquetas/adapters/out/persistence/entity/EtiquetaEntity.java:28
+
+	COLOR	String	VARCHAR2(28 bytes)	7 / C	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/etiquetas/adapters/out/persistence/entity/EtiquetaEntity.java:31
+
+	DESCRIPCION	String	VARCHAR2(640 bytes)	160 / C	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/etiquetas/adapters/out/persistence/entity/EtiquetaEntity.java:34
+
+	ACTIVA	Boolean	BOOLEAN(1 bytes)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/etiquetas/adapters/out/persistence/entity/EtiquetaEntity.java:37
+
+	CREADO_EN	LocalDateTime	TIMESTAMP(9)(11 bytes)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/etiquetas/adapters/out/persistence/entity/EtiquetaEntity.java:40
+
+CRM_FUENTES
+
+ColumnaJavaOracle observadoCaracteres / B-CNULL OracleRelaciónFuente
+
+	ID	Long	NUMBER(19,0)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/leads/adapters/out/persistence/entity/FuenteEntity.java:15
+
+	CODIGO	String	VARCHAR2(200 bytes)	50 / C	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/leads/adapters/out/persistence/entity/FuenteEntity.java:18
+
+	NOMBRE	String	VARCHAR2(480 bytes)	120 / C	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/leads/adapters/out/persistence/entity/FuenteEntity.java:21
+
+	DESCRIPCION	String	VARCHAR2(2000 bytes)	500 / C	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/leads/adapters/out/persistence/entity/FuenteEntity.java:24
+
+	ACTIVA	Boolean	BOOLEAN(1 bytes)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/leads/adapters/out/persistence/entity/FuenteEntity.java:28
+
+	CREADO_EN	LocalDateTime	TIMESTAMP(9)(11 bytes)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/leads/adapters/out/persistence/entity/FuenteEntity.java:32
+
+CRM_LEADS
+
+ColumnaJavaOracle observadoCaracteres / B-CNULL OracleRelaciónFuente
+
+	ID	Long	NUMBER(19,0)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/leads/adapters/out/persistence/entity/LeadEntity.java:17
+
+	NOMBRE	String	VARCHAR2(600 bytes)	150 / C	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/leads/adapters/out/persistence/entity/LeadEntity.java:20
+
+	EMPRESA	String	VARCHAR2(600 bytes)	150 / C	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/leads/adapters/out/persistence/entity/LeadEntity.java:23
+
+	CORREO	String	VARCHAR2(600 bytes)	150 / C	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/leads/adapters/out/persistence/entity/LeadEntity.java:26
+
+	TELEFONO	String	VARCHAR2(120 bytes)	30 / C	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/leads/adapters/out/persistence/entity/LeadEntity.java:29
+
+	FUENTE	String	VARCHAR2(320 bytes)	80 / C	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/leads/adapters/out/persistence/entity/LeadEntity.java:32
+
+	FUENTE_ID	Long	NUMBER(19,0)	0 / 	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/leads/adapters/out/persistence/entity/LeadEntity.java:35
+
+	ESTADO	EstadoLead	VARCHAR2(80 bytes)	20 / C	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/leads/adapters/out/persistence/entity/LeadEntity.java:40
+
+	RESPONSABLE	String	VARCHAR2(400 bytes)	100 / C	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/leads/adapters/out/persistence/entity/LeadEntity.java:43
+
+	FECHA	LocalDate	DATE(7 bytes)	0 / 	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/leads/adapters/out/persistence/entity/LeadEntity.java:46
+
+	CREADO_EN	LocalDateTime	TIMESTAMP(9)(11 bytes)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/leads/adapters/out/persistence/entity/LeadEntity.java:50
+
+CRM_CAMPANIAS
+
+ColumnaJavaOracle observadoCaracteres / B-CNULL OracleRelaciónFuente
+
+	ID	Long	NUMBER(19,0)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/marketing/adapters/out/persistence/entity/CampaniaEntity.java:17
+
+	NOMBRE	String	VARCHAR2(600 bytes)	150 / C	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/marketing/adapters/out/persistence/entity/CampaniaEntity.java:20
+
+	DESCRIPCION	String	VARCHAR2(4000 bytes)	1000 / C	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/marketing/adapters/out/persistence/entity/CampaniaEntity.java:23
+
+	FECHA_INICIO	LocalDate	DATE(7 bytes)	0 / 	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/marketing/adapters/out/persistence/entity/CampaniaEntity.java:26
+
+	FECHA_FIN	LocalDate	DATE(7 bytes)	0 / 	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/marketing/adapters/out/persistence/entity/CampaniaEntity.java:29
+
+	ESTADO	EstadoCampania	VARCHAR2(80 bytes)	20 / C	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/marketing/adapters/out/persistence/entity/CampaniaEntity.java:34
+
+	CREADO_EN	LocalDateTime	TIMESTAMP(9)(11 bytes)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/marketing/adapters/out/persistence/entity/CampaniaEntity.java:38
+
+CRM_CAMPANIA_LEADS
+
+ColumnaJavaOracle observadoCaracteres / B-CNULL OracleRelaciónFuente
+
+	ID	Long	NUMBER(19,0)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/marketing/adapters/out/persistence/entity/CampaniaLeadEntity.java:16
+
+	CAMPANIA_ID	Long	NUMBER(19,0)	0 / 	N	FK_CAMPANIA_LEAD_CAMP → CRM_CAMPANIAS.ID [ON DELETE CASCADE]	viernes-backend/src/main/java/com/viernes/marketing/adapters/out/persistence/entity/CampaniaLeadEntity.java:19
+
+	LEAD_ID	Long	NUMBER(19,0)	0 / 	N	FK_CAMPANIA_LEAD_LEAD → CRM_LEADS.ID [ON DELETE CASCADE]	viernes-backend/src/main/java/com/viernes/marketing/adapters/out/persistence/entity/CampaniaLeadEntity.java:22
+
+	CREADO_EN	LocalDateTime	TIMESTAMP(9)(11 bytes)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/marketing/adapters/out/persistence/entity/CampaniaLeadEntity.java:26
+
+CRM_MENSAJES
+
+ColumnaJavaOracle observadoCaracteres / B-CNULL OracleRelaciónFuente
+
+	ID	Long	NUMBER(19,0)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/mensajeria/adapters/out/persistence/entity/MensajeEntity.java:20
+
+	USUARIO_CORREO	String	VARCHAR2(600 bytes)	150 / C	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/mensajeria/adapters/out/persistence/entity/MensajeEntity.java:23
+
+	USUARIO_NOMBRE	String	VARCHAR2(800 bytes)	200 / C	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/mensajeria/adapters/out/persistence/entity/MensajeEntity.java:26
+
+	CONTENIDO	String	VARCHAR2(4000 bytes)	2000 / C	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/mensajeria/adapters/out/persistence/entity/MensajeEntity.java:29
+
+	CREADO_EN	LocalDateTime	TIMESTAMP(9)(11 bytes)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/mensajeria/adapters/out/persistence/entity/MensajeEntity.java:32
+
+CRM_OPORTUNIDAD_COLABORADORES
+
+ColumnaJavaOracle observadoCaracteres / B-CNULL OracleRelaciónFuente
+
+	ID	Long	NUMBER(19,0)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/oportunidades/adapters/out/persistence/entity/OportunidadColaboradorEntity.java:17
+
+	ID_OPORTUNIDAD	Long	NUMBER(19,0)	0 / 	N	FK_OPP_COLAB_OPP → CRM_OPORTUNIDADES.ID [ON DELETE CASCADE]	viernes-backend/src/main/java/com/viernes/oportunidades/adapters/out/persistence/entity/OportunidadColaboradorEntity.java:20
+
+	ID_USUARIO	Long	NUMBER(19,0)	0 / 	N	FK_OPP_COLAB_USUARIO → CRM_USUARIOS.ID [ON DELETE CASCADE]	viernes-backend/src/main/java/com/viernes/oportunidades/adapters/out/persistence/entity/OportunidadColaboradorEntity.java:24
+
+	CREADO_EN	LocalDateTime	TIMESTAMP(9)(11 bytes)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/oportunidades/adapters/out/persistence/entity/OportunidadColaboradorEntity.java:28
+
+CRM_OPORTUNIDAD_CONTACTOS
+
+ColumnaJavaOracle observadoCaracteres / B-CNULL OracleRelaciónFuente
+
+	ID	Long	NUMBER(19,0)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/oportunidades/adapters/out/persistence/entity/OportunidadContactoEntity.java:17
+
+	ID_OPORTUNIDAD	Long	NUMBER(19,0)	0 / 	N	FK_OPP_CONTACTO_OPP → CRM_OPORTUNIDADES.ID [ON DELETE CASCADE]	viernes-backend/src/main/java/com/viernes/oportunidades/adapters/out/persistence/entity/OportunidadContactoEntity.java:20
+
+	ID_CONTACTO	Long	NUMBER(19,0)	0 / 	N	FK_OPP_CONTACTO_CONTACTO → CRM_CONTACTOS.ID [ON DELETE CASCADE]	viernes-backend/src/main/java/com/viernes/oportunidades/adapters/out/persistence/entity/OportunidadContactoEntity.java:24
+
+	ROL	String	VARCHAR2(400 bytes)	100 / C	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/oportunidades/adapters/out/persistence/entity/OportunidadContactoEntity.java:27
+
+	ES_DECISOR	Boolean	BOOLEAN(1 bytes)	0 / 	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/oportunidades/adapters/out/persistence/entity/OportunidadContactoEntity.java:31
+
+	CREADO_EN	LocalDateTime	TIMESTAMP(9)(11 bytes)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/oportunidades/adapters/out/persistence/entity/OportunidadContactoEntity.java:35
+
+CRM_OPORTUNIDADES
+
+ColumnaJavaOracle observadoCaracteres / B-CNULL OracleRelaciónFuente
+
+	ID	Long	NUMBER(19,0)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/oportunidades/adapters/out/persistence/entity/OportunidadEntity.java:18
+
+	NOMBRE	String	VARCHAR2(800 bytes)	200 / C	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/oportunidades/adapters/out/persistence/entity/OportunidadEntity.java:21
+
+	CLIENTE_NOMBRE	String	VARCHAR2(600 bytes)	150 / C	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/oportunidades/adapters/out/persistence/entity/OportunidadEntity.java:24
+
+	VALOR	BigDecimal	NUMBER(14,2)	0 / 	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/oportunidades/adapters/out/persistence/entity/OportunidadEntity.java:27
+
+	PROBABILIDAD	Integer	NUMBER(10,0)	0 / 	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/oportunidades/adapters/out/persistence/entity/OportunidadEntity.java:30
+
+	ETAPA	EtapaOportunidad	VARCHAR2(80 bytes)	20 / C	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/oportunidades/adapters/out/persistence/entity/OportunidadEntity.java:35
+
+	RESPONSABLE	String	VARCHAR2(400 bytes)	100 / C	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/oportunidades/adapters/out/persistence/entity/OportunidadEntity.java:38
+
+	FECHA_CIERRE	LocalDate	DATE(7 bytes)	0 / 	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/oportunidades/adapters/out/persistence/entity/OportunidadEntity.java:41
+
+	DESCRIPCION	String	VARCHAR2(2000 bytes)	500 / C	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/oportunidades/adapters/out/persistence/entity/OportunidadEntity.java:44
+
+	CREADO_EN	LocalDateTime	TIMESTAMP(9)(11 bytes)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/oportunidades/adapters/out/persistence/entity/OportunidadEntity.java:48
+
+CRM_OPORTUNIDAD_PRODUCTOS
+
+ColumnaJavaOracle observadoCaracteres / B-CNULL OracleRelaciónFuente
+
+	ID	Long	NUMBER(19,0)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/oportunidades/adapters/out/persistence/entity/OportunidadProductoEntity.java:17
+
+	ID_OPORTUNIDAD	Long	NUMBER(19,0)	0 / 	N	FK_OPP_PRODUCTO_OPP → CRM_OPORTUNIDADES.ID [ON DELETE CASCADE]	viernes-backend/src/main/java/com/viernes/oportunidades/adapters/out/persistence/entity/OportunidadProductoEntity.java:20
+
+	ID_PRODUCTO	Long	NUMBER(19,0)	0 / 	N	FK_OPP_PRODUCTO_PRODUCTO → CRM_PRODUCTOS.ID [ON DELETE CASCADE]	viernes-backend/src/main/java/com/viernes/oportunidades/adapters/out/persistence/entity/OportunidadProductoEntity.java:24
+
+	CANTIDAD	Integer	NUMBER(10,0)	0 / 	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/oportunidades/adapters/out/persistence/entity/OportunidadProductoEntity.java:27
+
+	CREADO_EN	LocalDateTime	TIMESTAMP(9)(11 bytes)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/oportunidades/adapters/out/persistence/entity/OportunidadProductoEntity.java:31
+
+CRM_PRODUCTOS
+
+ColumnaJavaOracle observadoCaracteres / B-CNULL OracleRelaciónFuente
+
+	ID	Long	NUMBER(19,0)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/productos/adapters/out/persistence/entity/ProductoEntity.java:17
+
+	CODIGO	String	VARCHAR2(200 bytes)	50 / C	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/productos/adapters/out/persistence/entity/ProductoEntity.java:20
+
+	NOMBRE	String	VARCHAR2(800 bytes)	200 / C	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/productos/adapters/out/persistence/entity/ProductoEntity.java:23
+
+	DESCRIPCION	String	VARCHAR2(4000 bytes)	1000 / C	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/productos/adapters/out/persistence/entity/ProductoEntity.java:26
+
+	CATEGORIA	String	VARCHAR2(400 bytes)	100 / C	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/productos/adapters/out/persistence/entity/ProductoEntity.java:29
+
+	PRECIO_BASE	BigDecimal	NUMBER(14,2)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/productos/adapters/out/persistence/entity/ProductoEntity.java:32
+
+	ESTADO	EstadoProducto	VARCHAR2(80 bytes)	20 / C	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/productos/adapters/out/persistence/entity/ProductoEntity.java:37
+
+	CREADO_EN	LocalDateTime	TIMESTAMP(9)(11 bytes)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/productos/adapters/out/persistence/entity/ProductoEntity.java:41
+
+CRM_PROPUESTA_DETALLES
+
+ColumnaJavaOracle observadoCaracteres / B-CNULL OracleRelaciónFuente
+
+	ID	Long	NUMBER(19,0)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/propuestas/adapters/out/persistence/entity/DetallePropuestaEntity.java:15
+
+	ID_PRODUCTO	Long	NUMBER(19,0)	0 / 	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/propuestas/adapters/out/persistence/entity/DetallePropuestaEntity.java:18
+
+	DESCRIPCION	String	VARCHAR2(2000 bytes)	500 / C	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/propuestas/adapters/out/persistence/entity/DetallePropuestaEntity.java:21
+
+	CANTIDAD	Integer	NUMBER(10,0)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/propuestas/adapters/out/persistence/entity/DetallePropuestaEntity.java:24
+
+	PRECIO_UNITARIO	BigDecimal	NUMBER(14,2)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/propuestas/adapters/out/persistence/entity/DetallePropuestaEntity.java:27
+
+	SUBTOTAL	BigDecimal	NUMBER(14,2)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/propuestas/adapters/out/persistence/entity/DetallePropuestaEntity.java:30
+
+	ID_PROPUESTA	Long (ID del padre)	NUMBER(19,0)	0 / 	N	FKLUH9M8DOGREC8EECWYQNGXIRH → CRM_PROPUESTAS.ID [ON DELETE NO ACTION]	viernes-backend/src/main/java/com/viernes/propuestas/adapters/out/persistence/entity/PropuestaEntity.java:71
+
+CRM_PROPUESTAS
+
+ColumnaJavaOracle observadoCaracteres / B-CNULL OracleRelaciónFuente
+
+	ID	Long	NUMBER(19,0)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/propuestas/adapters/out/persistence/entity/PropuestaEntity.java:20
+
+	NUMERO_PROPUESTA	String	VARCHAR2(200 bytes)	50 / C	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/propuestas/adapters/out/persistence/entity/PropuestaEntity.java:23
+
+	ID_OPORTUNIDAD	Long	NUMBER(19,0)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/propuestas/adapters/out/persistence/entity/PropuestaEntity.java:26
+
+	ID_CLIENTE	Long	NUMBER(19,0)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/propuestas/adapters/out/persistence/entity/PropuestaEntity.java:29
+
+	CLIENTE_NOMBRE	String	VARCHAR2(600 bytes)	150 / C	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/propuestas/adapters/out/persistence/entity/PropuestaEntity.java:32
+
+	ESTADO	EstadoPropuesta	VARCHAR2(80 bytes)	20 / C	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/propuestas/adapters/out/persistence/entity/PropuestaEntity.java:37
+
+	VERSION	Integer	NUMBER(10,0)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/propuestas/adapters/out/persistence/entity/PropuestaEntity.java:41
+
+	SUBTOTAL	BigDecimal	NUMBER(14,2)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/propuestas/adapters/out/persistence/entity/PropuestaEntity.java:44
+
+	DESCUENTO	BigDecimal	NUMBER(14,2)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/propuestas/adapters/out/persistence/entity/PropuestaEntity.java:48
+
+	TOTAL	BigDecimal	NUMBER(14,2)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/propuestas/adapters/out/persistence/entity/PropuestaEntity.java:51
+
+	RESPONSABLE	String	VARCHAR2(400 bytes)	100 / C	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/propuestas/adapters/out/persistence/entity/PropuestaEntity.java:54
+
+	FECHA_EMISION	LocalDate	DATE(7 bytes)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/propuestas/adapters/out/persistence/entity/PropuestaEntity.java:57
+
+	FECHA_VENCIMIENTO	LocalDate	DATE(7 bytes)	0 / 	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/propuestas/adapters/out/persistence/entity/PropuestaEntity.java:60
+
+	OBSERVACIONES	String	CLOB(4000 bytes)	0 / 	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/propuestas/adapters/out/persistence/entity/PropuestaEntity.java:64
+
+	CREADO_EN	LocalDateTime	TIMESTAMP(9)(11 bytes)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/propuestas/adapters/out/persistence/entity/PropuestaEntity.java:68
+
+CRM_USUARIOS
+
+ColumnaJavaOracle observadoCaracteres / B-CNULL OracleRelaciónFuente
+
+	ID	Long	NUMBER(19,0)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/usuarios/adapters/out/persistence/entity/UsuarioEntity.java:17
+
+	NOMBRE	String	VARCHAR2(400 bytes)	100 / C	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/usuarios/adapters/out/persistence/entity/UsuarioEntity.java:20
+
+	APELLIDO	String	VARCHAR2(400 bytes)	100 / C	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/usuarios/adapters/out/persistence/entity/UsuarioEntity.java:23
+
+	CORREO	String	VARCHAR2(600 bytes)	150 / C	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/usuarios/adapters/out/persistence/entity/UsuarioEntity.java:26
+
+	PASSWORD_HASH	String	VARCHAR2(1020 bytes)	255 / C	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/usuarios/adapters/out/persistence/entity/UsuarioEntity.java:29
+
+	ROL	RolUsuario	VARCHAR2(80 bytes)	20 / C	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/usuarios/adapters/out/persistence/entity/UsuarioEntity.java:33
+
+	ESTADO	EstadoUsuario	VARCHAR2(80 bytes)	20 / C	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/usuarios/adapters/out/persistence/entity/UsuarioEntity.java:38
+
+	CREADO_EN	LocalDateTime	TIMESTAMP(9)(11 bytes)	0 / 	N	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/usuarios/adapters/out/persistence/entity/UsuarioEntity.java:42
+
+	ACTUALIZADO_EN	LocalDateTime	TIMESTAMP(9)(11 bytes)	0 / 	Y	Sin FK observada en esta columna	viernes-backend/src/main/java/com/viernes/usuarios/adapters/out/persistence/entity/UsuarioEntity.java:45
+
+11.6 Restricciones e índices reales
+
+El catálogo físico completo se adjunta: constraints y columnas, expresiones CHECK/NOT NULL, índices y orden de columnas y IDENTITY. Los conteos de constraints se deduplican por nombre; una UK compuesta ocupa varias filas. Los índices también se cuentan por nombre, no por fila de columna.
+
+TablaPK/UK físicaTipoEstado
+
+	CRM_ACTIVIDADES	SYS_C008686	P	ENABLED
+
+	CRM_ACTIVIDAD_ETIQUETAS	SYS_C008807	P	ENABLED
+
+	CRM_ACTIVIDAD_ETIQUETAS	UK_ACTIVIDAD_ETIQUETA	U	ENABLED
+
+	CRM_ACTIVIDAD_PARTICIPANTES	SYS_C008741	P	ENABLED
+
+	CRM_ACTIVIDAD_PARTICIPANTES	UK_ACTIVIDAD_CONTACTO	U	ENABLED
+
+	CRM_CAMPANIAS	SYS_C008752	P	ENABLED
+
+	CRM_CAMPANIA_LEADS	SYS_C008746	P	ENABLED
+
+	CRM_CAMPANIA_LEADS	UK_CAMPANIA_LEAD	U	ENABLED
+
+	CRM_CANALES	SYS_C008826	P	ENABLED
+
+	CRM_CANAL_MIEMBROS	SYS_C008821	P	ENABLED
+
+	CRM_CANAL_MIEMBROS	UK_CANAL_MIEMBRO	U	ENABLED
+
+	CRM_CLIENTES	SYS_C008663	P	ENABLED
+
+	CRM_CLIENTES	UK_CRM_CLIENTES_DOCUMENTO	U	ENABLED
+
+	CRM_CONTACTOS	SYS_C008714	P	ENABLED
+
+	CRM_EQUIPOS	SYS_C008763	P	ENABLED
+
+	CRM_EQUIPOS	UKC4BY11K2MMKORBNU049JLU41D	U	ENABLED
+
+	CRM_EQUIPO_MIEMBROS	SYS_C008757	P	ENABLED
+
+	CRM_EQUIPO_MIEMBROS	UK_EQUIPO_MIEMBRO	U	ENABLED
+
+	CRM_ETIQUETAS	SYS_C008814	P	ENABLED
+
+	CRM_ETIQUETAS	UK_ETIQUETA_NOMBRE_NORMALIZADO	U	ENABLED
+
+	CRM_FUENTES	SYS_C008769	P	ENABLED
+
+	CRM_FUENTES	UKD18WFB41YYSOD3OG95TALILPJ	U	ENABLED
+
+	CRM_INTEGRACIONES	PK_CRM_INTEGRACIONES	P	ENABLED
+
+	CRM_INTEGRACIONES	UK_CRM_INTEGRACIONES_CODIGO	U	ENABLED
+
+	CRM_INTEGRACION_AUDITORIA	PK_CRM_INT_AUDITORIA	P	ENABLED
+
+	CRM_INTEGRACION_CONFIG	PK_CRM_INTEGRACION_CONFIG	P	ENABLED
+
+	CRM_INTEGRACION_CONFIG	UK_INT_CONFIG_KEY	U	ENABLED
+
+	CRM_LEADS	SYS_C008669	P	ENABLED
+
+	CRM_MENSAJES	SYS_C008798	P	ENABLED
+
+	CRM_OPORTUNIDADES	SYS_C008675	P	ENABLED
+
+	CRM_OPORTUNIDAD_COLABORADORES	SYS_C008779	P	ENABLED
+
+	CRM_OPORTUNIDAD_COLABORADORES	UK_OPORTUNIDAD_COLABORADOR	U	ENABLED
+
+	CRM_OPORTUNIDAD_CONTACTOS	SYS_C008784	P	ENABLED
+
+	CRM_OPORTUNIDAD_CONTACTOS	UK_OPORTUNIDAD_CONTACTO	U	ENABLED
+
+	CRM_OPORTUNIDAD_PRODUCTOS	SYS_C008789	P	ENABLED
+
+	CRM_OPORTUNIDAD_PRODUCTOS	UK_OPORTUNIDAD_PRODUCTO	U	ENABLED
+
+	CRM_PRODUCTOS	SYS_C008735	P	ENABLED
+
+	CRM_PRODUCTOS	UK7KDONBJCMECGK3BJCXVDU3R7I	U	ENABLED
+
+	CRM_PROPUESTAS	SYS_C008707	P	ENABLED
+
+	CRM_PROPUESTAS	UKLRNFV25L86IL47UT17G1G9KMG	U	ENABLED
+
+	CRM_PROPUESTA_DETALLES	SYS_C008694	P	ENABLED
+
+	CRM_USUARIOS	SYS_C008726	P	ENABLED
+
+	CRM_USUARIOS	UKDE4H15O1FDUMJYSNXFC3TQ4X3	U	ENABLED
+
+	CRM_USUARIOS	UK_CRM_USUARIOS_KEYCLOAK_SUB	U	ENABLED
+
+11.7 Alcance y reproducibilidad de la consulta
+
+Se consultaron únicamente metadatos USER_* y contexto de sesión: no se extrajeron datos de clientes o usuarios, no se inició Spring y no se aplicó ninguna migración. Cada consulta se delimitó con SET TRANSACTION READ ONLY y ROLLBACK. El archivo manifest Oracle registra sentencias, fecha y SHA-256 de las salidas sin credenciales. Como son consultas en transacciones separadas, no se afirma una instantánea SCN común a todo el catálogo.
+
+Advertencia sobre la prueba anterior: el log de contextLoads conecta a Oracle con dev/keycloak y ddl-auto:update. Esa ejecución no es certificable como estrictamente de solo lectura; se conserva como resultado de pruebas, sin asegurar que no emitiera DDL. No se volvió a ejecutar la suite.
+Documentación técnica, no aprobación de usuarios. Archivos fuente y líneas corresponden al árbol de trabajo local; no se atribuyen al último commit.
+VIERNES CRM V1 · Evidencias académicas · 11/11/2026
+Encargo docente ↔ implementación comprobada en E:\Viernes\Viernes
+05. Criterios de aceptación
+
+Criterios propuestos, sin validación de usuarios. No se localizó el Word ni el catálogo original de RF/HU. Los identificadores HU-004, HU-005, HU-008, HU-016 y HU-017 no pueden vincularse responsablemente a una funcionalidad sin su enunciado. Este apartado deja esos cinco pendientes explícitos y aporta 20 historias técnicas derivadas, con 60 escenarios listos para contrastar. Los códigos RF-D/HU-D son nuevos identificadores documentales, no los oficiales.
+
+05.1 Pendientes originales y control de correspondencia
+
+HU originalQué faltaEstado
+
+	HU-004	Enunciado, actor, objetivo, RF relacionado y reglas del documento fuente.	Pendiente de correspondencia; no aprobada
+
+	HU-005	Enunciado, actor, objetivo, RF relacionado y reglas del documento fuente.	Pendiente de correspondencia; no aprobada
+
+	HU-008	Enunciado, actor, objetivo, RF relacionado y reglas del documento fuente.	Pendiente de correspondencia; no aprobada
+
+	HU-016	Enunciado, actor, objetivo, RF relacionado y reglas del documento fuente.	Pendiente de correspondencia; no aprobada
+
+	HU-017	Enunciado, actor, objetivo, RF relacionado y reglas del documento fuente.	Pendiente de correspondencia; no aprobada
+
+No se asegura haber revisado “las demás HU” originales: tampoco están disponibles. La revisión siguiente cubre capacidades observadas, con escenarios positivos, negativos y alternativos. Al recibir el catálogo, se conservan los IDs originales, se asigna equivalencia y se resuelven diferencias; no basta renumerar automáticamente. Véase registro de correspondencia.
+
+05.2 Condiciones comunes de evaluación
+
+Las operaciones protegidas requieren autenticación; escritura de catálogos y decisiones críticas exige los roles del perfil keycloak. Datos e identificadores son sintéticos. 400 significa entrada/regla inválida, 404 recurso ausente, 409 estado o integridad incompatible y 403 permiso insuficiente. Las precondiciones requieren entorno y fixtures adecuados. Cada escenario describe comportamiento esperado derivado del código, no un resultado ejecutado; la sección 12 identifica exactamente qué aserciones tienen evidencia.
+
+HU-D01 · Autorizar operaciones por rol
+
+Historia técnica propuesta: Como Usuario autenticado, quiero autorizar operaciones por rol, para gestionar esa capacidad del CRM con reglas verificables. Correspondencia provisional: RF-D01.
+
+viernes-backend/src/main/java/com/viernes/auth/keycloak/KeycloakSecurityConfig.java:121
+
+CA-D01-P · Positivo
+
+Dado un JWT válido de ADMIN; cuando se solicita escribir usuarios; entonces la regla de seguridad permite continuar; todavía aplican validaciones de negocio.
+
+CA-D01-N · Negativo
+
+Dado un JWT de VENDEDOR y perfil keycloak; cuando se solicita aprobar una propuesta; entonces se rechaza con 403, sin ejecutar la operación protegida.
+
+CA-D01-A · Alternativo
+
+Dado una petición a una API protegida sin JWT válido; cuando se solicita acceso; entonces se responde 401; los endpoints públicos configurados son excepción.
+
+HU-D02 · Administrar usuarios CRM
+
+Historia técnica propuesta: Como ADMIN, quiero administrar usuarios crm, para gestionar esa capacidad del CRM con reglas verificables. Correspondencia provisional: RF-D02.
+
+viernes-backend/src/main/java/com/viernes/usuarios/application/service/UsuarioService.java:47
+
+CA-D02-P · Positivo
+
+Dado correo no registrado y datos válidos; cuando se crea un usuario CRM; entonces se guarda ACTIVO con passwordHash codificado; no se presupone alta en Keycloak.
+
+CA-D02-N · Negativo
+
+Dado correo ya registrado o contraseña vacía al crear; cuando se solicita el alta; entonces se rechaza con IllegalArgumentException (400 por handler).
+
+CA-D02-A · Alternativo
+
+Dado usuario existente; cuando se actualiza sin una nueva contraseña; entonces se conserva el hash anterior y se actualiza la fecha de modificación.
+
+HU-D03 · Registrar y mantener clientes
+
+Historia técnica propuesta: Como Usuario autenticado, quiero registrar y mantener clientes, para gestionar esa capacidad del CRM con reglas verificables. Correspondencia provisional: RF-D03.
+
+viernes-backend/src/main/java/com/viernes/clientes/application/service/ClienteService.java:79
+
+CA-D03-P · Positivo
+
+Dado datos válidos y documento no duplicado; cuando se crea el cliente sin estado explícito; entonces se guarda ACTIVO y con fecha de creación.
+
+CA-D03-N · Negativo
+
+Dado un documento ya registrado; cuando se solicita crear otro cliente con ese número; entonces se rechaza la duplicidad según validación del servicio.
+
+CA-D03-A · Alternativo
+
+Dado ningún tipo ni número de documento; cuando se crea un cliente con el resto de datos válidos; entonces se permite el registro sin consulta externa; desactivar es distinto de eliminar.
+
+HU-D04 · Mantener contactos de cliente
+
+Historia técnica propuesta: Como Usuario autenticado, quiero mantener contactos de cliente, para gestionar esa capacidad del CRM con reglas verificables. Correspondencia provisional: RF-D04.
+
+viernes-backend/src/main/java/com/viernes/clientes/application/service/ClienteService.java:119
+
+CA-D04-P · Positivo
+
+Dado cliente existente y contacto válido; cuando se agrega el contacto; entonces se guarda dentro de la colección del cliente y se devuelve el contacto.
+
+CA-D04-N · Negativo
+
+Dado contacto que no pertenece al cliente solicitado; cuando se intenta actualizar; entonces se devuelve 404 y no se modifica un contacto ajeno.
+
+CA-D04-A · Alternativo
+
+Dado contacto existente y principal omitido en actualización; cuando se actualizan sus otros datos; entonces se conserva el valor anterior de principal.
+
+HU-D05 · Consultar DNI/RUC de forma controlada
+
+Historia técnica propuesta: Como Usuario autenticado, quiero consultar dni/ruc de forma controlada, para gestionar esa capacidad del CRM con reglas verificables. Correspondencia provisional: RF-D05.
+
+viernes-backend/src/main/java/com/viernes/clientes/application/service/ClienteService.java:67
+
+CA-D05-P · Positivo
+
+Dado DNI/RUC válido y proveedor simulado con datos; cuando se solicita consultar documento; entonces el backend devuelve el DTO de consulta; no crea el cliente automáticamente.
+
+CA-D05-N · Negativo
+
+Dado número incompatible con el tipo; cuando se solicita consultar; entonces se rechaza antes de consumir el puerto externo.
+
+CA-D05-A · Alternativo
+
+Dado consulta repetida cubierta por caché; cuando se consulta la misma clave dentro del TTL; entonces el proxy de caché puede reutilizar respuesta; el 404 negativo dura 10 min, no es una aprobación de la identidad.
+
+HU-D06 · Registrar leads y cambiar estado
+
+Historia técnica propuesta: Como Usuario autenticado, quiero registrar leads y cambiar estado, para gestionar esa capacidad del CRM con reglas verificables. Correspondencia provisional: RF-D06.
+
+viernes-backend/src/main/java/com/viernes/leads/application/service/LeadService.java:47
+
+CA-D06-P · Positivo
+
+Dado datos válidos sin estado; cuando se crea un lead; entonces el estado inicial es NUEVO.
+
+CA-D06-N · Negativo
+
+Dado fuenteId inexistente; cuando se registra o actualiza el lead; entonces se rechaza con ResourceNotFoundException (404).
+
+CA-D06-A · Alternativo
+
+Dado lead existente incluso DESCARTADO; cuando se solicita estado CONVERTIDO u otro enum válido; entonces se asigna ese estado sin crear oportunidad; no hay guardas de ciclo.
+
+HU-D07 · Mantener fuentes de captación
+
+Historia técnica propuesta: Como JEFE / ADMIN, quiero mantener fuentes de captación, para gestionar esa capacidad del CRM con reglas verificables. Correspondencia provisional: RF-D07.
+
+viernes-backend/src/main/java/com/viernes/leads/application/service/FuenteService.java:39
+
+CA-D07-P · Positivo
+
+Dado código único y datos válidos; cuando se crea una fuente sin activa explícita; entonces se guarda activa=true.
+
+CA-D07-N · Negativo
+
+Dado código ya existente; cuando se solicita crear otra fuente; entonces se rechaza por duplicidad en el servicio.
+
+CA-D07-A · Alternativo
+
+Dado fuente existente; cuando se cambia activa=false mediante actualización; entonces se conserva el registro, distinto de eliminarlo físicamente.
+
+HU-D08 · Registrar oportunidades y etapas
+
+Historia técnica propuesta: Como Usuario autenticado, quiero registrar oportunidades y etapas, para gestionar esa capacidad del CRM con reglas verificables. Correspondencia provisional: RF-D08.
+
+viernes-backend/src/main/java/com/viernes/oportunidades/application/service/OportunidadService.java:69
+
+CA-D08-P · Positivo
+
+Dado datos válidos sin etapa; cuando se crea una oportunidad; entonces se guarda PROSPECCION; no se exige que provenga de un lead.
+
+CA-D08-N · Negativo
+
+Dado ID de oportunidad inexistente; cuando se solicita cambiar etapa; entonces se devuelve 404.
+
+CA-D08-A · Alternativo
+
+Dado oportunidad GANADA o PERDIDA; cuando se solicita otra etapa válida; entonces se permite reapertura y no se recalcula probabilidad por la etapa.
+
+HU-D09 · Asociar contactos, productos y colaboradores
+
+Historia técnica propuesta: Como Usuario autenticado, quiero asociar contactos, productos y colaboradores, para gestionar esa capacidad del CRM con reglas verificables. Correspondencia provisional: RF-D09.
+
+viernes-backend/src/main/java/com/viernes/oportunidades/application/service/OportunidadService.java:108
+
+CA-D09-P · Positivo
+
+Dado oportunidad y contacto existentes no asociados; cuando se agrega el contacto; entonces se guarda rol y esDecisor (false por defecto).
+
+CA-D09-N · Negativo
+
+Dado el mismo par oportunidad-contacto ya existe; cuando se intenta agregar nuevamente; entonces se rechaza con 400; productos y colaboradores también verifican duplicidad.
+
+CA-D09-A · Alternativo
+
+Dado asociación existente; cuando se actualiza solo rol o esDecisor; entonces solo cambian los campos no nulos; no se actualiza el contacto maestro.
+
+HU-D10 · Crear propuesta válida
+
+Historia técnica propuesta: Como Usuario autenticado, quiero crear propuesta válida, para gestionar esa capacidad del CRM con reglas verificables. Correspondencia provisional: RF-D10.
+
+viernes-backend/src/main/java/com/viernes/propuestas/application/service/PropuestaService.java:32
+
+CA-D10-P · Positivo
+
+Dado cliente y oportunidad existentes; detalle de 3 × 250, descuento 10; cuando se crea con producto de catálogo y sin descripción/precio; entonces se guarda BORRADOR, subtotal 750 y total 740; se copia descripción/precio del catálogo.
+
+CA-D10-N · Negativo
+
+Dado oportunidad inexistente; cuando se solicita crear una propuesta; entonces se lanza 404 y no se invoca save.
+
+CA-D10-A · Alternativo
+
+Dado detalle libre sin productoId pero con descripción/precio; cuando se crea la propuesta; entonces no se consulta el catálogo y se conservan los datos del detalle.
+
+HU-D11 · Editar y resolver una propuesta
+
+Historia técnica propuesta: Como Usuario para editar/enviar; JEFE/ADMIN para decidir, quiero editar y resolver una propuesta, para gestionar esa capacidad del CRM con reglas verificables. Correspondencia provisional: RF-D11.
+
+viernes-backend/src/main/java/com/viernes/propuestas/application/service/PropuestaService.java:118
+
+CA-D11-P · Positivo
+
+Dado propuesta BORRADOR; cuando se solicita enviar; entonces se persiste ENVIADA; no se demuestra entrega de correo.
+
+CA-D11-N · Negativo
+
+Dado propuesta ENVIADA; cuando se intenta editar; entonces se rechaza por estado incompatible (409 por handler).
+
+CA-D11-A · Alternativo
+
+Dado propuesta BORRADOR y actor autorizado; cuando se solicita cancelar; entonces se guarda CANCELADA; una APROBADA no puede cancelarse.
+
+HU-D12 · Conservar snapshot comercial del detalle
+
+Historia técnica propuesta: Como Usuario autenticado, quiero conservar snapshot comercial del detalle, para gestionar esa capacidad del CRM con reglas verificables. Correspondencia provisional: RF-D12.
+
+viernes-backend/src/main/java/com/viernes/propuestas/application/service/PropuestaService.java:220
+
+CA-D12-P · Positivo
+
+Dado producto existente y descripción/precio personalizados; cuando se crea el detalle con override; entonces se respetan los valores comerciales enviados, sin sustituirlos por catálogo.
+
+CA-D12-N · Negativo
+
+Dado productoId inexistente; cuando se crea la propuesta; entonces se lanza 404 y no se persiste.
+
+CA-D12-A · Alternativo
+
+Dado propuesta BORRADOR con un nuevo producto; cuando se actualizan los detalles sin precio/descripcion; entonces se completa desde catálogo y se recalculan subtotal y total.
+
+HU-D13 · Gestionar actividades y participantes
+
+Historia técnica propuesta: Como Usuario autenticado, quiero gestionar actividades y participantes, para gestionar esa capacidad del CRM con reglas verificables. Correspondencia provisional: RF-D13.
+
+viernes-backend/src/main/java/com/viernes/actividades/application/service/ActividadService.java:63
+
+CA-D13-P · Positivo
+
+Dado referencias válidas y datos obligatorios; cuando se crea una actividad sin estado explícito; entonces se guarda PENDIENTE y se sincronizan las etiquetas.
+
+CA-D13-N · Negativo
+
+Dado un contacto ya es participante de la actividad; cuando se solicita agregar el mismo par; entonces se rechaza con 400.
+
+CA-D13-A · Alternativo
+
+Dado actividad existente; cuando se actualiza omitiendo etiquetaIds; entonces se conservan las etiquetas; enviar lista vacía pide reemplazarlas por ninguna.
+
+HU-D14 · Normalizar y archivar etiquetas
+
+Historia técnica propuesta: Como JEFE / ADMIN, quiero normalizar y archivar etiquetas, para gestionar esa capacidad del CRM con reglas verificables. Correspondencia provisional: RF-D14.
+
+viernes-backend/src/main/java/com/viernes/etiquetas/application/service/EtiquetaService.java:60
+
+CA-D14-P · Positivo
+
+Dado nombre nuevo y color omitido; cuando se crea una etiqueta; entonces se normaliza el nombre, se guarda activa y se usa #2563EB.
+
+CA-D14-N · Negativo
+
+Dado otro nombre equivalente tras quitar tildes y normalizar espacios/mayúsculas; cuando se intenta crear etiqueta; entonces se rechaza por nombre normalizado duplicado.
+
+CA-D14-A · Alternativo
+
+Dado etiqueta existente; cuando se solicita eliminar; entonces se archiva con activa=false, conservando el registro y el histórico.
+
+HU-D15 · Mantener catálogo de productos
+
+Historia técnica propuesta: Como JEFE / ADMIN, quiero mantener catálogo de productos, para gestionar esa capacidad del CRM con reglas verificables. Correspondencia provisional: RF-D15.
+
+viernes-backend/src/main/java/com/viernes/productos/application/service/ProductoService.java:50
+
+CA-D15-P · Positivo
+
+Dado código nuevo y DTO válido; cuando se crea producto sin estado; entonces se guarda ACTIVO.
+
+CA-D15-N · Negativo
+
+Dado código duplicado; cuando se solicita crear otro producto; entonces se rechaza con 400.
+
+CA-D15-A · Alternativo
+
+Dado producto existente; cuando se actualiza manteniendo su código; entonces no se rechaza por duplicidad consigo mismo y se invalida caché de productos.
+
+HU-D16 · Gestionar equipos y miembros
+
+Historia técnica propuesta: Como JEFE / ADMIN, quiero gestionar equipos y miembros, para gestionar esa capacidad del CRM con reglas verificables. Correspondencia provisional: RF-D16.
+
+viernes-backend/src/main/java/com/viernes/equipos/application/service/EquipoService.java:99
+
+CA-D16-P · Positivo
+
+Dado equipo y usuario existentes no asociados; cuando se agrega el miembro; entonces se guarda la asociación equipo-usuario.
+
+CA-D16-N · Negativo
+
+Dado usuario ya miembro del equipo; cuando se agrega nuevamente; entonces se rechaza con 400.
+
+CA-D16-A · Alternativo
+
+Dado equipo activo existente; cuando se desactiva; entonces se guarda INACTIVO sin borrar miembros; eliminar es una operación distinta.
+
+HU-D17 · Gestionar campañas y sus leads
+
+Historia técnica propuesta: Como JEFE / ADMIN, quiero gestionar campañas y sus leads, para gestionar esa capacidad del CRM con reglas verificables. Correspondencia provisional: RF-D17.
+
+viernes-backend/src/main/java/com/viernes/marketing/application/service/CampaniaService.java:76
+
+CA-D17-P · Positivo
+
+Dado campaña y lead existentes no asociados; cuando se asocia el lead; entonces se guarda la relación campaña-lead.
+
+CA-D17-N · Negativo
+
+Dado par campaña-lead ya registrado; cuando se asocia nuevamente; entonces se rechaza con 400.
+
+CA-D17-A · Alternativo
+
+Dado asociación existente; cuando se desasocia el lead; entonces se elimina solo la asociación, no el lead maestro.
+
+HU-D18 · Consultar indicadores del dashboard
+
+Historia técnica propuesta: Como Usuario autenticado, quiero consultar indicadores del dashboard, para gestionar esa capacidad del CRM con reglas verificables. Correspondencia provisional: RF-D18.
+
+viernes-backend/src/main/java/com/viernes/dashboard/application/service/DashboardService.java:18
+
+CA-D18-P · Positivo
+
+Dado datos disponibles en el puerto de consulta; cuando se obtiene resumen; entonces se integran clientes, leads, oportunidades, actividades y propuestas.
+
+CA-D18-N · Negativo
+
+Dado falla del puerto al calcular un indicador; cuando se consulta el resumen sin caché válida; entonces no se inventa éxito ni se sustituye todo por cifras cero; el error sigue el handler.
+
+CA-D18-A · Alternativo
+
+Dado sumValorPropuestasAprobadas devuelve null; cuando se consulta ese resumen; entonces valorTotalAprobadas se representa como cero.
+
+HU-D19 · Consultar mapa de relaciones
+
+Historia técnica propuesta: Como Usuario autenticado, quiero consultar mapa de relaciones, para gestionar esa capacidad del CRM con reglas verificables. Correspondencia provisional: RF-D19.
+
+viernes-backend/src/main/java/com/viernes/relationshipmap/application/service/RelationshipMapService.java:47
+
+CA-D19-P · Positivo
+
+Dado fixture de cliente, contacto, oportunidad, actividad y propuesta; cuando se obtiene mapa del cliente; entonces se devuelven raíz CLIENTE:1, cinco nodos y cuatro aristas en ese fixture, no como cantidad universal.
+
+CA-D19-N · Negativo
+
+Dado cliente solicitado inexistente; cuando se consulta su mapa; entonces se propaga ResourceNotFoundException (404 en API).
+
+CA-D19-A · Alternativo
+
+Dado contacto existente con relaciones; cuando se expande CONTACTO; entonces el subgrafo contiene cliente, oportunidad y actividad según las asociaciones existentes.
+
+HU-D20 · Enviar y consultar mensajería interna
+
+Historia técnica propuesta: Como Usuario autenticado, quiero enviar y consultar mensajería interna, para gestionar esa capacidad del CRM con reglas verificables. Correspondencia provisional: RF-D20.
+
+viernes-backend/src/main/java/com/viernes/mensajeria/application/service/MensajeService.java:29
+
+CA-D20-P · Positivo
+
+Dado correo del emisor disponible y contenido válido; cuando se envía mensaje; entonces se guarda el contenido recortado y la identidad visible del emisor.
+
+CA-D20-N · Negativo
+
+Dado contenido vacío tras trim o mayor de 2000 caracteres; cuando se envía mensaje; entonces se rechaza con 400.
+
+CA-D20-A · Alternativo
+
+Dado despuesDeId y límite mayor de 100; cuando se solicitan mensajes; entonces se usa consulta incremental con límite ajustado a 100; no es WebSocket.
+
+05.3 Reglas que no deben declararse implementadas
+
+No se exige secuencia estricta de estados de lead/oportunidad; no hay conversión automática ni cierre automático tras aprobar propuesta. No se demuestra envío por correo, aceptación del cliente, integración contable, venta o notificación persistente. El descuento de propuesta puede superar el subtotal porque el código resta ambos sin guarda de techo: una política de total no negativo sería una decisión/requisito adicional, no un criterio actualmente satisfecho. No se presume que el usuario CRM sea una cuenta sincronizada de Keycloak.
+
+05.4 Registro de validación
+
+Todos los criterios permanecen propuestos. Para aprobar: revisar enunciado original, datos de prueba, pasos, resultado observado y evidencia; registrar nombre/rol del validador, fecha, versión y decisión. Una prueba JUnit verde no reemplaza esa validación.
+
+Descargar los 60 escenarios editables
+Documentación técnica, no aprobación de usuarios. Archivos fuente y líneas corresponden al árbol de trabajo local; no se atribuyen al último commit.
+VIERNES CRM V1 · Evidencias académicas · 11/11/2026
+Encargo docente ↔ implementación comprobada en E:\Viernes\Viernes
+12. Pruebas y trazabilidad
+
+291 tests, 0 fallos, 0 errores, 0 omitidos en 32 clases. La ejecución ya registrada finalizó el 11/11/2026 a las 09:46:08 −05:00, duración informada por Maven 38,405 s. Se comprobó el log y se cruzaron los 291 testcases de Surefire con métodos @Test existentes. Esta continuación reutiliza ese resultado; no se volvió a ejecutar la suite.
+
+12.1 Procedencia y límites
+
+Extracto verificable del log · Resultados JUnit sanitizados · Hashes de reportes originales. Se excluyen properties y salidas potencialmente sensibles de los XML. PASS significa únicamente que las aserciones existentes no fallaron.
+
+La prueba contextLoads sí conectó a Oracle; no prueba transacciones comerciales ni integridad de todas las relaciones. Además, el perfil dev usa ddl-auto:update: aquella ejecución no se puede presentar como estrictamente de solo lectura ni certificar que no generó DDL. No hay evidencia para atribuirle cambios concretos. Por seguridad no se repitió. La extracción posterior de metadatos de la sección 11 sí usó exclusivamente SELECT/READ ONLY.
+
+viernes-backend/src/test/java/com/viernes/ViernesApplicationTests.java:6
+viernes-backend/src/main/resources/application-dev.yml:13
+viernes-backend/src/test/java/com/viernes/propuestas/adapters/in/web/PropuestaControllerTest.java:51
+
+12.2 Inventario existente y ejecutado
+
+291 métodos con fuente, resultado y nivel · Resumen por clase. El conteo no es porcentaje de cobertura de líneas ni de requisitos; no se presentó un informe JaCoCo ni UAT.
+
+ClaseTestsFallosErroresOmitidosSegundos
+
+	com.viernes.actividades.adapters.in.web.ActividadControllerTest	14	0	0	0	9.15
+
+	com.viernes.actividades.adapters.out.persistence.ActividadEtiquetaPersistenceAdapterTest	2	0	0	0	0.219
+
+	com.viernes.actividades.application.service.ActividadServiceTest	18	0	0	0	0.346
+
+	com.viernes.clientes.adapters.in.web.ClienteControllerTest	17	0	0	0	0.906
+
+	com.viernes.clientes.adapters.out.external.ApisPeruDocumentoAdapterTest	8	0	0	0	0.538
+
+	com.viernes.clientes.application.service.ClienteServiceTest	25	0	0	0	0.284
+
+	com.viernes.dashboard.adapters.in.web.DashboardControllerTest	5	0	0	0	0.173
+
+	com.viernes.dashboard.application.service.DashboardServiceTest	3	0	0	0	0.099
+
+	com.viernes.equipos.adapters.in.web.EquipoControllerTest	13	0	0	0	0.285
+
+	com.viernes.equipos.application.service.EquipoServiceTest	13	0	0	0	0.166
+
+	com.viernes.etiquetas.application.service.EtiquetaServiceTest	5	0	0	0	0.023
+
+	com.viernes.leads.adapters.in.web.FuenteControllerTest	9	0	0	0	0.164
+
+	com.viernes.leads.adapters.in.web.LeadControllerTest	11	0	0	0	0.221
+
+	com.viernes.leads.application.service.FuenteServiceTest	8	0	0	0	0.073
+
+	com.viernes.leads.application.service.LeadServiceTest	8	0	0	0	0.073
+
+	com.viernes.marketing.adapters.in.web.CampaniaControllerTest	13	0	0	0	0.258
+
+	com.viernes.marketing.application.service.CampaniaServiceTest	13	0	0	0	0.147
+
+	com.viernes.mensajeria.adapters.in.web.MensajeControllerTest	5	0	0	0	0.145
+
+	com.viernes.mensajeria.application.service.MensajeServiceTest	6	0	0	0	0.124
+
+	com.viernes.ModularityTests	2	0	0	0	4.301
+
+	com.viernes.oportunidades.adapters.in.web.OportunidadControllerTest	10	0	0	0	0.184
+
+	com.viernes.oportunidades.application.service.OportunidadServiceTest	5	0	0	0	0.287
+
+	com.viernes.oportunidades.domain.OportunidadTest	5	0	0	0	0.003
+
+	com.viernes.productos.adapters.in.web.ProductoControllerTest	11	0	0	0	0.138
+
+	com.viernes.productos.application.service.ProductoServiceTest	9	0	0	0	0.048
+
+	com.viernes.propuestas.adapters.in.web.PropuestaControllerTest	7	0	0	0	0.189
+
+	com.viernes.propuestas.application.service.PropuestaServiceTest	15	0	0	0	0.112
+
+	com.viernes.relationshipmap.RelationshipMapServiceTest	7	0	0	0	0.02
+
+	com.viernes.shared.ratelimit.ConsultaDocumentoRateLimiterTest	4	0	0	0	0.012
+
+	com.viernes.usuarios.adapters.in.web.UsuarioControllerTest	9	0	0	0	0.127
+
+	com.viernes.usuarios.application.service.UsuarioServiceTest	10	0	0	0	0.096
+
+	com.viernes.ViernesApplicationTests	1	0	0	0	11.251
+
+12.3 Matriz RF–HU–casos de prueba
+
+RF-D/HU-D son una correspondencia técnica provisional; los RF/HU del documento académico no están disponibles. La matriz tiene 60 escenarios propuestos. Doce poseen una vinculación puntual a tests existentes cuyas aserciones fueron revisadas y cuyo PASS está en Surefire; no se amplía su cobertura más allá de esas aserciones. Los otros 48 no se declaran fallidos ni inexistentes: falta vincular o ejecutar la aceptación. Véase matriz completa editable.
+
+RF / HUCasoPrueba existenteEstado y límite
+
+	RF-D01 / HU-D01	CP-D01-P	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D01 / HU-D01	CP-D01-N	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D01 / HU-D01	CP-D01-A	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D02 / HU-D02	CP-D02-P	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D02 / HU-D02	CP-D02-N	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D02 / HU-D02	CP-D02-A	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D03 / HU-D03	CP-D03-P	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D03 / HU-D03	CP-D03-N	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D03 / HU-D03	CP-D03-A	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D04 / HU-D04	CP-D04-P	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D04 / HU-D04	CP-D04-N	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D04 / HU-D04	CP-D04-A	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D05 / HU-D05	CP-D05-P	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D05 / HU-D05	CP-D05-N	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D05 / HU-D05	CP-D05-A	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D06 / HU-D06	CP-D06-P	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D06 / HU-D06	CP-D06-N	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D06 / HU-D06	CP-D06-A	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D07 / HU-D07	CP-D07-P	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D07 / HU-D07	CP-D07-N	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D07 / HU-D07	CP-D07-A	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D08 / HU-D08	CP-D08-P	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D08 / HU-D08	CP-D08-N	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D08 / HU-D08	CP-D08-A	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D09 / HU-D09	CP-D09-P	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D09 / HU-D09	CP-D09-N	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D09 / HU-D09	CP-D09-A	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D10 / HU-D10	CP-D10-P	com.viernes.propuestas.application.service.PropuestaServiceTest#crear_conProductoValido_prefillDesdeCatalogo	EXISTENTE Y EJECUTADO: PASS (alcance acotado)
+Comprueba snapshot 250, subtotal 750 y total 740 con ArgumentCaptor; no Oracle.
+
+	RF-D10 / HU-D10	CP-D10-N	com.viernes.propuestas.application.service.PropuestaServiceTest#crear_oportunidadInexistente_lanzaNotFound	EXISTENTE Y EJECUTADO: PASS (alcance acotado)
+Comprueba excepción y never().save; HTTP 404 deriva del handler, no de este test.
+
+	RF-D10 / HU-D10	CP-D10-A	com.viernes.propuestas.application.service.PropuestaServiceTest#crear_detalleLibreSinProducto_noConsultaCatalogo	EXISTENTE Y EJECUTADO: PASS (alcance acotado)
+Comprueba ausencia de consulta al catálogo; no un E2E.
+
+	RF-D11 / HU-D11	CP-D11-P	com.viernes.propuestas.application.service.PropuestaServiceTest#enviar_desdeBorrador_cambiaEstado	EXISTENTE Y EJECUTADO: PASS (alcance acotado)
+Comprueba ENVIADA; no autorización ni correo.
+
+	RF-D11 / HU-D11	CP-D11-N	com.viernes.propuestas.application.service.PropuestaServiceTest#actualizar_enEnviada_lanzaConflict	EXISTENTE Y EJECUTADO: PASS (alcance acotado)
+Comprueba IllegalStateException y no save; el código HTTP 409 no se evalúa aquí.
+
+	RF-D11 / HU-D11	CP-D11-A	com.viernes.propuestas.application.service.PropuestaServiceTest#cancelar_desdeBorrador_cambiaEstado	EXISTENTE Y EJECUTADO: PASS (alcance acotado)
+Comprueba CANCELADA desde BORRADOR; complemento cancelar_desdeAprobada_lanzaException verifica rechazo.
+
+	RF-D12 / HU-D12	CP-D12-P	com.viernes.propuestas.application.service.PropuestaServiceTest#crear_conProductoYOverride_respetaValoresEnviados	EXISTENTE Y EJECUTADO: PASS (alcance acotado)
+Captura descripción/precio personalizados en save.
+
+	RF-D12 / HU-D12	CP-D12-N	com.viernes.propuestas.application.service.PropuestaServiceTest#crear_conProductoInexistente_lanzaNotFound	EXISTENTE Y EJECUTADO: PASS (alcance acotado)
+Comprueba excepción y no persistencia con puerto mock.
+
+	RF-D12 / HU-D12	CP-D12-A	com.viernes.propuestas.application.service.PropuestaServiceTest#actualizar_conProductoNuevo_aplicaPrefillYRecalculaTotales	EXISTENTE Y EJECUTADO: PASS (alcance acotado)
+Comprueba prefill y total 990 en objeto capturado.
+
+	RF-D13 / HU-D13	CP-D13-P	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D13 / HU-D13	CP-D13-N	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D13 / HU-D13	CP-D13-A	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D14 / HU-D14	CP-D14-P	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D14 / HU-D14	CP-D14-N	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D14 / HU-D14	CP-D14-A	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D15 / HU-D15	CP-D15-P	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D15 / HU-D15	CP-D15-N	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D15 / HU-D15	CP-D15-A	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D16 / HU-D16	CP-D16-P	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D16 / HU-D16	CP-D16-N	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D16 / HU-D16	CP-D16-A	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D17 / HU-D17	CP-D17-P	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D17 / HU-D17	CP-D17-N	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D17 / HU-D17	CP-D17-A	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D18 / HU-D18	CP-D18-P	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D18 / HU-D18	CP-D18-N	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D18 / HU-D18	CP-D18-A	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D19 / HU-D19	CP-D19-P	com.viernes.relationshipmap.RelationshipMapServiceTest#obtenerMapaCliente_Exitoso	EXISTENTE Y EJECUTADO: PASS (alcance acotado)
+Comprueba cinco nodos y cuatro aristas para fixture; no universal.
+
+	RF-D19 / HU-D19	CP-D19-N	com.viernes.relationshipmap.RelationshipMapServiceTest#obtenerMapaCliente_NoEncontrado_LanzaExcepcion	EXISTENTE Y EJECUTADO: PASS (alcance acotado)
+Comprueba excepción, no HTTP ni conexión Oracle.
+
+	RF-D19 / HU-D19	CP-D19-A	com.viernes.relationshipmap.RelationshipMapServiceTest#expandirNodo_Contacto_Exitoso	EXISTENTE Y EJECUTADO: PASS (alcance acotado)
+Comprueba asociaciones en subgrafo; no interfaz Cytoscape.
+
+	RF-D20 / HU-D20	CP-D20-P	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D20 / HU-D20	CP-D20-N	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+	RF-D20 / HU-D20	CP-D20-A	Sin vinculación puntual verificada; consultar inventario del módulo	ESPECIFICADO, NO EJECUTADO COMO ACEPTACIÓN
+Puede haber pruebas unitarias relacionadas; no se afirma cobertura ni ausencia solo por el nombre.
+
+12.4 Pruebas faltantes o sin evidencia específica
+
+IDTrazabilidad provisionalEscenarioQué falta
+
+	CP-F01	RF-D01 / HU-D01	JWT ausente/expirado y VENDEDOR contra aprobación o escritura de usuarios	E2E/seguridad con cadena real Keycloak; MockMvc standalone no acredita roles
+
+	CP-F02	RF-D10 / HU-D10	Dos creaciones concurrentes con el mismo correlativo COUNT+1	Concurrencia con Oracle y captura de conflicto/reintento; sin evidencia específica localizada
+
+	CP-F03	RF-D10 / HU-D10	Vencimiento anterior a emisión, descuento mayor al subtotal y detalles al límite	Casos de borde; decidir con equipo si total negativo debe prohibirse antes de cambiar expectativa
+
+	CP-F04	RF-D06 / HU-D06	Marcar lead CONVERTIDO y comprobar que no crea oportunidad	Integración de módulos; ausencia de endpoint de conversión no sustituye ejecución
+
+	CP-F05	RF-D08 / HU-D08	Cambiar etapa GANADA a PROSPECCION y verificar probabilidad independiente	Caso alternativo de negocio; sin aceptación ejecutada documentada
+
+	CP-F06	RF-D19 / HU-D19	Expandir, colapsar y reexpandir grafo sin duplicar nodos en Angular	E2E frontend; los siete tests backend no prueban interacción visual
+
+	CP-F07	RF-D05 / HU-D05	Caché con proxy real, expiración, rate-limit y errores del proveedor	Integración controlada con servidor simulado; no consumir cuota sin autorización
+
+	CP-F08	RF-D09 / HU-D09	Eliminar entidades con FK reales de Oracle y verificar CASCADE/NO ACTION	Integración sobre base de prueba aislada; jamás contra datos operativos
+
+	CP-F09	Todas las HU originales	Validación de aceptación por el equipo/usuario	Pendiente catálogo original, testigo, fecha y evidencia; no reemplazable por JUnit
+
+12.5 Registro de resultados de aceptación
+
+Para cada ejecución futura: ID de caso, versión del código y configuración, entorno aislado, datos sintéticos, pasos, resultado esperado, resultado observado, evidencia y responsable. No usar credenciales de chat ni almacenar tokens. Las pruebas que escriban se ejecutarán únicamente en una base de prueba autorizada, no como parte de esta entrega documental.
+Documentación técnica, no aprobación de usuarios. Archivos fuente y líneas corresponden al árbol de trabajo local; no se atribuyen al último commit.Documentación técnica, no aprobación de usuarios. Archivos fuente y líneas corresponden al árbol de trabajo local; no se atribuyen al último commit.

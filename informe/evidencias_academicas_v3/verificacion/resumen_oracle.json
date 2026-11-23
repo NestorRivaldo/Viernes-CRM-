@@ -1,0 +1,22 @@
+{
+  "tablas_oracle": 26,
+  "columnas_oracle": 194,
+  "columnas_jpa": 152,
+  "columnas_extra_mapeadas": 7,
+  "tablas_no_mapeadas": [
+    "CRM_CANALES",
+    "CRM_CANAL_MIEMBROS",
+    "CRM_INTEGRACIONES",
+    "CRM_INTEGRACION_AUDITORIA",
+    "CRM_INTEGRACION_CONFIG"
+  ],
+  "fk_total": 22,
+  "fk_tablas_mapeadas": 18,
+  "indices": 51,
+  "constraints": {
+    "R": 22,
+    "C": 148,
+    "P": 26,
+    "U": 18
+  }
+}

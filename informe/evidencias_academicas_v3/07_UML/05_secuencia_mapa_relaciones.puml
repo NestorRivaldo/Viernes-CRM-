@@ -1,0 +1,71 @@
+@startuml
+!pragma layout smetana
+skinparam defaultFontName Segoe UI
+skinparam defaultFontSize 13
+skinparam shadowing false
+title Secuencia — mapa de cliente, expansión y detalle
+autonumber
+actor Usuario as U
+participant "Angular / RelationshipMapService" as UI
+participant "RelationshipMapController" as C
+participant "RelationshipMapService (backend)" as S
+participant "ManageClienteUseCase" as CL
+participant "ManageOportunidadUseCase" as O
+participant "ManageActividadUseCase" as A
+participant "ManagePropuestaUseCase" as P
+U -> UI : Abrir mapa cliente
+UI -> C : GET /api/v1/relationship-map/clientes/{id}
+C -> S : obtenerMapaCliente(id)
+S -> CL : obtener(id)
+CL --> S : ClienteResponse
+S -> CL : listarContactos(id)
+CL --> S : contactos
+S -> O : listar()
+O --> S : oportunidades
+loop Oportunidades
+ alt Coincide clienteNombre con nombre/empresa
+  S -> S : incluir oportunidad
+ else No coincide
+  S -> O : listarContactos(oportunidadId)
+  O --> S : contactos asociados
+  S -> S : incluir si comparten contacto del cliente
+ end
+end
+S -> A : filtrarPorCliente(id)
+A --> S : actividades
+S -> P : listarPorCliente(id)
+P --> S : propuestas
+S -> S : deduplicar nodos/aristas por ID
+S --> C : RelationshipMapResponse\nrootNodeId, nodes, edges, totalNodes, totalEdges
+C --> UI : 200 JSON
+UI --> U : Renderizar grafo
+== Expansión ==
+UI -> C : GET /nodes/oportunidad/{id}/connections
+C -> S : expandirNodo(OPORTUNIDAD, id)
+S -> S : obtenerMapaOportunidad(id)
+S -> O : obtener(id), listarContactos(id)
+O --> S : oportunidad y contactos
+S -> CL : resolver cliente por nombre/contactos
+CL --> S : cliente si se encuentra
+S -> O : listarProductos(id), listarColaboradores(id)
+O --> S : productos y colaboradores
+S -> A : filtrarPorOportunidad(id)
+A --> S : actividades
+S -> P : listarPorOportunidad(id)
+P --> S : propuestas
+S --> C : subgrafo
+C --> UI : 200 JSON
+UI -> UI : fusionar sin duplicar IDs
+== Detalle ==
+UI -> C : GET /nodes/{type}/{id}
+C -> S : obtenerDetalleNodo(NodeType, id)
+S -> S : delegar al caso de uso según tipo
+S --> C : GraphNodeDto
+C --> UI : 200 JSON
+note over C,S
+ Tipo inválido: 400; raíz inexistente: 404 (handler).
+ @Transactional(readOnly=true). No modifica entidades.
+ Asociación cliente/oportunidad heurística: no FK.
+ Recorridos de listas y consultas por oportunidad: coste creciente.
+end note
+@enduml

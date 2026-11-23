@@ -1,0 +1,47 @@
+{
+  "fecha": "2026-11-11",
+  "checks": [
+    {
+      "check": "HTML y anclas locales",
+      "result": "PASS",
+      "details": "8 documentos; fuentes existentes y líneas dentro de rango"
+    },
+    {
+      "check": "UML, ERD e imágenes",
+      "result": "PASS",
+      "details": "8 tríos PlantUML/SVG/PNG; SVG XML válidos sin mensajes de error; PNG decodificables"
+    },
+    {
+      "check": "BPMN integridad 01_comercial_to_be.bpmn",
+      "result": "PASS",
+      "details": "IDs únicos; referencias resueltas; flujos coherentes; todos los nodos alcanzables y con ruta a fin; DI presente"
+    },
+    {
+      "check": "BPMN integridad 02_propuesta_detallada.bpmn",
+      "result": "PASS",
+      "details": "IDs únicos; referencias resueltas; flujos coherentes; todos los nodos alcanzables y con ruta a fin; DI presente"
+    },
+    {
+      "check": "XSD OMG BPMN20",
+      "result": "PASS",
+      "details": "PASS XSD OMG BPMN 2.0: 01_comercial_to_be.bpmn\nPASS XSD OMG BPMN 2.0: 02_propuesta_detallada.bpmn"
+    },
+    {
+      "check": "Pruebas y matriz",
+      "result": "PASS",
+      "details": "291 PASS preservados; 60 casos; 12 vínculos revisados; no se ejecutó Maven de nuevo"
+    },
+    {
+      "check": "Diccionario y conciliación",
+      "result": "PASS",
+      "details": "21 entidades / 152 columnas JPA; 26 tablas / 194 columnas Oracle; 7 columnas extra en tablas mapeadas"
+    }
+  ],
+  "limites": [
+    "Enunciados RF/HU originales no disponibles; 5 HU pendientes de correspondencia.",
+    "No hay aprobación UAT ni AS-IS real.",
+    "No se abrió en Microsoft Word ni en todos los modeladores BPMN.",
+    "La ejecución Maven anterior con ddl-auto:update no es certificable como estrictamente de solo lectura.",
+    "El chequeo de anclas valida existencia y rango; las referencias principales también se contrastaron por lectura."
+  ]
+}

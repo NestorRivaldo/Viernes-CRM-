@@ -1,0 +1,32 @@
+@startuml
+!pragma layout smetana
+skinparam defaultFontName Segoe UI
+skinparam defaultFontSize 13
+skinparam shadowing false
+title 06c estado oportunidad — comportamiento implementado
+state "Registro existente" as R {
+state "Cualquier valor válido del enum" as ANY
+state "PROSPECCION" as E0
+ANY --> E0 : cambiarEtapa(PROSPECCION)
+state "CONTACTO" as E1
+ANY --> E1 : cambiarEtapa(CONTACTO)
+state "CALIFICACION" as E2
+ANY --> E2 : cambiarEtapa(CALIFICACION)
+state "PROPUESTA" as E3
+ANY --> E3 : cambiarEtapa(PROPUESTA)
+state "NEGOCIACION" as E4
+ANY --> E4 : cambiarEtapa(NEGOCIACION)
+state "GANADA" as E5
+ANY --> E5 : cambiarEtapa(GANADA)
+state "PERDIDA" as E6
+ANY --> E6 : cambiarEtapa(PERDIDA)
+}
+[*] --> R : crear (default PROSPECCION; admite otro valor)
+note bottom of R
+  ANY resume el estado de origen: no es un valor persistido.
+  Se permite cualquier origen → cualquier destino válido, incluso el mismo.
+  No se comprueba secuencia ni se bloquea reapertura.
+  GANADA/PERDIDA no son terminales; no exige propuesta aprobada.
+  Las acciones residen en el servicio; no hay motor de estados.
+end note
+@enduml

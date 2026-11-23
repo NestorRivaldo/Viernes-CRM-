@@ -36,7 +36,7 @@ PowerShell; en macOS/Linux, `.\mvnw.cmd` es `./mvnw`.
 
 ### 1. Backend (`bomerp-backend/`)
 
-Base de datos (Oracle, contenedor `bomerp-oracle`):
+Base de datos (Oracle, contenedor `viernes-oracle`):
 
 ```powershell
 cd lp2/bomerp-backend

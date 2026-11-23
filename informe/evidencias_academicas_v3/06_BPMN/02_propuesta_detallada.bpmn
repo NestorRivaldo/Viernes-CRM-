@@ -1,0 +1,408 @@
+<?xml version='1.0' encoding='utf-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_Viernes_Propuesta" targetNamespace="http://viernes.local/bpmn/propuesta" exporter="Viernes CRM - documentacion" exporterVersion="1.0">
+  <bpmn:collaboration id="Collaboration_Propuesta">
+    <bpmn:participant id="Participant_Viernes" name="Viernes CRM V1" processRef="Process_Propuesta" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_Propuesta" name="Gestion de propuesta comercial (TO-BE)" isExecutable="false">
+    <bpmn:documentation>
+      Proceso TO-BE documentado a partir de PropuestaController, PropuestaService,
+      Propuesta, DetallePropuesta y KeycloakSecurityConfig (árbol de trabajo revisado 11/11/2026).
+      No representa una aprobacion de usuarios ni una ejecucion real de Oracle.
+    </bpmn:documentation>
+    <bpmn:laneSet id="LaneSet_Propuesta">
+      <bpmn:lane id="Lane_Vendedor" name="Vendedor">
+        <bpmn:flowNodeRef>StartEvent_Lead</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_CrearOportunidad</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_RegistrarPropuesta</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_AgregarDetalles</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_CorregirDatos</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_RevisarPropuesta</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Enviar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_EditarBorrador</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Jefe" name="Jefe / ADMIN">
+        <bpmn:flowNodeRef>Task_RevisarEnviada</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Decision</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Aprobar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Rechazar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Cancelar</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_CRM" name="CRM (sistema)">
+        <bpmn:flowNodeRef>Task_Validar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Valido</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Persistir</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_CambiarEnviada</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_RegistrarAprobada</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_RegistrarRechazada</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_RegistrarCancelada</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_Aprobada</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_Rechazada</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_Cancelada</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="StartEvent_Lead" name="Lead calificado o necesidad detectada">
+      <bpmn:documentation>
+        Punto de partida. Un lead en estado CONVERTIDO no crea una oportunidad
+        automaticamente; la oportunidad se registra manualmente en la tarea siguiente.
+      </bpmn:documentation>
+      <bpmn:outgoing>Flow_Start_Manual</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="Task_CrearOportunidad" name="Crear oportunidad manualmente">
+      <bpmn:documentation>
+        Acción del vendedor en la aplicación. No existe endpoint de conversion lead a oportunidad:
+        PATCH /api/v1/leads/{id}/estado?estado=CONVERTIDO solo cambia el estado del lead.
+      </bpmn:documentation>
+      <bpmn:incoming>Flow_Start_Manual</bpmn:incoming>
+      <bpmn:outgoing>Flow_Manual_Registrar</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task_RegistrarPropuesta" name="Registrar cabecera de propuesta">
+      <bpmn:documentation>POST /api/v1/propuestas con idOportunidad e idCliente existentes.</bpmn:documentation>
+      <bpmn:incoming>Flow_Manual_Registrar</bpmn:incoming>
+      <bpmn:outgoing>Flow_Registrar_Detalles</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task_AgregarDetalles" name="Agregar al menos un detalle">
+      <bpmn:documentation>Producto, descripcion, cantidad y precio unitario; snapshot del catalogo.</bpmn:documentation>
+      <bpmn:incoming>Flow_Registrar_Detalles</bpmn:incoming>
+      <bpmn:outgoing>Flow_Detalles_Validar</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="Task_Validar" name="Validar relaciones, fechas y detalles">
+      <bpmn:documentation>
+        PropuestaService.validarRelaciones(), validarFechas(), toDetalleDomain(),
+        calcular subtotales y recalcularTotales().
+      </bpmn:documentation>
+      <bpmn:incoming>Flow_Detalles_Validar</bpmn:incoming>
+      <bpmn:incoming>Flow_Corregir_Validar</bpmn:incoming>
+      <bpmn:outgoing>Flow_Validar_Gateway</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Gateway_Valido" name="¿Datos válidos?" default="Flow_Valido_No">
+      <bpmn:incoming>Flow_Validar_Gateway</bpmn:incoming>
+      <bpmn:outgoing>Flow_Valido_Si</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Valido_No</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="Task_CorregirDatos" name="Corregir datos">
+      <bpmn:documentation>La API devuelve error 400/404 y permite corregir la propuesta.</bpmn:documentation>
+      <bpmn:incoming>Flow_Valido_No</bpmn:incoming>
+      <bpmn:outgoing>Flow_Corregir_Validar</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="Task_Persistir" name="Generar número y persistir BORRADOR">
+      <bpmn:documentation>Genera PROP-AAAA-NNNN y guarda cabecera y detalles en estado BORRADOR.</bpmn:documentation>
+      <bpmn:incoming>Flow_Valido_Si</bpmn:incoming>
+      <bpmn:outgoing>Flow_Persistir_Revisar</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="Task_RevisarPropuesta" name="Revisar propuesta">
+      <bpmn:incoming>Flow_Persistir_Revisar</bpmn:incoming>
+      <bpmn:incoming>Flow_Editar_Revisar</bpmn:incoming>
+      <bpmn:outgoing>Flow_Revisar_Enviar</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Gateway_Enviar" name="¿Enviar?" default="Flow_Enviar_No">
+      <bpmn:incoming>Flow_Revisar_Enviar</bpmn:incoming>
+      <bpmn:outgoing>Flow_Enviar_Si</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Enviar_No</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="Task_EditarBorrador" name="Editar propuesta en BORRADOR">
+      <bpmn:documentation>Actualizar o eliminar solo se permite en BORRADOR; eliminar exige ADMIN.</bpmn:documentation>
+      <bpmn:incoming>Flow_Enviar_No</bpmn:incoming>
+      <bpmn:outgoing>Flow_Editar_Revisar</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="Task_CambiarEnviada" name="Cambiar estado a ENVIADA">
+      <bpmn:documentation>PATCH /api/v1/propuestas/{id}/enviar; requiere estado BORRADOR.</bpmn:documentation>
+      <bpmn:incoming>Flow_Enviar_Si</bpmn:incoming>
+      <bpmn:outgoing>Flow_Enviada_RevisarJefe</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="Task_RevisarEnviada" name="Revisar propuesta ENVIADA">
+      <bpmn:documentation>Revision comercial por JEFE o ADMIN.</bpmn:documentation>
+      <bpmn:incoming>Flow_Enviada_RevisarJefe</bpmn:incoming>
+      <bpmn:outgoing>Flow_RevisarJefe_Decision</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Gateway_Decision" name="¿Decisión?">
+      <bpmn:incoming>Flow_RevisarJefe_Decision</bpmn:incoming>
+      <bpmn:outgoing>Flow_Decision_Aprobar</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Decision_Rechazar</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Decision_Cancelar</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="Task_Aprobar" name="Aprobar propuesta">
+      <bpmn:incoming>Flow_Decision_Aprobar</bpmn:incoming>
+      <bpmn:outgoing>Flow_Aprobar_Registrar</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task_Rechazar" name="Rechazar propuesta">
+      <bpmn:incoming>Flow_Decision_Rechazar</bpmn:incoming>
+      <bpmn:outgoing>Flow_Rechazar_Registrar</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task_Cancelar" name="Cancelar propuesta">
+      <bpmn:documentation>Solo ADMIN o JEFE; no se permite si la propuesta ya es terminal.</bpmn:documentation>
+      <bpmn:incoming>Flow_Decision_Cancelar</bpmn:incoming>
+      <bpmn:outgoing>Flow_Cancelar_Registrar</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="Task_RegistrarAprobada" name="Registrar APROBADA">
+      <bpmn:incoming>Flow_Aprobar_Registrar</bpmn:incoming>
+      <bpmn:outgoing>Flow_RegistrarAprobada_End</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Task_RegistrarRechazada" name="Registrar RECHAZADA">
+      <bpmn:incoming>Flow_Rechazar_Registrar</bpmn:incoming>
+      <bpmn:outgoing>Flow_RegistrarRechazada_End</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Task_RegistrarCancelada" name="Registrar CANCELADA">
+      <bpmn:incoming>Flow_Cancelar_Registrar</bpmn:incoming>
+      <bpmn:outgoing>Flow_RegistrarCancelada_End</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="EndEvent_Aprobada" name="Propuesta aprobada">
+      <bpmn:incoming>Flow_RegistrarAprobada_End</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:endEvent id="EndEvent_Rechazada" name="Propuesta rechazada">
+      <bpmn:incoming>Flow_RegistrarRechazada_End</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:endEvent id="EndEvent_Cancelada" name="Propuesta cancelada">
+      <bpmn:incoming>Flow_RegistrarCancelada_End</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_Start_Manual" sourceRef="StartEvent_Lead" targetRef="Task_CrearOportunidad" />
+    <bpmn:sequenceFlow id="Flow_Manual_Registrar" sourceRef="Task_CrearOportunidad" targetRef="Task_RegistrarPropuesta" />
+    <bpmn:sequenceFlow id="Flow_Registrar_Detalles" sourceRef="Task_RegistrarPropuesta" targetRef="Task_AgregarDetalles" />
+    <bpmn:sequenceFlow id="Flow_Detalles_Validar" sourceRef="Task_AgregarDetalles" targetRef="Task_Validar" />
+    <bpmn:sequenceFlow id="Flow_Validar_Gateway" sourceRef="Task_Validar" targetRef="Gateway_Valido" />
+    <bpmn:sequenceFlow id="Flow_Valido_Si" name="Sí" sourceRef="Gateway_Valido" targetRef="Task_Persistir">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${datosValidos}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_Valido_No" name="No: 400/404" sourceRef="Gateway_Valido" targetRef="Task_CorregirDatos">
+      </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_Corregir_Validar" sourceRef="Task_CorregirDatos" targetRef="Task_Validar" />
+    <bpmn:sequenceFlow id="Flow_Persistir_Revisar" sourceRef="Task_Persistir" targetRef="Task_RevisarPropuesta" />
+    <bpmn:sequenceFlow id="Flow_Revisar_Enviar" sourceRef="Task_RevisarPropuesta" targetRef="Gateway_Enviar" />
+    <bpmn:sequenceFlow id="Flow_Enviar_Si" name="Sí" sourceRef="Gateway_Enviar" targetRef="Task_CambiarEnviada">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${enviar}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_Enviar_No" name="No" sourceRef="Gateway_Enviar" targetRef="Task_EditarBorrador">
+      </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_Editar_Revisar" sourceRef="Task_EditarBorrador" targetRef="Task_RevisarPropuesta" />
+    <bpmn:sequenceFlow id="Flow_Enviada_RevisarJefe" sourceRef="Task_CambiarEnviada" targetRef="Task_RevisarEnviada" />
+    <bpmn:sequenceFlow id="Flow_RevisarJefe_Decision" sourceRef="Task_RevisarEnviada" targetRef="Gateway_Decision" />
+    <bpmn:sequenceFlow id="Flow_Decision_Aprobar" name="Aprobar" sourceRef="Gateway_Decision" targetRef="Task_Aprobar">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${decision == 'APROBAR'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_Decision_Rechazar" name="Rechazar" sourceRef="Gateway_Decision" targetRef="Task_Rechazar">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${decision == 'RECHAZAR'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_Decision_Cancelar" name="Cancelar" sourceRef="Gateway_Decision" targetRef="Task_Cancelar">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${decision == 'CANCELAR'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_Aprobar_Registrar" sourceRef="Task_Aprobar" targetRef="Task_RegistrarAprobada" />
+    <bpmn:sequenceFlow id="Flow_Rechazar_Registrar" sourceRef="Task_Rechazar" targetRef="Task_RegistrarRechazada" />
+    <bpmn:sequenceFlow id="Flow_Cancelar_Registrar" sourceRef="Task_Cancelar" targetRef="Task_RegistrarCancelada" />
+    <bpmn:sequenceFlow id="Flow_RegistrarAprobada_End" sourceRef="Task_RegistrarAprobada" targetRef="EndEvent_Aprobada" />
+    <bpmn:sequenceFlow id="Flow_RegistrarRechazada_End" sourceRef="Task_RegistrarRechazada" targetRef="EndEvent_Rechazada" />
+    <bpmn:sequenceFlow id="Flow_RegistrarCancelada_End" sourceRef="Task_RegistrarCancelada" targetRef="EndEvent_Cancelada" />
+    <bpmn:textAnnotation id="Annotation_ConversionManual">
+      <bpmn:text>No existe conversión automática lead → oportunidad.
+PATCH /leads/{id}/estado?estado=CONVERTIDO
+solo cambia el estado del lead; no crea la oportunidad.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_ConversionManual" sourceRef="Task_CrearOportunidad" targetRef="Annotation_ConversionManual" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_Propuesta">
+    <bpmndi:BPMNPlane id="BPMNPlane_Propuesta" bpmnElement="Collaboration_Propuesta">
+      <bpmndi:BPMNShape id="Participant_Viernes_di" bpmnElement="Participant_Viernes" isHorizontal="true">
+        <dc:Bounds x="40" y="40" width="2420" height="900" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Vendedor_di" bpmnElement="Lane_Vendedor" isHorizontal="true">
+        <dc:Bounds x="70" y="80" width="2360" height="240" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Jefe_di" bpmnElement="Lane_Jefe" isHorizontal="true">
+        <dc:Bounds x="70" y="320" width="2360" height="300" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_CRM_di" bpmnElement="Lane_CRM" isHorizontal="true">
+        <dc:Bounds x="70" y="620" width="2360" height="280" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_Lead_di" bpmnElement="StartEvent_Lead">
+        <dc:Bounds x="120" y="142" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CrearOportunidad_di" bpmnElement="Task_CrearOportunidad">
+        <dc:Bounds x="200" y="120" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_RegistrarPropuesta_di" bpmnElement="Task_RegistrarPropuesta">
+        <dc:Bounds x="360" y="120" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_AgregarDetalles_di" bpmnElement="Task_AgregarDetalles">
+        <dc:Bounds x="520" y="120" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Validar_di" bpmnElement="Task_Validar">
+        <dc:Bounds x="680" y="650" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_Valido_di" bpmnElement="Gateway_Valido" isMarkerVisible="true">
+        <dc:Bounds x="850" y="665" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CorregirDatos_di" bpmnElement="Task_CorregirDatos">
+        <dc:Bounds x="1020" y="220" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Persistir_di" bpmnElement="Task_Persistir">
+        <dc:Bounds x="1020" y="650" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_RevisarPropuesta_di" bpmnElement="Task_RevisarPropuesta">
+        <dc:Bounds x="1180" y="120" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_Enviar_di" bpmnElement="Gateway_Enviar" isMarkerVisible="true">
+        <dc:Bounds x="1350" y="135" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_EditarBorrador_di" bpmnElement="Task_EditarBorrador">
+        <dc:Bounds x="1180" y="220" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CambiarEnviada_di" bpmnElement="Task_CambiarEnviada">
+        <dc:Bounds x="1500" y="650" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_RevisarEnviada_di" bpmnElement="Task_RevisarEnviada">
+        <dc:Bounds x="1660" y="350" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_Decision_di" bpmnElement="Gateway_Decision" isMarkerVisible="true">
+        <dc:Bounds x="1830" y="365" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Aprobar_di" bpmnElement="Task_Aprobar">
+        <dc:Bounds x="1990" y="350" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Rechazar_di" bpmnElement="Task_Rechazar">
+        <dc:Bounds x="1990" y="440" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Cancelar_di" bpmnElement="Task_Cancelar">
+        <dc:Bounds x="1990" y="530" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_RegistrarAprobada_di" bpmnElement="Task_RegistrarAprobada">
+        <dc:Bounds x="2170" y="650" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_RegistrarRechazada_di" bpmnElement="Task_RegistrarRechazada">
+        <dc:Bounds x="2170" y="730" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_RegistrarCancelada_di" bpmnElement="Task_RegistrarCancelada">
+        <dc:Bounds x="2170" y="810" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_Aprobada_di" bpmnElement="EndEvent_Aprobada">
+        <dc:Bounds x="2350" y="672" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_Rechazada_di" bpmnElement="EndEvent_Rechazada">
+        <dc:Bounds x="2350" y="752" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_Cancelada_di" bpmnElement="EndEvent_Cancelada">
+        <dc:Bounds x="2350" y="832" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Annotation_ConversionManual_di" bpmnElement="Annotation_ConversionManual">
+        <dc:Bounds x="200" y="220" width="300" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_ConversionManual_di" bpmnElement="Association_ConversionManual">
+        <di:waypoint x="260" y="160" />
+        <di:waypoint x="260" y="220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Start_Manual_di" bpmnElement="Flow_Start_Manual">
+        <di:waypoint x="156" y="160" />
+        <di:waypoint x="200" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Manual_Registrar_di" bpmnElement="Flow_Manual_Registrar">
+        <di:waypoint x="320" y="160" />
+        <di:waypoint x="360" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Registrar_Detalles_di" bpmnElement="Flow_Registrar_Detalles">
+        <di:waypoint x="480" y="160" />
+        <di:waypoint x="520" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Detalles_Validar_di" bpmnElement="Flow_Detalles_Validar">
+        <di:waypoint x="640" y="160" />
+        <di:waypoint x="660" y="160" />
+        <di:waypoint x="660" y="690" />
+        <di:waypoint x="680" y="690" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Validar_Gateway_di" bpmnElement="Flow_Validar_Gateway">
+        <di:waypoint x="800" y="690" />
+        <di:waypoint x="850" y="690" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Valido_Si_di" bpmnElement="Flow_Valido_Si">
+        <di:waypoint x="900" y="690" />
+        <di:waypoint x="1020" y="690" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Valido_No_di" bpmnElement="Flow_Valido_No">
+        <di:waypoint x="875" y="715" />
+        <di:waypoint x="875" y="260" />
+        <di:waypoint x="1020" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Corregir_Validar_di" bpmnElement="Flow_Corregir_Validar">
+        <di:waypoint x="1080" y="260" />
+        <di:waypoint x="740" y="260" />
+        <di:waypoint x="740" y="650" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Persistir_Revisar_di" bpmnElement="Flow_Persistir_Revisar">
+        <di:waypoint x="1140" y="690" />
+        <di:waypoint x="1160" y="690" />
+        <di:waypoint x="1160" y="160" />
+        <di:waypoint x="1180" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Revisar_Enviar_di" bpmnElement="Flow_Revisar_Enviar">
+        <di:waypoint x="1300" y="160" />
+        <di:waypoint x="1350" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Enviar_Si_di" bpmnElement="Flow_Enviar_Si">
+        <di:waypoint x="1400" y="160" />
+        <di:waypoint x="1420" y="160" />
+        <di:waypoint x="1420" y="690" />
+        <di:waypoint x="1500" y="690" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Enviar_No_di" bpmnElement="Flow_Enviar_No">
+        <di:waypoint x="1375" y="185" />
+        <di:waypoint x="1375" y="260" />
+        <di:waypoint x="1300" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Editar_Revisar_di" bpmnElement="Flow_Editar_Revisar">
+        <di:waypoint x="1240" y="220" />
+        <di:waypoint x="1240" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Enviada_RevisarJefe_di" bpmnElement="Flow_Enviada_RevisarJefe">
+        <di:waypoint x="1560" y="690" />
+        <di:waypoint x="1600" y="690" />
+        <di:waypoint x="1600" y="390" />
+        <di:waypoint x="1660" y="390" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_RevisarJefe_Decision_di" bpmnElement="Flow_RevisarJefe_Decision">
+        <di:waypoint x="1780" y="390" />
+        <di:waypoint x="1830" y="390" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Decision_Aprobar_di" bpmnElement="Flow_Decision_Aprobar">
+        <di:waypoint x="1880" y="390" />
+        <di:waypoint x="1990" y="390" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Decision_Rechazar_di" bpmnElement="Flow_Decision_Rechazar">
+        <di:waypoint x="1880" y="390" />
+        <di:waypoint x="1930" y="390" />
+        <di:waypoint x="1930" y="480" />
+        <di:waypoint x="1990" y="480" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Decision_Cancelar_di" bpmnElement="Flow_Decision_Cancelar">
+        <di:waypoint x="1855" y="415" />
+        <di:waypoint x="1855" y="570" />
+        <di:waypoint x="1990" y="570" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Aprobar_Registrar_di" bpmnElement="Flow_Aprobar_Registrar">
+        <di:waypoint x="2110" y="390" />
+        <di:waypoint x="2140" y="390" />
+        <di:waypoint x="2140" y="690" />
+        <di:waypoint x="2170" y="690" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Rechazar_Registrar_di" bpmnElement="Flow_Rechazar_Registrar">
+        <di:waypoint x="2110" y="480" />
+        <di:waypoint x="2140" y="480" />
+        <di:waypoint x="2140" y="770" />
+        <di:waypoint x="2170" y="770" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Cancelar_Registrar_di" bpmnElement="Flow_Cancelar_Registrar">
+        <di:waypoint x="2110" y="570" />
+        <di:waypoint x="2140" y="570" />
+        <di:waypoint x="2140" y="850" />
+        <di:waypoint x="2170" y="850" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_RegistrarAprobada_End_di" bpmnElement="Flow_RegistrarAprobada_End">
+        <di:waypoint x="2290" y="690" />
+        <di:waypoint x="2350" y="690" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_RegistrarRechazada_End_di" bpmnElement="Flow_RegistrarRechazada_End">
+        <di:waypoint x="2290" y="770" />
+        <di:waypoint x="2350" y="770" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_RegistrarCancelada_End_di" bpmnElement="Flow_RegistrarCancelada_End">
+        <di:waypoint x="2290" y="850" />
+        <di:waypoint x="2350" y="850" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

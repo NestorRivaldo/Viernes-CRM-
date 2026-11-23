@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Viernes CRM V1 — Arquitectura C4 Nivel 3 (Componentes)</title>
+  <style>
+    body { font: 15px/1.6 Calibri, Segoe UI, sans-serif; color: #163047; background: #f2f5f8; margin: 0; padding: 25px; }
+    main { max-width: 1200px; margin: auto; background: white; padding: 40px 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.06); border-radius: 4px; }
+    h1, h2, h3 { color: #153e63; line-height: 1.25; }
+    h1 { border-bottom: 3px solid #1e8293; padding-bottom: 12px; margin-top: 0; font-size: 26px; }
+    h2 { border-bottom: 1px solid #d3dce4; padding-bottom: 6px; margin-top: 36px; font-size: 20px; }
+    h3 { margin-top: 24px; font-size: 16px; color: #086b94; }
+    table { border-collapse: collapse; width: 100%; font-size: 13px; margin: 18px 0; }
+    td, th { border: 1px solid #d3dce4; padding: 8px 10px; text-align: left; vertical-align: top; }
+    th { background: #e7eef5; color: #153e63; font-weight: bold; }
+    tr:nth-child(even) { background: #fbfcfd; }
+    code { font-family: Consolas, monospace; font-size: 12px; background: #eef2f6; padding: 2px 4px; border-radius: 3px; color: #b02a37; }
+    pre { background: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #1e8293; padding: 12px; font-family: Consolas, monospace; font-size: 12px; overflow-x: auto; white-space: pre-wrap; }
+    .banner { font-size: 12px; color: #526c83; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .alerta { border-left: 4px solid #dc9b35; background: #fff8eb; padding: 12px 16px; margin: 16px 0; font-size: 13px; }
+    .diag-container { text-align: center; margin: 25px 0; background: #fcfdfe; border: 1px solid #e2e8f0; padding: 15px; border-radius: 4px; }
+    .diag-container img { max-width: 100%; height: auto; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-radius: 4px; }
+    .diag-caption { font-size: 13px; color: #526c83; font-style: italic; margin-top: 10px; }
+    .badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+    .badge-core { background: #d1e7dd; color: #0f5132; }
+    .badge-soporte { background: #cfe2ff; color: #084298; }
+    .badge-generico { background: #f8d7da; color: #842029; }
+    @media print { body { background: white; padding: 0; } main { box-shadow: none; padding: 0; max-width: none; } }
+  </style>
+</head>
+<body>
+<main>
+
+<div class="banner">VIERNES CRM V1 · PROYECTO INTEGRADOR DE ANÁLISIS Y DISEÑO DE SOFTWARE · 11/11/2026</div>
+<h1>Actualización del Diagrama C4 Nivel 3 (Componentes)</h1>
+<p>Documento de ingeniería de software que reemplaza el diagrama C3 preliminar de la Sesión 2 (Lucidchart), incorporando la arquitectura hexagonal definitiva, la modularidad gobernada por Spring Modulith, la delegación de identidad en Keycloak y la implementación física de las 7 relaciones muchos a muchos (N:M) en Oracle Database 23c.</p>
+
+<!-- SECCIÓN 1: INTRODUCCIÓN -->
+<h2>1. Justificación y Evolución Arquitectónica</h2>
+<p>El diseño preliminar concebía un backend básico con 8 módulos acoplados y sin soporte de relaciones complejas. La versión final de producción de <strong>Viernes CRM V1</strong> implementa:</p>
+<ul>
+  <li><strong>Monolito Modular con Spring Modulith 2.0.7:</strong> Fronteras de módulo explícitas validadas en tiempo de compilación con <code>ModularityTests.java</code>.</li>
+  <li><strong>Arquitectura Hexagonal en 15 submódulos:</strong> Aislamiento completo de la lógica de dominio respecto al framework JPA y la base de datos Oracle.</li>
+  <li><strong>7 Relaciones Muchos a Muchos (N:M) Físicas:</strong> Tablas intermedias independientes en Oracle con atributos contextuales (roles de decisores, cantidades de producto, secuencias de orden).</li>
+  <li><strong>Capa Anticorrupción (ACL) y Seguridad OAuth2:</strong> Desacoplamiento de la autenticación mediante Resource Server JWT integrado con Keycloak 25.</li>
+</ul>
+
+<!-- SECCIÓN 2: C3 PRINCIPAL -->
+<h2>2. Diagrama C3 Principal: Componentes del Backend Spring Boot</h2>
+<p>Ilustra la arquitectura interna del contenedor Spring Boot, mostrando los módulos comerciales más importantes, sus controladores, servicios de aplicación, adaptadores de persistencia, puertos de comunicación inter-módulo y los sistemas externos.</p>
+
+<div class="diag-container">
+  <img src="c3_principal_backend.svg" alt="Diagrama C3 Principal del Backend Spring Boot" />
+  <div class="diag-caption">Figura 3.1: Diagrama C4 Nivel 3 (Componentes) del Backend Monolítico Modular de Viernes CRM V1.</div>
+</div>
+
+<h3>2.1 Componentes Principales Representados</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Componente</th>
+      <th>Tipo Arquitectónico</th>
+      <th>Paquete Java</th>
+      <th>Responsabilidad y Colaboración</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>KeycloakSecurityConfig</code></td>
+      <td>Configuración Spring Security</td>
+      <td><code>com.viernes.auth.keycloak</code></td>
+      <td>Define la cadena de filtros de seguridad, políticas CORS y autorización RBAC por endpoint.</td>
+    </tr>
+    <tr>
+      <td><code>KeycloakJwtAuthenticationConverter</code></td>
+      <td>Capa Anticorrupción (ACL)</td>
+      <td><code>com.viernes.auth.keycloak</code></td>
+      <td>Traduce los claims <code>realm_access.roles</code> de Keycloak a autoridades <code>ROLE_*</code> de Spring Security.</td>
+    </tr>
+    <tr>
+      <td><code>ClienteController</code> / <code>ClienteService</code></td>
+      <td>Inbound Adapter / Service</td>
+      <td><code>com.viernes.clientes</code></td>
+      <td>Gestión de cuentas corporativas, contactos y consultas oficiales a través de <code>ApisPeruDocumentoAdapter</code>.</td>
+    </tr>
+    <tr>
+      <td><code>OportunidadController</code> / <code>OportunidadService</code></td>
+      <td>Inbound Adapter / Service</td>
+      <td><code>com.viernes.oportunidades</code></td>
+      <td>Control del embudo comercial, valor ponderado y sincronización de contactos, productos y colaboradores N:M.</td>
+    </tr>
+    <tr>
+      <td><code>PropuestaController</code> / <code>PropuestaService</code></td>
+      <td>Inbound Adapter / Service</td>
+      <td><code>com.viernes.propuestas</code></td>
+      <td>Cotizaciones económicas con control de estados (Borrador → Enviada → Aprobada/Rechazada/Cancelada).</td>
+    </tr>
+    <tr>
+      <td><code>ActividadController</code> / <code>ActividadService</code></td>
+      <td>Inbound Adapter / Service</td>
+      <td><code>com.viernes.actividades</code></td>
+      <td>Bitácora operativa con regla <code>MAX_ETIQUETAS = 8</code> y validación cruzada vía <code>RelacionValidationPort</code>.</td>
+    </tr>
+    <tr>
+      <td><code>UsuariosApi</code></td>
+      <td>Named Public Interface</td>
+      <td><code>com.viernes.usuarios</code></td>
+      <td>API pública de Spring Modulith para consultar y validar la existencia de usuarios entre módulos.</td>
+    </tr>
+    <tr>
+      <td><code>DashboardService</code></td>
+      <td>Facade / Analytics Component</td>
+      <td><code>com.viernes.dashboard</code></td>
+      <td>Fachada que agrega KPIs comerciales desde múltiples repositorios con caché Caffeine (30s TTL).</td>
+    </tr>
+    <tr>
+      <td><code>RelationshipMapService</code></td>
+      <td>Graph Processing Engine</td>
+      <td><code>com.viernes.relationshipmap</code></td>
+      <td>Construcción de grafos multicapa de clientes y oportunidades para visualización con Cytoscape.js.</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- SECCIÓN 3: C3 OPORTUNIDADES -->
+<h2>3. Diagrama C3 del Módulo Oportunidades: Componentes y Relaciones N:M</h2>
+<p>Detalla el funcionamiento interno del módulo Oportunidades, destacando cómo los servicios, puertos y adaptadores gestionan las tres relaciones muchos a muchos hacia contactos, productos y colaboradores sin acoplar la lógica de negocio.</p>
+
+<div class="diag-container">
+  <img src="c3_modulo_oportunidades.svg" alt="Diagrama C3 del Módulo Oportunidades" />
+  <div class="diag-caption">Figura 3.2: Diagrama C4 Nivel 3 de Componentes Internos del Módulo Oportunidades y Gestión N:M.</div>
+</div>
+
+<h3>3.1 Gestión de Relaciones N:M en Oportunidades</h3>
+<ul>
+  <li><strong>Oportunidad ↔ Contacto:</strong> Modelado por la entidad de dominio <code>OportunidadContacto</code> (con atributos <code>rol</code> y <code>esDecisor</code>). Persistido a través de <code>OportunidadContactoPersistencePort</code> en la tabla física <code>CRM_OPORTUNIDAD_CONTACTOS</code>. <code>ContactoQueryAdapter</code> valida contra el módulo Clientes.</li>
+  <li><strong>Oportunidad ↔ Producto:</strong> Modelado por <code>OportunidadProducto</code> (con atributo <code>cantidad</code>). Persistido mediante <code>OportunidadProductoPersistencePort</code> en <code>CRM_OPORTUNIDAD_PRODUCTOS</code>. <code>ProductoQueryAdapter</code> consulta el catálogo maestro en el módulo Productos.</li>
+  <li><strong>Oportunidad ↔ Colaborador:</strong> Modelado por <code>OportunidadColaborador</code> (atributos <code>idUsuario</code> y <code>creadoEn</code>). Persistido en <code>CRM_OPORTUNIDAD_COLABORADORES</code>. <code>UsuarioQueryAdapter</code> verifica la vigencia del usuario mediante <code>UsuariosApi</code>.</li>
+</ul>
+
+<!-- SECCIÓN 4: C3 ACTIVIDADES -->
+<h2>4. Diagrama C3 del Módulo Actividades: Participantes y Etiquetas N:M</h2>
+<p>Presenta los componentes del módulo Actividades, explicando la orquestación de la bitácora comercial, la restricción de etiquetas y la vinculación de múltiples contactos participantes.</p>
+
+<div class="diag-container">
+  <img src="c3_modulo_actividades.svg" alt="Diagrama C3 del Módulo Actividades" />
+  <div class="diag-caption">Figura 3.3: Diagrama C4 Nivel 3 de Componentes Internos del Módulo Actividades, Participantes y Etiquetas N:M.</div>
+</div>
+
+<h3>4.1 Reglas y Componentes Internos de Actividades</h3>
+<ul>
+  <li><strong>Actividad ↔ Participante:</strong> Gestionado por <code>ActividadParticipantePersistencePort</code> e implementado en <code>CRM_ACTIVIDAD_PARTICIPANTES</code>. Permite vincular múltiples contactos a una misma llamada o reunión.</li>
+  <li><strong>Actividad ↔ Etiqueta:</strong> Gestionado por <code>ActividadEtiquetaPersistencePort</code> en <code>CRM_ACTIVIDAD_ETIQUETAS</code>. Aplica la regla <code>MAX_ETIQUETAS = 8</code> y almacena el orden de presentación visual.</li>
+  <li><strong>Validación Referencial Desacoplada:</strong> <code>RelacionValidationAdapter</code> implementa <code>RelacionValidationPort</code>, validando la existencia de clientes, leads, oportunidades y usuarios sin acoplar dependencias directas en la capa de aplicación.</li>
+</ul>
+
+<!-- SECCIÓN 5: TABLA COMPARATIVA -->
+<h2>5. Tabla Comparativa de Cambios respecto al Diagrama C3 Antiguo (Lucidchart S2)</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Dimensión de Comparación</th>
+      <th>C3 Antiguo (Lucidchart Sesión 2)</th>
+      <th>C3 Actual (Noviembre 2026 - Verificado)</th>
+      <th>Fundamento del Cambio</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Gobernanza Modular</strong></td>
+      <td>Capas tradicionales sin control de fronteras</td>
+      <td><strong>Spring Modulith 2.0.7 con <code>ModularityTests</code></strong></td>
+      <td>Previene acoplamiento indeseado y dependencias cíclicas en compilación.</td>
+    </tr>
+    <tr>
+      <td><strong>Módulos Totales</strong></td>
+      <td>8 módulos iniciales</td>
+      <td><strong>15 submódulos documentados</strong></td>
+      <td>Se formalizaron <code>propuestas</code>, <code>relationshipmap</code>, <code>equipos</code>, <code>productos</code>, <code>etiquetas</code> y <code>marketing</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>Relaciones N:M</strong></td>
+      <td>0 relaciones N:M (solo FK directas 1:N)</td>
+      <td><strong>7 relaciones N:M con tablas intermedias</strong></td>
+      <td>Soporte a metadatos de relación (roles, cantidades cotizadas y orden de etiquetas).</td>
+    </tr>
+    <tr>
+      <td><strong>Seguridad</strong></td>
+      <td>JWT local simple (HS256) en el backend</td>
+      <td><strong>OAuth2 Resource Server con Keycloak 25</strong></td>
+      <td>Delegación de autenticación a servidor OIDC independiente con flujo PKCE.</td>
+    </tr>
+    <tr>
+      <td><strong>Capa Anticorrupción</strong></td>
+      <td>Inexistente</td>
+      <td><strong>Implementada en módulo <code>auth</code></strong></td>
+      <td>Aisla roles internos de Keycloak y los traduce al modelo de dominio.</td>
+    </tr>
+    <tr>
+      <td><strong>Consultas Oficiales</strong></td>
+      <td>Inexistente</td>
+      <td><strong>Integración con APIsPerú (RENIEC/SUNAT)</strong></td>
+      <td>Validación oficial con caché Caffeine y limitación de tasa (rate-limit).</td>
+    </tr>
+    <tr>
+      <td><strong>Persistencia Relacional</strong></td>
+      <td>10 tablas preliminares</td>
+      <td><strong>26 tablas físicas en esquema <code>BOM_VENTAS</code></strong></td>
+      <td>Normalización física completa con 22 claves foráneas y 51 índices.</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- SECCIÓN 6: LIMITACIONES -->
+<h2>6. Elementos que No Pudieron Verificarse o Limitaciones del Sistema</h2>
+<ul>
+  <li><strong>Campañas de Marketing en Interfaz Web:</strong> El módulo y la tabla <code>CRM_CAMPANIA_LEADS</code> existen en backend y base de datos, pero la ruta frontend <code>/campanas</code> redirige al dashboard.</li>
+  <li><strong>Máquina de Estados en Leads:</strong> A diferencia de las propuestas, el cambio de estado en prospectos no impone precondiciones en el backend.</li>
+  <li><strong>Servidor de Correo Saliente (SMTP):</strong> La acción de enviar propuesta actualiza el estado a <code>ENVIADA</code> en Oracle, pero no efectúa el despacho de un correo electrónico real.</li>
+  <li><strong>Eliminación Física de Usuarios:</strong> La interfaz REST no expone método DELETE para usuarios para evitar rupturas de integridad referencial histórica.</li>
+</ul>
+
+</main>
+</body>
+</html>
+

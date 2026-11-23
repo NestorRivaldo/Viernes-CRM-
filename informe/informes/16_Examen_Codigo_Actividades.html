@@ -1,0 +1,1753 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Examen de código · Módulo Actividades · Viernes CRM</title>
+<style>
+  :root {
+    --bg: #f4efe4;
+    --paper: #fffdf8;
+    --ink: #23262b;
+    --muted: #626975;
+    --line: #ded3bf;
+    --accent: #0f766e;
+    --accent-dark: #0b4f4a;
+    --accent-soft: #e6f4f1;
+    --amber: #b45309;
+    --amber-soft: #fdf1e3;
+    --blue: #1d4ed8;
+    --blue-soft: #e8eefc;
+    --rose: #be123c;
+    --rose-soft: #fde8ed;
+    --green: #15803d;
+    --green-soft: #e8f7ed;
+    --code-bg: #161c26;
+    --code-bar: #1e2633;
+    --code-line: #2b3444;
+    --shadow: 0 12px 34px rgba(35, 38, 43, .09);
+    --radius: 18px;
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    padding-bottom: 110px;
+    background:
+      radial-gradient(circle at 10% 0%, #fbf6ea 0, transparent 40%),
+      radial-gradient(circle at 90% 10%, #eef6f2 0, transparent 36%),
+      var(--bg);
+    color: var(--ink);
+    font-family: "Segoe UI", "Trebuchet MS", system-ui, -apple-system, sans-serif;
+    line-height: 1.55;
+  }
+
+  .wrap { max-width: 1060px; margin: 0 auto; padding: 0 20px 40px; }
+
+  /* ---------- PORTADA ---------- */
+  header.hero {
+    margin-top: 22px;
+    border-radius: 24px;
+    padding: 38px 36px 34px;
+    color: #f5fffd;
+    background:
+      radial-gradient(circle at 88% 16%, rgba(255,255,255,.16), transparent 42%),
+      linear-gradient(135deg, #0b4f4a 0%, #0f766e 58%, #14958a 100%);
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+  }
+
+  header.hero::after {
+    content: "";
+    position: absolute;
+    right: -60px;
+    bottom: -80px;
+    width: 250px;
+    height: 250px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.08);
+  }
+
+  .kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,.14);
+    border: 1px solid rgba(255,255,255,.24);
+    border-radius: 999px;
+    padding: 6px 13px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  header.hero h1 {
+    margin: 16px 0 10px;
+    font-size: clamp(28px, 4.2vw, 46px);
+    line-height: 1.08;
+    letter-spacing: -.02em;
+    max-width: 780px;
+  }
+
+  header.hero p {
+    margin: 0;
+    max-width: 740px;
+    color: #d8f3ee;
+    font-size: clamp(14.5px, 1.5vw, 17px);
+  }
+
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-top: 22px;
+  }
+
+  .hero-meta span {
+    background: rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.22);
+    border-radius: 11px;
+    padding: 7px 12px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  /* ---------- INSTRUCCIONES ---------- */
+  .instructions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 10px;
+    margin-top: 18px;
+  }
+
+  .instructions div {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 13px;
+    padding: 13px 15px;
+    font-size: 13.7px;
+    color: var(--muted);
+    box-shadow: 0 4px 14px rgba(35,38,43,.04);
+  }
+
+  .instructions b { color: var(--ink); }
+
+  /* ---------- LEYENDA DE SINTAXIS ---------- */
+  .legend {
+    margin-top: 10px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 13px;
+    padding: 12px 15px;
+    font-size: 13px;
+    color: var(--muted);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    align-items: center;
+    box-shadow: 0 4px 14px rgba(35,38,43,.04);
+  }
+
+  .legend b { color: var(--ink); }
+  .legend i {
+    font-style: normal;
+    font-family: "Cascadia Code", Consolas, monospace;
+    font-size: 12.5px;
+    padding: 1px 6px;
+    border-radius: 5px;
+    background: #eae2d1;
+  }
+
+  .legend .k { color: #b91c1c; }
+  .legend .t { color: #15803d; }
+  .legend .s { color: #0369a1; }
+  .legend .c { color: #6b7280; }
+
+  /* ---------- BARRA DE HERRAMIENTAS ---------- */
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    align-items: center;
+    margin: 20px 0 8px;
+  }
+
+  .btn {
+    border: 1px solid var(--line);
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: 11px;
+    padding: 10px 14px;
+    font: inherit;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(35,38,43,.05);
+    transition: transform .12s ease, border-color .12s ease, color .12s ease;
+  }
+
+  .btn:hover { transform: translateY(-1px); border-color: var(--accent); color: var(--accent); }
+
+  .btn.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  .btn.primary:hover { background: var(--accent-dark); color: #fff; }
+
+  .btn.ghost { background: transparent; box-shadow: none; }
+
+  /* ---------- PROGRESO ---------- */
+  .progress-card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 13px 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 4px 14px rgba(35,38,43,.04);
+  }
+
+  .progress-card strong { font-size: 13.5px; white-space: nowrap; }
+
+  .progress-track {
+    flex: 1;
+    height: 9px;
+    border-radius: 999px;
+    background: #eee5d5;
+    overflow: hidden;
+  }
+
+  .progress-track span {
+    display: block;
+    height: 100%;
+    width: 0;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #0f766e, #14958a);
+    transition: width .25s ease;
+  }
+
+  /* ---------- BLOQUES ---------- */
+  .block { margin-top: 34px; }
+
+  .block-head {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    margin-bottom: 4px;
+    flex-wrap: wrap;
+  }
+
+  .badge {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 900;
+    font-size: 15px;
+  }
+
+  .block:nth-of-type(2) .badge { background: var(--blue); }
+  .block:nth-of-type(3) .badge { background: var(--amber); }
+  .block:nth-of-type(4) .badge { background: #7c3aed; }
+  .block:nth-of-type(5) .badge { background: var(--rose); }
+
+  .block-head h2 { margin: 0; font-size: clamp(20px, 2.4vw, 26px); letter-spacing: -.01em; }
+  .block-head .lang { font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+
+  .block-head .pts {
+    margin-left: auto;
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--muted);
+    letter-spacing: .05em;
+    text-transform: uppercase;
+  }
+
+  /* ---------- PREGUNTAS ---------- */
+  fieldset.q {
+    border: 0;
+    padding: 0;
+    margin: 14px 0 0;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 18px 20px 16px;
+    box-shadow: 0 6px 18px rgba(35,38,43,.05);
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+
+  fieldset.q.correct { border-color: #86d3a2; box-shadow: 0 0 0 3px rgba(21,128,61,.08); }
+  fieldset.q.wrong { border-color: #f3a7b8; box-shadow: 0 0 0 3px rgba(190,18,60,.07); }
+  fieldset.q.unanswered { border-color: #e8c98a; box-shadow: 0 0 0 3px rgba(180,83,9,.07); }
+
+  legend.q-text {
+    display: block;
+    width: 100%;
+    padding: 0;
+    font-size: 15.5px;
+    font-weight: 700;
+    line-height: 1.45;
+    color: var(--ink);
+  }
+
+  .q-num {
+    display: inline-grid;
+    place-items: center;
+    width: 27px;
+    height: 27px;
+    border-radius: 8px;
+    background: #f1eadc;
+    color: #5b5347;
+    font-size: 12.5px;
+    font-weight: 900;
+    margin-right: 7px;
+    vertical-align: 1px;
+  }
+
+  .q-text code {
+    background: #f1eadc;
+    border-radius: 5px;
+    padding: 1px 5px;
+    font-size: .9em;
+  }
+
+  /* ---------- BLOQUE DE CODIGO ---------- */
+  .src {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 9px;
+    font-size: 11.5px;
+    color: var(--muted);
+    font-family: "Cascadia Code", Consolas, ui-monospace, monospace;
+    letter-spacing: .01em;
+  }
+
+  .code-wrap {
+    margin-top: 8px;
+    border: 1px solid var(--code-line);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--code-bg);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+  }
+
+  .code-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 13px;
+    background: var(--code-bar);
+    color: #9fb0c7;
+    font-family: "Cascadia Code", Consolas, ui-monospace, monospace;
+    font-size: 11.5px;
+    border-bottom: 1px solid var(--code-line);
+  }
+
+  .code-label::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ff5f57;
+    box-shadow: 14px 0 0 #febc2e, 28px 0 0 #28c840;
+    margin-right: 22px;
+    flex: 0 0 auto;
+  }
+
+  .code-label b { color: #d6e4f7; font-weight: 700; }
+
+  .code-wrap pre {
+    margin: 0;
+    padding: 13px 15px 15px;
+    overflow-x: auto;
+  }
+
+  .code-wrap code {
+    display: block;
+    font-family: "Cascadia Code", "JetBrains Mono", Consolas, ui-monospace, monospace;
+    font-size: 12.7px;
+    line-height: 1.62;
+    color: #e6edf3;
+    white-space: pre;
+    tab-size: 4;
+  }
+
+  /* tokens */
+  .tk-k { color: #ff7b72; }
+  .tk-t { color: #7ee787; }
+  .tk-s { color: #a5d6ff; }
+  .tk-c { color: #8b949e; font-style: italic; }
+  .tk-n { color: #79c0ff; }
+  .tk-a { color: #d2a8ff; }
+
+  /* ---------- OPCIONES ---------- */
+  .opts {
+    display: grid;
+    gap: 7px;
+    margin-top: 13px;
+  }
+
+  .opt {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 9px 12px;
+    cursor: pointer;
+    font-size: 14.2px;
+    color: #3b4048;
+    background: #fffefb;
+    transition: background .12s ease, border-color .12s ease;
+  }
+
+  .opt:hover { background: #fbf7ee; border-color: #cbbfa9; }
+
+  .opt:has(input:checked) {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+
+  .opt input {
+    margin-top: 3px;
+    accent-color: var(--accent);
+    flex: 0 0 auto;
+  }
+
+  .letter {
+    flex: 0 0 auto;
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    display: grid;
+    place-items: center;
+    background: #f1eadc;
+    color: #5b5347;
+    font-size: 11.5px;
+    font-weight: 900;
+  }
+
+  .opt-text { flex: 1; }
+  .opt-text code {
+    background: #efe7d7;
+    border-radius: 4px;
+    padding: 1px 4px;
+    font-family: "Cascadia Code", Consolas, monospace;
+    font-size: 12.4px;
+  }
+
+  .opt.is-correct {
+    border-color: #4ea86f;
+    background: var(--green-soft);
+  }
+
+  .opt.is-correct .letter { background: #c9edd5; color: #14612f; }
+
+  .opt.is-wrong {
+    border-color: #e07c95;
+    background: var(--rose-soft);
+  }
+
+  .opt.is-wrong .letter { background: #f6c6d2; color: #8b0f2d; }
+
+  .opt:has(input:disabled) { cursor: default; }
+
+  .feedback {
+    margin-top: 12px;
+    border-left: 4px solid var(--green);
+    background: var(--green-soft);
+    border-radius: 0 9px 9px 0;
+    padding: 10px 13px;
+    font-size: 13.5px;
+    color: #215c36;
+    line-height: 1.5;
+  }
+
+  .feedback strong { color: #14612f; }
+
+  .feedback code {
+    background: #d7eede;
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-family: "Cascadia Code", Consolas, monospace;
+    font-size: 12.2px;
+  }
+
+  fieldset.q.wrong .feedback {
+    border-left-color: var(--rose);
+    background: var(--rose-soft);
+    color: #7d1a34;
+  }
+
+  fieldset.q.wrong .feedback strong { color: #8b0f2d; }
+  fieldset.q.wrong .feedback code { background: #f8d7df; }
+
+  fieldset.q.unanswered .feedback {
+    border-left-color: var(--amber);
+    background: var(--amber-soft);
+    color: #6b4213;
+  }
+
+  fieldset.q.unanswered .feedback strong { color: #4b2d0b; }
+  fieldset.q.unanswered .feedback code { background: #f7e3c8; }
+
+  .q-status {
+    display: inline-block;
+    margin-left: 8px;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 999px;
+    vertical-align: 1px;
+  }
+
+  .correct .q-status { background: #c9edd5; color: #14612f; }
+  .wrong .q-status { background: #f6c6d2; color: #8b0f2d; }
+  .unanswered .q-status { background: #f6dfb8; color: #7a4a0c; }
+
+  /* ---------- RESULTADO ---------- */
+  .resultado {
+    margin-top: 30px;
+    border-radius: 20px;
+    padding: 26px 28px;
+    color: #f4fffd;
+    background:
+      radial-gradient(circle at 90% 10%, rgba(255,255,255,.14), transparent 40%),
+      linear-gradient(135deg, #0b4f4a, #0f766e);
+    box-shadow: var(--shadow);
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    gap: 24px;
+    align-items: center;
+  }
+
+  .score-ring {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    background: rgba(255,255,255,.1);
+    border: 8px solid rgba(255,255,255,.24);
+  }
+
+  .score-ring b { display: block; font-size: 36px; line-height: 1; }
+  .score-ring span { font-size: 12px; color: #cdeee8; letter-spacing: .05em; text-transform: uppercase; }
+
+  .resultado h2 { margin: 0 0 4px; font-size: 24px; letter-spacing: -.01em; }
+  .resultado p { margin: 0 0 12px; color: #d3f0eb; font-size: 14.5px; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; }
+
+  .chips span {
+    background: rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .resultado .btn {
+    margin-top: 15px;
+    background: rgba(255,255,255,.14);
+    border-color: rgba(255,255,255,.28);
+    color: #fff;
+    box-shadow: none;
+  }
+
+  .resultado .btn:hover { background: rgba(255,255,255,.22); color: #fff; }
+
+  /* ---------- CLAVE ---------- */
+  details.key {
+    margin-top: 34px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 0 18px;
+    box-shadow: 0 6px 18px rgba(35,38,43,.05);
+  }
+
+  details.key summary {
+    cursor: pointer;
+    padding: 15px 2px;
+    font-weight: 800;
+    font-size: 15px;
+    color: var(--accent);
+    list-style: none;
+  }
+
+  details.key summary::-webkit-details-marker { display: none; }
+  details.key summary::before { content: "🔑 "; }
+
+  .key-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+    gap: 7px;
+    padding: 0 0 18px;
+  }
+
+  .key-grid span {
+    background: #faf5ea;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 6px 8px;
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+
+  .key-grid b { color: var(--ink); }
+
+  /* ---------- DOCK ---------- */
+  .dock {
+    position: fixed;
+    left: 50%;
+    bottom: 14px;
+    transform: translateX(-50%);
+    z-index: 50;
+    width: min(760px, calc(100vw - 24px));
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    background: rgba(255, 253, 248, .95);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 10px 12px;
+    box-shadow: 0 14px 36px rgba(35,38,43,.16);
+  }
+
+  .dock .count {
+    font-size: 13px;
+    font-weight: 800;
+    white-space: nowrap;
+    color: var(--muted);
+  }
+
+  .dock .count b { color: var(--ink); font-size: 15px; }
+
+  .dock .progress-track { height: 8px; }
+  .dock .btn { white-space: nowrap; }
+
+  /* ---------- PIE ---------- */
+  footer {
+    margin-top: 40px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 12.5px;
+  }
+
+  footer code {
+    background: #efe7d7;
+    padding: 1px 5px;
+    border-radius: 5px;
+    font-size: 11.5px;
+  }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 640px) {
+    .wrap { padding-left: 13px; padding-right: 13px; }
+    header.hero { padding: 28px 22px; border-radius: 19px; }
+    fieldset.q { padding: 15px 14px 13px; }
+    .code-wrap code { font-size: 11.8px; }
+    .resultado { grid-template-columns: 1fr; text-align: center; }
+    .score-ring { margin: 0 auto; }
+    .chips { justify-content: center; }
+    .dock .count { display: none; }
+    .block-head .pts { margin-left: 0; }
+  }
+
+  /* ---------- IMPRESIÓN ---------- */
+  @media print {
+    body { background: #fff; padding-bottom: 0; }
+    .dock, .toolbar, .progress-card, .resultado, .feedback, details.key, .legend { display: none !important; }
+    header.hero { box-shadow: none; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    fieldset.q { box-shadow: none; break-inside: avoid; page-break-inside: avoid; }
+    .opt { break-inside: avoid; }
+    .code-wrap, .code-wrap code { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="hero">
+    <div class="kicker">💻 Evaluación · Viernes CRM</div>
+    <h1>Examen de código: módulo Actividades</h1>
+    <p>
+      Treinta preguntas sobre fragmentos reales del código: Java, TypeScript y Oracle SQL.
+      No hace falta memorizar: lee el fragmento y deduce qué hace, qué devuelve o qué falla.
+    </p>
+    <div class="hero-meta">
+      <span>30 preguntas</span>
+      <span>30 fragmentos de código</span>
+      <span>1 punto cada una</span>
+      <span>Calificación automática</span>
+    </div>
+  </header>
+
+  <div class="instructions">
+    <div><b>1. Lee primero el código.</b> Cada pregunta trae el fragmento exacto, con archivo y líneas.</div>
+    <div><b>2. Una sola opción.</b> Marca la que describa mejor lo que hace ese código.</div>
+    <div><b>3. Califica al final.</b> Verás el puntaje, la respuesta correcta y por qué.</div>
+  </div>
+
+  <div class="legend">
+    <b>Cómo leer los fragmentos:</b>
+    <span><i class="k">private</i> palabra clave</span>
+    <span><i class="t">ActividadService</i> tipo o clase</span>
+    <span><i class="s">"texto"</i> cadena</span>
+    <span><i class="c">// comentario</i></span>
+  </div>
+
+  <div class="toolbar">
+    <button class="btn primary" type="button" id="btnCalificar">Calificar examen</button>
+    <button class="btn" type="button" id="btnVer">Ver respuestas</button>
+    <button class="btn ghost" type="button" id="btnReiniciar">Reiniciar</button>
+    <button class="btn ghost" type="button" onclick="window.print()">Imprimir examen</button>
+  </div>
+
+  <div class="progress-card">
+    <strong><span id="answeredCount">0</span> / 30 respondidas</strong>
+    <div class="progress-track" aria-hidden="true"><span id="progressBar"></span></div>
+  </div>
+
+  <!-- ================= A. SERVICIO ================= -->
+  <section class="block" data-section="A">
+    <div class="block-head">
+      <span class="badge">A</span>
+      <h2>El servicio: reglas de negocio</h2>
+      <span class="lang">Java</span>
+      <span class="pts">7 preguntas</span>
+    </div>
+
+    <fieldset class="q" data-section="A" data-answer="b" data-explain="Si el estado viene nulo, el servicio asigna PENDIENTE. La columna ESTADO es NOT NULL en Oracle, así que nunca se guarda null.">
+      <legend class="q-text"><span class="q-num">1</span> El JSON llega con <code>estado: null</code>. ¿Qué queda en la columna ESTADO?</legend>
+      <div class="src">📄 ActividadService.java · líneas 77-78</div>
+      <div class="code-wrap">
+        <div class="code-label"><b>ActividadService.java</b> · crear()</div>
+        <pre><code class="java">actividad.setEstado(request.estado() != null
+        ? request.estado()
+        : EstadoActividad.PENDIENTE);
+actividad.setCreadoEn(LocalDateTime.now());</code></pre>
+      </div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q1" value="a"><span class="letter">A</span><span class="opt-text">Queda <code>NULL</code> en la columna.</span></label>
+        <label class="opt"><input type="radio" name="q1" value="b"><span class="letter">B</span><span class="opt-text">Queda <code>PENDIENTE</code>.</span></label>
+        <label class="opt"><input type="radio" name="q1" value="c"><span class="letter">C</span><span class="opt-text">Queda <code>EN_PROCESO</code>.</span></label>
+        <label class="opt"><input type="radio" name="q1" value="d"><span class="letter">D</span><span class="opt-text">El servicio lanza una excepción de validación.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="A" data-answer="b" data-explain="Solo se marca vencida si el estado es exactamente PENDIENTE. Una actividad EN_PROCESO con fecha pasada devuelve vencida = false.">
+      <legend class="q-text"><span class="q-num">2</span> Actividad con estado <code>EN_PROCESO</code> y fecha de ayer. ¿Qué vale <code>vencida</code>?</legend>
+      <div class="src">📄 ActividadService.java · líneas 382-384</div>
+      <div class="code-wrap">
+        <div class="code-label"><b>ActividadService.java</b> · toResponse()</div>
+        <pre><code class="java">boolean esVencida = actividad.getEstado() == EstadoActividad.PENDIENTE &amp;&amp;
+        actividad.getFecha().isBefore(LocalDateTime.now());</code></pre>
+      </div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q2" value="a"><span class="letter">A</span><span class="opt-text"><code>true</code>, porque la fecha ya pasó.</span></label>
+        <label class="opt"><input type="radio" name="q2" value="b"><span class="letter">B</span><span class="opt-text"><code>false</code>, porque el estado no es PENDIENTE.</span></label>
+        <label class="opt"><input type="radio" name="q2" value="c"><span class="letter">C</span><span class="opt-text"><code>null</code>.</span></label>
+        <label class="opt"><input type="radio" name="q2" value="d"><span class="letter">D</span><span class="opt-text">Lanza <code>NullPointerException</code>.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="A" data-answer="b" data-explain="filter descarta los null y distinct elimina repetidos. De [3, null, 3, 5] quedan [3, 5], en el orden de primera aparición.">
+      <legend class="q-text"><span class="q-num">3</span> Llega <code>[3, null, 3, 5]</code>. ¿Qué queda en la lista <code>limpios</code>?</legend>
+      <div class="src">📄 ActividadService.java · líneas 255-258</div>
+      <div class="code-wrap">
+        <div class="code-label"><b>ActividadService.java</b> · etiquetaIdsValidos()</div>
+        <pre><code class="java">List&lt;Long&gt; limpios = etiquetaIds.stream()
+        .filter(Objects::nonNull)
+        .distinct()
+        .toList();</code></pre>
+      </div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q3" value="a"><span class="letter">A</span><span class="opt-text"><code>[3, null, 3, 5]</code></span></label>
+        <label class="opt"><input type="radio" name="q3" value="b"><span class="letter">B</span><span class="opt-text"><code>[3, 5]</code></span></label>
+        <label class="opt"><input type="radio" name="q3" value="c"><span class="letter">C</span><span class="opt-text"><code>[3, 3, 5]</code></span></label>
+        <label class="opt"><input type="radio" name="q3" value="d"><span class="letter">D</span><span class="opt-text"><code>[3, null, 5]</code></span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="A" data-answer="b" data-explain="IllegalArgumentException está mapeada a HTTP 400 en GlobalExceptionHandler. ResourceNotFoundException sería 404, pero aquí no aplica.">
+      <legend class="q-text"><span class="q-num">4</span> Llegan 9 etiquetas distintas. ¿Qué responde la API?</legend>
+      <div class="src">📄 ActividadService.java · líneas 260-262</div>
+      <div class="code-wrap">
+        <div class="code-label"><b>ActividadService.java</b> · etiquetaIdsValidos()</div>
+        <pre><code class="java">if (limpios.size() &gt; MAX_ETIQUETAS) {
+    throw new IllegalArgumentException(
+        "Una actividad puede tener como máximo " + MAX_ETIQUETAS + " etiquetas");
+}</code></pre>
+      </div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q4" value="a"><span class="letter">A</span><span class="opt-text">Guarda las 8 primeras y descarta la novena.</span></label>
+        <label class="opt"><input type="radio" name="q4" value="b"><span class="letter">B</span><span class="opt-text">HTTP 400 con el mensaje del máximo de etiquetas.</span></label>
+        <label class="opt"><input type="radio" name="q4" value="c"><span class="letter">C</span><span class="opt-text">HTTP 404 con «Etiquetas no encontradas».</span></label>
+        <label class="opt"><input type="radio" name="q4" value="d"><span class="letter">D</span><span class="opt-text">HTTP 500 por error interno.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="A" data-answer="b" data-explain="Si etiquetaIds es null, sincronizarEtiquetas no se llama y las etiquetas actuales quedan intactas. Una lista vacía sí las borra.">
+      <legend class="q-text"><span class="q-num">5</span> Un <code>PUT</code> llega sin el campo <code>etiquetaIds</code>. ¿Qué pasa con las etiquetas actuales?</legend>
+      <div class="src">📄 ActividadService.java · líneas 92-94 y 110-112</div>
+      <div class="code-wrap">
+        <div class="code-label"><b>ActividadService.java</b> · actualizar()</div>
+        <pre><code class="java">List&lt;Long&gt; etiquetaIds = request.etiquetaIds() == null
+        ? null
+        : etiquetaIdsValidos(request.etiquetaIds());
+
+// ...
+Actividad updated = persistencePort.save(actividad);
+if (etiquetaIds != null) {
+    sincronizarEtiquetas(updated.getId(), etiquetaIds);
+}</code></pre>
+      </div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q5" value="a"><span class="letter">A</span><span class="opt-text">Se borran todas.</span></label>
+        <label class="opt"><input type="radio" name="q5" value="b"><span class="letter">B</span><span class="opt-text">Se conservan tal como estaban.</span></label>
+        <label class="opt"><input type="radio" name="q5" value="c"><span class="letter">C</span><span class="opt-text">Se duplican.</span></label>
+        <label class="opt"><input type="radio" name="q5" value="d"><span class="letter">D</span><span class="opt-text">La petición falla con 400.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="A" data-answer="b" data-explain="No existen foreign keys en el esquema. Si se borrara solo la actividad, las filas de etiquetas y participantes quedarían apuntando a un ID inexistente.">
+      <legend class="q-text"><span class="q-num">6</span> ¿Por qué <code>eliminar()</code> borra las tablas hijas antes que la actividad?</legend>
+      <div class="src">📄 ActividadService.java · líneas 186-193</div>
+      <div class="code-wrap">
+        <div class="code-label"><b>ActividadService.java</b> · eliminar()</div>
+        <pre><code class="java">actividadEtiquetaPort.deleteByIdActividad(id);
+participantePort.deleteByIdActividad(id);
+persistencePort.deleteById(id);</code></pre>
+      </div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q6" value="a"><span class="letter">A</span><span class="opt-text">Porque Oracle obliga a borrar primero las tablas hijas por sus FK.</span></label>
+        <label class="opt"><input type="radio" name="q6" value="b"><span class="letter">B</span><span class="opt-text">Porque no hay FK con <code>ON DELETE CASCADE</code> y quedarían vínculos huérfanos.</span></label>
+        <label class="opt"><input type="radio" name="q6" value="c"><span class="letter">C</span><span class="opt-text">Para liberar espacio en el tablespace.</span></label>
+        <label class="opt"><input type="radio" name="q6" value="d"><span class="letter">D</span><span class="opt-text">Porque Hibernate exige ese orden en las relaciones.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="A" data-answer="b" data-explain="usar orElse(null) evita el 404: el participante se devuelve igual, pero con nombre y correo nulos porque el contacto ya no existe.">
+      <legend class="q-text"><span class="q-num">7</span> El contacto fue borrado de <code>CRM_CONTACTOS</code>. ¿Qué devuelve el listado de participantes?</legend>
+      <div class="src">📄 ActividadService.java · líneas 230-232</div>
+      <div class="code-wrap">
+        <div class="code-label"><b>ActividadService.java</b> · listarParticipantes()</div>
+        <pre><code class="java">return participantePort.findByIdActividad(actividadId).stream()
+        .map(p -&gt; toParticipanteResponse(p,
+                contactoQueryPort.buscarPorId(p.getIdContacto()).orElse(null)))
+        .collect(Collectors.toList());</code></pre>
+      </div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q7" value="a"><span class="letter">A</span><span class="opt-text">HTTP 404.</span></label>
+        <label class="opt"><input type="radio" name="q7" value="b"><span class="letter">B</span><span class="opt-text">El participante con <code>nombre</code> y <code>correo</code> en <code>null</code>.</span></label>
+        <label class="opt"><input type="radio" name="q7" value="c"><span class="letter">C</span><span class="opt-text">Una lista vacía.</span></label>
+        <label class="opt"><input type="radio" name="q7" value="d"><span class="letter">D</span><span class="opt-text">HTTP 500 por <code>NullPointerException</code>.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+  </section>
+
+  <!-- ================= B. WEB Y PERSISTENCIA ================= -->
+  <section class="block" data-section="B">
+    <div class="block-head">
+      <span class="badge">B</span>
+      <h2>Controller, repositorio y adaptadores</h2>
+      <span class="lang">Java</span>
+      <span class="pts">8 preguntas</span>
+    </div>
+
+    <fieldset class="q" data-section="B" data-answer="b" data-explain="Los filtros están en cascada con else if: gana el primero que no sea nulo. estado está antes que idCliente, así que idCliente se ignora.">
+      <legend class="q-text"><span class="q-num">8</span> <code>GET /actividades?estado=PENDIENTE&amp;idCliente=1</code>: ¿qué filtro se aplica?</legend>
+      <div class="src">📄 ActividadController.java · líneas 54-71</div>
+      <div class="code-wrap">
+        <div class="code-label"><b>ActividadController.java</b> · listar()</div>
+        <pre><code class="java">if (Boolean.TRUE.equals(vencidas)) {
+    return ResponseEntity.ok(useCase.listarVencidas());
+} else if (etiquetaId != null) {
+    return ResponseEntity.ok(useCase.filtrarPorEtiqueta(etiquetaId));
+} else if (estado != null) {
+    return ResponseEntity.ok(useCase.filtrarPorEstado(estado));
+} else if (idCliente != null) {
+    return ResponseEntity.ok(useCase.filtrarPorCliente(idCliente));
+}
+// ... idLead, idOportunidad, idUsuario</code></pre>
+      </div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q8" value="a"><span class="letter">A</span><span class="opt-text">Los dos filtros combinados con AND.</span></label>
+        <label class="opt"><input type="radio" name="q8" value="b"><span class="letter">B</span><span class="opt-text">Solo <code>estado</code>; <code>idCliente</code> se ignora.</span></label>
+        <label class="opt"><input type="radio" name="q8" value="c"><span class="letter">C</span><span class="opt-text">Solo <code>idCliente</code>.</span></label>
+        <label class="opt"><input type="radio" name="q8" value="d"><span class="letter">D</span><span class="opt-text">Ninguno: devuelve todas.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="B" data-answer="b" data-explain="vencidas tiene la máxima prioridad y listarVencidas siempre consulta PENDIENTE con fecha anterior a ahora. El estado enviado no se usa.">
+      <legend class="q-text"><span class="q-num">9</span> <code>GET /actividades?vencidas=true&amp;estado=CANCELADA</code>: ¿qué devuelve?</legend>
+      <div class="src">📄 ActividadController.java · 52-58 · ActividadService.java · 132-134</div>
+      <div class="code-wrap">
+        <div class="code-label"><b>Controller + Service</b> · rama de vencidas</div>
+        <pre><code class="java">@RequestParam(required = false) Boolean vencidas
+// ...
+if (Boolean.TRUE.equals(vencidas)) {
+    return ResponseEntity.ok(useCase.listarVencidas());
+}
+
+// ActividadService.listarVencidas()
+return toResponses(persistencePort.findVencidas(
+        EstadoActividad.PENDIENTE, LocalDateTime.now()));</code></pre>
+      </div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q9" value="a"><span class="letter">A</span><span class="opt-text">Las actividades CANCELADAS con fecha pasada.</span></label>
+        <label class="opt"><input type="radio" name="q9" value="b"><span class="letter">B</span><span class="opt-text">Las PENDIENTES con fecha anterior a ahora.</span></label>
+        <label class="opt"><input type="radio" name="q9" value="c"><span class="letter">C</span><span class="opt-text">HTTP 400 por parámetros contradictorios.</span></label>
+        <label class="opt"><input type="radio" name="q9" value="d"><span class="letter">D</span><span class="opt-text">Una lista vacía siempre.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="B" data-answer="b" data-explain="No hay máquina de estados: cambiarEstado asigna el enum recibido y guarda. Cualquier transición es aceptada, incluso COMPLETADA a PENDIENTE.">
+      <legend class="q-text"><span class="q-num">10</span> <code>PATCH /actividades/1/estado?estado=PENDIENTE</code> sobre una actividad COMPLETADA.</legend>
+      <div class="src">📄 ActividadService.java · líneas 176-182</div>
+      <div class="code-wrap">
+        <div class="code-label"><b>ActividadService.java</b> · cambiarEstado()</div>
+        <pre><code class="java">Actividad actividad = persistencePort.findById(id)
+        .orElseThrow(() -&gt; new ResourceNotFoundException(
+                "Actividad no encontrada con ID: " + id));
+
+actividad.setEstado(estado);
+Actividad updated = persistencePort.save(actividad);
+return toResponse(updated, cargarEtiquetas(updated.getId()));</code></pre>
+      </div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q10" value="a"><span class="letter">A</span><span class="opt-text">HTTP 409 Conflict: transición no permitida.</span></label>
+        <label class="opt"><input type="radio" name="q10" value="b"><span class="letter">B</span><span class="opt-text">HTTP 200 y la actividad vuelve a PENDIENTE.</span></label>
+        <label class="opt"><input type="radio" name="q10" value="c"><span class="letter">C</span><span class="opt-text">HTTP 404.</span></label>
+        <label class="opt"><input type="radio" name="q10" value="d"><span class="letter">D</span><span class="opt-text">HTTP 400 por enum inválido.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="B" data-answer="b" data-explain="POST responde 201 Created porque crea un recurso. DELETE responde 204 No Content porque no devuelve cuerpo.">
+      <legend class="q-text"><span class="q-num">11</span> ¿Qué códigos HTTP devuelven <code>POST</code> y <code>DELETE</code> cuando todo sale bien?</legend>
+      <div class="src">📄 ActividadController.java · líneas 26-30 y 81-85</div>
+      <div class="code-wrap">
+        <div class="code-label"><b>ActividadController.java</b> · crear() y eliminar()</div>
+        <pre><code class="java">@PostMapping
+public ResponseEntity&lt;ActividadResponse&gt; crear(...) {
+    ActividadResponse response = useCase.crear(request);
+    return new ResponseEntity&lt;&gt;(response, HttpStatus.CREATED);
+}
+
+@DeleteMapping("/{id}")
+public ResponseEntity&lt;Void&gt; eliminar(@PathVariable Long id) {
+    useCase.eliminar(id);
+    return ResponseEntity.noContent().build();
+}</code></pre>
+      </div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q11" value="a"><span class="letter">A</span><span class="opt-text">200 y 200.</span></label>
+        <label class="opt"><input type="radio" name="q11" value="b"><span class="letter">B</span><span class="opt-text">201 y 204.</span></label>
+        <label class="opt"><input type="radio" name="q11" value="c"><span class="letter">C</span><span class="opt-text">200 y 204.</span></label>
+        <label class="opt"><input type="radio" name="q11" value="d"><span class="letter">D</span><span class="opt-text">201 y 200.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="B" data-answer="b" data-explain="La subconsulta busca en la tabla de vínculos los idActividad que tienen esa etiqueta; el SELECT exterior devuelve esas actividades.">
+      <legend class="q-text"><span class="q-num">12</span> ¿Qué devuelve esta consulta JPQL?</legend>
+      <div class="src">📄 ActividadSpringDataRepository.java · líneas 21-23</div>
+      <div class="code-wrap">
+        <div class="code-label"><b>ActividadSpringDataRepository.java</b> · findByEtiquetaId()</div>
+        <pre><code class="java">@Query("SELECT DISTINCT a FROM ActividadEntity a WHERE a.id IN " +
+        "(SELECT ae.idActividad FROM ActividadEtiquetaEntity ae " +
+        " WHERE ae.idEtiqueta = :idEtiqueta)")
+List&lt;ActividadEntity&gt; findByEtiquetaId(@Param("idEtiqueta") Long idEtiqueta);</code></pre>
+      </div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q12" value="a"><span class="letter">A</span><span class="opt-text">Las etiquetas que tiene una actividad.</span></label>
+        <label class="opt"><input type="radio" name="q12" value="b"><span class="letter">B</span><span class="opt-text">Las actividades que tienen esa etiqueta.</span></label>
+        <label class="opt"><input type="radio" name="q12" value="c"><span class="letter">C</span><span class="opt-text">Los contactos etiquetados con ese ID.</span></label>
+        <label class="opt"><input type="radio" name="q12" value="d"><span class="letter">D</span><span class="opt-text">El número de veces que se usa la etiqueta.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="B" data-answer="b" data-explain="El servicio siempre pasa PENDIENTE y la hora actual. En SQL equivale a estado = PENDIENTE AND fecha &lt; SYSTIMESTAMP.">
+      <legend class="q-text"><span class="q-num">13</span> ¿Cuál es el equivalente SQL de <code>findVencidas</code>?</legend>
+      <div class="src">📄 ActividadSpringDataRepository.java · líneas 32-34</div>
+      <div class="code-wrap">
+        <div class="code-label"><b>ActividadSpringDataRepository.java</b> · findVencidas()</div>
+        <pre><code class="java">@Query("SELECT a FROM ActividadEntity a " +
+       "WHERE a.estado = :estado AND a.fecha &lt; :ahora")
+List&lt;ActividadEntity&gt; findVencidas(@Param("estado") EstadoActividad estado,
+                                   @Param("ahora") LocalDateTime ahora);</code></pre>
+      </div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q13" value="a"><span class="letter">A</span><span class="opt-text"><code>WHERE estado = 'PENDIENTE' AND fecha &lt; SYSTIMESTAMP</code></span></label>
+        <label class="opt"><input type="radio" name="q13" value="b"><span class="letter">B</span><span class="opt-text"><code>WHERE estado = 'VENCIDA'</code></span></label>
+        <label class="opt"><input type="radio" name="q13" value="c"><span class="letter">C</span><span class="opt-text"><code>WHERE fecha &gt; SYSTIMESTAMP</code></span></label>
+        <label class="opt"><input type="radio" name="q13" value="d"><span class="letter">D</span><span class="opt-text"><code>WHERE estado &lt;&gt; 'COMPLETADA'</code></span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="B" data-answer="b" data-explain="El puerto público de Clientes no ofrece buscar un contacto por ID, así que el adapter recorre todos los clientes y todos sus contactos: coste O(clientes × contactos) en cada búsqueda.">
+      <legend class="q-text"><span class="q-num">14</span> ¿Cuál es el problema de este adaptador?</legend>
+      <div class="src">📄 ContactoQueryAdapter.java · líneas 29-35</div>
+      <div class="code-wrap">
+        <div class="code-label"><b>ContactoQueryAdapter.java</b> · buscarPorId()</div>
+        <pre><code class="java">@Override
+public Optional&lt;ContactoResponse&gt; buscarPorId(Long idContacto) {
+    return clienteUseCase.listar().stream()
+            .flatMap(cliente -&gt; cliente.contactos().stream())
+            .filter(contacto -&gt; contacto.id().equals(idContacto))
+            .findFirst();
+}</code></pre>
+      </div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q14" value="a"><span class="letter">A</span><span class="opt-text">No compila: falta un <code>return</code>.</span></label>
+        <label class="opt"><input type="radio" name="q14" value="b"><span class="letter">B</span><span class="opt-text">Recorre todos los clientes y contactos en cada búsqueda.</span></label>
+        <label class="opt"><input type="radio" name="q14" value="c"><span class="letter">C</span><span class="opt-text">Lanza excepción si no encuentra el contacto.</span></label>
+        <label class="opt"><input type="radio" name="q14" value="d"><span class="letter">D</span><span class="opt-text">Devuelve siempre <code>null</code>.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="B" data-answer="b" data-explain="Oracle no garantiza el orden de las filas sin ORDER BY. Ordenar por id descendente asegura que la actividad recién creada aparezca primera.">
+      <legend class="q-text"><span class="q-num">15</span> ¿Por qué <code>findAll()</code> ordena explícitamente por <code>id</code> descendente?</legend>
+      <div class="src">📄 ActividadPersistenceAdapter.java · líneas 38-45</div>
+      <div class="code-wrap">
+        <div class="code-label"><b>ActividadPersistenceAdapter.java</b> · findAll()</div>
+        <pre><code class="java">// Orden explícito: sin ORDER BY, Oracle devuelve las filas en orden de
+// almacenamiento y cualquier UPDATE puede alterarlo.
+Sort orden = Sort.by(Sort.Direction.DESC, "id");
+return repository.findAll(orden).stream()
+        .map(this::toDomain)
+        .collect(Collectors.toList());</code></pre>
+      </div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q15" value="a"><span class="letter">A</span><span class="opt-text">Porque Oracle exige <code>ORDER BY</code> en toda consulta.</span></label>
+        <label class="opt"><input type="radio" name="q15" value="b"><span class="letter">B</span><span class="opt-text">Porque sin <code>ORDER BY</code> Oracle no garantiza el orden de las filas.</span></label>
+        <label class="opt"><input type="radio" name="q15" value="c"><span class="letter">C</span><span class="opt-text">Para usar el índice de <code>FECHA</code>.</span></label>
+        <label class="opt"><input type="radio" name="q15" value="d"><span class="letter">D</span><span class="opt-text">Porque el frontend lo exige en la URL.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+  </section>
+
+  <!-- ================= C. FRONTEND ================= -->
+  <section class="block" data-section="C">
+    <div class="block-head">
+      <span class="badge">C</span>
+      <h2>Frontend: formulario y lista</h2>
+      <span class="lang">TypeScript</span>
+      <span class="pts">7 preguntas</span>
+    </div>
+
+    <fieldset class="q" data-section="C" data-answer="a" data-explain="El sufijo es fijo según el modo: actividad:nuevo al crear y actividad:&lt;id&gt; al editar. Así cada actividad tiene su propio borrador.">
+      <legend class="q-text"><span class="q-num">16</span> ¿Qué clave usa el borrador cuando se crea una actividad nueva?</legend>
+      <div class="src">📄 actividad-form.ts · líneas 109-111</div>
+      <div class="code-wrap">
+        <div class="code-label"><b>actividad-form.ts</b> · draftKey</div>
+        <pre><code class="ts">get draftKey(): string {
+  return `actividad:${this.isEdit ? this.id : 'nuevo'}`;
+}</code></pre>
+      </div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q16" value="a"><span class="letter">A</span><span class="opt-text"><code>actividad:nuevo</code></span></label>
+        <label class="opt"><input type="radio" name="q16" value="b"><span class="letter">B</span><span class="opt-text"><code>actividad:0</code></span></label>
+        <label class="opt"><input type="radio" name="q16" value="c"><span class="letter">C</span><span class="opt-text"><code>actividad:null</code></span></label>
+        <label class="opt"><input type="radio" name="q16" value="d"><span class="letter">D</span><span class="opt-text"><code>nuevo</code></span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="C" data-answer="b" data-explain="debounceTime(600) espera 600 ms de silencio, y la condición dirty evita guardar si el usuario no tocó nada.">
+      <legend class="q-text"><span class="q-num">17</span> ¿Cuándo se guarda el borrador en <code>localStorage</code>?</legend>
+      <div class="src">📄 actividad-form.ts · líneas 136-142</div>
+      <div class="code-wrap">
+        <div class="code-label"><b>actividad-form.ts</b> · ngOnInit()</div>
+        <pre><code class="ts">this.form.valueChanges
+  .pipe(debounceTime(600), takeUntilDestroyed(this.destroyRef))
+  .subscribe((v) =&gt; {
+    if (this.form.dirty) {
+      this.draft.save(this.draftKey, {
+        form: v, etiquetas: this.etiquetasSeleccionadas
+      });
+    }
+  });</code></pre>
+      </div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q17" value="a"><span class="letter">A</span><span class="opt-text">En cada tecla, al instante.</span></label>
+        <label class="opt"><input type="radio" name="q17" value="b"><span class="letter">B</span><span class="opt-text">600 ms después del último cambio y solo si el formulario está <code>dirty</code>.</span></label>
+        <label class="opt"><input type="radio" name="q17" value="c"><span class="letter">C</span><span class="opt-text">Solo al cerrar el diálogo.</span></label>
+        <label class="opt"><input type="radio" name="q17" value="d"><span class="letter">D</span><span class="opt-text">Cada 60 segundos con un temporizador.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="C" data-answer="b" data-explain="Cada petición atrapa su error con catchError(() =&gt; of([])), así forkJoin recibe un arreglo vacío en lugar de fallar completo. El formulario abre igual.">
+      <legend class="q-text"><span class="q-num">18</span> Falla <code>GET /clientes</code> al abrir el formulario. ¿Qué ocurre?</legend>
+      <div class="src">📄 actividad-form.ts · líneas 169-178</div>
+      <div class="code-wrap">
+        <div class="code-label"><b>actividad-form.ts</b> · cargarCatalogos()</div>
+        <pre><code class="ts">forkJoin({
+  clientes: this.clientesService.listar().pipe(catchError(() =&gt; of([]))),
+  leads: this.leadsService.listar().pipe(catchError(() =&gt; of([]))),
+  oportunidades: this.oportunidadesService.listar().pipe(catchError(() =&gt; of([]))),
+  etiquetas: this.etiquetasService.listar(true).pipe(
+    catchError(() =&gt; {
+      this.errorEtiquetas = 'No se pudieron cargar las etiquetas.';
+      return of([]);
+    })
+  )
+})</code></pre>
+      </div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q18" value="a"><span class="letter">A</span><span class="opt-text">Todo el formulario falla y no se abre.</span></label>
+        <label class="opt"><input type="radio" name="q18" value="b"><span class="letter">B</span><span class="opt-text">Clientes queda vacío y el resto de catálogos carga normal.</span></label>
+        <label class="opt"><input type="radio" name="q18" value="c"><span class="letter">C</span><span class="opt-text">Se reintenta tres veces y luego falla.</span></label>
+        <label class="opt"><input type="radio" name="q18" value="d"><span class="letter">D</span><span class="opt-text">Redirige al login de Keycloak.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="C" data-answer="b" data-explain="datetime-local devuelve YYYY-MM-DDTHH:mm, sin segundos. Spring deserializa a LocalDateTime y necesita el formato completo, por eso se añade :00.">
+      <legend class="q-text"><span class="q-num">19</span> ¿Por qué se añade <code>:00</code> a la fecha antes de enviarla?</legend>
+      <div class="src">📄 actividad-form.ts · líneas 355-356</div>
+      <div class="code-wrap">
+        <div class="code-label"><b>actividad-form.ts</b> · guardar()</div>
+        <pre><code class="ts">// datetime-local entrega "YYYY-MM-DDTHH:mm"; Spring espera LocalDateTime.
+const fechaISO = val.fechaHora.length === 16
+  ? `${val.fechaHora}:00`
+  : val.fechaHora;</code></pre>
+      </div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q19" value="a"><span class="letter">A</span><span class="opt-text">Para convertir la hora local a UTC.</span></label>
+        <label class="opt"><input type="radio" name="q19" value="b"><span class="letter">B</span><span class="opt-text">Porque <code>datetime-local</code> omite los segundos y Spring espera el formato completo.</span></label>
+        <label class="opt"><input type="radio" name="q19" value="c"><span class="letter">C</span><span class="opt-text">Para escapar los dos puntos en la URL.</span></label>
+        <label class="opt"><input type="radio" name="q19" value="d"><span class="letter">D</span><span class="opt-text">Porque Oracle exige siempre microsegundos.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="C" data-answer="a" data-explain="Cada vínculo se envía solo si el tipo coincide. Con OPORTUNIDAD, idCliente e idLead quedan undefined; el backend recibe solo idOportunidad.">
+      <legend class="q-text"><span class="q-num">20</span> Con <code>vinculacionTipo = 'OPORTUNIDAD'</code> e <code>idOportunidad = 2</code>, ¿qué se envía?</legend>
+      <div class="src">📄 actividad-form.ts · líneas 364-366</div>
+      <div class="code-wrap">
+        <div class="code-label"><b>actividad-form.ts</b> · guardar()</div>
+        <pre><code class="ts">idCliente: val.vinculacionTipo === 'CLIENTE' &amp;&amp; val.idCliente
+  ? Number(val.idCliente) : undefined,
+idLead: val.vinculacionTipo === 'LEAD' &amp;&amp; val.idLead
+  ? Number(val.idLead) : undefined,
+idOportunidad: val.vinculacionTipo === 'OPORTUNIDAD' &amp;&amp; val.idOportunidad
+  ? Number(val.idOportunidad) : undefined,</code></pre>
+      </div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q20" value="a"><span class="letter">A</span><span class="opt-text"><code>idOportunidad: 2</code> y los otros dos <code>undefined</code>.</span></label>
+        <label class="opt"><input type="radio" name="q20" value="b"><span class="letter">B</span><span class="opt-text">Los tres IDs a la vez.</span></label>
+        <label class="opt"><input type="radio" name="q20" value="c"><span class="letter">C</span><span class="opt-text"><code>idOportunidad: "2"</code> como texto.</span></label>
+        <label class="opt"><input type="radio" name="q20" value="d"><span class="letter">D</span><span class="opt-text">Solo <code>idCliente</code>.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="C" data-answer="b" data-explain="La ruta pasa data.abrirEdicion y el id por la URL. ngOnInit los lee y llama a abrirDialogo(id), que abre el mismo formulario en modo edición.">
+      <legend class="q-text"><span class="q-num">21</span> El usuario entra a <code>/actividades/3/editar</code>. ¿Qué pasa?</legend>
+      <div class="src">📄 actividad-list.ts · líneas 89-101</div>
+      <div class="code-wrap">
+        <div class="code-label"><b>actividad-list.ts</b> · ngOnInit()</div>
+        <pre><code class="ts">if (this.route.snapshot.data['abrirNuevaActividad']) {
+  this.abrirDialogo();
+  return;
+}
+
+const idParam = this.route.snapshot.paramMap.get('id');
+if (this.route.snapshot.data['abrirEdicion'] &amp;&amp; idParam) {
+  const id = Number(idParam);
+  if (Number.isFinite(id) &amp;&amp; id &gt; 0) {
+    this.abrirDialogo(id);
+  }
+}</code></pre>
+      </div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q21" value="a"><span class="letter">A</span><span class="opt-text">Muestra la lista sin abrir nada.</span></label>
+        <label class="opt"><input type="radio" name="q21" value="b"><span class="letter">B</span><span class="opt-text">Abre el diálogo de edición con la actividad 3.</span></label>
+        <label class="opt"><input type="radio" name="q21" value="c"><span class="letter">C</span><span class="opt-text">Abre el diálogo de creación vacío.</span></label>
+        <label class="opt"><input type="radio" name="q21" value="d"><span class="letter">D</span><span class="opt-text">Redirige a <code>/actividades</code> con un 404.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="C" data-answer="b" data-explain="El filtro busca en título, tipo, estado, descripción y nombre de etiqueta. No busca por nombre de cliente ni por usuario.">
+      <legend class="q-text"><span class="q-num">22</span> ¿En qué campos busca el filtro de texto de la lista?</legend>
+      <div class="src">📄 actividad-list.ts · líneas 55-70</div>
+      <div class="code-wrap">
+        <div class="code-label"><b>actividad-list.ts</b> · actividadesFiltradas</div>
+        <pre><code class="ts">return !q ||
+  a.titulo?.toLowerCase().includes(q) ||
+  a.tipo?.toLowerCase().includes(q) ||
+  a.estado?.toLowerCase().includes(q) ||
+  a.descripcion?.toLowerCase().includes(q) ||
+  (a.etiquetas || []).some(e =&gt; e.nombre.toLowerCase().includes(q));</code></pre>
+      </div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q22" value="a"><span class="letter">A</span><span class="opt-text">Solo en el título.</span></label>
+        <label class="opt"><input type="radio" name="q22" value="b"><span class="letter">B</span><span class="opt-text">Título, tipo, estado, descripción y nombre de etiqueta.</span></label>
+        <label class="opt"><input type="radio" name="q22" value="c"><span class="letter">C</span><span class="opt-text">Todos los campos, incluido el nombre del cliente.</span></label>
+        <label class="opt"><input type="radio" name="q22" value="d"><span class="letter">D</span><span class="opt-text">Solo en las etiquetas.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+  </section>
+
+  <!-- ================= D. SQL ================= -->
+  <section class="block" data-section="D">
+    <div class="block-head">
+      <span class="badge">D</span>
+      <h2>Oracle: tablas y restricciones</h2>
+      <span class="lang">SQL</span>
+      <span class="pts">5 preguntas</span>
+    </div>
+
+    <fieldset class="q" data-section="D" data-answer="b" data-explain="La restricción única es sobre el par (ID_ACTIVIDAD, ID_ETIQUETA), así que impide repetir la misma etiqueta en la misma actividad, pero no en actividades distintas.">
+      <legend class="q-text"><span class="q-num">23</span> ¿Qué impide la restricción <code>UK_ACTIVIDAD_ETIQUETA</code>?</legend>
+      <div class="src">📄 03_tablas/07_actividades.sql · CRM_ACTIVIDAD_ETIQUETAS</div>
+      <div class="code-wrap">
+        <div class="code-label"><b>07_actividades.sql</b> · tabla de vínculos</div>
+        <pre><code class="sql">CREATE TABLE CRM_ACTIVIDAD_ETIQUETAS (
+    ID_ACTIVIDAD_ETIQUETA NUMBER(19,0) GENERATED BY DEFAULT AS IDENTITY,
+    ID_ACTIVIDAD          NUMBER(19,0) NOT NULL,
+    ID_ETIQUETA           NUMBER(19,0) NOT NULL,
+    CREADO_EN             TIMESTAMP(6) NOT NULL,
+    ORDEN                 NUMBER(10,0),
+    CONSTRAINT PK_CRM_ACTIVIDAD_ETIQUETAS
+        PRIMARY KEY (ID_ACTIVIDAD_ETIQUETA),
+    CONSTRAINT UK_ACTIVIDAD_ETIQUETA
+        UNIQUE (ID_ACTIVIDAD, ID_ETIQUETA)
+);</code></pre>
+      </div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q23" value="a"><span class="letter">A</span><span class="opt-text">Que existan dos actividades con el mismo ID.</span></label>
+        <label class="opt"><input type="radio" name="q23" value="b"><span class="letter">B</span><span class="opt-text">Que la misma etiqueta se repita en la misma actividad.</span></label>
+        <label class="opt"><input type="radio" name="q23" value="c"><span class="letter">C</span><span class="opt-text">Que una etiqueta no tenga nombre.</span></label>
+        <label class="opt"><input type="radio" name="q23" value="d"><span class="letter">D</span><span class="opt-text">Que una actividad tenga más de 8 etiquetas.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="D" data-answer="b" data-explain="No hay restricciones de tipo R (foreign key). Oracle acepta el DELETE del cliente y las actividades quedan apuntando a un ID que ya no existe.">
+      <legend class="q-text"><span class="q-num">24</span> Se ejecuta <code>DELETE FROM CRM_CLIENTES WHERE ID = 1</code> por SQL*Plus. ¿Qué ocurre con sus actividades?</legend>
+      <div class="src">📄 Consulta real sobre el esquema</div>
+      <div class="code-wrap">
+        <div class="code-label"><b>SQL*Plus</b> · restricciones de la tabla</div>
+        <pre><code class="sql">SELECT constraint_name, constraint_type
+FROM user_constraints
+WHERE table_name = 'CRM_ACTIVIDADES';
+
+-- resultado: 1 fila, tipo 'P' (primary key)
+-- 0 filas de tipo 'R' (foreign key)</code></pre>
+      </div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q24" value="a"><span class="letter">A</span><span class="opt-text">Oracle borra las actividades en cascada.</span></label>
+        <label class="opt"><input type="radio" name="q24" value="b"><span class="letter">B</span><span class="opt-text">Quedan con <code>ID_CLIENTE = 1</code> apuntando a un cliente inexistente.</span></label>
+        <label class="opt"><input type="radio" name="q24" value="c"><span class="letter">C</span><span class="opt-text">Oracle rechaza el DELETE por integridad referencial.</span></label>
+        <label class="opt"><input type="radio" name="q24" value="d"><span class="letter">D</span><span class="opt-text">Oracle pone <code>ID_CLIENTE</code> en NULL automáticamente.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="D" data-answer="b" data-explain="Hay índices sobre ESTADO, FECHA, ID_CLIENTE e ID_OPORTUNIDAD. No hay índice sobre ID_LEAD ni sobre ID_USUARIO, así que esos dos filtros hacen recorrido completo.">
+      <legend class="q-text"><span class="q-num">25</span> Según estos índices, ¿qué filtro de la API queda sin índice?</legend>
+      <div class="src">📄 03_tablas/07_actividades.sql · líneas finales</div>
+      <div class="code-wrap">
+        <div class="code-label"><b>07_actividades.sql</b> · índices</div>
+        <pre><code class="sql">CREATE INDEX IX_CRM_ACTIVIDADES_ESTADO
+    ON CRM_ACTIVIDADES (ESTADO);
+CREATE INDEX IX_CRM_ACTIVIDADES_FECHA
+    ON CRM_ACTIVIDADES (FECHA);
+CREATE INDEX IX_CRM_ACTIVIDADES_CLIENTE
+    ON CRM_ACTIVIDADES (ID_CLIENTE);
+CREATE INDEX IX_CRM_ACTIVIDADES_OPORTUNIDAD
+    ON CRM_ACTIVIDADES (ID_OPORTUNIDAD);</code></pre>
+      </div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q25" value="a"><span class="letter">A</span><span class="opt-text"><code>estado</code></span></label>
+        <label class="opt"><input type="radio" name="q25" value="b"><span class="letter">B</span><span class="opt-text"><code>idLead</code> e <code>idUsuario</code></span></label>
+        <label class="opt"><input type="radio" name="q25" value="c"><span class="letter">C</span><span class="opt-text"><code>idCliente</code></span></label>
+        <label class="opt"><input type="radio" name="q25" value="d"><span class="letter">D</span><span class="opt-text"><code>idOportunidad</code></span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="D" data-answer="b" data-explain="Una actividad puede existir sin cliente, sin lead y sin oportunidad. Con INNER JOIN esas filas desaparecerían de la vista; LEFT JOIN las conserva con nombres nulos.">
+      <legend class="q-text"><span class="q-num">26</span> ¿Por qué la vista usa <code>LEFT JOIN</code> y no <code>INNER JOIN</code>?</legend>
+      <div class="src">📄 06_vistas/vw_viernes_agenda.sql</div>
+      <div class="code-wrap">
+        <div class="code-label"><b>vw_viernes_agenda.sql</b> · vista agenda</div>
+        <pre><code class="sql">SELECT a.ID_ACTIVIDAD, a.TITULO, a.TIPO, a.ESTADO, a.FECHA,
+       c.NOMBRE AS CLIENTE,
+       l.NOMBRE AS LEAD,
+       o.NOMBRE AS OPORTUNIDAD
+FROM CRM_ACTIVIDADES a
+LEFT JOIN CRM_CLIENTES c      ON c.ID = a.ID_CLIENTE
+LEFT JOIN CRM_LEADS l         ON l.ID = a.ID_LEAD
+LEFT JOIN CRM_OPORTUNIDADES o ON o.ID = a.ID_OPORTUNIDAD;</code></pre>
+      </div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q26" value="a"><span class="letter">A</span><span class="opt-text">Por rendimiento: el LEFT JOIN usa menos memoria.</span></label>
+        <label class="opt"><input type="radio" name="q26" value="b"><span class="letter">B</span><span class="opt-text">Porque una actividad puede no tener cliente, lead ni oportunidad y con INNER desaparecería.</span></label>
+        <label class="opt"><input type="radio" name="q26" value="c"><span class="letter">C</span><span class="opt-text">Porque Oracle no soporta <code>INNER JOIN</code> en vistas.</span></label>
+        <label class="opt"><input type="radio" name="q26" value="d"><span class="letter">D</span><span class="opt-text">Para poder ordenar por el nombre del cliente.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="D" data-answer="b" data-explain="GENERATED BY DEFAULT AS IDENTITY hace que Oracle asigne el valor al insertar. En JPA se refleja con GenerationType.IDENTITY, no con una secuencia aparte.">
+      <legend class="q-text"><span class="q-num">27</span> ¿Quién asigna el valor de <code>ID_ACTIVIDAD</code> al insertar?</legend>
+      <div class="src">📄 07_actividades.sql · ActividadEntity.java</div>
+      <div class="code-wrap">
+        <div class="code-label"><b>DDL + entidad JPA</b> · identidad</div>
+        <pre><code class="sql">ID_ACTIVIDAD NUMBER(19,0) GENERATED BY DEFAULT AS IDENTITY</code></pre>
+        <pre><code class="java">@Id
+@GeneratedValue(strategy = GenerationType.IDENTITY)
+@Column(name = "id_actividad")
+private Long id;</code></pre>
+      </div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q27" value="a"><span class="letter">A</span><span class="opt-text">Hibernate, con una secuencia propia que crea al arrancar.</span></label>
+        <label class="opt"><input type="radio" name="q27" value="b"><span class="letter">B</span><span class="opt-text">Oracle, mediante la columna <code>IDENTITY</code> de la tabla.</span></label>
+        <label class="opt"><input type="radio" name="q27" value="c"><span class="letter">C</span><span class="opt-text">El frontend, que envía el siguiente número libre.</span></label>
+        <label class="opt"><input type="radio" name="q27" value="d"><span class="letter">D</span><span class="opt-text">Un trigger <code>BEFORE INSERT</code> definido aparte.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+  </section>
+
+  <!-- ================= E. CAZA DE BUGS ================= -->
+  <section class="block" data-section="E">
+    <div class="block-head">
+      <span class="badge">E</span>
+      <h2>Caza de bugs y decisiones dudosas</h2>
+      <span class="lang">Java + TS</span>
+      <span class="pts">3 preguntas</span>
+    </div>
+
+    <fieldset class="q" data-section="E" data-answer="b" data-explain="El request que arma el formulario no incluye idUsuario. El backend acepta el campo, pero como nunca se envía, las actividades creadas desde la web quedan sin responsable.">
+      <legend class="q-text"><span class="q-num">28</span> ¿Qué dato del vendedor falta en este request?</legend>
+      <div class="src">📄 actividad-form.ts · líneas 358-368</div>
+      <div class="code-wrap">
+        <div class="code-label"><b>actividad-form.ts</b> · guardar()</div>
+        <pre><code class="ts">const request: ActividadRequest = {
+  titulo: val.titulo,
+  descripcion: val.descripcion,
+  tipo: val.tipo,
+  estado: val.estado,
+  fecha: fechaISO,
+  idCliente: ...,
+  idLead: ...,
+  idOportunidad: ...,
+  etiquetaIds: this.etiquetasSeleccionadas.map(e =&gt; e.id)
+};</code></pre>
+      </div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q28" value="a"><span class="letter">A</span><span class="opt-text"><code>idUsuario</code></span></label>
+        <label class="opt"><input type="radio" name="q28" value="b"><span class="letter">B</span><span class="opt-text"><code>idCliente</code></span></label>
+        <label class="opt"><input type="radio" name="q28" value="c"><span class="letter">C</span><span class="opt-text"><code>tipo</code></span></label>
+        <label class="opt"><input type="radio" name="q28" value="d"><span class="letter">D</span><span class="opt-text"><code>estado</code></span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="E" data-answer="b" data-explain="Aunque la API acepta ?estado, ?vencidas, ?idCliente y más, la lista llama a listar() sin argumentos: trae todo y filtra en el navegador con computed.">
+      <legend class="q-text"><span class="q-num">29</span> La API soporta filtros por query string. ¿Qué hace realmente la lista?</legend>
+      <div class="src">📄 actividad-list.ts · líneas 103-116</div>
+      <div class="code-wrap">
+        <div class="code-label"><b>actividad-list.ts</b> · cargarActividades()</div>
+        <pre><code class="ts">cargarActividades() {
+  this.loading.set(true);
+  this.error.set('');
+  this.actividadesService.listar().subscribe({
+    next: (data) =&gt; {
+      this.actividades.set(data || []);
+      this.loading.set(false);
+    },
+    error: () =&gt; {
+      this.error.set('Error al cargar actividades.');
+      this.loading.set(false);
+    }
+  });
+}</code></pre>
+      </div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q29" value="a"><span class="letter">A</span><span class="opt-text">Manda todos los filtros al backend.</span></label>
+        <label class="opt"><input type="radio" name="q29" value="b"><span class="letter">B</span><span class="opt-text">Trae todas las actividades y filtra en el navegador.</span></label>
+        <label class="opt"><input type="radio" name="q29" value="c"><span class="letter">C</span><span class="opt-text">Pagina de 20 en 20.</span></label>
+        <label class="opt"><input type="radio" name="q29" value="d"><span class="letter">D</span><span class="opt-text">Solo trae las vencidas.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="E" data-answer="b" data-explain="validarRelaciones solo comprueba que cada referencia exista, no que sea la única. Las tres se guardan. La restricción de una sola vinculación vive solo en la UI.">
+      <legend class="q-text"><span class="q-num">30</span> Un cliente externo manda <code>idCliente=1</code>, <code>idLead=2</code> y <code>idOportunidad=3</code>, todos existentes. ¿Qué hace el backend?</legend>
+      <div class="src">📄 ActividadService.java · líneas 235-248</div>
+      <div class="code-wrap">
+        <div class="code-label"><b>ActividadService.java</b> · validarRelaciones()</div>
+        <pre><code class="java">if (request.idCliente() != null
+        &amp;&amp; !validationPort.existeCliente(request.idCliente())) {
+    throw new ResourceNotFoundException(...);
+}
+if (request.idLead() != null
+        &amp;&amp; !validationPort.existeLead(request.idLead())) {
+    throw new ResourceNotFoundException(...);
+}
+if (request.idOportunidad() != null
+        &amp;&amp; !validationPort.existeOportunidad(request.idOportunidad())) {
+    throw new ResourceNotFoundException(...);
+}</code></pre>
+      </div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q30" value="a"><span class="letter">A</span><span class="opt-text">HTTP 400: solo se permite una vinculación.</span></label>
+        <label class="opt"><input type="radio" name="q30" value="b"><span class="letter">B</span><span class="opt-text">Guarda las tres referencias en la misma fila.</span></label>
+        <label class="opt"><input type="radio" name="q30" value="c"><span class="letter">C</span><span class="opt-text">Prioriza el cliente e ignora lead y oportunidad.</span></label>
+        <label class="opt"><input type="radio" name="q30" value="d"><span class="letter">D</span><span class="opt-text">HTTP 404 por conflicto de relaciones.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+  </section>
+
+  <!-- ================= RESULTADO ================= -->
+  <section class="resultado" id="resultado" hidden aria-live="polite">
+    <div class="score-ring">
+      <div>
+        <b id="scoreNumber">0</b>
+        <span>de 30</span>
+      </div>
+    </div>
+    <div>
+      <h2 id="scoreTitle">Resultado</h2>
+      <p id="scoreMessage"></p>
+      <div class="chips" id="sectionChips"></div>
+      <button class="btn" type="button" onclick="reiniciar()">Intentar de nuevo</button>
+    </div>
+  </section>
+
+  <div class="resultado" id="revealBanner" hidden style="grid-template-columns:1fr;">
+    <div>
+      <h2>Respuestas reveladas</h2>
+      <p>Las opciones correctas están marcadas en verde. Usa «Reiniciar» para intentarlo de nuevo sin mirar.</p>
+    </div>
+  </div>
+
+  <!-- ================= CLAVE ================= -->
+  <details class="key">
+    <summary>Clave rápida de respuestas (para el docente)</summary>
+    <div class="key-grid">
+      <span>1 <b>B</b></span><span>2 <b>B</b></span><span>3 <b>B</b></span><span>4 <b>B</b></span><span>5 <b>B</b></span>
+      <span>6 <b>B</b></span><span>7 <b>B</b></span><span>8 <b>B</b></span><span>9 <b>B</b></span><span>10 <b>B</b></span>
+      <span>11 <b>B</b></span><span>12 <b>B</b></span><span>13 <b>A</b></span><span>14 <b>B</b></span><span>15 <b>B</b></span>
+      <span>16 <b>A</b></span><span>17 <b>B</b></span><span>18 <b>B</b></span><span>19 <b>B</b></span><span>20 <b>A</b></span>
+      <span>21 <b>B</b></span><span>22 <b>B</b></span><span>23 <b>B</b></span><span>24 <b>B</b></span><span>25 <b>B</b></span>
+      <span>26 <b>B</b></span><span>27 <b>B</b></span><span>28 <b>A</b></span><span>29 <b>B</b></span><span>30 <b>B</b></span>
+    </div>
+  </details>
+
+  <footer>
+    Examen de código del módulo <b>actividades</b> · Viernes CRM · 22/11/2026 · 30 preguntas · 1 punto cada una.
+    Fragmentos tomados del código real en <code>E:\Viernes\Viernes</code>.
+  </footer>
+
+</div>
+
+<!-- ================= DOCK ================= -->
+<div class="dock">
+  <div class="count"><b id="dockCount">0</b> / 30</div>
+  <div class="progress-track" aria-hidden="true"><span id="dockBar"></span></div>
+  <button class="btn primary" type="button" id="btnCalificarDock">Calificar</button>
+</div>
+
+<script>
+  /* ---------- Resaltado de sintaxis ---------- */
+  const JAVA_KW = new Set(['abstract','assert','boolean','break','byte','case','catch','char','class','const','continue','default','do','double','else','enum','extends','final','finally','float','for','if','implements','import','instanceof','int','interface','long','native','new','package','private','protected','public','record','return','short','static','strictfp','super','switch','synchronized','this','throw','throws','transient','try','void','volatile','while','var','true','false','null']);
+  const TS_KW = new Set(['const','let','var','function','return','if','else','for','while','switch','case','break','continue','new','class','interface','type','enum','import','from','export','default','extends','implements','public','private','protected','readonly','async','await','this','true','false','null','undefined','void','number','string','boolean','any','never','of','in','instanceof','typeof','as','get','set','throw','try','catch','finally']);
+  const SQL_KW = new Set(['select','from','where','and','or','not','null','is','in','insert','into','values','update','set','delete','create','table','constraint','primary','key','unique','index','tablespace','identity','generated','by','default','as','on','join','left','right','inner','outer','order','group','having','asc','desc','number','varchar2','timestamp','clob','references','foreign','check','distinct','count','exists','using','user_constraints','constraint_name','constraint_type','table_name']);
+
+  function escHtml(s) {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function highlightJavaLike(code, keywords) {
+    const re = /(\/\/[^\n]*|\/\*[\s\S]*?\*\/)|("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`)|(@[A-Za-z_][A-Za-z0-9_]*)|(\b\d+(?:\.\d+)?\b)|(\b[A-Za-z_][A-Za-z0-9_]*\b)/g;
+    let out = '', last = 0, m;
+    while ((m = re.exec(code)) !== null) {
+      out += escHtml(code.slice(last, m.index));
+      if (m[1] !== undefined) out += '<span class="tk-c">' + escHtml(m[1]) + '</span>';
+      else if (m[2] !== undefined) out += '<span class="tk-s">' + escHtml(m[2]) + '</span>';
+      else if (m[3] !== undefined) out += '<span class="tk-a">' + escHtml(m[3]) + '</span>';
+      else if (m[4] !== undefined) out += '<span class="tk-n">' + escHtml(m[4]) + '</span>';
+      else if (m[5] !== undefined) {
+        const w = m[5];
+        if (keywords.has(w)) out += '<span class="tk-k">' + escHtml(w) + '</span>';
+        else if (/^[A-Z]/.test(w)) out += '<span class="tk-t">' + escHtml(w) + '</span>';
+        else out += escHtml(w);
+      }
+      last = re.lastIndex;
+    }
+    return out + escHtml(code.slice(last));
+  }
+
+  function highlightSql(code) {
+    const re = /(--[^\n]*)|('(?:[^']|'')*')|(\b\d+(?:\.\d+)?\b)|(\b[A-Za-z_][A-Za-z0-9_$]*\b)/g;
+    let out = '', last = 0, m;
+    while ((m = re.exec(code)) !== null) {
+      out += escHtml(code.slice(last, m.index));
+      if (m[1] !== undefined) out += '<span class="tk-c">' + escHtml(m[1]) + '</span>';
+      else if (m[2] !== undefined) out += '<span class="tk-s">' + escHtml(m[2]) + '</span>';
+      else if (m[3] !== undefined) out += '<span class="tk-n">' + escHtml(m[3]) + '</span>';
+      else if (m[4] !== undefined) {
+        const w = m[4];
+        if (SQL_KW.has(w.toLowerCase())) out += '<span class="tk-k">' + escHtml(w) + '</span>';
+        else out += escHtml(w);
+      }
+      last = re.lastIndex;
+    }
+    return out + escHtml(code.slice(last));
+  }
+
+  document.querySelectorAll('.code-wrap code').forEach((el) => {
+    const lang = (el.className || '').trim();
+    const raw = el.textContent;
+    if (lang === 'sql') el.innerHTML = highlightSql(raw);
+    else el.innerHTML = highlightJavaLike(raw, lang === 'ts' ? TS_KW : JAVA_KW);
+  });
+
+  /* ---------- Calificación ---------- */
+  const questions = Array.from(document.querySelectorAll('fieldset.q'));
+  const total = questions.length;
+  const answeredCount = document.getElementById('answeredCount');
+  const dockCount = document.getElementById('dockCount');
+  const progressBar = document.getElementById('progressBar');
+  const dockBar = document.getElementById('dockBar');
+  const resultado = document.getElementById('resultado');
+  const revealBanner = document.getElementById('revealBanner');
+  let graded = false;
+
+  const sectionNames = {
+    A: 'Servicio',
+    B: 'Web y BD',
+    C: 'Frontend',
+    D: 'SQL',
+    E: 'Bugs'
+  };
+
+  function updateProgress() {
+    const answered = questions.filter(q => q.querySelector('input[type="radio"]:checked')).length;
+    const pct = total ? (answered / total) * 100 : 0;
+    answeredCount.textContent = answered;
+    dockCount.textContent = answered;
+    progressBar.style.width = pct + '%';
+    dockBar.style.width = pct + '%';
+  }
+
+  document.addEventListener('change', (event) => {
+    if (event.target.matches('input[type="radio"]')) {
+      if (graded) return;
+      updateProgress();
+    }
+  });
+
+  function limpiarClases(q) {
+    q.classList.remove('correct', 'wrong', 'unanswered');
+    q.querySelectorAll('.opt').forEach(opt => opt.classList.remove('is-correct', 'is-wrong'));
+    const status = q.querySelector('.q-status');
+    if (status) status.remove();
+  }
+
+  function mostrarFeedback(q, texto, estado) {
+    const fb = q.querySelector('.feedback');
+    if (!fb) return;
+    fb.hidden = false;
+    fb.innerHTML = texto;
+
+    const legend = q.querySelector('legend.q-text');
+    if (legend) {
+      const old = legend.querySelector('.q-status');
+      if (old) old.remove();
+      const badge = document.createElement('span');
+      badge.className = 'q-status';
+      badge.textContent = estado;
+      legend.appendChild(badge);
+    }
+  }
+
+  function calificar() {
+    if (graded) {
+      resultado.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    let correct = 0;
+    let wrong = 0;
+    let blank = 0;
+    const bySection = {};
+
+    questions.forEach((q) => {
+      const section = q.dataset.section;
+      if (!bySection[section]) bySection[section] = { ok: 0, total: 0 };
+      bySection[section].total++;
+
+      limpiarClases(q);
+
+      const selected = q.querySelector('input[type="radio"]:checked');
+      const correctValue = q.dataset.answer;
+      const correctInput = q.querySelector('input[type="radio"][value="' + correctValue + '"]');
+      const correctLabel = correctInput ? correctInput.closest('.opt') : null;
+
+      if (!selected) {
+        blank++;
+        q.classList.add('unanswered');
+        if (correctLabel) correctLabel.classList.add('is-correct');
+        mostrarFeedback(
+          q,
+          '<strong>Sin responder.</strong> La respuesta correcta era <b>' + correctValue.toUpperCase() + '</b>. ' + q.dataset.explain,
+          'Sin responder'
+        );
+      } else if (selected.value === correctValue) {
+        correct++;
+        bySection[section].ok++;
+        q.classList.add('correct');
+        if (correctLabel) correctLabel.classList.add('is-correct');
+        mostrarFeedback(
+          q,
+          '<strong>¡Correcto!</strong> ' + q.dataset.explain,
+          'Correcta'
+        );
+      } else {
+        wrong++;
+        q.classList.add('wrong');
+        selected.closest('.opt').classList.add('is-wrong');
+        if (correctLabel) correctLabel.classList.add('is-correct');
+        mostrarFeedback(
+          q,
+          '<strong>Incorrecto.</strong> La respuesta correcta era <b>' + correctValue.toUpperCase() + '</b>. ' + q.dataset.explain,
+          'Incorrecta'
+        );
+      }
+
+      q.querySelectorAll('input[type="radio"]').forEach(input => { input.disabled = true; });
+    });
+
+    graded = true;
+    const pct = Math.round((correct / total) * 100);
+
+    document.getElementById('scoreNumber').textContent = correct;
+    document.getElementById('scoreTitle').textContent = pct >= 90 ? 'Excelente' : pct >= 70 ? 'Muy bien' : pct >= 50 ? 'Aprobado' : 'A repasar';
+
+    let mensaje = '';
+    if (pct >= 90) mensaje = 'Lees el código como un veterano: arquitectura, reglas y SQL claros. ' + correct + ' de ' + total + ' correctas (' + pct + '%).';
+    else if (pct >= 70) mensaje = 'Buen nivel. Revisa las marcadas en rojo: casi siempre son detalles de persistencia o de estado. ' + correct + ' de ' + total + ' correctas (' + pct + '%).';
+    else if (pct >= 50) mensaje = 'Aprobado justo. Vuelve a los fragmentos de ActividadService y a los adaptadores. ' + correct + ' de ' + total + ' correctas (' + pct + '%).';
+    else mensaje = 'Conviene repasar la guía y volver a leer el servicio y el formulario. ' + correct + ' de ' + total + ' correctas (' + pct + '%).';
+
+    document.getElementById('scoreMessage').textContent = mensaje;
+
+    const chips = document.getElementById('sectionChips');
+    chips.innerHTML = '';
+    Object.keys(bySection).forEach((key) => {
+      const data = bySection[key];
+      const chip = document.createElement('span');
+      chip.textContent = (sectionNames[key] || key) + ': ' + data.ok + '/' + data.total;
+      chips.appendChild(chip);
+    });
+
+    const extra = document.createElement('span');
+    extra.textContent = 'En blanco: ' + blank;
+    chips.appendChild(extra);
+
+    resultado.hidden = false;
+    revealBanner.hidden = true;
+    updateProgress();
+    resultado.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function verRespuestas() {
+    questions.forEach((q) => {
+      limpiarClases(q);
+      const correctValue = q.dataset.answer;
+      const correctInput = q.querySelector('input[type="radio"][value="' + correctValue + '"]');
+      const correctLabel = correctInput ? correctInput.closest('.opt') : null;
+      if (correctLabel) correctLabel.classList.add('is-correct');
+
+      mostrarFeedback(
+        q,
+        '<strong>Respuesta correcta: ' + correctValue.toUpperCase() + '.</strong> ' + q.dataset.explain,
+        'Clave'
+      );
+
+      q.querySelectorAll('input[type="radio"]').forEach(input => { input.disabled = true; });
+    });
+
+    graded = true;
+    resultado.hidden = true;
+    revealBanner.hidden = false;
+    revealBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function reiniciar() {
+    questions.forEach((q) => {
+      limpiarClases(q);
+      q.querySelectorAll('input[type="radio"]').forEach((input) => {
+        input.checked = false;
+        input.disabled = false;
+      });
+      const fb = q.querySelector('.feedback');
+      if (fb) {
+        fb.hidden = true;
+        fb.innerHTML = '';
+      }
+    });
+
+    graded = false;
+    resultado.hidden = true;
+    revealBanner.hidden = true;
+    updateProgress();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  document.getElementById('btnCalificar').addEventListener('click', calificar);
+  document.getElementById('btnCalificarDock').addEventListener('click', calificar);
+  document.getElementById('btnVer').addEventListener('click', verRespuestas);
+  document.getElementById('btnReiniciar').addEventListener('click', reiniciar);
+
+  updateProgress();
+</script>
+
+</body>
+</html>

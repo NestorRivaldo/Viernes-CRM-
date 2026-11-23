@@ -1,0 +1,23 @@
+﻿Origen,Destino,Elemento usado,Tipo,Evidencia y observación
+`equipos`,`usuarios`,`UsuariosApi`,API nombrada,`UsuarioValidationAdapter`; dependencia correcta y declarada
+`mensajeria`,`usuarios`,`UsuariosApi`,API nombrada,`MensajeService` inyecta `UsuariosApi`
+`marketing`,`leads`,`ManageLeadUseCase`,Caso de uso,`CampaniaService`; también usa `EstadoLead` en DTO de respuesta
+`propuestas`,`clientes`,`ClienteSpringDataRepository`,Repositorio de módulo `OPEN`,`PropuestaRelacionValidationAdapter`; acoplamiento a persistencia
+`propuestas`,`oportunidades`,`OportunidadSpringDataRepository`,Repositorio de módulo `OPEN`,`PropuestaRelacionValidationAdapter`; acoplamiento a persistencia
+`propuestas`,`productos`,`ManageProductoUseCase`,Caso de uso,`PropuestaService`; dependencia correcta
+`actividades`,`clientes`,`ManageClienteUseCase`,Caso de uso,`ContactoQueryAdapter`; recorre clientes y contactos
+`actividades`,`clientes`,`ClienteSpringDataRepository`,Repositorio de módulo `OPEN`,`RelacionValidationAdapter`; validación de existencia
+`actividades`,`leads`,`LeadSpringDataRepository`,Repositorio de módulo `OPEN`,`RelacionValidationAdapter`
+`actividades`,`oportunidades`,`OportunidadSpringDataRepository`,Repositorio de módulo `OPEN`,`RelacionValidationAdapter`
+`actividades`,`etiquetas`,`EtiquetaPersistencePort`,Puerto de salida de otro módulo,`ActividadService`; dependencia directa entre módulos
+`actividades`,`usuarios`,`UsuariosApi`,API nombrada,`RelacionValidationAdapter`; valida `idUsuario`
+`oportunidades`,`clientes`,`ManageClienteUseCase`,Caso de uso,`ContactoQueryAdapter`
+`oportunidades`,`productos`,`ManageProductoUseCase`,Caso de uso,`ProductoQueryAdapter`
+`oportunidades`,`usuarios`,`UsuariosApi`,API nombrada,`UsuarioQueryAdapter`
+`relationshipmap`,"`clientes`, `oportunidades`, `actividades`, `propuestas`, `productos`",Casos de uso respectivos,Casos de uso,`RelationshipMapService`; lectura agregada
+`relationshipmap`,`usuarios`,`UsuariosApi`,API nombrada,`RelationshipMapService`
+`dashboard`,Entidades de otros módulos,"`ClienteEntity`, `LeadEntity`, `OportunidadEntity`, `ActividadEntity`, `PropuestaEntity`",JPQL por nombre de entidad,`DashboardQueryRepository`; no hay import de clases de otros módulos
+`auth`,`usuarios`,Ninguno,Dependencia declarada no usada,`auth/package-info.java` declara `usuarios`; no se encontraron imports
+Todos los módulos de negocio,`shared.exception`,"`ResourceNotFoundException`, `GlobalExceptionHandler`",Submódulo `OPEN`,Uso generalizado de `ResourceNotFoundException`; el handler es infraestructura
+`clientes`,`shared.ratelimit`,`ConsultaDocumentoRateLimiter`,Submódulo `OPEN`,`ClienteController`
+`clientes`,`shared.cache`,"`CacheConfig`, `@Cacheable`",Configuración transversal,`ApisPeruDocumentoAdapter`

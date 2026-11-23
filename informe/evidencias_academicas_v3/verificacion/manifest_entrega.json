@@ -1,0 +1,437 @@
+[
+  {
+    "archivo": "05_Criterios_aceptacion/05_Criterios_aceptacion.html",
+    "bytes": 29674,
+    "sha256": "ace8855d6e04a701e8d1eaf507c78e1f3e20dfa53eac59bb47c9f3c0ec147b30"
+  },
+  {
+    "archivo": "05_Criterios_aceptacion/catalogo_derivado.json",
+    "bytes": 15087,
+    "sha256": "e370b3fa33768c5b1b734c444fd7b517908acbce31b85c1c4b11153b67fb4c3f"
+  },
+  {
+    "archivo": "05_Criterios_aceptacion/correspondencia_hu_originales.csv",
+    "bytes": 335,
+    "sha256": "2f36438175f6043808a81eb18fe80b888f32d06e007523366b584f9661b79576"
+  },
+  {
+    "archivo": "05_Criterios_aceptacion/criterios_60_escenarios.csv",
+    "bytes": 16839,
+    "sha256": "23419a3f847cd453c20b7301abdd6d5b753fafb7ca13137b09e8b7343485234e"
+  },
+  {
+    "archivo": "06_BPMN/01_comercial_to_be.bpmn",
+    "bytes": 19417,
+    "sha256": "35a3a38c5fd8e4680bc1b4a92a0ce1b97b6f698319b1aea26ba56e3f8fb07b8b"
+  },
+  {
+    "archivo": "06_BPMN/01_comercial_to_be.svg",
+    "bytes": 13338,
+    "sha256": "8214265b8ebf6fbe806a9d737557c0f5418b359367fffba9dcd665a358951841"
+  },
+  {
+    "archivo": "06_BPMN/02_propuesta_detallada.bpmn",
+    "bytes": 24779,
+    "sha256": "a9fe6a85285ed608e9233cc538a770db1a9801cb3431bcba8ea7d1e47f896e1a"
+  },
+  {
+    "archivo": "06_BPMN/02_propuesta_detallada.svg",
+    "bytes": 12894,
+    "sha256": "d1985ef819b03615f3159e9987e45f8e8a436a87e23a1f757d1c9406d8e6b941"
+  },
+  {
+    "archivo": "06_BPMN/06_BPMN.html",
+    "bytes": 8011,
+    "sha256": "fd2e3cf1793ad269ef5f2a83671ccf8e24a9eed2f2439b98ae9be88dad53d5d2"
+  },
+  {
+    "archivo": "06_BPMN/levantamiento_as_is.csv",
+    "bytes": 1115,
+    "sha256": "8513c6befaf1a4bea45471589570fb1d384d11ac8cd774032a8fc1b170b89ab2"
+  },
+  {
+    "archivo": "07_UML/01_casos_uso_general.png",
+    "bytes": 66339,
+    "sha256": "5825028bbf995690adc94e453e59492e7fd0571ce8e92f6b2098e0b83d893bd9"
+  },
+  {
+    "archivo": "07_UML/01_casos_uso_general.puml",
+    "bytes": 1935,
+    "sha256": "544955b78c4e5fe704492794bb2e0f31876bad68160a0954a5003a449737830b"
+  },
+  {
+    "archivo": "07_UML/01_casos_uso_general.svg",
+    "bytes": 22444,
+    "sha256": "baba997ec18acac6d74af4eee2b33a2f8be6490ad2a37ff09a1b505e32789ce0"
+  },
+  {
+    "archivo": "07_UML/02_actividad_propuesta.png",
+    "bytes": 57133,
+    "sha256": "8b80efc444a582fc8ee03cc4911ba9627eef5be2ca6a974044f618d58441578c"
+  },
+  {
+    "archivo": "07_UML/02_actividad_propuesta.puml",
+    "bytes": 1766,
+    "sha256": "c7e02f321899b438568828bc9314cc05efa30054182ed15fc7bdc91c98c55d0d"
+  },
+  {
+    "archivo": "07_UML/02_actividad_propuesta.svg",
+    "bytes": 28033,
+    "sha256": "bb68603e8bb6122be6cc7e90139244e079ecb06445de0484164c8c0b278c7f9e"
+  },
+  {
+    "archivo": "07_UML/03_clases_dominio.png",
+    "bytes": 80890,
+    "sha256": "0ce0c6d87a3c3d5b9d3d55bccc74af6a5ca7c2a941a65db941d2829a84ce9264"
+  },
+  {
+    "archivo": "07_UML/03_clases_dominio.puml",
+    "bytes": 4630,
+    "sha256": "d08c8bf02f34baed42f46942e2ae7567d1429cc720a5c1245069ac146b2b3a6c"
+  },
+  {
+    "archivo": "07_UML/03_clases_dominio.svg",
+    "bytes": 40610,
+    "sha256": "355da37b3b4bee3cf28d1fb4741ea87031a5768559ce146c3e24fc151643bbb4"
+  },
+  {
+    "archivo": "07_UML/04_secuencia_crear_propuesta.png",
+    "bytes": 76141,
+    "sha256": "e34825b9b7bf8ad1ca0615b1d027a82a044ae3305c32f2d71f889a551b721d52"
+  },
+  {
+    "archivo": "07_UML/04_secuencia_crear_propuesta.puml",
+    "bytes": 2218,
+    "sha256": "2095990e4ac18efb524dab7f3766ace134960e34a2e8085fd4c0143f155fa9e2"
+  },
+  {
+    "archivo": "07_UML/04_secuencia_crear_propuesta.svg",
+    "bytes": 41914,
+    "sha256": "9e4ea5f14eefa3f53f181056ba3b4ba46794f2fb06fa0cc62101f944c084c960"
+  },
+  {
+    "archivo": "07_UML/05_secuencia_mapa_relaciones.png",
+    "bytes": 82075,
+    "sha256": "13599e408f0b64122a7f372fe392b39551f6c80dacbf30a2b0d273d32e4376fa"
+  },
+  {
+    "archivo": "07_UML/05_secuencia_mapa_relaciones.puml",
+    "bytes": 2403,
+    "sha256": "7edbb3c340cc307fd5746c5b73f7a0d7f931f282e1cd86845f4d051e398deb53"
+  },
+  {
+    "archivo": "07_UML/05_secuencia_mapa_relaciones.svg",
+    "bytes": 44752,
+    "sha256": "278bb7395d49bd22f692d9768feeb414e9b4bc6b3d62a714ad3741abd5204d1b"
+  },
+  {
+    "archivo": "07_UML/06a_estado_propuesta.png",
+    "bytes": 33414,
+    "sha256": "b31af257295cac930d3911cc62cf5c1ff3658648f8faa107f31c1d4c04e5abbb"
+  },
+  {
+    "archivo": "07_UML/06a_estado_propuesta.puml",
+    "bytes": 1549,
+    "sha256": "4571e058c2e624906fb23f70e9d1a504dde014d375a63d0212f74a6d375b414a"
+  },
+  {
+    "archivo": "07_UML/06a_estado_propuesta.svg",
+    "bytes": 15421,
+    "sha256": "67a38158f4f72479147b085d7ab8c95e8514c2ad8c4be8ae9017a719bc06a8e5"
+  },
+  {
+    "archivo": "07_UML/06b_estado_lead.png",
+    "bytes": 20779,
+    "sha256": "25c277e73a926f668146c807038c1fc0e214a8f7aacee98a94b904b9e1ce8bfb"
+  },
+  {
+    "archivo": "07_UML/06b_estado_lead.puml",
+    "bytes": 978,
+    "sha256": "a3239aff6d4bc028a8318d6b45c50ca25abde4073ec3791b711d2ec1f658d816"
+  },
+  {
+    "archivo": "07_UML/06b_estado_lead.svg",
+    "bytes": 10283,
+    "sha256": "b50d5649c12861c72849c362eaa3fac830e8bda50fddb48855b7a24e4c16db2f"
+  },
+  {
+    "archivo": "07_UML/06c_estado_oportunidad.png",
+    "bytes": 25517,
+    "sha256": "eb05dc09b0112ec30a5945ec5b0bcf7d595a7977e3e70df1ed139e24dfe56cf0"
+  },
+  {
+    "archivo": "07_UML/06c_estado_oportunidad.puml",
+    "bytes": 1145,
+    "sha256": "cf9e58bf80cac643d92c2f830fcf7fae3d8fd6f7ebbe617f1af35cafeb055e97"
+  },
+  {
+    "archivo": "07_UML/06c_estado_oportunidad.svg",
+    "bytes": 12548,
+    "sha256": "985e6b203b293d96885cf6c18d451baa4ad7c4dc00e32736d8136659c8c9e284"
+  },
+  {
+    "archivo": "07_UML/07_UML.html",
+    "bytes": 10999,
+    "sha256": "6b9245aa9187adaf7f0682a848aa2259d42344a25fce99a40adcc26852edf34a"
+  },
+  {
+    "archivo": "11_Datos/11_Datos.html",
+    "bytes": 88555,
+    "sha256": "8ab11af55c9e9a116ce471e648980034bc831a9131b1f4a330834cd0fcb43c47"
+  },
+  {
+    "archivo": "11_Datos/11_Datos_JPA.html",
+    "bytes": 89792,
+    "sha256": "836c39311fa1485020fc0638cc04225c66265d47d7835be8abb3aaabfa9ba268"
+  },
+  {
+    "archivo": "11_Datos/columnas_no_mapeadas.csv",
+    "bytes": 470,
+    "sha256": "931c23feaf95f71877aefc56dc1b0c7b862f516834253bf19b63df144c0acd97"
+  },
+  {
+    "archivo": "11_Datos/diccionario_campos.csv",
+    "bytes": 31969,
+    "sha256": "264b40c1244f69201ce885cef9cb687dc13fd6c660f6327b1839fc04569fd635"
+  },
+  {
+    "archivo": "11_Datos/diccionario_conciliado.csv",
+    "bytes": 28960,
+    "sha256": "e9370109703a525a90df1f1caa52748bdfde0b2a8bcdeca2d13cbd9ae753f45a"
+  },
+  {
+    "archivo": "11_Datos/erd_completo.puml",
+    "bytes": 4312,
+    "sha256": "ce38f335e4eb4d181712937a415d52cc6a7ec888ceff6822f891b4c848828d42"
+  },
+  {
+    "archivo": "11_Datos/erd_completo.svg",
+    "bytes": 69812,
+    "sha256": "6db032678467310035040797072567ba5232f50d899c564bc412cacccdd1dfe9"
+  },
+  {
+    "archivo": "11_Datos/erd_oracle_21.puml",
+    "bytes": 4094,
+    "sha256": "19b064743f16fd10e1853bfaa82738750c25cec7391ffd411e7550e469b664c6"
+  },
+  {
+    "archivo": "11_Datos/erd_oracle_21.svg",
+    "bytes": 61369,
+    "sha256": "2627f9d5d38f4c0514de42616e160bd89722b52f98819f58fba0f6592fc70ac1"
+  },
+  {
+    "archivo": "11_Datos/erd_oracle_26.puml",
+    "bytes": 6025,
+    "sha256": "c1dbd3383323f78d3a8ab5a264f54e99801cf1f957eaa8f9ae1373828555e93d"
+  },
+  {
+    "archivo": "11_Datos/erd_oracle_26.svg",
+    "bytes": 79881,
+    "sha256": "cc728e08ea5a7fb1f4bd18ad4e982af24fa7f4434eda3364d07e85a5cec25e01"
+  },
+  {
+    "archivo": "11_Datos/modelo_jpa.json",
+    "bytes": 76652,
+    "sha256": "f8ac168d1836cb1fe7527b68fbd3e59bb074c62c7157ff1a93cd6db9f884cbb8"
+  },
+  {
+    "archivo": "11_Datos/oracle_checks.csv",
+    "bytes": 9681,
+    "sha256": "30041dda391afece810d02a00543af07d470e9450e4fdec5a5e67d120eb4ed4a"
+  },
+  {
+    "archivo": "11_Datos/oracle_columnas.csv",
+    "bytes": 11841,
+    "sha256": "fdb7a3ed79bd074660c36d4b0899578e2e7bf13cb0015edfbd73544a06e41a4d"
+  },
+  {
+    "archivo": "11_Datos/oracle_constraints.csv",
+    "bytes": 18675,
+    "sha256": "86240b009677929a21d89ef5a170b58ef2b5320cba4640a78cedc1d89d4b011d"
+  },
+  {
+    "archivo": "11_Datos/oracle_contexto.csv",
+    "bytes": 65,
+    "sha256": "1a4a09ccbc0e80a9dcb1fc8d8027e2dd7eabb08da64b69e45538df8a0dd13ac3"
+  },
+  {
+    "archivo": "11_Datos/oracle_identity.csv",
+    "bytes": 6665,
+    "sha256": "974f91c2efc9cdd221401d990dadc407dc88428b612f24b1951f791093d59e53"
+  },
+  {
+    "archivo": "11_Datos/oracle_indices.csv",
+    "bytes": 5532,
+    "sha256": "0cf3f31620d34f8ead0e7209e22c08160f71def26896b339f4db89ea7907724d"
+  },
+  {
+    "archivo": "11_Datos/oracle_manifest.json",
+    "bytes": 2888,
+    "sha256": "e53831df94ff9293729831cde300e5ce466177b93248a9306b26a3e2fc82c5c5"
+  },
+  {
+    "archivo": "11_Datos/oracle_metadatos_solo_lectura.sql",
+    "bytes": 1630,
+    "sha256": "d6d6b85da598442f7775f2e87775dbe52142e158fe226853344479cf6fbd798a"
+  },
+  {
+    "archivo": "11_Datos/relaciones.csv",
+    "bytes": 1490,
+    "sha256": "655aa5c1c4780734d06d2eca97ac27d361adf087c107b1c02f6f47b86056a882"
+  },
+  {
+    "archivo": "11_Datos/restricciones_unicas.csv",
+    "bytes": 1367,
+    "sha256": "15ad54d59803e8d300e72786ea4292ed6f9b20382e9a6983b7dc8ecc17e4039a"
+  },
+  {
+    "archivo": "12_Pruebas/12_Pruebas.html",
+    "bytes": 28317,
+    "sha256": "116535120963efb0ec8742e019da372ec4a553cbb7ae3b0a425ec719da3b9082"
+  },
+  {
+    "archivo": "12_Pruebas/casos_faltantes_o_no_acreditados.csv",
+    "bytes": 1626,
+    "sha256": "7b49a7a5e8abc96762394ba36c4c2d3b18d867583e51071902646b156f19b46d"
+  },
+  {
+    "archivo": "12_Pruebas/ejecucion_maven_extracto.txt",
+    "bytes": 5679,
+    "sha256": "3b76db61ca1c442976091651cfcfca4b0f53743972ed80c162f1989803b9c7a9"
+  },
+  {
+    "archivo": "12_Pruebas/inventario_291_pruebas.csv",
+    "bytes": 92630,
+    "sha256": "d23bd799f146e3c4aa6d8662c23aa77d3a5879e2fb8bc39e9dcf99267990b719"
+  },
+  {
+    "archivo": "12_Pruebas/manifest_reportes.json",
+    "bytes": 8423,
+    "sha256": "91b513a6b8fd3b63091f19d7091f412a14feddc26fcdc868d92c35c360394a0e"
+  },
+  {
+    "archivo": "12_Pruebas/matriz_RF_HU_CP.csv",
+    "bytes": 31161,
+    "sha256": "fb0c61634986cdee25cada1c0f13e380c6c52258afe26c21c3b61d6de8bba68a"
+  },
+  {
+    "archivo": "12_Pruebas/resultados_junit_sanitizados.xml",
+    "bytes": 51379,
+    "sha256": "b204d33f2fd67d7132e85fd53dbb105965994504dd1acef03e1555e3fe5010e0"
+  },
+  {
+    "archivo": "12_Pruebas/resumen_32_clases.csv",
+    "bytes": 2459,
+    "sha256": "1ee628033df710e06c7a62cdba492a39ac4a54de504d33798202234452d6db9e"
+  },
+  {
+    "archivo": "index.html",
+    "bytes": 5592,
+    "sha256": "eb1c6435ca440dcc6c03b0c4f27a1e239ba4bee5a64a25b95f551d095984edd1"
+  },
+  {
+    "archivo": "Informe_academico_consolidado.html",
+    "bytes": 163533,
+    "sha256": "4d2af0b7c4a2b67f37ccc9640a5782ab167bc77e5ae1aa9e8b25e79782aed9bf"
+  },
+  {
+    "archivo": "Texto_para_Word.txt",
+    "bytes": 97182,
+    "sha256": "bf4d19a2477872f9ddc843efb3a218571f1c76be0191c328788b1d66de9316ed"
+  },
+  {
+    "archivo": "verificacion/BPMN20.xsd",
+    "bytes": 1941,
+    "sha256": "a07c159cb0594573dd7c97b1370dd116112378f377e43c89a8bf512ac5030705"
+  },
+  {
+    "archivo": "verificacion/BPMNDI.xsd",
+    "bytes": 4010,
+    "sha256": "f0dff1cd559d1514d8ebfc8c646f58402bcaced27ec22e2aa6456c2dcc80b038"
+  },
+  {
+    "archivo": "verificacion/conciliar_oracle.py",
+    "bytes": 11289,
+    "sha256": "a4092fbd4b55d4cb7e62eca1aa10927802d4ff696af08691ccda1f1f0629ee65"
+  },
+  {
+    "archivo": "verificacion/DC.xsd",
+    "bytes": 1324,
+    "sha256": "a2f90e5ad9bb48c6915e4e034b4e27ac838264a1d4f27bfc70dbdfc69351312d"
+  },
+  {
+    "archivo": "verificacion/DI.xsd",
+    "bytes": 3470,
+    "sha256": "8220b179c175572df74e08a51bffabe957867962035cee7b5fee0b6acb4c4498"
+  },
+  {
+    "archivo": "verificacion/documentos.py",
+    "bytes": 2685,
+    "sha256": "9c9f07bf8cbcc4d424c8793f6fca79f2cc41fb641e78f74736187d217efbd5a6"
+  },
+  {
+    "archivo": "verificacion/entregar_y_verificar.py",
+    "bytes": 12347,
+    "sha256": "23d7db159924807b22b11e4bc000aa21133d215486a8acf0029b74ccaa05c724"
+  },
+  {
+    "archivo": "verificacion/extraer_oracle.py",
+    "bytes": 3333,
+    "sha256": "c06d86e30935628c2b0fa1dfcfa6c968729f136f72f600b77631bf34a0de2746"
+  },
+  {
+    "archivo": "verificacion/fuentes_sha256.json",
+    "bytes": 10260,
+    "sha256": "c9ce0dff0cdbe1c7adf71d8b57009e026d309533cde5950d7594bff589658e86"
+  },
+  {
+    "archivo": "verificacion/generar_bpmn.py",
+    "bytes": 17853,
+    "sha256": "355ec907decdc229fce101d51476e5011c736edde9de206a8105d57962f72655"
+  },
+  {
+    "archivo": "verificacion/generar_criterios.py",
+    "bytes": 14990,
+    "sha256": "72e5cc85a3a90fc5a89c4cf30e2d38d3f27fa850c0cbfbfa4470651d5e604b6a"
+  },
+  {
+    "archivo": "verificacion/generar_datos.py",
+    "bytes": 11551,
+    "sha256": "59c397413c192efdee53c0006f970ae05a265a98a98a1e239d4a274ec4af5e5a"
+  },
+  {
+    "archivo": "verificacion/generar_pruebas.py",
+    "bytes": 12052,
+    "sha256": "4da395c01f21ece599084d7d5e71e049be0e2d491253d2c8f54ab92f5c6a53ff"
+  },
+  {
+    "archivo": "verificacion/generar_uml.py",
+    "bytes": 15186,
+    "sha256": "1f5f6aaab774f61e6f456f6759db487d73e9fe0c8fdd00ee2b88994f9d53938f"
+  },
+  {
+    "archivo": "verificacion/resultado_verificacion.json",
+    "bytes": 1909,
+    "sha256": "122a526a031a9c3c927ed123bbe45266881881d22b9b4a71577360b792580889"
+  },
+  {
+    "archivo": "verificacion/resumen_oracle.json",
+    "bytes": 429,
+    "sha256": "2ad59e9f2316e42825f2e50240742b97cb91fe2dcb6617340fca3913461f15e8"
+  },
+  {
+    "archivo": "verificacion/Semantic.xsd",
+    "bytes": 62507,
+    "sha256": "c4318842f7d2bbc262d7954c9452c501db16f0868eac0b8732ec5d7fb384d9a7"
+  },
+  {
+    "archivo": "verificacion/validacion_xsd.txt",
+    "bytes": 100,
+    "sha256": "fa1b28a2b08dbd3926e2f4988132a0dc9fa364e5e91970070ab6f25f3958656d"
+  },
+  {
+    "archivo": "verificacion/ValidarBpmn.java",
+    "bytes": 746,
+    "sha256": "96e2dd280a66af129a38dff91e564c2e18bcef12c8b72ce62e0d209fe22ef5ac"
+  }
+]

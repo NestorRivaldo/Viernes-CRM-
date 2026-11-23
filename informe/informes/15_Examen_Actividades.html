@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Examen · Módulo Actividades · Viernes CRM</title>
+<style>
+  :root {
+    --bg: #f4efe4;
+    --paper: #fffdf8;
+    --ink: #23262b;
+    --muted: #626975;
+    --line: #ded3bf;
+    --accent: #0f766e;
+    --accent-dark: #0b4f4a;
+    --accent-soft: #e6f4f1;
+    --amber: #b45309;
+    --amber-soft: #fdf1e3;
+    --blue: #1d4ed8;
+    --blue-soft: #e8eefc;
+    --rose: #be123c;
+    --rose-soft: #fde8ed;
+    --green: #15803d;
+    --green-soft: #e8f7ed;
+    --shadow: 0 12px 34px rgba(35, 38, 43, .09);
+    --radius: 18px;
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    padding-bottom: 110px;
+    background:
+      radial-gradient(circle at 10% 0%, #fbf6ea 0, transparent 40%),
+      radial-gradient(circle at 90% 10%, #eef6f2 0, transparent 36%),
+      var(--bg);
+    color: var(--ink);
+    font-family: "Segoe UI", "Trebuchet MS", system-ui, -apple-system, sans-serif;
+    line-height: 1.55;
+  }
+
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px 40px; }
+
+  /* ---------- PORTADA ---------- */
+  header.hero {
+    margin-top: 22px;
+    border-radius: 24px;
+    padding: 38px 36px 34px;
+    color: #f5fffd;
+    background:
+      radial-gradient(circle at 88% 16%, rgba(255,255,255,.16), transparent 42%),
+      linear-gradient(135deg, #0b4f4a 0%, #0f766e 58%, #14958a 100%);
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+  }
+
+  header.hero::after {
+    content: "";
+    position: absolute;
+    right: -60px;
+    bottom: -80px;
+    width: 250px;
+    height: 250px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.08);
+  }
+
+  .kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,.14);
+    border: 1px solid rgba(255,255,255,.24);
+    border-radius: 999px;
+    padding: 6px 13px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  header.hero h1 {
+    margin: 16px 0 10px;
+    font-size: clamp(28px, 4.2vw, 46px);
+    line-height: 1.08;
+    letter-spacing: -.02em;
+    max-width: 760px;
+  }
+
+  header.hero p {
+    margin: 0;
+    max-width: 720px;
+    color: #d8f3ee;
+    font-size: clamp(14.5px, 1.5vw, 17px);
+  }
+
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-top: 22px;
+  }
+
+  .hero-meta span {
+    background: rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.22);
+    border-radius: 11px;
+    padding: 7px 12px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  /* ---------- INSTRUCCIONES ---------- */
+  .instructions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 10px;
+    margin-top: 18px;
+  }
+
+  .instructions div {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 13px;
+    padding: 13px 15px;
+    font-size: 13.7px;
+    color: var(--muted);
+    box-shadow: 0 4px 14px rgba(35,38,43,.04);
+  }
+
+  .instructions b { color: var(--ink); }
+
+  /* ---------- BARRA DE HERRAMIENTAS ---------- */
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    align-items: center;
+    margin: 20px 0 8px;
+  }
+
+  .btn {
+    border: 1px solid var(--line);
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: 11px;
+    padding: 10px 14px;
+    font: inherit;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(35,38,43,.05);
+    transition: transform .12s ease, border-color .12s ease, color .12s ease;
+  }
+
+  .btn:hover { transform: translateY(-1px); border-color: var(--accent); color: var(--accent); }
+
+  .btn.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  .btn.primary:hover { background: var(--accent-dark); color: #fff; }
+
+  .btn.ghost { background: transparent; box-shadow: none; }
+
+  /* ---------- PROGRESO ---------- */
+  .progress-card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 13px 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 4px 14px rgba(35,38,43,.04);
+  }
+
+  .progress-card strong { font-size: 13.5px; white-space: nowrap; }
+
+  .progress-track {
+    flex: 1;
+    height: 9px;
+    border-radius: 999px;
+    background: #eee5d5;
+    overflow: hidden;
+  }
+
+  .progress-track span {
+    display: block;
+    height: 100%;
+    width: 0;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #0f766e, #14958a);
+    transition: width .25s ease;
+  }
+
+  /* ---------- BLOQUES ---------- */
+  .block { margin-top: 34px; }
+
+  .block-head {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    margin-bottom: 4px;
+    flex-wrap: wrap;
+  }
+
+  .badge {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 900;
+    font-size: 15px;
+  }
+
+  .block:nth-of-type(2) .badge { background: var(--blue); }
+  .block:nth-of-type(3) .badge { background: var(--amber); }
+  .block:nth-of-type(4) .badge { background: #7c3aed; }
+  .block:nth-of-type(5) .badge { background: var(--rose); }
+
+  .block-head h2 { margin: 0; font-size: clamp(20px, 2.4vw, 26px); letter-spacing: -.01em; }
+
+  .block-head .pts {
+    margin-left: auto;
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--muted);
+    letter-spacing: .05em;
+    text-transform: uppercase;
+  }
+
+  /* ---------- PREGUNTAS ---------- */
+  fieldset.q {
+    border: 0;
+    padding: 0;
+    margin: 14px 0 0;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 18px 20px 16px;
+    box-shadow: 0 6px 18px rgba(35,38,43,.05);
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+
+  fieldset.q.correct { border-color: #86d3a2; box-shadow: 0 0 0 3px rgba(21,128,61,.08); }
+  fieldset.q.wrong { border-color: #f3a7b8; box-shadow: 0 0 0 3px rgba(190,18,60,.07); }
+  fieldset.q.unanswered { border-color: #e8c98a; box-shadow: 0 0 0 3px rgba(180,83,9,.07); }
+
+  legend.q-text {
+    display: block;
+    width: 100%;
+    padding: 0;
+    font-size: 15.5px;
+    font-weight: 700;
+    line-height: 1.45;
+    color: var(--ink);
+  }
+
+  .q-num {
+    display: inline-grid;
+    place-items: center;
+    width: 27px;
+    height: 27px;
+    border-radius: 8px;
+    background: #f1eadc;
+    color: #5b5347;
+    font-size: 12.5px;
+    font-weight: 900;
+    margin-right: 7px;
+    vertical-align: 1px;
+  }
+
+  .q-text code {
+    background: #f1eadc;
+    border-radius: 5px;
+    padding: 1px 5px;
+    font-size: .9em;
+  }
+
+  .opts {
+    display: grid;
+    gap: 7px;
+    margin-top: 13px;
+  }
+
+  .opt {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 9px 12px;
+    cursor: pointer;
+    font-size: 14.2px;
+    color: #3b4048;
+    background: #fffefb;
+    transition: background .12s ease, border-color .12s ease;
+  }
+
+  .opt:hover { background: #fbf7ee; border-color: #cbbfa9; }
+
+  .opt:has(input:checked) {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+
+  .opt input {
+    margin-top: 3px;
+    accent-color: var(--accent);
+    flex: 0 0 auto;
+  }
+
+  .letter {
+    flex: 0 0 auto;
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    display: grid;
+    place-items: center;
+    background: #f1eadc;
+    color: #5b5347;
+    font-size: 11.5px;
+    font-weight: 900;
+  }
+
+  .opt-text { flex: 1; }
+
+  .opt.is-correct {
+    border-color: #4ea86f;
+    background: var(--green-soft);
+  }
+
+  .opt.is-correct .letter { background: #c9edd5; color: #14612f; }
+
+  .opt.is-wrong {
+    border-color: #e07c95;
+    background: var(--rose-soft);
+  }
+
+  .opt.is-wrong .letter { background: #f6c6d2; color: #8b0f2d; }
+
+  .opt:has(input:disabled) { cursor: default; }
+
+  .feedback {
+    margin-top: 12px;
+    border-left: 4px solid var(--green);
+    background: var(--green-soft);
+    border-radius: 0 9px 9px 0;
+    padding: 10px 13px;
+    font-size: 13.5px;
+    color: #215c36;
+    line-height: 1.5;
+  }
+
+  .feedback strong { color: #14612f; }
+
+  fieldset.q.wrong .feedback {
+    border-left-color: var(--rose);
+    background: var(--rose-soft);
+    color: #7d1a34;
+  }
+
+  fieldset.q.wrong .feedback strong { color: #8b0f2d; }
+
+  fieldset.q.unanswered .feedback {
+    border-left-color: var(--amber);
+    background: var(--amber-soft);
+    color: #6b4213;
+  }
+
+  fieldset.q.unanswered .feedback strong { color: #4b2d0b; }
+
+  .q-status {
+    display: inline-block;
+    margin-left: 8px;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 999px;
+    vertical-align: 1px;
+  }
+
+  .correct .q-status { background: #c9edd5; color: #14612f; }
+  .wrong .q-status { background: #f6c6d2; color: #8b0f2d; }
+  .unanswered .q-status { background: #f6dfb8; color: #7a4a0c; }
+
+  /* ---------- RESULTADO ---------- */
+  .resultado {
+    margin-top: 30px;
+    border-radius: 20px;
+    padding: 26px 28px;
+    color: #f4fffd;
+    background:
+      radial-gradient(circle at 90% 10%, rgba(255,255,255,.14), transparent 40%),
+      linear-gradient(135deg, #0b4f4a, #0f766e);
+    box-shadow: var(--shadow);
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    gap: 24px;
+    align-items: center;
+  }
+
+  .score-ring {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    background: rgba(255,255,255,.1);
+    border: 8px solid rgba(255,255,255,.24);
+  }
+
+  .score-ring b { display: block; font-size: 36px; line-height: 1; }
+  .score-ring span { font-size: 12px; color: #cdeee8; letter-spacing: .05em; text-transform: uppercase; }
+
+  .resultado h2 { margin: 0 0 4px; font-size: 24px; letter-spacing: -.01em; }
+  .resultado p { margin: 0 0 12px; color: #d3f0eb; font-size: 14.5px; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; }
+
+  .chips span {
+    background: rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .resultado .btn {
+    margin-top: 15px;
+    background: rgba(255,255,255,.14);
+    border-color: rgba(255,255,255,.28);
+    color: #fff;
+    box-shadow: none;
+  }
+
+  .resultado .btn:hover { background: rgba(255,255,255,.22); color: #fff; }
+
+  /* ---------- CLAVE ---------- */
+  details.key {
+    margin-top: 34px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 0 18px;
+    box-shadow: 0 6px 18px rgba(35,38,43,.05);
+  }
+
+  details.key summary {
+    cursor: pointer;
+    padding: 15px 2px;
+    font-weight: 800;
+    font-size: 15px;
+    color: var(--accent);
+    list-style: none;
+  }
+
+  details.key summary::-webkit-details-marker { display: none; }
+  details.key summary::before { content: "🔑 "; }
+
+  .key-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+    gap: 7px;
+    padding: 0 0 18px;
+  }
+
+  .key-grid span {
+    background: #faf5ea;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 6px 8px;
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+
+  .key-grid b { color: var(--ink); }
+
+  /* ---------- DOCK ---------- */
+  .dock {
+    position: fixed;
+    left: 50%;
+    bottom: 14px;
+    transform: translateX(-50%);
+    z-index: 50;
+    width: min(760px, calc(100vw - 24px));
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    background: rgba(255, 253, 248, .95);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 10px 12px;
+    box-shadow: 0 14px 36px rgba(35,38,43,.16);
+  }
+
+  .dock .count {
+    font-size: 13px;
+    font-weight: 800;
+    white-space: nowrap;
+    color: var(--muted);
+  }
+
+  .dock .count b { color: var(--ink); font-size: 15px; }
+
+  .dock .progress-track { height: 8px; }
+
+  .dock .btn { white-space: nowrap; }
+
+  /* ---------- PIE ---------- */
+  footer {
+    margin-top: 40px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 12.5px;
+  }
+
+  footer code {
+    background: #efe7d7;
+    padding: 1px 5px;
+    border-radius: 5px;
+    font-size: 11.5px;
+  }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 640px) {
+    .wrap { padding-left: 13px; padding-right: 13px; }
+    header.hero { padding: 28px 22px; border-radius: 19px; }
+    fieldset.q { padding: 15px 14px 13px; }
+    .resultado { grid-template-columns: 1fr; text-align: center; }
+    .score-ring { margin: 0 auto; }
+    .chips { justify-content: center; }
+    .dock .count { display: none; }
+    .block-head .pts { margin-left: 0; }
+  }
+
+  /* ---------- IMPRESIÓN ---------- */
+  @media print {
+    body { background: #fff; padding-bottom: 0; }
+    .dock, .toolbar, .progress-card, .resultado, .feedback, details.key { display: none !important; }
+    header.hero { box-shadow: none; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    fieldset.q { box-shadow: none; break-inside: avoid; page-break-inside: avoid; }
+    .opt { break-inside: avoid; }
+    .block { break-before: auto; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="hero">
+    <div class="kicker">📝 Evaluación · Viernes CRM</div>
+    <h1>Examen del módulo Actividades</h1>
+    <p>
+      Treinta preguntas para comprobar si quedó clara la oficina: qué hace cada archivo,
+      cómo viaja una ficha, qué reglas aplica el coordinador y qué guarda el archivo.
+    </p>
+    <div class="hero-meta">
+      <span>30 preguntas</span>
+      <span>1 punto cada una</span>
+      <span>Selección múltiple y verdadero/falso</span>
+      <span>Calificación automática</span>
+    </div>
+  </header>
+
+  <div class="instructions">
+    <div><b>1. Responde todo.</b> Marca una opción por pregunta. No hay penalización por adivinar.</div>
+    <div><b>2. Califica al final.</b> Verás tu puntaje, las respuestas correctas y una explicación breve.</div>
+    <div><b>3. Sin apuro.</b> No hay cronómetro. Puedes reiniciar y volver a intentarlo.</div>
+  </div>
+
+  <div class="toolbar">
+    <button class="btn primary" type="button" id="btnCalificar">Calificar examen</button>
+    <button class="btn" type="button" id="btnVer">Ver respuestas</button>
+    <button class="btn ghost" type="button" id="btnReiniciar">Reiniciar</button>
+    <button class="btn ghost" type="button" onclick="window.print()">Imprimir examen</button>
+  </div>
+
+  <div class="progress-card">
+    <strong><span id="answeredCount">0</span> / 30 respondidas</strong>
+    <div class="progress-track" aria-hidden="true"><span id="progressBar"></span></div>
+  </div>
+
+  <!-- ================= A. CONCEPTOS ================= -->
+  <section class="block" data-section="A">
+    <div class="block-head">
+      <span class="badge">A</span>
+      <h2>Conceptos básicos</h2>
+      <span class="pts">6 preguntas</span>
+    </div>
+
+    <fieldset class="q" data-section="A" data-answer="b" data-explain="Actividades es la agenda comercial: allí se anotan llamadas, reuniones, tareas y seguimientos.">
+      <legend class="q-text"><span class="q-num">1</span> ¿Qué representa una actividad en Viernes CRM?</legend>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q1" value="a"><span class="letter">A</span><span class="opt-text">Un cliente interesado en comprar.</span></label>
+        <label class="opt"><input type="radio" name="q1" value="b"><span class="letter">B</span><span class="opt-text">Una tarea de la agenda comercial: llamada, reunión, tarea o seguimiento.</span></label>
+        <label class="opt"><input type="radio" name="q1" value="c"><span class="letter">C</span><span class="opt-text">Una propuesta económica enviada al cliente.</span></label>
+        <label class="opt"><input type="radio" name="q1" value="d"><span class="letter">D</span><span class="opt-text">Un producto del catálogo.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="A" data-answer="d" data-explain="Son cuatro: LLAMADA, REUNION, TAREA y SEGUIMIENTO, definidos en TipoActividad.java.">
+      <legend class="q-text"><span class="q-num">2</span> ¿Cuántos tipos de actividad existen?</legend>
+            <div class="opts">
+        <label class="opt"><input type="radio" name="q2" value="a"><span class="letter">A</span><span class="opt-text">3</span></label>
+        <label class="opt"><input type="radio" name="q2" value="b"><span class="letter">B</span><span class="opt-text">5</span></label>
+        <label class="opt"><input type="radio" name="q2" value="c"><span class="letter">C</span><span class="opt-text">6</span></label>
+        <label class="opt"><input type="radio" name="q2" value="d"><span class="letter">D</span><span class="opt-text">4</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="A" data-answer="c" data-explain="Son cuatro: PENDIENTE, EN_PROCESO, COMPLETADA y CANCELADA, definidos en EstadoActividad.java.">
+      <legend class="q-text"><span class="q-num">3</span> ¿Cuántos estados puede tener una actividad?</legend>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q3" value="a"><span class="letter">A</span><span class="opt-text">2</span></label>
+        <label class="opt"><input type="radio" name="q3" value="b"><span class="letter">B</span><span class="opt-text">3</span></label>
+        <label class="opt"><input type="radio" name="q3" value="c"><span class="letter">C</span><span class="opt-text">4</span></label>
+        <label class="opt"><input type="radio" name="q3" value="d"><span class="letter">D</span><span class="opt-text">5</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="A" data-answer="a" data-explain="Solo se marca vencida si sigue PENDIENTE y su fecha ya pasó. Una actividad EN_PROCESO atrasada no recibe ese aviso.">
+      <legend class="q-text"><span class="q-num">4</span> ¿Cuándo se considera que una actividad está vencida?</legend>
+            <div class="opts">
+        <label class="opt"><input type="radio" name="q4" value="a"><span class="letter">A</span><span class="opt-text">Cuando está PENDIENTE y la fecha es anterior a ahora.</span></label>
+        <label class="opt"><input type="radio" name="q4" value="b"><span class="letter">B</span><span class="opt-text">Siempre que la fecha ya pasó, sin importar el estado.</span></label>
+        <label class="opt"><input type="radio" name="q4" value="c"><span class="letter">C</span><span class="opt-text">Cuando está EN_PROCESO y la fecha ya pasó.</span></label>
+        <label class="opt"><input type="radio" name="q4" value="d"><span class="letter">D</span><span class="opt-text">Cuando está CANCELADA.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="A" data-answer="b" data-explain="Las columnas ID_CLIENTE, ID_LEAD e ID_OPORTUNIDAD son opcionales. La pantalla deja elegir una o ninguna; la API no valida que sea solo una.">
+      <legend class="q-text"><span class="q-num">5</span> ¿A qué se puede vincular una actividad?</legend>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q5" value="a"><span class="letter">A</span><span class="opt-text">Obligatoriamente a un cliente.</span></label>
+        <label class="opt"><input type="radio" name="q5" value="b"><span class="letter">B</span><span class="opt-text">A un cliente, un lead o una oportunidad, o a ninguno.</span></label>
+        <label class="opt"><input type="radio" name="q5" value="c"><span class="letter">C</span><span class="opt-text">Solo a una oportunidad.</span></label>
+        <label class="opt"><input type="radio" name="q5" value="d"><span class="letter">D</span><span class="opt-text">Obligatoriamente a los tres a la vez.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="A" data-answer="c" data-explain="El DTO exige tipo, título y fecha. La descripción es opcional y el estado tiene valor por defecto.">
+      <legend class="q-text"><span class="q-num">6</span> ¿Qué campos son obligatorios al crear una actividad?</legend>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q6" value="a"><span class="letter">A</span><span class="opt-text">Solo el título.</span></label>
+        <label class="opt"><input type="radio" name="q6" value="b"><span class="letter">B</span><span class="opt-text">Título y descripción.</span></label>
+        <label class="opt"><input type="radio" name="q6" value="c"><span class="letter">C</span><span class="opt-text">Tipo, título y fecha.</span></label>
+        <label class="opt"><input type="radio" name="q6" value="d"><span class="letter">D</span><span class="opt-text">Todos los campos, incluidos etiquetas y participantes.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+  </section>
+
+  <!-- ================= B. ARQUITECTURA ================= -->
+  <section class="block" data-section="B">
+    <div class="block-head">
+      <span class="badge">B</span>
+      <h2>Arquitectura: quién hace qué</h2>
+      <span class="pts">7 preguntas</span>
+    </div>
+
+    <fieldset class="q" data-section="B" data-answer="a" data-explain="ActividadController es la ventanilla: recibe las peticiones HTTP en /api/v1/actividades y las pasa al servicio.">
+      <legend class="q-text"><span class="q-num">7</span> ¿Qué archivo recibe las peticiones HTTP del módulo?</legend>
+            <div class="opts">
+        <label class="opt"><input type="radio" name="q7" value="a"><span class="letter">A</span><span class="opt-text"><code>ActividadController</code></span></label>
+        <label class="opt"><input type="radio" name="q7" value="b"><span class="letter">B</span><span class="opt-text"><code>ActividadService</code></span></label>
+        <label class="opt"><input type="radio" name="q7" value="c"><span class="letter">C</span><span class="opt-text"><code>ActividadEntity</code></span></label>
+        <label class="opt"><input type="radio" name="q7" value="d"><span class="letter">D</span><span class="opt-text"><code>ActividadPersistenceAdapter</code></span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="B" data-answer="c" data-explain="ActividadService es el coordinador: valida relaciones, limita etiquetas, calcula vencimientos y ordena guardar.">
+      <legend class="q-text"><span class="q-num">8</span> ¿Dónde vive la lógica de negocio del módulo?</legend>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q8" value="a"><span class="letter">A</span><span class="opt-text">En el Controller.</span></label>
+        <label class="opt"><input type="radio" name="q8" value="b"><span class="letter">B</span><span class="opt-text">En el Repository.</span></label>
+        <label class="opt"><input type="radio" name="q8" value="c"><span class="letter">C</span><span class="opt-text">En <code>ActividadService</code>.</span></label>
+        <label class="opt"><input type="radio" name="q8" value="d"><span class="letter">D</span><span class="opt-text">En la entidad JPA.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="B" data-answer="d" data-explain="ActividadRequest es el formulario de entrada; ActividadResponse es el recibo de salida. Ambos son DTO.">
+      <legend class="q-text"><span class="q-num">9</span> ¿Qué es <code>ActividadRequest</code>?</legend>
+            <div class="opts">
+        <label class="opt"><input type="radio" name="q9" value="a"><span class="letter">A</span><span class="opt-text">La tabla de Oracle donde se guardan las actividades.</span></label>
+        <label class="opt"><input type="radio" name="q9" value="b"><span class="letter">B</span><span class="opt-text">El recibo que devuelve el backend.</span></label>
+        <label class="opt"><input type="radio" name="q9" value="c"><span class="letter">C</span><span class="opt-text">Un índice de búsqueda de la base de datos.</span></label>
+        <label class="opt"><input type="radio" name="q9" value="d"><span class="letter">D</span><span class="opt-text">El formulario de entrada con los datos que envía el cliente.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="B" data-answer="a" data-explain="El PersistenceAdapter traduce entre el modelo de dominio (Actividad) y la entidad JPA (ActividadEntity).">
+      <legend class="q-text"><span class="q-num">10</span> ¿Qué hace <code>ActividadPersistenceAdapter</code>?</legend>
+            <div class="opts">
+        <label class="opt"><input type="radio" name="q10" value="a"><span class="letter">A</span><span class="opt-text">Convierte entre el dominio y la entidad JPA.</span></label>
+        <label class="opt"><input type="radio" name="q10" value="b"><span class="letter">B</span><span class="opt-text">Recibe las peticiones HTTP.</span></label>
+        <label class="opt"><input type="radio" name="q10" value="c"><span class="letter">C</span><span class="opt-text">Valida los roles de Keycloak.</span></label>
+        <label class="opt"><input type="radio" name="q10" value="d"><span class="letter">D</span><span class="opt-text">Genera el HTML del formulario.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="B" data-answer="b" data-explain="Un puerto es una interfaz o contrato: dice qué operación se necesita, pero no cómo se implementa. El adapter pone la implementación.">
+      <legend class="q-text"><span class="q-num">11</span> ¿Qué es un <em>puerto</em> (<code>port</code>) en este módulo?</legend>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q11" value="a"><span class="letter">A</span><span class="opt-text">Un número de red para conectarse a Oracle.</span></label>
+        <label class="opt"><input type="radio" name="q11" value="b"><span class="letter">B</span><span class="opt-text">Un contrato que define una operación sin decir cómo se implementa.</span></label>
+        <label class="opt"><input type="radio" name="q11" value="c"><span class="letter">C</span><span class="opt-text">Una tabla de la base de datos.</span></label>
+        <label class="opt"><input type="radio" name="q11" value="d"><span class="letter">D</span><span class="opt-text">Un tipo de etiqueta de colores.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="B" data-answer="c" data-explain="ActividadController usa @RestController, que combina @Controller y @ResponseBody para devolver JSON.">
+      <legend class="q-text"><span class="q-num">12</span> ¿Qué anotación de Spring marca la clase como controlador REST?</legend>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q12" value="a"><span class="letter">A</span><span class="opt-text"><code>@Service</code></span></label>
+        <label class="opt"><input type="radio" name="q12" value="b"><span class="letter">B</span><span class="opt-text"><code>@Repository</code></span></label>
+        <label class="opt"><input type="radio" name="q12" value="c"><span class="letter">C</span><span class="opt-text"><code>@RestController</code></span></label>
+        <label class="opt"><input type="radio" name="q12" value="d"><span class="letter">D</span><span class="opt-text"><code>@Entity</code></span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="B" data-answer="d" data-explain="El Repository (Spring Data) ofrece las búsquedas sobre la tabla: por estado, cliente, lead, oportunidad, etiqueta o vencidas.">
+      <legend class="q-text"><span class="q-num">13</span> ¿Qué hace el <code>Repository</code> del módulo?</legend>
+            <div class="opts">
+        <label class="opt"><input type="radio" name="q13" value="a"><span class="letter">A</span><span class="opt-text">Decide las reglas de negocio.</span></label>
+        <label class="opt"><input type="radio" name="q13" value="b"><span class="letter">B</span><span class="opt-text">Recibe las peticiones HTTP.</span></label>
+        <label class="opt"><input type="radio" name="q13" value="c"><span class="letter">C</span><span class="opt-text">Pinta la pantalla del vendedor.</span></label>
+        <label class="opt"><input type="radio" name="q13" value="d"><span class="letter">D</span><span class="opt-text">Ofrece las búsquedas sobre la tabla (por estado, cliente, etc.).</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+  </section>
+
+  <!-- ================= C. BASE DE DATOS ================= -->
+  <section class="block" data-section="C">
+    <div class="block-head">
+      <span class="badge">C</span>
+      <h2>Base de datos</h2>
+      <span class="pts">5 preguntas</span>
+    </div>
+
+    <fieldset class="q" data-section="C" data-answer="c" data-explain="Son tres: CRM_ACTIVIDADES, CRM_ACTIVIDAD_ETIQUETAS y CRM_ACTIVIDAD_PARTICIPANTES. La vista VW_VIERNES_AGENDA es adicional.">
+      <legend class="q-text"><span class="q-num">14</span> ¿Cuántas tablas propias tiene el módulo de actividades?</legend>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q14" value="a"><span class="letter">A</span><span class="opt-text">1</span></label>
+        <label class="opt"><input type="radio" name="q14" value="b"><span class="letter">B</span><span class="opt-text">2</span></label>
+        <label class="opt"><input type="radio" name="q14" value="c"><span class="letter">C</span><span class="opt-text">3</span></label>
+        <label class="opt"><input type="radio" name="q14" value="d"><span class="letter">D</span><span class="opt-text">4</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="C" data-answer="d" data-explain="CRM_ACTIVIDAD_ETIQUETAS guarda qué etiqueta va pegada a qué actividad y en qué orden.">
+      <legend class="q-text"><span class="q-num">15</span> ¿En qué tabla se guarda la relación entre actividad y etiqueta?</legend>
+            <div class="opts">
+        <label class="opt"><input type="radio" name="q15" value="a"><span class="letter">A</span><span class="opt-text"><code>CRM_ACTIVIDADES</code></span></label>
+        <label class="opt"><input type="radio" name="q15" value="b"><span class="letter">B</span><span class="opt-text"><code>CRM_ETIQUETAS</code></span></label>
+        <label class="opt"><input type="radio" name="q15" value="c"><span class="letter">C</span><span class="opt-text"><code>CRM_ACTIVIDAD_PARTICIPANTES</code></span></label>
+        <label class="opt"><input type="radio" name="q15" value="d"><span class="letter">D</span><span class="opt-text"><code>CRM_ACTIVIDAD_ETIQUETAS</code></span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="C" data-answer="c" data-explain="No hay foreign keys físicas: las relaciones son referencias lógicas y se validan en Java antes de guardar.">
+      <legend class="q-text"><span class="q-num">16</span> ¿Existen <em>foreign keys</em> físicas en las tablas de actividades?</legend>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q16" value="a"><span class="letter">A</span><span class="opt-text">Sí, todas las relaciones tienen FK.</span></label>
+        <label class="opt"><input type="radio" name="q16" value="b"><span class="letter">B</span><span class="opt-text">Solo entre actividades y clientes.</span></label>
+        <label class="opt"><input type="radio" name="q16" value="c"><span class="letter">C</span><span class="opt-text">No; son referencias lógicas validadas en Java.</span></label>
+        <label class="opt"><input type="radio" name="q16" value="d"><span class="letter">D</span><span class="opt-text">Solo en Oracle 23c.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="C" data-answer="a" data-explain="La columna ORDEN, en CRM_ACTIVIDAD_ETIQUETAS, conserva el orden en que el usuario arrastró las etiquetas.">
+      <legend class="q-text"><span class="q-num">17</span> ¿Qué columna conserva el orden de las etiquetas?</legend>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q17" value="a"><span class="letter">A</span><span class="opt-text"><code>ORDEN</code> en <code>CRM_ACTIVIDAD_ETIQUETAS</code></span></label>
+        <label class="opt"><input type="radio" name="q17" value="b"><span class="letter">B</span><span class="opt-text"><code>ID_ETIQUETA</code></span></label>
+        <label class="opt"><input type="radio" name="q17" value="c"><span class="letter">C</span><span class="opt-text"><code>PRIORIDAD</code> en <code>CRM_ETIQUETAS</code></span></label>
+        <label class="opt"><input type="radio" name="q17" value="d"><span class="letter">D</span><span class="opt-text"><code>SECUENCIA</code> en <code>CRM_ACTIVIDADES</code></span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="C" data-answer="a" data-explain="VW_VIERNES_AGENDA une actividades con cliente, lead y oportunidad. Existe en Oracle, aunque el backend todavía no la consulta.">
+      <legend class="q-text"><span class="q-num">18</span> ¿Qué vista consolida actividades con cliente, lead y oportunidad?</legend>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q18" value="a"><span class="letter">A</span><span class="opt-text"><code>VW_VIERNES_AGENDA</code></span></label>
+        <label class="opt"><input type="radio" name="q18" value="b"><span class="letter">B</span><span class="opt-text"><code>VW_CRM_ACTIVIDADES</code></span></label>
+        <label class="opt"><input type="radio" name="q18" value="c"><span class="letter">C</span><span class="opt-text"><code>VW_PIPELINE</code></span></label>
+        <label class="opt"><input type="radio" name="q18" value="d"><span class="letter">D</span><span class="opt-text"><code>VW_CLIENTES</code></span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+  </section>
+
+  <!-- ================= D. REGLAS Y FLUJO ================= -->
+  <section class="block" data-section="D">
+    <div class="block-head">
+      <span class="badge">D</span>
+      <h2>Reglas y funcionamiento</h2>
+      <span class="pts">7 preguntas</span>
+    </div>
+
+    <fieldset class="q" data-section="D" data-answer="b" data-explain="Si el formulario no trae estado, el servicio asigna PENDIENTE automáticamente.">
+      <legend class="q-text"><span class="q-num">19</span> Si al crear no se envía estado, ¿qué estado toma la actividad?</legend>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q19" value="a"><span class="letter">A</span><span class="opt-text">EN_PROCESO</span></label>
+        <label class="opt"><input type="radio" name="q19" value="b"><span class="letter">B</span><span class="opt-text">PENDIENTE</span></label>
+        <label class="opt"><input type="radio" name="q19" value="c"><span class="letter">C</span><span class="opt-text">COMPLETADA</span></label>
+        <label class="opt"><input type="radio" name="q19" value="d"><span class="letter">D</span><span class="opt-text">CANCELADA</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="D" data-answer="d" data-explain="El máximo es 8, validado dos veces: con @Size(max = 8) en el DTO y con MAX_ETIQUETAS en el servicio.">
+      <legend class="q-text"><span class="q-num">20</span> ¿Cuál es el máximo de etiquetas por actividad?</legend>
+            <div class="opts">
+        <label class="opt"><input type="radio" name="q20" value="a"><span class="letter">A</span><span class="opt-text">5</span></label>
+        <label class="opt"><input type="radio" name="q20" value="b"><span class="letter">B</span><span class="opt-text">10</span></label>
+        <label class="opt"><input type="radio" name="q20" value="c"><span class="letter">C</span><span class="opt-text">Sin límite.</span></label>
+        <label class="opt"><input type="radio" name="q20" value="d"><span class="letter">D</span><span class="opt-text">8</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="D" data-answer="b" data-explain="El servicio borra primero los vínculos de etiquetas y participantes, y luego la actividad. Todo ocurre en una sola transacción.">
+      <legend class="q-text"><span class="q-num">21</span> ¿Qué ocurre al eliminar una actividad?</legend>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q21" value="a"><span class="letter">A</span><span class="opt-text">Solo se marca como inactiva.</span></label>
+        <label class="opt"><input type="radio" name="q21" value="b"><span class="letter">B</span><span class="opt-text">Se borran sus etiquetas, sus participantes y la actividad físicamente.</span></label>
+        <label class="opt"><input type="radio" name="q21" value="c"><span class="letter">C</span><span class="opt-text">Se borra la actividad, pero quedan los vínculos huérfanos.</span></label>
+        <label class="opt"><input type="radio" name="q21" value="d"><span class="letter">D</span><span class="opt-text">No se puede eliminar nunca.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="D" data-answer="c" data-explain="El DELETE de actividades está en ENTIDADES_NEGOCIO y KeycloakSecurityConfig lo reserva al rol ADMIN.">
+      <legend class="q-text"><span class="q-num">22</span> ¿Quién puede eliminar una actividad?</legend>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q22" value="a"><span class="letter">A</span><span class="opt-text">Cualquier usuario autenticado.</span></label>
+        <label class="opt"><input type="radio" name="q22" value="b"><span class="letter">B</span><span class="opt-text">ADMIN y JEFE.</span></label>
+        <label class="opt"><input type="radio" name="q22" value="c"><span class="letter">C</span><span class="opt-text">Solo ADMIN.</span></label>
+        <label class="opt"><input type="radio" name="q22" value="d"><span class="letter">D</span><span class="opt-text">Solo el usuario que la creó.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="D" data-answer="f" data-explain="Falso. La tabla tiene una restricción única por actividad y contacto, y el servicio rechaza el duplicado antes de guardar.">
+      <legend class="q-text"><span class="q-num">23</span> Verdadero o falso: un contacto puede ser participante dos veces en la misma actividad.</legend>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q23" value="v"><span class="letter">V</span><span class="opt-text">Verdadero.</span></label>
+        <label class="opt"><input type="radio" name="q23" value="f"><span class="letter">F</span><span class="opt-text">Falso.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="D" data-answer="f" data-explain="Falso. El formulario de Angular nunca envía idUsuario, por eso las actividades creadas desde la web quedan sin responsable.">
+      <legend class="q-text"><span class="q-num">24</span> Verdadero o falso: la interfaz asigna automáticamente el usuario responsable de la actividad.</legend>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q24" value="v"><span class="letter">V</span><span class="opt-text">Verdadero.</span></label>
+        <label class="opt"><input type="radio" name="q24" value="f"><span class="letter">F</span><span class="opt-text">Falso.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="D" data-answer="v" data-explain="Verdadero. No existe máquina de estados: cambiarEstado acepta cualquier transición, incluida COMPLETADA a PENDIENTE.">
+      <legend class="q-text"><span class="q-num">25</span> Verdadero o falso: una actividad completada puede volver a quedar pendiente.</legend>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q25" value="v"><span class="letter">V</span><span class="opt-text">Verdadero.</span></label>
+        <label class="opt"><input type="radio" name="q25" value="f"><span class="letter">F</span><span class="opt-text">Falso.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+  </section>
+
+  <!-- ================= E. CASOS ================= -->
+  <section class="block" data-section="E">
+    <div class="block-head">
+      <span class="badge">E</span>
+      <h2>Casos prácticos</h2>
+      <span class="pts">5 preguntas</span>
+    </div>
+
+    <fieldset class="q" data-section="E" data-answer="c" data-explain="El vendedor ve el botón, pero el backend responde 403 porque eliminar actividades está reservado a ADMIN.">
+      <legend class="q-text"><span class="q-num">26</span> Un vendedor intenta eliminar una actividad y recibe un error 403. ¿Por qué?</legend>
+            <div class="opts">
+        <label class="opt"><input type="radio" name="q26" value="a"><span class="letter">A</span><span class="opt-text">Porque el backend está caído.</span></label>
+        <label class="opt"><input type="radio" name="q26" value="b"><span class="letter">B</span><span class="opt-text">Porque la actividad ya está completada.</span></label>
+        <label class="opt"><input type="radio" name="q26" value="c"><span class="letter">C</span><span class="opt-text">Porque el DELETE está reservado al rol ADMIN.</span></label>
+        <label class="opt"><input type="radio" name="q26" value="d"><span class="letter">D</span><span class="opt-text">Porque la actividad no tiene etiquetas.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="E" data-answer="c" data-explain="El servicio busca todas las etiquetas y, si falta alguna, lanza ResourceNotFoundException con el mensaje Etiquetas no encontradas.">
+      <legend class="q-text"><span class="q-num">27</span> Se envía una etiqueta con un ID que no existe. ¿Qué ocurre?</legend>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q27" value="a"><span class="letter">A</span><span class="opt-text">Se ignora en silencio.</span></label>
+        <label class="opt"><input type="radio" name="q27" value="b"><span class="letter">B</span><span class="opt-text">Se crea la etiqueta automáticamente.</span></label>
+        <label class="opt"><input type="radio" name="q27" value="c"><span class="letter">C</span><span class="opt-text">Responde 404 con el mensaje «Etiquetas no encontradas».</span></label>
+        <label class="opt"><input type="radio" name="q27" value="d"><span class="letter">D</span><span class="opt-text">Se guarda la actividad sin etiquetas.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="E" data-answer="b" data-explain="El interceptor HTTP corta a los 15 segundos y muestra «El servidor no responde. Verifique que el backend esté disponible».">
+      <legend class="q-text"><span class="q-num">28</span> El backend está caído y el usuario intenta guardar. ¿Qué ve y cuándo?</legend>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q28" value="a"><span class="letter">A</span><span class="opt-text">Un error 500 inmediato.</span></label>
+        <label class="opt"><input type="radio" name="q28" value="b"><span class="letter">B</span><span class="opt-text">El mensaje «El servidor no responde» después de 15 segundos.</span></label>
+        <label class="opt"><input type="radio" name="q28" value="c"><span class="letter">C</span><span class="opt-text">Se queda cargando para siempre.</span></label>
+        <label class="opt"><input type="radio" name="q28" value="d"><span class="letter">D</span><span class="opt-text">Lo redirige al login de Keycloak.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="E" data-answer="a" data-explain="En una actualización, una lista vacía significa borrar todas las etiquetas; null significa no tocarlas.">
+      <legend class="q-text"><span class="q-num">29</span> Al actualizar, se envía <code>etiquetaIds: []</code>. ¿Qué pasa?</legend>
+            <div class="opts">
+        <label class="opt"><input type="radio" name="q29" value="a"><span class="letter">A</span><span class="opt-text">Se borran todas las etiquetas de la actividad.</span></label>
+        <label class="opt"><input type="radio" name="q29" value="b"><span class="letter">B</span><span class="opt-text">Se conservan las etiquetas actuales.</span></label>
+        <label class="opt"><input type="radio" name="q29" value="c"><span class="letter">C</span><span class="opt-text">Se produce un error de validación.</span></label>
+        <label class="opt"><input type="radio" name="q29" value="d"><span class="letter">D</span><span class="opt-text">Se agrega una etiqueta vacía.</span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+
+    <fieldset class="q" data-section="E" data-answer="b" data-explain="El cambio de estado se hace con PATCH /api/v1/actividades/{id}/estado?estado=COMPLETADA.">
+      <legend class="q-text"><span class="q-num">30</span> ¿Qué endpoint se usa para marcar una actividad como completada?</legend>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q30" value="a"><span class="letter">A</span><span class="opt-text"><code>PUT /api/v1/actividades/{id}</code></span></label>
+        <label class="opt"><input type="radio" name="q30" value="b"><span class="letter">B</span><span class="opt-text"><code>PATCH /api/v1/actividades/{id}/estado?estado=COMPLETADA</code></span></label>
+        <label class="opt"><input type="radio" name="q30" value="c"><span class="letter">C</span><span class="opt-text"><code>POST /api/v1/actividades/{id}/completar</code></span></label>
+        <label class="opt"><input type="radio" name="q30" value="d"><span class="letter">D</span><span class="opt-text"><code>DELETE /api/v1/actividades/{id}</code></span></label>
+      </div>
+      <div class="feedback" hidden></div>
+    </fieldset>
+  </section>
+
+  <!-- ================= RESULTADO ================= -->
+  <section class="resultado" id="resultado" hidden aria-live="polite">
+    <div class="score-ring">
+      <div>
+        <b id="scoreNumber">0</b>
+        <span>de 30</span>
+      </div>
+    </div>
+    <div>
+      <h2 id="scoreTitle">Resultado</h2>
+      <p id="scoreMessage"></p>
+      <div class="chips" id="sectionChips"></div>
+      <button class="btn" type="button" onclick="reiniciar()">Intentar de nuevo</button>
+    </div>
+  </section>
+
+  <div class="resultado" id="revealBanner" hidden style="grid-template-columns:1fr;">
+    <div>
+      <h2>Respuestas reveladas</h2>
+      <p>Las opciones correctas están marcadas en verde. Usa «Reiniciar» para intentarlo de nuevo sin mirar.</p>
+    </div>
+  </div>
+
+  <!-- ================= CLAVE ================= -->
+  <details class="key">
+    <summary>Clave rápida de respuestas (para el docente)</summary>
+    <div class="key-grid">
+      <span>1 <b>B</b></span><span>2 <b>D</b></span><span>3 <b>C</b></span><span>4 <b>A</b></span><span>5 <b>B</b></span>
+      <span>6 <b>C</b></span><span>7 <b>A</b></span><span>8 <b>C</b></span><span>9 <b>D</b></span><span>10 <b>A</b></span>
+      <span>11 <b>B</b></span><span>12 <b>C</b></span><span>13 <b>D</b></span><span>14 <b>C</b></span><span>15 <b>D</b></span>
+      <span>16 <b>C</b></span><span>17 <b>A</b></span><span>18 <b>A</b></span><span>19 <b>B</b></span><span>20 <b>D</b></span>
+      <span>21 <b>B</b></span><span>22 <b>C</b></span><span>23 <b>F</b></span><span>24 <b>F</b></span><span>25 <b>V</b></span>
+      <span>26 <b>C</b></span><span>27 <b>C</b></span><span>28 <b>B</b></span><span>29 <b>A</b></span><span>30 <b>B</b></span>
+    </div>
+  </details>
+
+  <footer>
+    Examen del módulo <b>actividades</b> · Viernes CRM · 22/11/2026 · 30 preguntas · 1 punto cada una.
+    Basado en el código real y en la guía <code>14_Actividades_Explicacion_Simple.html</code>.
+  </footer>
+
+</div>
+
+<!-- ================= DOCK ================= -->
+<div class="dock">
+  <div class="count"><b id="dockCount">0</b> / 30</div>
+  <div class="progress-track" aria-hidden="true"><span id="dockBar"></span></div>
+  <button class="btn primary" type="button" id="btnCalificarDock">Calificar</button>
+</div>
+
+<script>
+  const questions = Array.from(document.querySelectorAll('fieldset.q'));
+  const total = questions.length;
+  const answeredCount = document.getElementById('answeredCount');
+  const dockCount = document.getElementById('dockCount');
+  const progressBar = document.getElementById('progressBar');
+  const dockBar = document.getElementById('dockBar');
+  const resultado = document.getElementById('resultado');
+  const revealBanner = document.getElementById('revealBanner');
+  let graded = false;
+
+  const sectionNames = {
+    A: 'Conceptos',
+    B: 'Arquitectura',
+    C: 'Base de datos',
+    D: 'Reglas',
+    E: 'Casos'
+  };
+
+  function updateProgress() {
+    const answered = questions.filter(q => q.querySelector('input[type="radio"]:checked')).length;
+    const pct = total ? (answered / total) * 100 : 0;
+    answeredCount.textContent = answered;
+    dockCount.textContent = answered;
+    progressBar.style.width = pct + '%';
+    dockBar.style.width = pct + '%';
+  }
+
+  document.addEventListener('change', (event) => {
+    if (event.target.matches('input[type="radio"]')) {
+      if (graded) return;
+      updateProgress();
+    }
+  });
+
+  function limpiarClases(q) {
+    q.classList.remove('correct', 'wrong', 'unanswered');
+    q.querySelectorAll('.opt').forEach(opt => opt.classList.remove('is-correct', 'is-wrong'));
+    const status = q.querySelector('.q-status');
+    if (status) status.remove();
+  }
+
+  function mostrarFeedback(q, texto, estado) {
+    const fb = q.querySelector('.feedback');
+    if (!fb) return;
+    fb.hidden = false;
+    fb.innerHTML = texto;
+
+    const legend = q.querySelector('legend.q-text');
+    if (legend) {
+      const old = legend.querySelector('.q-status');
+      if (old) old.remove();
+      const badge = document.createElement('span');
+      badge.className = 'q-status';
+      badge.textContent = estado;
+      legend.appendChild(badge);
+    }
+  }
+
+  function calificar() {
+    if (graded) {
+      resultado.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    let correct = 0;
+    let wrong = 0;
+    let blank = 0;
+    const bySection = {};
+
+    questions.forEach((q) => {
+      const section = q.dataset.section;
+      if (!bySection[section]) bySection[section] = { ok: 0, total: 0 };
+      bySection[section].total++;
+
+      limpiarClases(q);
+
+      const selected = q.querySelector('input[type="radio"]:checked');
+      const correctValue = q.dataset.answer;
+      const correctInput = q.querySelector('input[type="radio"][value="' + correctValue + '"]');
+      const correctLabel = correctInput ? correctInput.closest('.opt') : null;
+
+      if (!selected) {
+        blank++;
+        q.classList.add('unanswered');
+        if (correctLabel) correctLabel.classList.add('is-correct');
+        mostrarFeedback(
+          q,
+          '<strong>Sin responder.</strong> La respuesta correcta era <b>' + correctValue.toUpperCase() + '</b>. ' + q.dataset.explain,
+          'Sin responder'
+        );
+      } else if (selected.value === correctValue) {
+        correct++;
+        bySection[section].ok++;
+        q.classList.add('correct');
+        if (correctLabel) correctLabel.classList.add('is-correct');
+        mostrarFeedback(
+          q,
+          '<strong>¡Correcto!</strong> ' + q.dataset.explain,
+          'Correcta'
+        );
+      } else {
+        wrong++;
+        q.classList.add('wrong');
+        selected.closest('.opt').classList.add('is-wrong');
+        if (correctLabel) correctLabel.classList.add('is-correct');
+        mostrarFeedback(
+          q,
+          '<strong>Incorrecto.</strong> La respuesta correcta era <b>' + correctValue.toUpperCase() + '</b>. ' + q.dataset.explain,
+          'Incorrecta'
+        );
+      }
+
+      q.querySelectorAll('input[type="radio"]').forEach(input => { input.disabled = true; });
+    });
+
+    graded = true;
+    const pct = Math.round((correct / total) * 100);
+
+    document.getElementById('scoreNumber').textContent = correct;
+    document.getElementById('scoreTitle').textContent = pct >= 90 ? 'Excelente' : pct >= 70 ? 'Muy bien' : pct >= 50 ? 'Aprobado' : 'A repasar';
+
+    let mensaje = '';
+    if (pct >= 90) mensaje = 'Dominas el módulo: arquitectura, reglas y base de datos. ' + correct + ' de ' + total + ' correctas (' + pct + '%).';
+    else if (pct >= 70) mensaje = 'Buen resultado. Revisa las preguntas marcadas en rojo para afinar los detalles. ' + correct + ' de ' + total + ' correctas (' + pct + '%).';
+    else if (pct >= 50) mensaje = 'Vas por buen camino, pero conviene repasar la guía de oficina. ' + correct + ' de ' + total + ' correctas (' + pct + '%).';
+    else mensaje = 'Toca volver a la guía: arquitectura, reglas y tablas. ' + correct + ' de ' + total + ' correctas (' + pct + '%).';
+
+    document.getElementById('scoreMessage').textContent = mensaje;
+
+    const chips = document.getElementById('sectionChips');
+    chips.innerHTML = '';
+    Object.keys(bySection).forEach((key) => {
+      const data = bySection[key];
+      const chip = document.createElement('span');
+      chip.textContent = (sectionNames[key] || key) + ': ' + data.ok + '/' + data.total;
+      chips.appendChild(chip);
+    });
+
+    const extra = document.createElement('span');
+    extra.textContent = 'En blanco: ' + blank;
+    chips.appendChild(extra);
+
+    resultado.hidden = false;
+    revealBanner.hidden = true;
+    updateProgress();
+    resultado.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function verRespuestas() {
+    questions.forEach((q) => {
+      limpiarClases(q);
+      const correctValue = q.dataset.answer;
+      const correctInput = q.querySelector('input[type="radio"][value="' + correctValue + '"]');
+      const correctLabel = correctInput ? correctInput.closest('.opt') : null;
+      if (correctLabel) correctLabel.classList.add('is-correct');
+
+      mostrarFeedback(
+        q,
+        '<strong>Respuesta correcta: ' + correctValue.toUpperCase() + '.</strong> ' + q.dataset.explain,
+        'Clave'
+      );
+
+      q.querySelectorAll('input[type="radio"]').forEach(input => { input.disabled = true; });
+    });
+
+    graded = true;
+    resultado.hidden = true;
+    revealBanner.hidden = false;
+    revealBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function reiniciar() {
+    questions.forEach((q) => {
+      limpiarClases(q);
+      q.querySelectorAll('input[type="radio"]').forEach((input) => {
+        input.checked = false;
+        input.disabled = false;
+      });
+      const fb = q.querySelector('.feedback');
+      if (fb) {
+        fb.hidden = true;
+        fb.innerHTML = '';
+      }
+    });
+
+    graded = false;
+    resultado.hidden = true;
+    revealBanner.hidden = true;
+    updateProgress();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  document.getElementById('btnCalificar').addEventListener('click', calificar);
+  document.getElementById('btnCalificarDock').addEventListener('click', calificar);
+  document.getElementById('btnVer').addEventListener('click', verRespuestas);
+  document.getElementById('btnReiniciar').addEventListener('click', reiniciar);
+
+  updateProgress();
+</script>
+
+</body>
+</html>
