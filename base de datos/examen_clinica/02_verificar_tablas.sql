@@ -1,8 +1,0 @@
-SET LINESIZE 150;
-SET PAGESIZE 50;
-COLUMN TABLE_NAME FORMAT A30;
-
-SELECT table_name 
-FROM all_tables 
-WHERE owner='EXA_CLINICA' 
-ORDER BY table_name;

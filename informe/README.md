@@ -9,8 +9,7 @@ Este directorio centraliza toda la documentación técnica, manuales de usuario,
 ```text
 informe/
 │
-├── 01_nuevo_y_vigente/             # Documentación vigente, final y guías de examen
-│   ├── 01_examen_final_v7_clinica/ # Guías del Examen Final LP2 (Variante 7: Clínica)
+├── 01_nuevo_y_vigente/             # Documentación vigente, final y guías oficiales
 │   ├── 02_simulador_examen_actividades/ # Simuladores interactivos y test de código
 │   ├── 03_manual_usuario_v2/       # Manual interactivo V2 con capturas de pantalla
 │   ├── 04_guias_sustentacion_y_pitch/ # Guía de sustentación, pitch de 5 min y patrones
