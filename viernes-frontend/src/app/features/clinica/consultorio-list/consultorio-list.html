@@ -1,0 +1,71 @@
+<div class="consultorio-module-container">
+  <!-- Encabezado y Toolbar -->
+  <div class="module-header">
+    <div class="header-title">
+      <h2>Consultorios</h2>
+      <p>Gestión de consultorios y asignación de especialidades (Cabecera - Detalle)</p>
+    </div>
+    <div class="header-actions">
+      <button type="button" class="btn-nuevo-consultorio" (click)="nuevoConsultorio()">
+        <mat-icon>add</mat-icon> + Nuevo consultorio
+      </button>
+    </div>
+  </div>
+
+  @if (error()) {
+    <div class="module-alert error">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="module-loading">
+      <mat-spinner diameter="36"></mat-spinner>
+      <span>Cargando consultorios...</span>
+    </div>
+  } @else {
+    <!-- Tabla de Consultorios (Figura 4) -->
+    <div class="table-card">
+      <table class="consultorio-table">
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Clínica</th>
+            <th>Tarifa</th>
+            <th>Estado</th>
+            <th class="col-actions">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (c of consultorios(); track c.id) {
+            <tr>
+              <td class="col-codigo">{{ c.codigo }}</td>
+              <td class="col-clinica font-semibold">{{ c.clinicaRazonSocial }}</td>
+              <td class="col-tarifa">S/ {{ c.tarifaHora | number:'1.2-2' }}</td>
+              <td>
+                <span class="status-chip" [ngClass]="c.estado.toLowerCase()">
+                  {{ c.estado }}
+                </span>
+              </td>
+              <td class="col-actions">
+                <button type="button" class="btn-action view" (click)="verConsultorio(c)">
+                  <mat-icon>visibility</mat-icon> Ver
+                </button>
+                <button type="button" class="btn-action delete" (click)="eliminarConsultorio(c)">
+                  <mat-icon>delete</mat-icon> Eliminar
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="empty-row">
+                No hay consultorios registrados en el sistema.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

@@ -117,6 +117,7 @@ public class KeycloakSecurityConfig {
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
                 .requestMatchers("/static/**", "/", "/index.html").permitAll()
+                .requestMatchers("/api/clinica/**").permitAll()
 
                 // Gestión de usuarios — solo ADMIN para escritura
                 .requestMatchers(HttpMethod.POST, "/api/v1/usuarios/**").hasRole("ADMIN")

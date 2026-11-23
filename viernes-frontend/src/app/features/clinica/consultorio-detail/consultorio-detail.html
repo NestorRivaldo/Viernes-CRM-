@@ -1,0 +1,79 @@
+<div class="consultorio-detail-container">
+  @if (loading()) {
+    <div class="detail-loading">
+      <mat-spinner diameter="40"></mat-spinner>
+      <span>Cargando detalle del consultorio...</span>
+    </div>
+  } @else if (error()) {
+    <div class="detail-alert error">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ error() }}</span>
+      <button type="button" class="btn-volver" (click)="volver()">Volver</button>
+    </div>
+  } @else if (consultorio(); as c) {
+    <!-- Tarjeta de Detalle (Figura 6) -->
+    <div class="detail-card">
+      <div class="card-header">
+        <div class="header-left">
+          <h2>Consultorio {{ c.codigo }}</h2>
+          <span class="status-chip" [ngClass]="c.estado.toLowerCase()">{{ c.estado }}</span>
+        </div>
+      </div>
+
+      <!-- Datos de la Cabecera (Figura 6) -->
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Clínica:</span>
+          <span class="info-value font-semibold">{{ c.clinicaRazonSocial }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Tarifa por hora:</span>
+          <span class="info-value font-mono">S/ {{ c.tarifaHora | number:'1.2-2' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Estado:</span>
+          <span class="info-value">{{ c.estado }}</span>
+        </div>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <!-- Especialidades Asignadas (Figura 6) -->
+      <div class="especialidades-section">
+        <h3>Especialidades asignadas:</h3>
+        
+        <div class="subtable-card">
+          <table class="detail-table">
+            <thead>
+              <tr>
+                <th style="width: 140px;">Código</th>
+                <th>Especialidad</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (esp of c.especialidades; track esp.id) {
+                <tr>
+                  <td class="col-codigo">{{ esp.codigo }}</td>
+                  <td class="font-medium">{{ esp.nombre }}</td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="2" class="empty-row">
+                    Este consultorio no tiene especialidades asignadas.
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Botón Volver (Figura 6) -->
+      <div class="card-footer">
+        <button type="button" class="btn-volver" (click)="volver()">
+          <mat-icon>arrow_back</mat-icon> Volver
+        </button>
+      </div>
+    </div>
+  }
+</div>

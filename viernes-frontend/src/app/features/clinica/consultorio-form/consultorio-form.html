@@ -1,0 +1,144 @@
+<div class="consultorio-form-container">
+  <div class="form-card">
+    <div class="card-header">
+      <h2>Nuevo consultorio</h2>
+      <p>Registra un nuevo consultorio y asigna sus especialidades (Cabecera - Detalle)</p>
+    </div>
+
+    @if (serverError) {
+      <div class="form-alert error">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ serverError }}</span>
+      </div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="guardar()">
+      <!-- Bloque Cabecera (Figura 5: Fila 1 y 2) -->
+      <div class="form-grid">
+        <!-- Clínica -->
+        <div class="form-group">
+          <label for="idClinica" class="form-label">Clínica <span class="req">*</span></label>
+          <select id="idClinica" formControlName="idClinica" class="form-control select-control">
+            @for (clinica of clinicas; track clinica.id) {
+              <option [value]="clinica.id">{{ clinica.razonSocial }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Código -->
+        <div class="form-group">
+          <label for="codigo" class="form-label">Código <span class="req">*</span></label>
+          <input
+            id="codigo"
+            type="text"
+            formControlName="codigo"
+            placeholder="Ej: CON-103"
+            class="form-control"
+            [class.is-invalid]="submitted && form.get('codigo')?.invalid"
+          />
+          @if (submitted && form.get('codigo')?.invalid) {
+            <span class="inline-error">El código es obligatorio</span>
+          }
+        </div>
+
+        <!-- Tarifa por hora -->
+        <div class="form-group">
+          <label for="tarifaHora" class="form-label">Tarifa por hora (S/) <span class="req">*</span></label>
+          <input
+            id="tarifaHora"
+            type="number"
+            step="0.01"
+            min="0.01"
+            formControlName="tarifaHora"
+            placeholder="0.00"
+            class="form-control"
+            [class.is-invalid]="submitted && form.get('tarifaHora')?.invalid"
+          />
+          @if (submitted && form.get('tarifaHora')?.invalid) {
+            <span class="inline-error">La tarifa debe ser mayor a 0</span>
+          }
+        </div>
+
+        <!-- Estado -->
+        <div class="form-group">
+          <label for="estado" class="form-label">Estado <span class="req">*</span></label>
+          <select id="estado" formControlName="estado" class="form-control select-control">
+            @for (st of estados; track st) {
+              <option [value]="st">{{ st }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <!-- Separador y Sección Detalle (Figura 5) -->
+      <div class="section-divider"></div>
+
+      <div class="detalle-section">
+        <label class="section-label">Especialidades del consultorio</label>
+        
+        <div class="selector-row">
+          <div class="select-wrapper">
+            <select
+              [(ngModel)]="especialidadSeleccionadaId"
+              [ngModelOptions]="{standalone: true}"
+              class="form-control select-control"
+            >
+              @for (esp of especialidadesCatalogo; track esp.id) {
+                <option [value]="esp.id">{{ esp.codigo }} — {{ esp.nombre }}</option>
+              }
+            </select>
+          </div>
+          <button type="button" class="btn-agregar" (click)="agregarEspecialidad()">
+            <mat-icon>add</mat-icon> Agregar
+          </button>
+        </div>
+
+        <!-- Tabla de Especialidades Asignadas -->
+        <div class="subtable-card">
+          <table class="subtable">
+            <thead>
+              <tr>
+                <th style="width: 120px;">Código</th>
+                <th>Especialidad</th>
+                <th style="width: 100px; text-align: right;">Acción</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (esp of especialidadesAsignadas; track esp.id) {
+                <tr>
+                  <td class="col-codigo">{{ esp.codigo }}</td>
+                  <td class="font-medium">{{ esp.nombre }}</td>
+                  <td style="text-align: right;">
+                    <button type="button" class="btn-quitar" (click)="quitarEspecialidad(esp.id)">
+                      <mat-icon>remove_circle_outline</mat-icon> Quitar
+                    </button>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="3" class="empty-subtable">
+                    No se han asignado especialidades aún. Selecciona una arriba y pulsa "Agregar".
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Botones de Acción -->
+      <div class="form-footer">
+        <button type="button" class="btn-cancelar" (click)="cancelar()" [disabled]="guardando">
+          Cancelar
+        </button>
+        <button type="submit" class="btn-guardar" [disabled]="guardando">
+          @if (guardando) {
+            <span>Guardando...</span>
+          } @else {
+            <span>Guardar</span>
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
