@@ -1,0 +1,1007 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cómo Construir un Módulo desde Cero V7 — Viernes CRM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#090d16; --surface:#111726; --surface2:#172033; --border:#232f48;
+  --text:#f1f5f9; --muted:#94a3b8; --subtle:#64748b;
+  --accent:#3b82f6; --accent-soft:rgba(59,130,246,.12);
+  --green:#10b981; --green-soft:rgba(16,185,129,.12);
+  --purple:#a855f7; --purple-soft:rgba(168,85,247,.12);
+  --amber:#f59e0b; --amber-soft:rgba(245,158,11,.12);
+  --cyan:#06b6d4; --cyan-soft:rgba(6,182,212,.12);
+  --rose:#f43f5e; --rose-soft:rgba(244,63,94,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;padding:40px 20px 80px;
+  background-image:radial-gradient(circle at 10% 10%,rgba(59,130,246,.08) 0%,transparent 45%),radial-gradient(circle at 90% 90%,rgba(168,85,247,.06) 0%,transparent 45%);background-attachment:fixed}
+.container{max-width:1200px;margin:0 auto}
+.top-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+.back-link{display:inline-flex;align-items:center;gap:8px;color:#60a5fa;text-decoration:none;font-size:13.5px;font-weight:600}
+header{text-align:center;margin-bottom:44px}
+.brand-badge{display:inline-flex;align-items:center;gap:8px;background:var(--accent-soft);color:#60a5fa;border:1px solid rgba(59,130,246,.3);padding:6px 16px;border-radius:30px;font-size:13px;font-weight:700;margin-bottom:18px;letter-spacing:.04em}
+h1{font-size:38px;font-weight:800;letter-spacing:-.025em;background:linear-gradient(135deg,#fff 30%,#93c5fd 80%,#38bdf8 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:14px;line-height:1.2}
+.subtitle{font-size:16.5px;color:var(--muted);max-width:860px;margin:0 auto 26px}
+.pills{display:flex;justify-content:center;flex-wrap:wrap;gap:10px}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;font-size:12.5px;font-weight:600}
+.p-green{background:var(--green-soft);color:#34d399;border:1px solid rgba(16,185,129,.3)}
+.p-blue{background:var(--accent-soft);color:#93c5fd;border:1px solid rgba(59,130,246,.3)}
+.p-purple{background:var(--purple-soft);color:#c084fc;border:1px solid rgba(168,85,247,.3)}
+.p-amber{background:var(--amber-soft);color:#fbbf24;border:1px solid rgba(245,158,11,.3)}
+.p-cyan{background:var(--cyan-soft);color:#67e8f9;border:1px solid rgba(6,182,212,.3)}
+.banner{display:flex;gap:14px;align-items:flex-start;background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:12px;padding:16px 18px;margin:0 0 30px;font-size:14px}
+.banner .bi{font-size:20px;line-height:1}
+.banner b{color:#93c5fd}
+h2{font-size:23px;font-weight:700;color:#fff;margin:48px 0 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);padding-bottom:12px}
+h2 .num{display:flex;align-items:center;justify-content:center;min-width:34px;height:34px;border-radius:8px;background:var(--accent-soft);color:#60a5fa;font-size:15px;font-family:'JetBrains Mono',monospace}
+h3{font-size:16.5px;font-weight:600;color:#e2e8f0;margin:24px 0 10px}
+p{margin:10px 0;color:#cbd5e1;font-size:14.5px}
+.sec-intro{color:var(--muted);font-size:14.5px;margin-bottom:16px}
+code{font-family:'JetBrains Mono',Consolas,monospace;font-size:12.5px;background:var(--surface2);border:1px solid var(--border);padding:1px 6px;border-radius:5px;color:#a5f3fc}
+.anchor{font-family:'JetBrains Mono',Consolas,monospace;font-size:12px;background:rgba(59,130,246,.1);color:#93c5fd;border:1px solid rgba(59,130,246,.2);padding:1px 7px;border-radius:6px;white-space:nowrap;display:inline-block;margin:1px 0}
+.note{border-radius:10px;padding:13px 16px;margin:16px 0;font-size:13.5px;border:1px solid}
+.note.info{background:var(--accent-soft);border-color:rgba(59,130,246,.3);color:#bfdbfe}
+.note.warn{background:var(--amber-soft);border-color:rgba(245,158,11,.3);color:#fde68a}
+.note.danger{background:var(--rose-soft);border-color:rgba(244,63,94,.3);color:#fecdd3}
+.note.ok{background:var(--green-soft);border-color:rgba(16,185,129,.3);color:#a7f3d0}
+.action-tag{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:6px;letter-spacing:.03em}
+.at-copy{background:var(--green-soft);color:#6ee7b7;border:1px solid rgba(16,185,129,.35)}
+.at-adapt{background:var(--amber-soft);color:#fbbf24;border:1px solid rgba(245,158,11,.35)}
+.at-new{background:var(--rose-soft);color:#fda4af;border:1px solid rgba(244,63,94,.35)}
+.badge{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.05em;padding:2px 8px;border-radius:5px;vertical-align:middle}
+.b-ok{background:var(--green-soft);color:#6ee7b7;border:1px solid rgba(16,185,129,.35)}
+.b-tip{background:var(--cyan-soft);color:#67e8f9;border:1px solid rgba(6,182,212,.35)}
+.b-warn{background:var(--amber-soft);color:#fbbf24;border:1px solid rgba(245,158,11,.35)}
+.tree{font-family:'JetBrains Mono',Consolas,monospace;font-size:12.5px;line-height:1.75;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;overflow-x:auto;white-space:pre;color:#cbd5e1}
+.tree .dir{color:#60a5fa;font-weight:600}
+.tree .cm{color:var(--subtle)}
+.tree .f{color:#a5f3fc}
+.code-block{font-family:'JetBrains Mono',Consolas,monospace;font-size:12.5px;line-height:1.75;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;overflow-x:auto;white-space:pre;color:#cbd5e1}
+.code-block .kw{color:#c084fc}
+.code-block .str{color:#6ee7b7}
+.code-block .cm{color:var(--subtle)}
+.code-block .ann{color:#fbbf24}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13.5px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+th{background:var(--surface2);color:#e2e8f0;text-align:left;padding:10px 14px;font-weight:600;font-size:12.5px;letter-spacing:.03em;text-transform:uppercase;border-bottom:1px solid var(--border)}
+td{padding:10px 14px;border-bottom:1px solid var(--border);color:#cbd5e1;vertical-align:top}
+tr:last-child td{border-bottom:none}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:16px 0}
+.mini{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+.mini .k{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--subtle)}
+.mini .v{font-size:15px;font-weight:600;color:#e2e8f0;margin:4px 0}
+.mini p{font-size:13px;margin:6px 0 0}
+.toc{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin:0 0 10px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:6px 22px}
+.toc a{color:#93c5fd;text-decoration:none;font-size:13.5px;display:flex;gap:8px;align-items:baseline}
+.toc a:hover{color:#bfdbfe}
+.toc a .n{font-family:'JetBrains Mono',monospace;color:var(--subtle);font-size:12px}
+.step-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin:16px 0}
+.step-box .step-head{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.step-box .step-num{flex:0 0 32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700}
+.step-box .step-title{font-size:16px;font-weight:700;color:#e2e8f0}
+.step-box .step-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.svgwrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin:16px 0;overflow-x:auto}
+.svgwrap svg{display:block;margin:0 auto;max-width:100%}
+.legend{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:10px;font-size:12px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.dot{width:10px;height:10px;border-radius:3px;display:inline-block}
+.legend-row{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;margin:20px 0;font-size:13px}
+.legend-row .lg{display:inline-flex;align-items:center;gap:8px;color:var(--muted)}
+footer{margin-top:50px;padding-top:20px;border-top:1px solid var(--border);color:var(--subtle);font-size:12.5px;text-align:center}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="top-nav">
+    <a class="back-link" href="index.html">&#8592; Portal de informes</a>
+    <span style="color:var(--subtle);font-size:12.5px;font-family:'JetBrains Mono',monospace">VIERNES CRM &middot; CONSTRUIR UN M&Oacute;DULO DESDE CERO</span>
+  </div>
+
+  <header>
+    <div class="brand-badge">&#128736;&#65039; GU&Iacute;A PR&Aacute;CTICA</div>
+    <h1>C&oacute;mo Construir un M&oacute;dulo desde Cero</h1>
+    <p class="subtitle">Gu&iacute;a paso a paso para crear un m&oacute;dulo completo a mano: d&oacute;nde empezar, qu&eacute; copiar de otros m&oacute;dulos, qu&eacute; adaptar y qu&eacute; escribir nuevo. Usamos el m&oacute;dulo <code>clinica</code> del examen como ejemplo.</p>
+    <div class="pills">
+      <span class="pill p-green">Copiar</span>
+      <span class="pill p-amber">Adaptar</span>
+      <span class="pill p-rose" style="background:var(--rose-soft);color:#fda4af;border:1px solid rgba(244,63,94,.3)">Nuevo</span>
+      <span class="pill p-purple">Patr&oacute;n N:M</span>
+      <span class="pill p-cyan">12 fases</span>
+    </div>
+  </header>
+
+  <div class="legend-row">
+    <div class="lg"><span class="action-tag at-copy">COPIAR</span> Copiar el archivo casi literal de otro m&oacute;dulo</div>
+    <div class="lg"><span class="action-tag at-adapt">ADAPTAR</span> Copiar la estructura pero cambiar nombres/campos</div>
+    <div class="lg"><span class="action-tag at-new">NUEVO</span> Escribir desde cero, no existe en ning&uacute;n m&oacute;dulo</div>
+  </div>
+
+  <div class="banner">
+    <span class="bi">&#129518;</span>
+    <div><b>La regla del 80/20:</b> el 80% de un m&oacute;dulo nuevo es copiar y adaptar patrones que ya existen. El 20% que debes escribir desde cero es: (1) el SQL de las tablas, (2) las reglas de validaci&oacute;n del service y (3) la l&oacute;gica de la relaci&oacute;n N:M. Si entiendes esas tres cosas, puedes construir cualquier m&oacute;dulo.</div>
+  </div>
+
+  <nav class="toc">
+    <a href="#big"><span class="n">&#9633;</span> El panorama: qu&eacute; vas a construir</a>
+    <a href="#p01"><span class="n">01</span> Fase 1: Base de datos</a>
+    <a href="#p02"><span class="n">02</span> Fase 2: Esqueleto del paquete</a>
+    <a href="#p03"><span class="n">03</span> Fase 3: Dominio (POJOs + enums)</a>
+    <a href="#p04"><span class="n">04</span> Fase 4: DTOs (Request/Response)</a>
+    <a href="#p05"><span class="n">05</span> Fase 5: Puertos (interfaces)</a>
+    <a href="#p06"><span class="n">06</span> Fase 6: Entidades JPA + Repositories</a>
+    <a href="#p07"><span class="n">07</span> Fase 7: Persistence Adapter</a>
+    <a href="#p08"><span class="n">08</span> Fase 8: Service (reglas de negocio)</a>
+    <a href="#p09"><span class="n">09</span> Fase 9: Controller (REST)</a>
+    <a href="#p10"><span class="n">10</span> Fase 10: Frontend model + service</a>
+    <a href="#p11"><span class="n">11</span> Fase 11: Frontend listado + formulario</a>
+    <a href="#p12"><span class="n">12</span> Fase 12: El caso N:M (consultorios)</a>
+    <a href="#order"><span class="n">&#9654;</span> Orden recomendado de creaci&oacute;n</a>
+    <a href="#matrix"><span class="n">&#9635;</span> Matriz: copiar/adaptar/nuevo</a>
+  </nav>
+
+  <!-- ============ PANORAMA ============ -->
+  <h2 id="big"><span class="num">&#9633;</span> El panorama: qu&eacute; vas a construir</h2>
+  <p class="sec-intro">Antes de escribir una l&iacute;nea de c&oacute;digo, entiende qu&eacute; piezas necesitas. El m&oacute;dulo cl&iacute;nica tiene 3 entidades y una relaci&oacute;n N:M.</p>
+
+  <div class="svgwrap">
+  <svg viewBox="0 0 860 320" width="860" height="320" role="img" aria-label="Mapa de lo que vas a construir">
+    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#60a5fa"/></marker></defs>
+    <rect x="20" y="20" width="820" height="280" rx="16" fill="#0b1220" stroke="#232f48"/>
+    <text x="40" y="46" fill="#64748b" font-size="13" font-family="JetBrains Mono,monospace">M&Oacute;DULO CLINICA &mdash; todo lo que vas a crear</text>
+    <rect x="40" y="60" width="200" height="100" rx="12" fill="#1e2942" stroke="#10b981" stroke-opacity=".6"/>
+    <text x="60" y="86" fill="#6ee7b7" font-size="14" font-weight="700">CLINICAS</text>
+    <text x="60" y="106" fill="#94a3b8" font-size="11.5">CRUD simple (1 tabla)</text>
+    <text x="60" y="124" fill="#64748b" font-size="11">RUC, raz&oacute;n social, tel&eacute;fono</text>
+    <text x="60" y="142" fill="#64748b" font-size="11">Validaci&oacute;n: RUC 11 d&iacute;gitos</text>
+    <rect x="280" y="60" width="200" height="100" rx="12" fill="#1e2942" stroke="#f59e0b" stroke-opacity=".6"/>
+    <text x="300" y="86" fill="#fbbf24" font-size="14" font-weight="700">CONSULTORIOS</text>
+    <text x="300" y="106" fill="#94a3b8" font-size="11.5">CRUD con cabecera-detalle</text>
+    <text x="300" y="124" fill="#64748b" font-size="11">C&oacute;digo, tarifa, estado (enum)</text>
+    <text x="300" y="142" fill="#64748b" font-size="11">Pertenece a 1 cl&iacute;nica (FK)</text>
+    <rect x="520" y="60" width="200" height="100" rx="12" fill="#1e2942" stroke="#06b6d4" stroke-opacity=".6"/>
+    <text x="540" y="86" fill="#67e8f9" font-size="14" font-weight="700">ESPECIALIDADES</text>
+    <text x="540" y="106" fill="#94a3b8" font-size="11.5">Cat&aacute;logo (solo lectura)</text>
+    <text x="540" y="124" fill="#64748b" font-size="11">C&oacute;digo, nombre</text>
+    <text x="540" y="142" fill="#64748b" font-size="11">5 registros precargados</text>
+    <rect x="280" y="190" width="440" height="80" rx="12" fill="#172033" stroke="#a855f7" stroke-opacity=".6"/>
+    <text x="300" y="216" fill="#c084fc" font-size="13" font-weight="700">CONSULTORIO_ESPECIALIDAD (N:M)</text>
+    <text x="300" y="236" fill="#94a3b8" font-size="11.5">Tabla intermedia: la parte NUEVA</text>
+    <text x="300" y="254" fill="#64748b" font-size="11">PK compuesta: id_consultorio + id_especialidad</text>
+    <line x1="380" y1="160" x2="380" y2="190" stroke="#a855f7" stroke-width="2" marker-end="url(#ar)"/>
+    <line x1="620" y1="160" x2="620" y2="190" stroke="#a855f7" stroke-width="2" marker-end="url(#ar)"/>
+    <line x1="240" y1="110" x2="280" y2="110" stroke="#60a5fa" stroke-width="2" marker-end="url(#ar)"/>
+    <text x="244" y="100" fill="#64748b" font-size="10">1:N</text>
+  </svg>
+  </div>
+
+  <div class="grid">
+    <div class="mini"><div class="k">PIEZA 1 &mdash; Simple</div><div class="v">Cl&iacute;nicas (CRUD)</div><p>Una tabla, un CRUD. Igual que <code>etiquetas</code>. Aqu&iacute; aprendes el patr&oacute;n b&aacute;sico.</p></div>
+    <div class="mini"><div class="k">PIEZA 2 &mdash; Cat&aacute;logo</div><div class="v">Especialidades (solo lectura)</div><p>Una tabla que el frontend lee pero no edita. M&aacute;s simple todav&iacute;a: solo GET.</p></div>
+    <div class="mini"><div class="k">PIEZA 3 &mdash; Compleja</div><div class="v">Consultorios (N:M)</div><p>Cabecera + detalles. La parte nueva. Aqu&iacute; est&aacute; el <span class="action-tag at-new">NUEVO</span> de verdad.</p></div>
+  </div>
+
+  <div class="note ok"><b>Orden de construcci&oacute;n:</b> empieza por la pieza m&aacute;s simple (cl&iacute;nicas), luego el cat&aacute;logo (especialidades), y al final la pieza compleja (consultorios con N:M). Cada pieza te ense&ntilde;a algo que necesitas para la siguiente.</div>
+
+  <!-- ============ FASE 1 ============ -->
+  <h2 id="p01"><span class="num">01</span> Fase 1: Base de datos</h2>
+  <p class="sec-intro">Siempre se empieza por la base de datos. Sin tablas, no hay nada que el backend pueda leer ni escribir.</p>
+
+  <div class="step-box">
+    <div class="step-head">
+      <div class="step-num" style="background:var(--rose-soft);color:#fda4af;border:1px solid rgba(244,63,94,.4)">1.1</div>
+      <div class="step-title">Escribir el SQL de las tablas</div>
+      <span class="action-tag at-new">NUEVO</span>
+    </div>
+    <div class="step-meta">
+      <span class="badge b-warn">Siempre nuevo</span>
+      <span class="badge b-tip">Origen: el examen lo da</span>
+    </div>
+    <p>El SQL es siempre nuevo porque las tablas y columnas son espec&iacute;ficas de cada m&oacute;dulo. Nadie lo puede copiar por ti. Pero el <b>patr&oacute;n</b> s&iacute; se repite: cada tabla sigue las mismas convenciones.</p>
+    <div class="code-block"><span class="cm">-- Patron: CREATE TABLE [ESQUEMA].[TABLA] (</span>
+<span class="cm">--   ID  NUMBER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,</span>
+<span class="cm">--   ... columnas ...</span>
+<span class="cm">--   CONSTRAINTS (unique, check, FK)</span>
+<span class="cm">-- )</span>
+
+<span class="kw">CREATE TABLE</span> EXA_CLINICA.CLINICAS (
+    ID            <span class="kw">NUMBER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY</span>,
+    RUC           <span class="kw">CHAR</span>(11)      <span class="kw">NOT NULL</span>,
+    RAZON_SOCIAL  <span class="kw">VARCHAR2</span>(150) <span class="kw">NOT NULL</span>,
+    TELEFONO      <span class="kw">VARCHAR2</span>(20),
+    ACTIVO        <span class="kw">NUMBER</span>(1)     <span class="kw">DEFAULT</span> 1 <span class="kw">NOT NULL</span>,
+    <span class="kw">CONSTRAINT</span> UQ_CLINICA_RUC <span class="kw">UNIQUE</span> (RUC),
+    <span class="kw">CONSTRAINT</span> CK_CLINICA_ACTIVO <span class="kw">CHECK</span> (ACTIVO <span class="kw">IN</span> (0, 1))
+);</div>
+    <div class="note info"><b>Qu&eacute; mirar antes de escribir:</b> abre <span class="anchor">base de datos/03_tablas/07_actividades.sql</span> y mira el patr&oacute;n: PK con <code>GENERATED BY DEFAULT AS IDENTITY</code>, constraints <code>UQ_</code> para &uacute;nicos, <code>CK_</code> para checks, <code>FK_</code> para for&aacute;neas. Tus tablas deben seguir las mismas convenciones.</div>
+    <div class="note warn"><b>La tabla N:M es la &uacute;nica distinta:</b> <code>CONSULTORIO_ESPECIALIDAD</code> tiene PK compuesta (dos columnas que a la vez son FK). No tiene ID propio. Este patr&oacute;n no aparece en el SQL de actividades (que usa tabla intermedia con ID propio). Cópialo del examen.</div>
+  </div>
+
+  <div class="step-box">
+    <div class="step-head">
+      <div class="step-num" style="background:var(--rose-soft);color:#fda4af;border:1px solid rgba(244,63,94,.4)">1.2</div>
+      <div class="step-title">Insertar datos semilla</div>
+      <span class="action-tag at-new">NUEVO</span>
+    </div>
+    <p>Los datos iniciales (3 cl&iacute;nicas, 4 consultorios, 5 especialidades) son espec&iacute;ficos del examen. Escr&iacute;belos en el mismo script.</p>
+  </div>
+
+  <div class="step-box">
+    <div class="step-head">
+      <div class="step-num" style="background:var(--amber-soft);color:#fbbf24;border:1px solid rgba(245,158,11,.4)">1.3</div>
+      <div class="step-title">Dar permisos al usuario del backend</div>
+      <span class="action-tag at-adapt">ADAPTAR</span>
+    </div>
+    <p>El examen dice <code>GRANT ... TO BOMERP_APP</code>. Tu proyecto usa <code>BOM_VENTAS</code>. <b>Cambia el nombre del usuario</b>. El resto es igual.</p>
+    <div class="code-block"><span class="cm">-- Examen dice:</span>
+<span class="kw">GRANT SELECT, INSERT, UPDATE, DELETE ON</span> EXA_CLINICA.CLINICAS <span class="kw">TO</span> BOMERP_APP;
+<span class="cm">-- T&uacute; cambias a:</span>
+<span class="kw">GRANT SELECT, INSERT, UPDATE, DELETE ON</span> EXA_CLINICA.CLINICAS <span class="kw">TO</span> BOM_VENTAS;</div>
+  </div>
+
+  <!-- ============ FASE 2 ============ -->
+  <h2 id="p02"><span class="num">02</span> Fase 2: Esqueleto del paquete</h2>
+  <p class="sec-intro">Crear las carpetas y el package-info.java. Es lo m&aacute;s r&aacute;pido pero si lo olvidas, Spring no encuentra el m&oacute;dulo.</p>
+
+  <div class="step-box">
+    <div class="step-head">
+      <div class="step-num" style="background:var(--green-soft);color:#34d399;border:1px solid rgba(16,185,129,.4)">2.1</div>
+      <div class="step-title">Crear las carpetas</div>
+      <span class="action-tag at-copy">COPIAR</span>
+    </div>
+    <p>Crea esta estructura dentro de <code>viernes-backend/src/main/java/com/viernes/clinica/</code>. Es id&eacute;ntica en todos los m&oacute;dulos:</p>
+    <div class="tree"><span class="dir">clinica/</span>
+├─ <span class="dir">adapters/</span>
+│  ├─ <span class="dir">in/web/</span>           <span class="cm">&larr; controllers</span>
+│  └─ <span class="dir">out/persistence/</span>
+│     ├─ <span class="dir">entity/</span>        <span class="cm">&larr; @Entity JPA</span>
+│     └─ <span class="dir">repository/</span>    <span class="cm">&larr; Spring Data</span>
+├─ <span class="dir">application/</span>
+│  ├─ <span class="dir">dto/</span>              <span class="cm">&larr; records Request/Response</span>
+│  ├─ <span class="dir">port/in/</span>         <span class="cm">&larr; interfaces de use case</span>
+│  ├─ <span class="dir">port/out/</span>        <span class="cm">&larr; interfaces de persistencia</span>
+│  └─ <span class="dir">service/</span>        <span class="cm">&larr; l&oacute;gica de negocio</span>
+└─ <span class="dir">domain/</span>             <span class="cm">&larr; POJOs y enums puros</span></div>
+  </div>
+
+  <div class="step-box">
+    <div class="step-head">
+      <div class="step-num" style="background:var(--amber-soft);color:#fbbf24;border:1px solid rgba(245,158,11,.4)">2.2</div>
+      <div class="step-title">Crear package-info.java</div>
+      <span class="action-tag at-adapt">ADAPTAR</span>
+    </div>
+    <p>Copia de cualquier m&oacute;dulo (ej: <span class="anchor">etiquetas/package-info.java</span>) y cambia el nombre del paquete.</p>
+    <div class="code-block"><span class="cm">// COPIAR de etiquetas/package-info.java y cambiar:</span>
+
+<span class="kw">@org.springframework.modulith.ApplicationModule</span>(
+    allowedDependencies = {<span class="str">"shared"</span>, <span class="str">"shared.exception"</span>}
+)
+<span class="kw">package</span> com.viernes.clinica;  <span class="cm">&larr; solo esto cambia</span></div>
+    <div class="note info"><b>Si el m&oacute;dulo no depende de otros:</b> el clinica es aut&oacute;nomo, solo necesita <code>shared</code>. Si tu m&oacute;dulo necesita leer de clientes, agrega <code>"clientes"</code> en <code>allowedDependencies</code>.</div>
+  </div>
+
+  <!-- ============ FASE 3 ============ -->
+  <h2 id="p03"><span class="num">03</span> Fase 3: Dominio (POJOs + enums)</h2>
+  <p class="sec-intro">El dominio son clases POJO puras y enums. Sin JPA, sin Spring. Es lo m&aacute;s f&aacute;cil de copiar: la estructura es siempre igual, solo cambian los campos.</p>
+
+  <div class="step-box">
+    <div class="step-head">
+      <div class="step-num" style="background:var(--amber-soft);color:#fbbf24;border:1px solid rgba(245,158,11,.4)">3.1</div>
+      <div class="step-title">Crear el POJO del dominio</div>
+      <span class="action-tag at-adapt">ADAPTAR</span>
+    </div>
+    <p>Copia de <span class="anchor">etiquetas/domain/Etiqueta.java</span>. Cambia los campos por los de tu entidad. La estructura es id&eacute;ntica:</p>
+    <div class="code-block"><span class="cm">// PATR&Oacute;N (de Etiqueta.java):</span>
+<span class="kw">@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder</span>
+<span class="kw">public class</span> Etiqueta {
+    <span class="kw">private</span> Long id;
+    <span class="kw">private</span> String nombre;
+    <span class="kw">private</span> Boolean activa;
+    <span class="kw">private</span> LocalDateTime creadoEn;
+}
+
+<span class="cm">// ADAPTADO a Clinica.java:</span>
+<span class="kw">@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder</span>
+<span class="kw">public class</span> Clinica {
+    <span class="kw">private</span> Long id;           <span class="cm">// &larr; igual</span>
+    <span class="kw">private</span> String ruc;       <span class="cm">// &larr; cambia el campo</span>
+    <span class="kw">private</span> String razonSocial; <span class="cm">// &larr; cambia el campo</span>
+    <span class="kw">private</span> String telefono;   <span class="cm">// &larr; cambia el campo</span>
+    <span class="kw">private</span> Integer activo;    <span class="cm">// &larr; cambia el tipo</span>
+}</div>
+    <p><b>Qu&eacute; NO cambia nunca:</b> las anotaciones de Lombok (<code>@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder</code>), el campo <code>id</code> de tipo <code>Long</code>, el hecho de que no tiene anotaciones de JPA.</p>
+  </div>
+
+  <div class="step-box">
+    <div class="step-head">
+      <div class="step-num" style="background:var(--amber-soft);color:#fbbf24;border:1px solid rgba(245,158,11,.4)">3.2</div>
+      <div class="step-title">Crear el enum</div>
+      <span class="action-tag at-adapt">ADAPTAR</span>
+    </div>
+    <p>Copia de <span class="anchor">productos/domain/EstadoProducto.java</span>. Cambia los valores:</p>
+    <div class="code-block"><span class="cm">// PATR&Oacute;N (de EstadoProducto.java):</span>
+<span class="kw">public enum</span> EstadoProducto {
+    ACTIVO, INACTIVO, DESCONTINUADO
+}
+
+<span class="cm">// ADAPTADO a EstadoConsultorio.java:</span>
+<span class="kw">public enum</span> EstadoConsultorio {
+    DISPONIBLE, OCUPADO, MANTENIMIENTO
+}</div>
+    <p>Un enum es lo m&aacute;s simple: una l&iacute;nea por valor. Si tu m&oacute;dulo no tiene estados, saltas este paso.</p>
+  </div>
+
+  <!-- ============ FASE 4 ============ -->
+  <h2 id="p04"><span class="num">04</span> Fase 4: DTOs (Request / Response)</h2>
+  <p class="sec-intro">Los DTOs son records de Java. Lo que entra (Request) y lo que sale (Response). Copias el patr&oacute;n y cambias los campos.</p>
+
+  <div class="step-box">
+    <div class="step-head">
+      <div class="step-num" style="background:var(--amber-soft);color:#fbbf24;border:1px solid rgba(245,158,11,.4)">4.1</div>
+      <div class="step-title">Crear Request</div>
+      <span class="action-tag at-adapt">ADAPTAR</span>
+    </div>
+    <p>Copia de <span class="anchor">etiquetas/application/dto/EtiquetaRequest.java</span>. Cambia los campos y las validaciones:</p>
+    <div class="code-block"><span class="cm">// PATR&Oacute;N (de EtiquetaRequest.java):</span>
+<span class="kw">public record</span> EtiquetaRequest(
+    <span class="ann">@NotBlank</span>(message = <span class="str">"El nombre es obligatorio"</span>)
+    <span class="ann">@Size</span>(max = 40) String nombre,
+    String color,
+    Boolean activa
+) {}
+
+<span class="cm">// ADAPTADO a ClinicaRequest.java:</span>
+<span class="kw">public record</span> ClinicaRequest(
+    <span class="ann">@NotBlank</span>(message = <span class="str">"La raz&oacute;n social es obligatoria"</span>)
+    <span class="ann">@Size</span>(max = 150) String razonSocial,
+
+    <span class="ann">@NotBlank</span>(message = <span class="str">"El RUC es obligatorio"</span>)
+    <span class="ann">@Size</span>(min = 11, max = 11, message = <span class="str">"El RUC debe tener 11 d&iacute;gitos"</span>)
+    String ruc,
+
+    <span class="ann">@Size</span>(max = 20) String telefono,
+    Boolean activo
+) {}</div>
+    <div class="note warn"><b>Las validaciones son lo NUEVO.</b> El patr&oacute;n del record es siempre igual, pero las anotaciones <code>@NotBlank</code>, <code>@Size</code>, <code>@Pattern</code> dependen de las reglas de tu entidad. Para el examen: RUC de exactamente 11 d&iacute;gitos y raz&oacute;n social obligatoria. <b>Si no pones <code>@Size(min=11, max=11)</code>, el backend no rechaza el RUC corto y pierdes el punto de validaci&oacute;n.</b></div>
+  </div>
+
+  <div class="step-box">
+    <div class="step-head">
+      <div class="step-num" style="background:var(--amber-soft);color:#fbbf24;border:1px solid rgba(245,158,11,.4)">4.2</div>
+      <div class="step-title">Crear Response</div>
+      <span class="action-tag at-adapt">ADAPTAR</span>
+    </div>
+    <p>Copia de <span class="anchor">etiquetas/application/dto/EtiquetaResponse.java</span>. El Response tiene los mismos campos que el Request pero incluye el <code>id</code> y puede tener campos calculados:</p>
+    <div class="code-block"><span class="cm">// ADAPTADO a ClinicaResponse.java:</span>
+<span class="kw">public record</span> ClinicaResponse(
+    Long id,
+    String ruc,
+    String razonSocial,
+    String telefono,
+    Boolean activo
+) {}</div>
+  </div>
+
+  <!-- ============ FASE 5 ============ -->
+  <h2 id="p05"><span class="num">05</span> Fase 5: Puertos (interfaces)</h2>
+  <p class="sec-intro">Los puertos son interfaces. Port IN = lo que el mundo puede pedir. Port OUT = lo que el n&uacute;cleo necesita de fuera. Copias el patr&oacute;n y cambias los nombres de los m&eacute;todos.</p>
+
+  <div class="step-box">
+    <div class="step-head">
+      <div class="step-num" style="background:var(--amber-soft);color:#fbbf24;border:1px solid rgba(245,158,11,.4)">5.1</div>
+      <div class="step-title">Port IN (use case)</div>
+      <span class="action-tag at-adapt">ADAPTAR</span>
+    </div>
+    <p>Copia de <span class="anchor">productos/application/port/in/ManageProductoUseCase.java</span>. Cambia los nombres de los m&eacute;todos:</p>
+    <div class="code-block"><span class="cm">// PATR&Oacute;N (de ManageProductoUseCase.java):</span>
+<span class="kw">public interface</span> ManageProductoUseCase {
+    List&lt;ProductoResponse&gt; listar();
+    ProductoResponse obtener(Long id);
+    ProductoResponse crear(ProductoRequest request);
+    ProductoResponse actualizar(Long id, ProductoRequest request);
+    <span class="kw">void</span> eliminar(Long id);
+}
+
+<span class="cm">// ADAPTADO a ManageClinicaUseCase.java:</span>
+<span class="kw">public interface</span> ManageClinicaUseCase {
+    List&lt;ClinicaResponse&gt; listar();
+    ClinicaResponse obtener(Long id);
+    ClinicaResponse crear(ClinicaRequest request);
+    ClinicaResponse actualizar(Long id, ClinicaRequest request);
+    <span class="kw">void</span> eliminar(Long id);
+}</div>
+    <p>Los m&eacute;todos del CRUD son siempre los mismos 5. Si necesitas filtros o operaciones extra, las agregas aqu&iacute;.</p>
+  </div>
+
+  <div class="step-box">
+    <div class="step-head">
+      <div class="step-num" style="background:var(--amber-soft);color:#fbbf24;border:1px solid rgba(245,158,11,.4)">5.2</div>
+      <div class="step-title">Port OUT (persistencia)</div>
+      <span class="action-tag at-adapt">ADAPTAR</span>
+    </div>
+    <p>Copia de <span class="anchor">etiquetas/application/port/out/EtiquetaPersistencePort.java</span>. Cambia el tipo de retorno y los m&eacute;todos:</p>
+    <div class="code-block"><span class="cm">// ADAPTADO a ClinicaPersistencePort.java:</span>
+<span class="kw">public interface</span> ClinicaPersistencePort {
+    List&lt;Clinica&gt; findAll();
+    Optional&lt;Clinica&gt; findById(Long id);
+    <span class="kw">boolean</span> existsByRuc(String ruc);
+    <span class="kw">boolean</span> existsByRucAndIdNot(String ruc, Long id);
+    Clinica save(Clinica clinica);
+    <span class="kw">void</span> deleteById(Long id);
+}</div>
+    <div class="note info"><b>El Port OUT devuelve el dominio</b> (<code>Clinica</code>), nunca la entidad JPA (<code>ClinicaEntity</code>). La conversi&oacute;n la hace el adapter.</div>
+  </div>
+
+  <!-- ============ FASE 6 ============ -->
+  <h2 id="p06"><span class="num">06</span> Fase 6: Entidades JPA + Repositories</h2>
+  <p class="sec-intro">La entidad JPA es la &uacute;nica clase que conoce la tabla de la base de datos. El repository es la interfaz que hace las consultas. Ambos se copian y adaptan.</p>
+
+  <div class="step-box">
+    <div class="step-head">
+      <div class="step-num" style="background:var(--amber-soft);color:#fbbf24;border:1px solid rgba(245,158,11,.4)">6.1</div>
+      <div class="step-title">Crear la entidad JPA</div>
+      <span class="action-tag at-adapt">ADAPTAR</span>
+    </div>
+    <p>Copia de <span class="anchor">etiquetas/adapters/out/persistence/entity/EtiquetaEntity.java</span>. Cambia <code>@Table</code>, <code>@Column</code> y los campos:</p>
+    <div class="code-block"><span class="cm">// PATR&Oacute;N (de EtiquetaEntity.java):</span>
+<span class="ann">@Entity</span>
+<span class="ann">@Table</span>(name = <span class="str">"CRM_ETIQUETAS"</span>)
+<span class="ann">@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder</span>
+<span class="kw">public class</span> EtiquetaEntity {
+    <span class="ann">@Id @GeneratedValue</span>(strategy = GenerationType.IDENTITY)
+    <span class="ann">@Column</span>(name = <span class="str">"ID_ETIQUETA"</span>)
+    <span class="kw">private</span> Long id;
+    <span class="ann">@Column</span>(name = <span class="str">"NOMBRE"</span>) <span class="kw">private</span> String nombre;
+}
+
+<span class="cm">// ADAPTADO a ClinicaEntity.java:</span>
+<span class="ann">@Entity</span>
+<span class="ann">@Table</span>(name = <span class="str">"CLINICAS"</span>, schema = <span class="str">"EXA_CLINICA"</span>)  <span class="cm">&larr; OJO: schema distinto</span>
+<span class="ann">@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder</span>
+<span class="kw">public class</span> ClinicaEntity {
+    <span class="ann">@Id @GeneratedValue</span>(strategy = GenerationType.IDENTITY)
+    <span class="ann">@Column</span>(name = <span class="str">"ID"</span>)
+    <span class="kw">private</span> Long id;
+    <span class="ann">@Column</span>(name = <span class="str">"RUC"</span>, length = 11, nullable = <span class="kw">false</span>, unique = <span class="kw">true</span>)
+    <span class="kw">private</span> String ruc;
+    <span class="ann">@Column</span>(name = <span class="str">"RAZON_SOCIAL"</span>, nullable = <span class="kw">false</span>)
+    <span class="kw">private</span> String razonSocial;
+    <span class="ann">@Column</span>(name = <span class="str">"TELEFONO"</span>) <span class="kw">private</span> String telefono;
+    <span class="ann">@Column</span>(name = <span class="str">"ACTIVO"</span>) <span class="kw">private</span> Integer activo = 1;
+}</div>
+    <div class="note warn"><b>Cuidado con <code>schema</code>.</b> Los m&oacute;dulos normales del proyecto usan el esquema <code>BOM_VENTAS</code> (sin especificar schema en la entidad). El m&oacute;dulo cl&iacute;nica usa un esquema separado <code>EXA_CLINICA</code>, por eso la entidad lleva <code>schema = "EXA_CLINICA"</code>. Si no lo pones, Hibernate busca en el esquema por defecto y no encuentra la tabla.</div>
+  </div>
+
+  <div class="step-box">
+    <div class="step-head">
+      <div class="step-num" style="background:var(--amber-soft);color:#fbbf24;border:1px solid rgba(245,158,11,.4)">6.2</div>
+      <div class="step-title">Crear el repository Spring Data</div>
+      <span class="action-tag at-adapt">ADAPTAR</span>
+    </div>
+    <p>Copia de <span class="anchor">etiquetas/adapters/out/persistence/repository/EtiquetaSpringDataRepository.java</span>. Cambia el tipo de entidad y los m&eacute;todos de b&uacute;squeda:</p>
+    <div class="code-block"><span class="cm">// PATR&Oacute;N (de EtiquetaSpringDataRepository.java):</span>
+<span class="kw">@Repository</span>
+<span class="kw">public interface</span> EtiquetaSpringDataRepository
+        <span class="kw">extends</span> JpaRepository&lt;EtiquetaEntity, Long&gt; {
+    <span class="kw">boolean</span> existsByNombreNormalizado(String n);
+}
+
+<span class="cm">// ADAPTADO a ClinicaRepository.java:</span>
+<span class="kw">@Repository</span>
+<span class="kw">public interface</span> ClinicaRepository
+        <span class="kw">extends</span> JpaRepository&lt;ClinicaEntity, Long&gt; {
+    <span class="kw">boolean</span> existsByRuc(String ruc);
+    <span class="kw">boolean</span> existsByRucAndIdNot(String ruc, Long id);
+}</div>
+    <div class="note ok"><b>Spring Data genera la implementaci&oacute;n autom&aacute;ticamente.</b> No escribes ni una l&iacute;nea de SQL. El nombre del m&eacute;todo es la consulta: <code>existsByRuc</code> = <code>SELECT 1 FROM ... WHERE ruc = ?</code>. Solo agregas los m&eacute;todos que necesitas para validar (unique check).</div>
+  </div>
+
+  <!-- ============ FASE 7 ============ -->
+  <h2 id="p07"><span class="num">07</span> Fase 7: Persistence Adapter</h2>
+  <p class="sec-intro">El adapter es el puente entre el dominio y la entidad JPA. Implementa el <code>Port OUT</code> usando el repository. Copias el patr&oacute;n y cambias los mapeos.</p>
+
+  <div class="step-box">
+    <div class="step-head">
+      <div class="step-num" style="background:var(--amber-soft);color:#fbbf24;border:1px solid rgba(245,158,11,.4)">7.1</div>
+      <div class="step-title">Crear el persistence adapter</div>
+      <span class="action-tag at-adapt">ADAPTAR</span>
+    </div>
+    <p>Copia de <span class="anchor">etiquetas/adapters/out/persistence/EtiquetaPersistenceAdapter.java</span>. Cambia los mapeos <code>toEntity</code>/<code>toDomain</code>:</p>
+    <div class="code-block"><span class="cm">// PATR&Oacute;N (de EtiquetaPersistenceAdapter.java):</span>
+<span class="ann">@Component</span>
+<span class="ann">@RequiredArgsConstructor</span>
+<span class="kw">public class</span> EtiquetaPersistenceAdapter <span class="kw">implements</span> EtiquetaPersistencePort {
+    <span class="kw">private final</span> EtiquetaSpringDataRepository repository;
+
+    <span class="kw">public</span> Etiqueta save(Etiqueta etiqueta) {
+        <span class="kw">return</span> toDomain(repository.save(toEntity(etiqueta)));
+    }
+    <span class="cm">// toEntity y toDomain mapean campo a campo</span>
+}
+
+<span class="cm">// ADAPTADO a ClinicaPersistenceAdapter.java:</span>
+<span class="ann">@Component</span>
+<span class="ann">@RequiredArgsConstructor</span>
+<span class="kw">public class</span> ClinicaPersistenceAdapter <span class="kw">implements</span> ClinicaPersistencePort {
+    <span class="kw">private final</span> ClinicaRepository repository;
+
+    <span class="ann">@Override</span>
+    <span class="kw">public</span> Clinica save(Clinica clinica) {
+        <span class="kw">return</span> toDomain(repository.save(toEntity(clinica)));
+    }
+
+    <span class="kw">private</span> ClinicaEntity toEntity(Clinica c) {
+        <span class="kw">return</span> ClinicaEntity.builder()
+            .id(c.getId()).ruc(c.getRuc())
+            .razonSocial(c.getRazonSocial())
+            .telefono(c.getTelefono())
+            .activo(c.getActivo())
+            .build();
+    }
+
+    <span class="kw">private</span> Clinica toDomain(ClinicaEntity e) {
+        <span class="kw">return</span> Clinica.builder()
+            .id(e.getId()).ruc(e.getRuc())
+            .razonSocial(e.getRazonSocial())
+            .telefono(e.getTelefono())
+            .activo(e.getActivo())
+            .build();
+    }
+}</div>
+    <div class="note info"><b>Lo que cambia:</b> solo los campos del <code>toEntity</code> y <code>toDomain</code>. Lo que NO cambia: la estructura de la clase, el <code>@Component</code>, el <code>@RequiredArgsConstructor</code>, que implementa el <code>Port OUT</code>, que usa el repository.</div>
+  </div>
+
+  <!-- ============ FASE 8 ============ -->
+  <h2 id="p08"><span class="num">08</span> Fase 8: Service (reglas de negocio)</h2>
+  <p class="sec-intro">El service es donde est&aacute; la l&oacute;gica de verdad. Aqu&iacute; es donde piensas. La estructura se copia, pero las reglas se escriben nuevas.</p>
+
+  <div class="step-box">
+    <div class="step-head">
+      <div class="step-num" style="background:var(--green-soft);color:#34d399;border:1px solid rgba(16,185,129,.4)">8.1</div>
+      <div class="step-title">La estructura (copiar)</div>
+      <span class="action-tag at-copy">COPIAR</span>
+    </div>
+    <p>La estructura del service es siempre la misma. Copia de <span class="anchor">etiquetas/application/service/EtiquetaService.java</span>:</p>
+    <div class="code-block"><span class="ann">@Service</span>
+<span class="ann">@RequiredArgsConstructor</span>
+<span class="ann">@Transactional</span>
+<span class="kw">public class</span> ClinicaService <span class="kw">implements</span> ManageClinicaUseCase {
+
+    <span class="kw">private final</span> ClinicaPersistencePort persistencePort;  <span class="cm">&larr; inyecta el puerto</span>
+
+    <span class="ann">@Override</span>
+    <span class="ann">@Transactional</span>(readOnly = <span class="kw">true</span>)
+    <span class="kw">public</span> List&lt;ClinicaResponse&gt; listar() { ... }
+
+    <span class="ann">@Override</span>
+    <span class="ann">@Transactional</span>(readOnly = <span class="kw">true</span>)
+    <span class="kw">public</span> ClinicaResponse obtener(Long id) { ... }
+
+    <span class="ann">@Override</span>
+    <span class="kw">public</span> ClinicaResponse crear(ClinicaRequest request) { ... }
+
+    <span class="ann">@Override</span>
+    <span class="kw">public</span> ClinicaResponse actualizar(Long id, ClinicaRequest request) { ... }
+
+    <span class="ann">@Override</span>
+    <span class="kw">public void</span> eliminar(Long id) { ... }
+}</div>
+    <p><b>Lo que NO cambia nunca:</b> <code>@Service</code>, <code>@RequiredArgsConstructor</code>, <code>@Transactional</code>, que implementa el <code>Port IN</code>, que inyecta el <code>Port OUT</code>, los m&eacute;todos <code>read-only</code> en las lecturas.</p>
+  </div>
+
+  <div class="step-box">
+    <div class="step-head">
+      <div class="step-num" style="background:var(--rose-soft);color:#fda4af;border:1px solid rgba(244,63,94,.4)">8.2</div>
+      <div class="step-title">Las reglas de negocio (nuevo)</div>
+      <span class="action-tag at-new">NUEVO</span>
+    </div>
+    <p>Aqu&iacute; es donde piensas. El patr&oacute;n del CRUD se copia, pero <b>qu&eacute; validas y c&oacute;mo</b> es espec&iacute;fico de tu m&oacute;dulo:</p>
+    <div class="code-block"><span class="cm">// NUEVO: validar que el RUC no exista antes de crear</span>
+<span class="kw">public</span> ClinicaResponse crear(ClinicaRequest request) {
+    <span class="kw">if</span> (persistencePort.existsByRuc(request.ruc())) {
+        <span class="kw">throw new</span> IllegalArgumentException(
+            <span class="str">"Ya existe una cl&iacute;nica con el RUC: "</span> + request.ruc());
+    }
+
+    Clinica clinica = Clinica.builder()
+        .ruc(request.ruc())
+        .razonSocial(request.razonSocial())
+        .telefono(request.telefono())
+        .activo(request.activo() == <span class="kw">null</span> || request.activo() ? 1 : 0)
+        .build();
+
+    <span class="kw">return</span> toResponse(persistencePort.save(clinica));
+}
+
+<span class="cm">// NUEVO: validar RUC &uacute;nico al actualizar (excluyendo el propio ID)</span>
+<span class="kw">public</span> ClinicaResponse actualizar(Long id, ClinicaRequest request) {
+    Clinica clinica = findOrThrow(id);
+
+    <span class="kw">if</span> (persistencePort.existsByRucAndIdNot(request.ruc(), id)) {
+        <span class="kw">throw new</span> IllegalArgumentException(<span class="str">"RUC ya existe"</span>);
+    }
+
+    clinica.setRuc(request.ruc());
+    clinica.setRazonSocial(request.razonSocial());
+    <span class="cm">// ... actualizar campos</span>
+    <span class="kw">return</span> toResponse(persistencePort.save(clinica));
+}</div>
+    <div class="note warn"><b>Qu&eacute; es NUEVO en el service:</b></div>
+    <ul style="margin:8px 0 8px 20px;color:#cbd5e1;font-size:13.5px;line-height:2">
+      <li><b>Las validaciones de unicidad:</b> &iquest;el RUC ya existe? &iquest;el c&oacute;digo de consultorio ya existe?</li>
+      <li><b>Las reglas de campo:</b> &iquest;ACTIVO es 0 o 1? &iquest;la tarifa es &gt; 0?</li>
+      <li><b>El <code>toResponse</code>:</b> convierte dominio a DTO. Cada m&oacute;dulo tiene los suyos.</li>
+      <li><b>La excepci&oacute;n:</b> usa <code>ResourceNotFoundException</code> de <code>shared.exception</code> para el 404, <code>IllegalArgumentException</code> para el 400.</li>
+    </ul>
+  </div>
+
+  <!-- ============ FASE 9 ============ -->
+  <h2 id="p09"><span class="num">09</span> Fase 9: Controller (REST)</h2>
+  <p class="sec-intro">El controller es lo m&aacute;s mec&aacute;nico de todo. Recibe HTTP, delega al use case y responde. Cero l&oacute;gica de negocio.</p>
+
+  <div class="step-box">
+    <div class="step-head">
+      <div class="step-num" style="background:var(--amber-soft);color:#fbbf24;border:1px solid rgba(245,158,11,.4)">9.1</div>
+      <div class="step-title">Crear el controller</div>
+      <span class="action-tag at-adapt">ADAPTAR</span>
+    </div>
+    <p>Copia de <span class="anchor">etiquetas/adapters/in/web/EtiquetaController.java</span>. Cambia el path, el use case y los DTOs:</p>
+    <div class="code-block"><span class="cm">// PATR&Oacute;N (de EtiquetaController.java):</span>
+<span class="ann">@RestController</span>
+<span class="ann">@RequestMapping</span>(<span class="str">"/api/v1/etiquetas"</span>)
+<span class="ann">@RequiredArgsConstructor</span>
+<span class="kw">public class</span> EtiquetaController {
+    <span class="kw">private final</span> ManageEtiquetaUseCase useCase;
+
+    <span class="ann">@GetMapping</span>
+    <span class="kw">public</span> ResponseEntity&lt;List&lt;EtiquetaResponse&gt;&gt; listar() {
+        <span class="kw">return</span> ResponseEntity.ok(useCase.listar());
+    }
+    <span class="ann">@PostMapping</span>
+    <span class="kw">public</span> EtiquetaResponse crear(<span class="ann">@Valid @RequestBody</span> EtiquetaRequest request) {
+        <span class="kw">return</span> useCase.crear(request);
+    }
+    <span class="cm">// ... resto igual</span>
+}
+
+<span class="cm">// ADAPTADO a ClinicaController.java:</span>
+<span class="ann">@RestController</span>
+<span class="ann">@RequestMapping</span>(<span class="str">"/api/clinica/clinicas"</span>)   <span class="cm">&larr; cambia el path</span>
+<span class="ann">@RequiredArgsConstructor</span>
+<span class="kw">public class</span> ClinicaController {
+    <span class="kw">private final</span> ManageClinicaUseCase useCase;  <span class="cm">&larr; cambia el use case</span>
+
+    <span class="ann">@GetMapping</span>
+    <span class="kw">public</span> ResponseEntity&lt;List&lt;ClinicaResponse&gt;&gt; listar() {  <span class="cm">&larr; cambia el DTO</span>
+        <span class="kw">return</span> ResponseEntity.ok(useCase.listar());
+    }
+    <span class="ann">@PostMapping</span>
+    <span class="kw">public</span> ResponseEntity&lt;ClinicaResponse&gt; crear(
+            <span class="ann">@Valid @RequestBody</span> ClinicaRequest request) {
+        <span class="kw">return</span> ResponseEntity.status(HttpStatus.CREATED)
+            .body(useCase.crear(request));
+    }
+    <span class="cm">// ... resto igual, cambiando tipos</span>
+}</div>
+    <div class="note ok"><b>El controller es el archivo m&aacute;s f&aacute;cil de adaptar.</b> Cambias 3 cosas: el <code>@RequestMapping</code>, el tipo del <code>useCase</code>, y los tipos de los DTOs en las firmas. La estructura (los <code>@GetMapping</code>, <code>@PostMapping</code>, <code>@PathVariable</code>, <code>@RequestBody</code>) es siempre igual.</div>
+  </div>
+
+  <!-- ============ FASE 10 ============ -->
+  <h2 id="p10"><span class="num">10</span> Fase 10: Frontend &mdash; model + service</h2>
+  <p class="sec-intro">El frontend de Angular sigue el mismo patr&oacute;n: un modelo (interfaces), un service (llamadas HTTP) y componentes (pantallas).</p>
+
+  <div class="step-box">
+    <div class="step-head">
+      <div class="step-num" style="background:var(--amber-soft);color:#fbbf24;border:1px solid rgba(245,158,11,.4)">10.1</div>
+      <div class="step-title">Crear el model</div>
+      <span class="action-tag at-adapt">ADAPTAR</span>
+    </div>
+    <p>Copia de <span class="anchor">productos/producto.model.ts</span>. Cambia los campos:</p>
+    <div class="code-block"><span class="cm">// ADAPTADO a clinica.model.ts:</span>
+<span class="kw">export interface</span> Clinica {
+  id?: number;
+  ruc: string;
+  razonSocial: string;
+  telefono?: string;
+  activo?: boolean;
+}
+
+<span class="kw">export type</span> EstadoConsultorio = <span class="str">'DISPONIBLE'</span> | <span class="str">'OCUPADO'</span> | <span class="str">'MANTENIMIENTO'</span>;
+
+<span class="kw">export interface</span> Especialidad {
+  id: number;
+  codigo: string;
+  nombre: string;
+}
+
+<span class="kw">export interface</span> ConsultorioRequest {
+  idClinica: number;
+  codigo: string;
+  tarifaHora: number;
+  estado: EstadoConsultorio;
+  especialidadIds: number[];  <span class="cm">&larr; N:M: lista de IDs</span>
+}
+
+<span class="kw">export interface</span> ConsultorioResponse {
+  id: number;
+  idClinica: number;
+  clinicaRazonSocial: string;
+  codigo: string;
+  tarifaHora: number;
+  estado: EstadoConsultorio;
+  especialidades: Especialidad[];  <span class="cm">&larr; N:M: lista completa</span>
+}</div>
+    <div class="note warn"><b>Lo NUEVO del N:M en el model:</b> <code>ConsultorioRequest</code> lleva <code>especialidadIds: number[]</code> (los IDs que el usuario eligi&oacute;) y <code>ConsultorioResponse</code> lleva <code>especialidades: Especialidad[]</code> (los objetos completos para mostrar en el detalle). Esto no aparece en un CRUD simple.</div>
+  </div>
+
+  <div class="step-box">
+    <div class="step-head">
+      <div class="step-num" style="background:var(--amber-soft);color:#fbbf24;border:1px solid rgba(245,158,11,.4)">10.2</div>
+      <div class="step-title">Crear el service</div>
+      <span class="action-tag at-adapt">ADAPTAR</span>
+    </div>
+    <p>Copia de <span class="anchor">productos/productos.service.ts</span>. Cambia los paths:</p>
+    <div class="code-block"><span class="ann">@Injectable</span>({ providedIn: <span class="str">'root'</span> })
+<span class="kw">export class</span> ClinicaService {
+  <span class="kw">constructor</span>(<span class="kw">private</span> http: HttpClient, <span class="kw">private</span> apiService: ApiService) {}
+
+  listarClinicas(): Observable&lt;Clinica[]&gt; {
+    <span class="kw">return</span> <span class="kw">this</span>.http.get&lt;Clinica[]&gt;(
+      <span class="kw">this</span>.apiService.buildUrl(<span class="str">'/clinica/clinicas'</span>));  <span class="cm">&larr; cambia el path</span>
+  }
+
+  crearClinica(clinica: Clinica): Observable&lt;Clinica&gt; {
+    <span class="kw">return</span> <span class="kw">this</span>.http.post&lt;Clinica&gt;(
+      <span class="kw">this</span>.apiService.buildUrl(<span class="str">'/clinica/clinicas'</span>), clinica);
+  }
+  <span class="cm">// ... resto de m&eacute;todos (obtener, actualizar, eliminar)</span>
+}</div>
+    <div class="note ok"><b>El service es copiar y cambiar el path.</b> La estructura (<code>HttpClient</code>, <code>Observable</code>, <code>buildUrl</code>) es siempre la misma. Solo cambias la URL y el tipo de retorno.</div>
+  </div>
+
+  <!-- ============ FASE 11 ============ -->
+  <h2 id="p11"><span class="num">11</span> Fase 11: Frontend &mdash; listado + formulario</h2>
+  <p class="sec-intro">Los componentes son la parte m&aacute;s larga del frontend pero tambi&eacute;n la m&aacute;s repetitiva. Un listado muestra una tabla y un formulario recoge datos.</p>
+
+  <div class="step-box">
+    <div class="step-head">
+      <div class="step-num" style="background:var(--amber-soft);color:#fbbf24;border:1px solid rgba(245,158,11,.4)">11.1</div>
+      <div class="step-title">Listado</div>
+      <span class="action-tag at-adapt">ADAPTAR</span>
+    </div>
+    <p>Copia de <span class="anchor">productos/producto-list/producto-list.ts</span>. Cambia las columnas de la tabla y los botones de acci&oacute;n:</p>
+    <ul style="margin:8px 0 8px 20px;color:#cbd5e1;font-size:13.5px;line-height:2">
+      <li><b>El TS:</b> mismo patr&oacute;n: <code>signals</code>, <code>ngOnInit</code>, <code>cargar()</code>, <code>eliminar()</code></li>
+      <li><b>El HTML:</b> cambia las columnas de la tabla: RUC, Raz&oacute;n social, Tel&eacute;fono, Activa</li>
+      <li><b>El CSS:</b> copia sin cambios</li>
+    </ul>
+  </div>
+
+  <div class="step-box">
+    <div class="step-head">
+      <div class="step-num" style="background:var(--amber-soft);color:#fbbf24;border:1px solid rgba(245,158,11,.4)">11.2</div>
+      <div class="step-title">Formulario</div>
+      <span class="action-tag at-adapt">ADAPTAR</span>
+    </div>
+    <p>Copia de <span class="anchor">productos/producto-form/producto-form.ts</span>. Cambia los campos del <code>FormGroup</code> y las validaciones:</p>
+    <div class="code-block"><span class="cm">// ADAPTADO a clinica-form.ts:</span>
+<span class="kw">this</span>.form = <span class="kw">this</span>.fb.group({
+  ruc: [<span class="str">''</span>, [Validators.required, Validators.minLength(11), Validators.maxLength(11)]],
+  razonSocial: [<span class="str">''</span>, [Validators.required]],
+  telefono: [<span class="str">''</span>],
+  activo: [<span class="kw">true</span>]
+});
+
+<span class="cm">// En el HTML, mostrar errores con *ngIf:</span>
+<span class="cm">// &lt;div *ngIf="form.get('ruc').invalid &amp;&amp; form.get('ruc').touched"&gt;</span>
+<span class="cm">//   El RUC debe tener 11 d&iacute;gitos</span>
+<span class="cm">// &lt;/div&gt;</span></div>
+    <div class="note warn"><b>Las validaciones del frontend son NUEVAS.</b> El patr&oacute;n del <code>FormGroup</code> se copia, pero <code>Validators.minLength(11)</code> y <code>Validators.required</code> dependen de tu entidad. <b>El examen pide que el error sea visible en el formulario</b>, no como alerta. Necesitas <code>*ngIf</code> que muestre el mensaje cuando el campo es inv&aacute;lido y ha sido tocado.</div>
+  </div>
+
+  <!-- ============ FASE 12 ============ -->
+  <h2 id="p12"><span class="num">12</span> Fase 12: El caso N:M (consultorios)</h2>
+  <p class="sec-intro">Hasta aqu&iacute; todo era copiar y adaptar el patr&oacute;n CRUD. El consultorio con especialidades es la parte que no existe en ning&uacute;n m&oacute;dulo simple: una cabecera (consultorio) con detalles (especialidades) en una relaci&oacute;n muchos-a-muchos.</p>
+
+  <div class="note danger"><b>Esta fase es lo que separa un CRUD simple de un m&oacute;dulo completo.</b> Todo lo anterior (fases 1-11) lo haces igual para cl&iacute;nicas que para etiquetas. Esta fase solo aplica cuando tienes una relaci&oacute;n N:M con una tabla intermedia.</div>
+
+  <h3>Qu&eacute; es NUEVO en cada capa</h3>
+  <table>
+    <thead><tr><th>Capa</th><th>Qu&eacute; cambia vs un CRUD simple</th><th>Acci&oacute;n</th></tr></thead>
+    <tbody>
+      <tr><td>SQL</td><td>Tabla intermedia con PK compuesta (dos FKs)</td><td><span class="action-tag at-new">NUEVO</span></td></tr>
+      <tr><td>Entidad JPA</td><td><code>@ManyToMany</code> + <code>@JoinTable</code> en ConsultorioEntity</td><td><span class="action-tag at-new">NUEVO</span></td></tr>
+      <tr><td>Request DTO</td><td>Lleva <code>especialidadIds: List&lt;Long&gt;</code> adem&aacute;s de los campos normales</td><td><span class="action-tag at-new">NUEVO</span></td></tr>
+      <tr><td>Response DTO</td><td>Lleva <code>especialidades: List&lt;EspecialidadResponse&gt;</code> (objetos completos)</td><td><span class="action-tag at-new">NUEVO</span></td></tr>
+      <tr><td>Service</td><td>Al crear: busca las especialidades por ID y las asigna al Set antes de guardar</td><td><span class="action-tag at-new">NUEVO</span></td></tr>
+      <tr><td>Frontend form</td><td>Tabla din&aacute;mica: dropdown de especialidades + bot&oacute;n agregar + bot&oacute;n quitar</td><td><span class="action-tag at-new">NUEVO</span></td></tr>
+      <tr><td>Frontend detail</td><td>Tabla de solo lectura con las especialidades asignadas</td><td><span class="action-tag at-adapt">ADAPTAR</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="step-box">
+    <div class="step-head">
+      <div class="step-num" style="background:var(--rose-soft);color:#fda4af;border:1px solid rgba(244,63,94,.4)">12.1</div>
+      <div class="step-title">Entidad con @ManyToMany</div>
+      <span class="action-tag at-new">NUEVO</span>
+    </div>
+    <p>La entidad <code>ConsultorioEntity</code> tiene algo que ninguna entidad simple tiene: un <code>Set</code> de especialidades mapeado con <code>@ManyToMany</code>:</p>
+    <div class="code-block"><span class="ann">@Entity</span>
+<span class="ann">@Table</span>(name = <span class="str">"CONSULTORIOS"</span>, schema = <span class="str">"EXA_CLINICA"</span>)
+<span class="ann">@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder</span>
+<span class="kw">public class</span> ConsultorioEntity {
+    <span class="ann">@Id @GeneratedValue</span>(strategy = GenerationType.IDENTITY)
+    <span class="kw">private</span> Long id;
+
+    <span class="ann">@ManyToOne</span>(fetch = FetchType.EAGER)
+    <span class="ann">@JoinColumn</span>(name = <span class="str">"ID_CLINICA"</span>)
+    <span class="kw">private</span> ClinicaEntity clinica;  <span class="cm">&larr; FK a cl&iacute;nica</span>
+
+    <span class="ann">@Column</span>(name = <span class="str">"CODIGO"</span>) <span class="kw">private</span> String codigo;
+    <span class="ann">@Column</span>(name = <span class="str">"TARIFA_HORA"</span>) <span class="kw">private</span> BigDecimal tarifaHora;
+
+    <span class="ann">@Enumerated</span>(EnumType.STRING)
+    <span class="ann">@Column</span>(name = <span class="str">"ESTADO"</span>) <span class="kw">private</span> EstadoConsultorio estado;
+
+    <span class="cm">// &larr; ESTO ES LO NUEVO:</span>
+    <span class="ann">@ManyToMany</span>(fetch = FetchType.EAGER)
+    <span class="ann">@JoinTable</span>(
+        name = <span class="str">"CONSULTORIO_ESPECIALIDAD"</span>,
+        schema = <span class="str">"EXA_CLINICA"</span>,
+        joinColumns = <span class="ann">@JoinColumn</span>(name = <span class="str">"ID_CONSULTORIO"</span>),
+        inverseJoinColumns = <span class="ann">@JoinColumn</span>(name = <span class="str">"ID_ESPECIALIDAD"</span>)
+    )
+    <span class="ann">@Builder.Default</span>
+    <span class="kw">private</span> Set&lt;EspecialidadEntity&gt; especialidades = <span class="kw">new</span> HashSet&lt;&gt;();
+}</div>
+    <div class="note info"><b>Qu&eacute; hace JPA por ti:</b> cuando guardas un <code>ConsultorioEntity</code> que tiene 2 especialidades en su <code>Set</code>, JPA inserta la fila en <code>CONSULTORIOS</code> y autom&aacute;ticamente inserta 2 filas en <code>CONSULTORIO_ESPECIALIDAD</code>. No tienes que escribir SQL para la tabla intermedia. <b>Si borras el consultorio, JPA borra las filas intermedias autom&aacute;ticamente.</b></div>
+  </div>
+
+  <div class="step-box">
+    <div class="step-head">
+      <div class="step-num" style="background:var(--rose-soft);color:#fda4af;border:1px solid rgba(244,63,94,.4)">12.2</div>
+      <div class="step-title">Service que maneja la N:M</div>
+      <span class="action-tag at-new">NUEVO</span>
+    </div>
+    <p>El service de consultorio hace algo que el de cl&iacute;nicas no hace: <b>buscar las especialidades por ID y asignarlas</b>:</p>
+    <div class="code-block"><span class="kw">public</span> ConsultorioResponse crearConsultorio(ConsultorioRequest request) {
+    <span class="cm">// 1. Validar que la cl&iacute;nica existe</span>
+    ClinicaEntity clinica = clinicaRepository.findById(request.idClinica())
+        .orElseThrow(() -&gt; <span class="kw">new</span> ResourceNotFoundException(<span class="str">"Cl&iacute;nica no encontrada"</span>));
+
+    <span class="cm">// 2. Validar que el c&oacute;digo no exista</span>
+    <span class="kw">if</span> (consultorioRepository.existsByCodigo(request.codigo())) {
+        <span class="kw">throw new</span> IllegalArgumentException(<span class="str">"C&oacute;digo ya existe"</span>);
+    }
+
+    <span class="cm">// 3. NUEVO: buscar las especialidades por los IDs que mand&oacute; el frontend</span>
+    Set&lt;EspecialidadEntity&gt; especialidades = <span class="kw">new</span> HashSet&lt;&gt;();
+    <span class="kw">if</span> (request.especialidadIds() != <span class="kw">null</span> &amp;&amp; !request.especialidadIds().isEmpty()) {
+        especialidades.addAll(especialidadRepository.findAllById(request.especialidadIds()));
+    }
+
+    <span class="cm">// 4. Construir el consultorio CON las especialidades</span>
+    ConsultorioEntity entity = ConsultorioEntity.builder()
+        .clinica(clinica)
+        .codigo(request.codigo())
+        .tarifaHora(request.tarifaHora())
+        .estado(request.estado())
+        .especialidades(especialidades)  <span class="cm">&larr; N:M: se asignan aqu&iacute;</span>
+        .build();
+
+    <span class="cm">// 5. Guardar &mdash; JPA inserta en CONSULTORIOS + CONSULTORIO_ESPECIALIDAD</span>
+    <span class="kw">return</span> toResponse(consultorioRepository.save(entity));
+}</div>
+    <div class="note ok"><b>Lo &uacute;nico nuevo</b> vs el service de cl&iacute;nicas son las l&iacute;neas 3 y 4: buscar las especialidades por ID y pasarlas al builder. El resto (validar cl&iacute;nica, validar c&oacute;digo &uacute;nico, guardar) es el mismo patr&oacute;n.</div>
+  </div>
+
+  <div class="step-box">
+    <div class="step-head">
+      <div class="step-num" style="background:var(--rose-soft);color:#fda4af;border:1px solid rgba(244,63,94,.4)">12.3</div>
+      <div class="step-title">Frontend: tabla din&aacute;mica de especialidades</div>
+      <span class="action-tag at-new">NUEVO</span>
+    </div>
+    <p>El formulario de consultorio tiene algo que el de cl&iacute;nicas no tiene: una tabla donde el usuario agrega y quita especialidades antes de guardar:</p>
+    <div class="code-block"><span class="cm">// En consultorio-form.ts:</span>
+
+<span class="cm">// Cat&aacute;logo de especialidades (cargadas del backend)</span>
+especialidadesCatalogo: Especialidad[] = [];
+especialidadSeleccionadaId: number | <span class="kw">null</span> = <span class="kw">null</span>;
+
+<span class="cm">// Tabla en memoria: las especialidades que el usuario agreg&oacute;</span>
+especialidadesAsignadas: Especialidad[] = [];
+
+<span class="cm">// NUEVO: agregar especialidad a la tabla</span>
+agregarEspecialidad() {
+  <span class="kw">const</span> esp = <span class="kw">this</span>.especialidadesCatalogo
+    .find(e =&gt; e.id === <span class="kw">Number</span>(<span class="kw">this</span>.especialidadSeleccionadaId));
+  <span class="kw">if</span> (esp &amp;&amp; !<span class="kw">this</span>.especialidadesAsignadas.some(e =&gt; e.id === esp.id)) {
+    <span class="kw">this</span>.especialidadesAsignadas.push(esp);
+  }
+}
+
+<span class="cm">// NUEVO: quitar especialidad de la tabla</span>
+quitarEspecialidad(id: number) {
+  <span class="kw">this</span>.especialidadesAsignadas = <span class="kw">this</span>.especialidadesAsignadas
+    .filter(e =&gt; e.id !== id);
+}
+
+<span class="cm">// Al guardar: mandar los IDs de las especialidades asignadas</span>
+guardar() {
+  <span class="kw">const</span> payload = {
+    ...<span class="kw">this</span>.form.value,
+    especialidadIds: <span class="kw">this</span>.especialidadesAsignadas.map(e =&gt; e.id)
+  };
+  <span class="kw">this</span>.clinicaService.crearConsultorio(payload).subscribe(...);
+}</div>
+    <div class="note warn"><b>Esto es lo m&aacute;s NUEVO de todo el m&oacute;dulo.</b> No existe en <code>producto-form</code> ni en <code>etiqueta-form</code>. El &uacute;nico lugar del proyecto que hace algo parecido es <code>actividad-form</code> (que tiene un selector de etiquetas), pero la l&oacute;gica es distinta. Aqu&iacute; debes pensar: c&oacute;mo llenar el dropdown, c&oacute;mo agregar a la tabla, c&oacute;mo evitar duplicados, c&oacute;mo quitar.</div>
+  </div>
+
+  <!-- ============ ORDEN ============ -->
+  <h2 id="order"><span class="num">&#9654;</span> Orden recomendado de creaci&oacute;n</h2>
+  <p class="sec-intro">No crees los archivos en el orden de las carpetas. Crea en el orden en que cada archivo necesita al anterior para compilar.</p>
+  <table>
+    <thead><tr><th>Orden</th><th>Archivo</th><th>Por qu&eacute; este orden</th><th>Acci&oacute;n</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>SQL: tablas + semillas</td><td>Sin tablas no hay nada</td><td><span class="action-tag at-new">NUEVO</span></td></tr>
+      <tr><td>2</td><td><code>package-info.java</code></td><td>Spring reconoce el paquete</td><td><span class="action-tag at-adapt">ADAPTAR</span></td></tr>
+      <tr><td>3</td><td>Domain: POJOs + enums</td><td>No depende de nada, compila solo</td><td><span class="action-tag at-adapt">ADAPTAR</span></td></tr>
+      <tr><td>4</td><td>DTOs: Request + Response</td><td>Depende del dominio</td><td><span class="action-tag at-adapt">ADAPTAR</span></td></tr>
+      <tr><td>5</td><td>Port IN (use case)</td><td>Depende de DTOs</td><td><span class="action-tag at-adapt">ADAPTAR</span></td></tr>
+      <tr><td>6</td><td>Port OUT (persistencia)</td><td>Depende del dominio</td><td><span class="action-tag at-adapt">ADAPTAR</span></td></tr>
+      <tr><td>7</td><td>Entity JPA</td><td>Depende del dominio</td><td><span class="action-tag at-adapt">ADAPTAR</span></td></tr>
+      <tr><td>8</td><td>Repository</td><td>Depende de la entidad</td><td><span class="action-tag at-adapt">ADAPTAR</span></td></tr>
+      <tr><td>9</td><td>Persistence Adapter</td><td>Implementa Port OUT usando entity + repo</td><td><span class="action-tag at-adapt">ADAPTAR</span></td></tr>
+      <tr><td>10</td><td>Service</td><td>Implementa Port IN usando Port OUT</td><td><span class="action-tag at-copy">COPIAR estructura</span> + <span class="action-tag at-new">reglas NUEVAS</span></td></tr>
+      <tr><td>11</td><td>Controller</td><td>Usa Port IN</td><td><span class="action-tag at-adapt">ADAPTAR</span></td></tr>
+      <tr><td>12</td><td>Frontend model</td><td>Independiente del backend</td><td><span class="action-tag at-adapt">ADAPTAR</span></td></tr>
+      <tr><td>13</td><td>Frontend service</td><td>Depende del model</td><td><span class="action-tag at-adapt">ADAPTAR</span></td></tr>
+      <tr><td>14</td><td>Frontend listado</td><td>Depende del service</td><td><span class="action-tag at-adapt">ADAPTAR</span></td></tr>
+      <tr><td>15</td><td>Frontend formulario</td><td>Depende del service</td><td><span class="action-tag at-adapt">ADAPTAR</span></td></tr>
+      <tr><td>16</td><td>Frontend N:M (consultorio)</td><td>La parte compleja</td><td><span class="action-tag at-new">NUEVO</span></td></tr>
+      <tr><td>17</td><td>Frontend detalle</td><td>Mostrar las especialidades</td><td><span class="action-tag at-adapt">ADAPTAR</span></td></tr>
+      <tr><td>18</td><td>Probar todo desde la SPA</td><td>Verificar que funciona end-to-end</td><td><span class="action-tag at-new">NUEVO</span></td></tr>
+    </tbody>
+  </table>
+
+  <!-- ============ MATRIZ ============ -->
+  <h2 id="matrix"><span class="num">&#9635;</span> Matriz: copiar / adaptar / nuevo</h2>
+  <p class="sec-intro">Resumen final. Para cada archivo del m&oacute;dulo, qu&eacute; acci&oacute;n tomar y de d&oacute;nde copiar.</p>
+  <table>
+    <thead><tr><th>Archivo</th><th>Acci&oacute;n</th><th>Copiar de</th><th>Qu&eacute; cambia</th></tr></thead>
+    <tbody>
+      <tr><td>SQL tablas</td><td><span class="action-tag at-new">NUEVO</span></td><td>Patr&oacute;n de <code>07_actividades.sql</code></td><td>Tablas, columnas, constraints</td></tr>
+      <tr><td><code>package-info.java</code></td><td><span class="action-tag at-adapt">ADAPTAR</span></td><td><code>etiquetas/package-info.java</code></td><td>Nombre del paquete</td></tr>
+      <tr><td>Domain POJO</td><td><span class="action-tag at-adapt">ADAPTAR</span></td><td><code>etiquetas/domain/Etiqueta.java</code></td><td>Campos</td></tr>
+      <tr><td>Domain enum</td><td><span class="action-tag at-adapt">ADAPTAR</span></td><td><code>productos/domain/EstadoProducto.java</code></td><td>Valores del enum</td></tr>
+      <tr><td>DTO Request</td><td><span class="action-tag at-adapt">ADAPTAR</span></td><td><code>etiquetas/dto/EtiquetaRequest.java</code></td><td>Campos + validaciones</td></tr>
+      <tr><td>DTO Response</td><td><span class="action-tag at-adapt">ADAPTAR</span></td><td><code>etiquetas/dto/EtiquetaResponse.java</code></td><td>Campos</td></tr>
+      <tr><td>Port IN</td><td><span class="action-tag at-adapt">ADAPTAR</span></td><td><code>productos/port/in/ManageProductoUseCase.java</code></td><td>Nombres de m&eacute;todos</td></tr>
+      <tr><td>Port OUT</td><td><span class="action-tag at-adapt">ADAPTAR</span></td><td><code>etiquetas/port/out/EtiquetaPersistencePort.java</code></td><td>Tipo de retorno + m&eacute;todos</td></tr>
+      <tr><td>Entity JPA</td><td><span class="action-tag at-adapt">ADAPTAR</span></td><td><code>etiquetas/entity/EtiquetaEntity.java</code></td><td><code>@Table</code>, <code>@Column</code>, campos</td></tr>
+      <tr><td>Entity N:M</td><td><span class="action-tag at-new">NUEVO</span></td><td>Patr&oacute;n <code>@ManyToMany</code> + <code>@JoinTable</code></td><td>Configuraci&oacute;n de la tabla intermedia</td></tr>
+      <tr><td>Repository</td><td><span class="action-tag at-adapt">ADAPTAR</span></td><td><code>etiquetas/repository/EtiquetaSpringDataRepository.java</code></td><td>Tipo de entidad + m&eacute;todos de b&uacute;squeda</td></tr>
+      <tr><td>Persistence Adapter</td><td><span class="action-tag at-adapt">ADAPTAR</span></td><td><code>etiquetas/EtiquetaPersistenceAdapter.java</code></td><td>Mapeos toEntity/toDomain</td></tr>
+      <tr><td>Service estructura</td><td><span class="action-tag at-copy">COPIAR</span></td><td><code>etiquetas/service/EtiquetaService.java</code></td><td>Nada (estructura id&eacute;ntica)</td></tr>
+      <tr><td>Service reglas</td><td><span class="action-tag at-new">NUEVO</span></td><td>&mdash;</td><td>Validaciones, &uacute;nicos, l&oacute;gica N:M</td></tr>
+      <tr><td>Controller</td><td><span class="action-tag at-adapt">ADAPTAR</span></td><td><code>etiquetas/controller/EtiquetaController.java</code></td><td>Path, use case, DTOs</td></tr>
+      <tr><td>Frontend model</td><td><span class="action-tag at-adapt">ADAPTAR</span></td><td><code>productos/producto.model.ts</code></td><td>Interfaces + campos</td></tr>
+      <tr><td>Frontend service</td><td><span class="action-tag at-adapt">ADAPTAR</span></td><td><code>productos/productos.service.ts</code></td><td>URLs</td></tr>
+      <tr><td>Frontend list</td><td><span class="action-tag at-adapt">ADAPTAR</span></td><td><code>productos/producto-list</code></td><td>Columnas de la tabla</td></tr>
+      <tr><td>Frontend form</td><td><span class="action-tag at-adapt">ADAPTAR</span></td><td><code>productos/producto-form</code></td><td>Campos + validaciones</td></tr>
+      <tr><td>Frontend N:M form</td><td><span class="action-tag at-new">NUEVO</span></td><td>&mdash;</td><td>Tabla din&aacute;mica de especialidades</td></tr>
+      <tr><td>Frontend detail</td><td><span class="action-tag at-adapt">ADAPTAR</span></td><td>Cualquier vista de detalle</td><td>Campos mostrados</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note ok"><b>Resumen:</b> de ~20 archivos que creas, solo 4 son NUEVOS de verdad: (1) el SQL de las tablas, (2) la entidad con <code>@ManyToMany</code>, (3) las reglas del service y (4) la tabla din&aacute;mica del frontend. El resto es copiar y adaptar. <b>Si dominas esos 4, puedes construir cualquier m&oacute;dulo.</b></div>
+
+  <footer>VIERNES CRM &middot; C&oacute;mo construir un m&oacute;dulo desde cero &middot; basado en el c&oacute;digo real de E:\Viernes\Viernes &middot; noviembre 2026.</footer>
+</div>
+</body>
+</html>

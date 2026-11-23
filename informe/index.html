@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Portal Central de Informes Técnicos y de Evaluación – Viernes CRM V1. Acceso a todos los informes oficiales del sistema.">
+    <meta name="description" content="Portal Central de Informes Técnicos y de Evaluación – Viernes CRM V1. Acceso organizado a todos los informes oficiales del sistema.">
     <title>Portal Central de Informes – VIERNES CRM V1</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -53,7 +53,7 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1240px;
             margin: 0 auto;
         }
 
@@ -62,198 +62,280 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-bottom: 25px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
             border-bottom: 1px solid var(--border);
-            margin-bottom: 35px;
         }
 
-        .brand-logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-            color: #ffffff;
-            font-weight: 800;
-            font-size: 19px;
-            letter-spacing: -0.02em;
-        }
-
-        .logo-box {
-            width: 38px;
-            height: 38px;
-            background: linear-gradient(135deg, #2563eb, #10b981);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-
-        .nav-link {
-            font-size: 13px;
-            color: var(--text-muted);
-            text-decoration: none;
-            padding: 6px 14px;
-            border-radius: 8px;
-            transition: all 0.2s;
-            border: 1px solid transparent;
-        }
-
-        .nav-link:hover {
-            color: #ffffff;
-            background: var(--surface2);
-            border-color: var(--border);
-        }
-
-        /* Hero */
-        header.hero {
-            text-align: center;
-            margin-bottom: 40px;
-            padding: 20px 0 10px;
-        }
-
-        .hero-badge {
+        .brand-badge {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            background: var(--accent-soft);
-            color: #60a5fa;
-            border: 1px solid rgba(59, 130, 246, 0.35);
-            padding: 7px 18px;
-            border-radius: 30px;
-            font-size: 13px;
-            font-weight: 700;
-            margin-bottom: 16px;
-            letter-spacing: 0.02em;
+            gap: 10px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 8px 16px;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
         }
 
-        h1 {
-            font-size: 42px;
+        .brand-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 10px var(--green);
+        }
+
+        .top-links {
+            display: flex;
+            gap: 12px;
+        }
+
+        .top-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .top-link:hover {
+            color: var(--text);
+            border-color: var(--border);
+            background: var(--surface);
+        }
+
+        .top-link.primary {
+            background: var(--accent-soft);
+            color: var(--accent);
+            border-color: rgba(59, 130, 246, 0.3);
+            font-weight: 600;
+        }
+
+        .top-link.primary:hover {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        /* Hero Header */
+        .hero {
+            text-align: center;
+            padding: 30px 20px 40px;
+        }
+
+        .hero-pill {
+            display: inline-block;
+            background: var(--accent-soft);
+            color: var(--accent);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 4px 14px;
+            border-radius: 9999px;
+            margin-bottom: 16px;
+        }
+
+        .hero h1 {
+            font-size: 2.8rem;
             font-weight: 900;
             letter-spacing: -0.03em;
-            background: linear-gradient(135deg, #ffffff 30%, #93c5fd 70%, #a855f7 100%);
+            line-height: 1.15;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 12px;
         }
 
-        .subtitle {
-            font-size: 17px;
+        .hero p {
+            font-size: 1.1rem;
             color: var(--text-muted);
-            max-width: 780px;
+            max-width: 760px;
             margin: 0 auto 30px;
-            line-height: 1.6;
         }
 
         /* Stats Bar */
-        .stats-bar {
-            display: flex;
-            justify-content: center;
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
             gap: 16px;
-            margin-bottom: 35px;
-            flex-wrap: wrap;
+            margin-bottom: 40px;
         }
 
-        .stat-item {
+        .stat-card {
             background: var(--surface);
             border: 1px solid var(--border);
-            padding: 12px 20px;
-            border-radius: 12px;
-            font-size: 13.5px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.2s;
         }
 
-        .stat-item strong {
-            color: #60a5fa;
+        .stat-card:hover {
+            border-color: var(--border-strong);
+            transform: translateY(-2px);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+        }
+
+        .stat-card.v-nuevo::before { background: var(--green); }
+        .stat-card.v-desarrollo::before { background: var(--accent); }
+        .stat-card.v-antiguo::before { background: var(--amber); }
+
+        .stat-num {
+            font-size: 2rem;
+            font-weight: 800;
             font-family: var(--mono);
-            font-size: 15px;
+            color: #fff;
+            margin-bottom: 4px;
         }
 
-        /* Search / Filter Bar */
-        .search-container {
-            max-width: 600px;
-            margin: 0 auto 45px;
+        .stat-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .stat-desc {
+            font-size: 0.8rem;
+            color: var(--text-subtle);
+            margin-top: 4px;
+        }
+
+        /* Search & Filter Controls */
+        .controls-container {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 18px 24px;
+            margin-bottom: 35px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 280px;
             position: relative;
         }
 
         .search-input {
             width: 100%;
-            padding: 14px 20px 14px 46px;
-            background: var(--surface);
-            border: 1px solid var(--border-strong);
-            border-radius: 14px;
-            color: #ffffff;
-            font-size: 15px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 10px 16px 10px 42px;
+            color: #fff;
+            font-size: 0.95rem;
             outline: none;
             transition: all 0.2s;
-            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
         }
 
         .search-input:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.25);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-soft);
         }
 
         .search-icon {
             position: absolute;
-            left: 16px;
+            left: 14px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--text-muted);
-            font-size: 17px;
+            color: var(--text-subtle);
+            font-size: 1.1rem;
         }
 
-        /* Section Headings */
+        .filter-pills {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .pill-btn {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 8px 16px;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .pill-btn:hover {
+            color: #fff;
+            border-color: var(--border-strong);
+        }
+
+        .pill-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        /* Section Layout */
+        .section-block {
+            margin-bottom: 45px;
+        }
+
         .section-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin: 35px 0 20px;
+            margin-bottom: 20px;
             padding-bottom: 12px;
             border-bottom: 1px solid var(--border);
         }
 
         .section-title {
-            font-size: 20px;
-            font-weight: 800;
             display: flex;
             align-items: center;
-            gap: 10px;
-            letter-spacing: -0.01em;
+            gap: 12px;
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #fff;
         }
 
         .section-badge {
-            font-size: 12px;
+            font-size: 0.75rem;
+            font-family: var(--mono);
             padding: 3px 10px;
-            border-radius: 20px;
+            border-radius: 9999px;
             font-weight: 600;
-            text-transform: uppercase;
         }
 
-        /* Grids */
-        .grid {
+        .badge-nuevo { background: var(--green-soft); color: var(--green); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .badge-desarrollo { background: var(--accent-soft); color: var(--accent); border: 1px solid rgba(59, 130, 246, 0.3); }
+        .badge-antiguo { background: var(--amber-soft); color: var(--amber); border: 1px solid rgba(245, 158, 11, 0.3); }
+
+        /* Report Cards Grid */
+        .cards-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-            gap: 22px;
-            margin-bottom: 35px;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 20px;
         }
 
-        .grid-star {
-            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-        }
-
-        /* Report Cards */
-        .report-card {
+        .card {
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: var(--radius-md);
@@ -261,701 +343,668 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            text-decoration: none;
+            color: inherit;
             transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
             position: relative;
-            overflow: hidden;
         }
 
-        .report-card:hover {
-            transform: translateY(-3px);
-            border-color: rgba(59, 130, 246, 0.6);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), 0 0 20px var(--accent-soft);
         }
 
-        /* Special Highlighting */
-        .card-star-nm {
-            border-color: rgba(16, 185, 129, 0.6);
-            background: linear-gradient(180deg, rgba(16, 185, 129, 0.12) 0%, var(--surface) 85%);
-            box-shadow: 0 6px 24px rgba(16, 185, 129, 0.15);
-        }
-
-        .card-star-nm:hover {
-            border-color: rgba(16, 185, 129, 0.9);
-            box-shadow: 0 12px 36px rgba(16, 185, 129, 0.28);
-        }
-
-        .card-star-sys {
-            border-color: rgba(59, 130, 246, 0.6);
-            background: linear-gradient(180deg, rgba(59, 130, 246, 0.12) 0%, var(--surface) 85%);
-        }
-
-        .card-star-how {
-            border-color: rgba(6, 182, 212, 0.6);
-            background: linear-gradient(180deg, rgba(6, 182, 212, 0.12) 0%, var(--surface) 85%);
-        }
-
-        .card-star-pitch {
-            border-color: rgba(168, 85, 247, 0.6);
-            background: linear-gradient(180deg, rgba(168, 85, 247, 0.12) 0%, var(--surface) 85%);
-        }
-
-        .report-header {
+        .card-top {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
             margin-bottom: 14px;
         }
 
-        .report-type {
-            font-size: 11px;
+        .card-category {
+            font-size: 0.75rem;
+            font-family: var(--mono);
             font-weight: 700;
-            padding: 4px 9px;
-            border-radius: 6px;
             text-transform: uppercase;
             letter-spacing: 0.05em;
+            color: var(--accent);
         }
 
-        .type-nm {
-            background: rgba(16, 185, 129, 0.25);
-            color: #6ee7b7;
-            border: 1px solid rgba(16, 185, 129, 0.4);
-        }
-
-        .type-sys {
-            background: rgba(59, 130, 246, 0.25);
-            color: #93c5fd;
-            border: 1px solid rgba(59, 130, 246, 0.4);
-        }
-
-        .type-how {
-            background: rgba(6, 182, 212, 0.25);
-            color: #67e8f9;
-            border: 1px solid rgba(6, 182, 212, 0.4);
-        }
-
-        .type-pitch {
-            background: rgba(168, 85, 247, 0.25);
-            color: #d8b4fe;
-            border: 1px solid rgba(168, 85, 247, 0.4);
-        }
-
-        .type-deploy {
-            background: rgba(245, 158, 11, 0.25);
-            color: #fde68a;
-            border: 1px solid rgba(245, 158, 11, 0.4);
-        }
-
-        .report-num {
+        .card-format {
+            font-size: 0.7rem;
             font-family: var(--mono);
-            font-size: 12px;
-            font-weight: 700;
+            background: var(--surface2);
             color: var(--text-subtle);
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
         }
 
-        .report-title {
-            font-size: 18px;
-            font-weight: 800;
-            color: #ffffff;
-            margin-bottom: 10px;
+        .card h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
             line-height: 1.35;
         }
 
-        .report-desc {
-            font-size: 13.5px;
+        .card p {
+            font-size: 0.88rem;
             color: var(--text-muted);
+            line-height: 1.5;
             margin-bottom: 18px;
             flex-grow: 1;
-            line-height: 1.6;
         }
 
-        .report-tags {
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .card-tags {
             display: flex;
             gap: 6px;
             flex-wrap: wrap;
-            margin-bottom: 20px;
         }
 
         .tag {
-            font-size: 11.5px;
-            color: #94a3b8;
+            font-size: 0.72rem;
             background: var(--surface2);
+            color: var(--text-muted);
             padding: 3px 8px;
-            border-radius: 5px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
         }
 
-        .tag-highlight {
-            background: rgba(16, 185, 129, 0.15);
-            color: #6ee7b7;
-            border-color: rgba(16, 185, 129, 0.3);
-            font-weight: 600;
-        }
-
-        .btn-open {
+        .card-action {
             display: inline-flex;
             align-items: center;
-            justify-content: center;
+            gap: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--accent);
+            transition: gap 0.2s;
+        }
+
+        .card:hover .card-action {
             gap: 8px;
-            width: 100%;
-            background: linear-gradient(135deg, #2563eb, #3b82f6);
-            color: #ffffff;
-            text-decoration: none;
-            padding: 11px 18px;
-            border-radius: 9px;
-            font-size: 14px;
-            font-weight: 700;
-            transition: all 0.2s;
-            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+            color: #60a5fa;
         }
 
-        .btn-open:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 18px rgba(37, 99, 235, 0.5);
-            filter: brightness(1.1);
-        }
-
-        .btn-green {
-            background: linear-gradient(135deg, #059669, #10b981);
-            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
-        }
-        .btn-green:hover { box-shadow: 0 6px 18px rgba(16, 185, 129, 0.5); }
-
-        .btn-cyan {
-            background: linear-gradient(135deg, #0891b2, #06b6d4);
-            box-shadow: 0 4px 14px rgba(6, 182, 212, 0.3);
-        }
-        .btn-cyan:hover { box-shadow: 0 6px 18px rgba(6, 182, 212, 0.5); }
-
-        .btn-purple {
-            background: linear-gradient(135deg, #7c3aed, #a855f7);
-            box-shadow: 0 4px 14px rgba(168, 85, 247, 0.3);
-        }
-        .btn-purple:hover { box-shadow: 0 6px 18px rgba(168, 85, 247, 0.5); }
-
-        .btn-amber {
-            background: linear-gradient(135deg, #d97706, #f59e0b);
-            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
-        }
-        .btn-amber:hover { box-shadow: 0 6px 18px rgba(245, 158, 11, 0.5); }
-
-        .btn-secondary {
-            background: var(--surface2);
-            color: #cbd5e1;
+        /* Empty Search State */
+        .empty-search {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+            background: var(--surface);
             border: 1px solid var(--border);
-            box-shadow: none;
-        }
-        .btn-secondary:hover {
-            background: var(--surface3);
-            border-color: var(--border-strong);
-            color: #ffffff;
+            border-radius: var(--radius-md);
+            color: var(--text-muted);
         }
 
         /* Footer */
-        footer {
-            text-align: center;
-            padding: 45px 0 15px;
-            color: var(--text-subtle);
-            font-size: 13px;
+        .footer {
+            margin-top: 70px;
+            padding-top: 30px;
             border-top: 1px solid var(--border);
-            margin-top: 60px;
+            text-align: center;
+            color: var(--text-subtle);
+            font-size: 0.85rem;
         }
 
-        footer strong { color: #94a3b8; }
-
-        /* Quick directory preview banner */
-        .direct-access-banner {
-            background: var(--surface);
-            border: 1px solid var(--border-strong);
-            border-radius: var(--radius-md);
-            padding: 16px 22px;
-            margin-bottom: 35px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-        .direct-access-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 13.5px;
+        .footer strong {
             color: var(--text-muted);
-        }
-        .direct-access-info code {
-            background: var(--surface2);
-            color: #60a5fa;
-            padding: 3px 8px;
-            border-radius: 6px;
-            font-family: var(--mono);
-            font-size: 12.5px;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-
-    <!-- TOP NAVIGATION -->
-    <nav class="top-nav">
-        <a href="index.html" class="brand-logo">
-            <div class="logo-box">V</div>
-            <div>VIERNES CRM <span style="font-size: 12px; font-weight: 500; color: #10b981; margin-left: 6px;">V1.0 OFICIAL</span></div>
-        </a>
-        <div class="nav-links">
-            <a href="informe_que_es_viernes_crm.html" class="nav-link">¿Qué es el CRM?</a>
-            <a href="informe_como_funciona.html" class="nav-link">¿Cómo Funciona?</a>
-            <a href="informe_relaciones_nm.html" class="nav-link" style="color: #6ee7b7; font-weight: 600;">Relaciones N:M ★</a>
-            <a href="V2/index.html" class="nav-link" style="color: #6ee7b7;">Manual de Usuario</a>
-            <a href="guia_sustentacion_pitch_demo.html" class="nav-link" style="color: #c084fc;">Pitch 5 Min</a>
+    <!-- Top Navigation -->
+    <header class="top-nav">
+        <div class="brand-badge">
+            <span class="brand-dot"></span>
+            <strong>VIERNES CRM</strong> &nbsp;|&nbsp; Centro Oficial de Documentación
         </div>
-    </nav>
-
-    <!-- HERO HEADER -->
-    <header class="hero">
-        <div class="hero-badge">📁 CARPETA CENTRAL: INFORME / SISTEMA V1</div>
-        <h1>Portal Central de Informes Técnicos</h1>
-        <p class="subtitle">
-            Documentación técnica completa, arquitectura hexagonal, diseño relacional N:M con Oracle 23c, 
-            seguridad Keycloak OIDC y guías maestras de sustentación para <strong>Viernes CRM V1</strong>.
-        </p>
-
-        <!-- STATS BAR -->
-        <div class="stats-bar">
-            <div class="stat-item">📄 Informes Oficiales: <strong>10 Disponibles</strong></div>
-            <div class="stat-item">📘 Manual de Usuario: <strong>Guía Completa V1</strong></div>
-            <div class="stat-item">🔗 Relaciones N:M: <strong>7 Tablas Intermedias</strong></div>
-            <div class="stat-item">🛡️ Autenticación: <strong>Keycloak 25 OIDC</strong></div>
-            <div class="stat-item">🟢 Pruebas Backend: <strong>260/260 (100% OK)</strong></div>
-            <div class="stat-item">🗄️ Base de Datos: <strong>Oracle 23c Free</strong></div>
-        </div>
-
-        <!-- SEARCH INPUT -->
-        <div class="search-container">
-            <span class="search-icon">🔍</span>
-            <input type="text" id="searchInput" class="search-input" placeholder="Buscar informe por nombre, tema (N:M, flujo, Keycloak, pitch, Oracle)..." oninput="filterReports()">
-        </div>
+        <nav class="top-links">
+            <a href="http://localhost:4200" class="top-link primary">🚀 Abrir Viernes CRM</a>
+            <a href="http://localhost:8080/swagger-ui.html" class="top-link">API Swagger</a>
+            <a href="README.md" class="top-link">Estructura README</a>
+        </nav>
     </header>
 
-    <!-- DIRECT ACCESS BANNER -->
-    <div class="direct-access-banner">
-        <div class="direct-access-info">
-            <span>📂</span>
-            <span>Todos los informes están <strong>a simple vista</strong> en la carpeta: <code>e:/LPII/Viernes/informe/</code></span>
+    <!-- Hero Header -->
+    <section class="hero">
+        <span class="hero-pill">Catálogo Centralizado de Artefactos</span>
+        <h1>Documentación, Informes y Exámenes</h1>
+        <p>
+            Portal unificado con acceso directo a la solución de la Variante 7 (Clínica), simuladores de actividades, manuales de usuario V2 y especificaciones de arquitectura.
+        </p>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card v-nuevo">
+                <div class="stat-num" id="count-nuevo">15</div>
+                <div class="stat-label">Nuevo y Vigente</div>
+                <div class="stat-desc">Examen Final V7, Simuladores y Manual V2</div>
+            </div>
+            <div class="stat-card v-desarrollo">
+                <div class="stat-num" id="count-desarrollo">12</div>
+                <div class="stat-label">Desarrollo y Técnico</div>
+                <div class="stat-desc">Arquitectura C4, DDD, GRASP/GoF y Oracle</div>
+            </div>
+            <div class="stat-card v-antiguo">
+                <div class="stat-num" id="count-antiguo">22</div>
+                <div class="stat-label">Histórico y Antiguo</div>
+                <div class="stat-desc">Borradores legacy, manuales V1 y backups ZIP</div>
+            </div>
         </div>
-        <span style="font-size: 12px; color: #10b981; font-weight: 600;">● Doble clic directo o navegación web</span>
+    </section>
+
+    <!-- Controls: Search & Category Filter -->
+    <section class="controls-container">
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" class="search-input" placeholder="Buscar informe, tema, tecnología (ej: clinica, examen, c4, oracle, grasp)...">
+        </div>
+        <div class="filter-pills">
+            <button type="button" class="pill-btn active" data-filter="all">Todos</button>
+            <button type="button" class="pill-btn" data-filter="nuevo">🌟 01. Nuevo y Vigente</button>
+            <button type="button" class="pill-btn" data-filter="desarrollo">🛠️ 02. Desarrollo y Técnico</button>
+            <button type="button" class="pill-btn" data-filter="antiguo">📦 03. Histórico y Antiguo</button>
+        </div>
+    </section>
+
+    <div id="emptySearch" class="empty-search">
+        <h3>No se encontraron informes que coincidan con la búsqueda</h3>
+        <p>Intenta con otros términos o limpia el filtro para ver todo el catálogo.</p>
     </div>
 
-    <!-- SECCIÓN 1: TRILOGÍA ESENCIAL DEL SISTEMA -->
-    <div class="section-header">
-        <div class="section-title">
-            <span style="color: #f59e0b;">⭐</span>
-            <span>Trilogía Fundamental del Sistema (Evaluación & Entendimiento)</span>
-        </div>
-        <span class="section-badge" style="background: rgba(245, 158, 11, 0.15); color: #fde68a; border: 1px solid rgba(245, 158, 11, 0.3);">Prioridad Máxima</span>
-    </div>
-
-    <div class="grid grid-star" id="essentialGrid">
-
-        <!-- 1. INFORME N:M (EL MÁS IMPORTANTE) -->
-        <div class="report-card card-star-nm" data-keywords="nm n:m muchos a muchos tablas intermedias relaciones jpa oracle base de datos llaves foraneas ddd">
-            <div>
-                <div class="report-header">
-                    <span class="report-type type-nm">★ EL MÁS IMPORTANTE — EVALUACIÓN BD</span>
-                    <span class="report-num">INF-01</span>
-                </div>
-                <div class="report-title">Auditoría e Implementación de Relaciones N:M (Muchos a Muchos)</div>
-                <p class="report-desc">
-                    Informe exhaustivo sobre las <strong>7 relaciones N:M</strong> del CRM con tablas intermedias explícitas, 
-                    entidades JPA autónomas, llaves foráneas compuestas, atributos de enlace (rol, cantidad, orden, esDecisor) 
-                    y respeto estricto a las fronteras de Spring Modulith sin <code>@ManyToMany</code> implícitos.
-                </p>
-                <div class="report-tags">
-                    <span class="tag tag-highlight">7 Tablas N:M</span>
-                    <span class="tag">Tablas Intermedias</span>
-                    <span class="tag">Entidades JPA</span>
-                    <span class="tag">Oracle 23c</span>
-                    <span class="tag">Spring Modulith</span>
-                    <span class="tag">REST Sub-resources</span>
-                </div>
+    <!-- ==================================================================== -->
+    <!-- SECCIÓN 01: NUEVO Y VIGENTE -->
+    <!-- ==================================================================== -->
+    <section class="section-block" data-section="nuevo">
+        <div class="section-header">
+            <div class="section-title">
+                <span>🌟</span> 01. Nuevo y Vigente (Examen Final V7, Simuladores y Manuales V2)
             </div>
-            <a href="informe_relaciones_nm.html" class="btn-open btn-green">Abrir Informe de Relaciones N:M →</a>
+            <span class="section-badge badge-nuevo">VIGENTE / FINAL</span>
         </div>
 
-        <!-- 2. QUÉ ES VIERNES CRM -->
-        <div class="report-card card-star-sys" data-keywords="que es viernes crm explicacion sistema negocio modulos roles proposito clientes leads oportunidades comercial">
-            <div>
-                <div class="report-header">
-                    <span class="report-type type-sys">📘 EXPLICACIÓN DEL SISTEMA</span>
-                    <span class="report-num">INF-02</span>
+        <div class="cards-grid">
+            <!-- V7 Plan de Ataque -->
+            <a href="01_nuevo_y_vigente/01_examen_final_v7_clinica/plan_ataque_examen_v7.html" class="card" data-category="nuevo">
+                <div class="card-top">
+                    <span class="card-category">Examen LP2 · V7</span>
+                    <span class="card-format">HTML</span>
                 </div>
-                <div class="report-title">¿Qué es Viernes CRM? (Propósito, Negocio y Alcance)</div>
-                <p class="report-desc">
-                    Documento conceptual y funcional que explica qué problema resuelve el sistema, el ciclo de vida del lead 
-                    hasta la venta ganada, catálogo de 7 módulos de negocio, catálogo de 3 roles operativos (ADMIN, JEFE, VENDEDOR) 
-                    y stack tecnológico Full-Stack utilizado.
-                </p>
-                <div class="report-tags">
-                    <span class="tag">Visión General</span>
-                    <span class="tag">Embudo Comercial</span>
-                    <span class="tag">7 Módulos</span>
-                    <span class="tag">Roles y Permisos</span>
-                    <span class="tag">Full-Stack</span>
+                <h3>Plan de Ataque — Variante 7 (Clínica)</h3>
+                <p>Estrategia minuto a minuto para resolver los 20 puntos del examen: Base de Datos, CRUD de Clínicas y Cabecera-Detalle de Consultorios.</p>
+                <div class="card-footer">
+                    <div class="card-tags">
+                        <span class="tag">Examen Final</span>
+                        <span class="tag">Variante 7</span>
+                        <span class="tag">Rúbrica</span>
+                    </div>
+                    <span class="card-action">Ver guía →</span>
                 </div>
+            </a>
+
+            <!-- V7 Informe Desarrollo -->
+            <a href="01_nuevo_y_vigente/01_examen_final_v7_clinica/informe_desarrollo_modulo_v7.html" class="card" data-category="nuevo">
+                <div class="card-top">
+                    <span class="card-category">Examen LP2 · V7</span>
+                    <span class="card-format">HTML</span>
+                </div>
+                <h3>Guía de Desarrollo del Módulo Clínica</h3>
+                <p>Implementación técnica completa del módulo clinica en Backend Spring Boot y SPA Angular con los 8 checkpoints de verificación en vivo.</p>
+                <div class="card-footer">
+                    <div class="card-tags">
+                        <span class="tag">Spring Boot</span>
+                        <span class="tag">Angular</span>
+                        <span class="tag">Checkpoints</span>
+                    </div>
+                    <span class="card-action">Ver guía →</span>
+                </div>
+            </a>
+
+            <!-- V7 Como construir modulo -->
+            <a href="01_nuevo_y_vigente/01_examen_final_v7_clinica/como_construir_modulo_v7.html" class="card" data-category="nuevo">
+                <div class="card-top">
+                    <span class="card-category">Examen LP2 · V7</span>
+                    <span class="card-format">HTML</span>
+                </div>
+                <h3>Cómo Construir el Módulo V7 Paso a Paso</h3>
+                <p>Paso a paso interactivo desde la creación del esquema en Oracle hasta los componentes dinámicos en Angular.</p>
+                <div class="card-footer">
+                    <div class="card-tags">
+                        <span class="tag">Tutorial</span>
+                        <span class="tag">Paso a Paso</span>
+                    </div>
+                    <span class="card-action">Ver informe →</span>
+                </div>
+            </a>
+
+            <!-- Simulador Actividades Principal -->
+            <a href="01_nuevo_y_vigente/02_simulador_examen_actividades/examen_modulo_actividades.html" class="card" data-category="nuevo">
+                <div class="card-top">
+                    <span class="card-category">Simulador Técnico</span>
+                    <span class="card-format">HTML Interactivo</span>
+                </div>
+                <h3>Examen Interactivo — Módulo de Actividades</h3>
+                <p>Simulador técnico completo de código: explicaciones arquitectónicas, preguntas frecuentes y test de 5 preguntas con calificación automática.</p>
+                <div class="card-footer">
+                    <div class="card-tags">
+                        <span class="tag">Quiz Interactivo</span>
+                        <span class="tag">Actividades</span>
+                        <span class="tag">Código</span>
+                    </div>
+                    <span class="card-action">Iniciar test →</span>
+                </div>
+            </a>
+
+            <!-- Examen Codigo Actividades -->
+            <a href="01_nuevo_y_vigente/02_simulador_examen_actividades/16_Examen_Codigo_Actividades.html" class="card" data-category="nuevo">
+                <div class="card-top">
+                    <span class="card-category">Examen Código</span>
+                    <span class="card-format">HTML</span>
+                </div>
+                <h3>Evaluación de Código — Actividades y Etiquetas N:M</h3>
+                <p>Análisis en profundidad de la persistencia hexagonal, puertos, adaptadores y manejo de etiquetas asociadas.</p>
+                <div class="card-footer">
+                    <div class="card-tags">
+                        <span class="tag">Hexagonal</span>
+                        <span class="tag">JPA</span>
+                        <span class="tag">N:M</span>
+                    </div>
+                    <span class="card-action">Ver código →</span>
+                </div>
+            </a>
+
+            <!-- Manual Usuario V2 -->
+            <a href="01_nuevo_y_vigente/03_manual_usuario_v2/manual_usuario_v2.html" class="card" data-category="nuevo">
+                <div class="card-top">
+                    <span class="card-category">Manual Oficial</span>
+                    <span class="card-format">HTML + Capturas</span>
+                </div>
+                <h3>Manual de Usuario V2 — Viernes CRM</h3>
+                <p>Manual oficial del sistema con 28 capturas de pantalla de alta resolución que cubren todos los flujos comerciales y administrativos.</p>
+                <div class="card-footer">
+                    <div class="card-tags">
+                        <span class="tag">Manual V2</span>
+                        <span class="tag">28 Capturas</span>
+                        <span class="tag">Oficial</span>
+                    </div>
+                    <span class="card-action">Abrir manual →</span>
+                </div>
+            </a>
+
+            <!-- Guia Sustentacion Pitch -->
+            <a href="01_nuevo_y_vigente/04_guias_sustentacion_y_pitch/guia_sustentacion_pitch_demo.html" class="card" data-category="nuevo">
+                <div class="card-top">
+                    <span class="card-category">Sustentación</span>
+                    <span class="card-format">HTML</span>
+                </div>
+                <h3>Guía de Sustentación, Pitch & Demo (5 min)</h3>
+                <p>Estructura cronometrada de 5 minutos para la presentación ante el jurado: elevator pitch, demo en vivo y puntos fuertes del sistema.</p>
+                <div class="card-footer">
+                    <div class="card-tags">
+                        <span class="tag">Pitch 5 min</span>
+                        <span class="tag">Jurado</span>
+                        <span class="tag">Demo</span>
+                    </div>
+                    <span class="card-action">Ver pitch →</span>
+                </div>
+            </a>
+
+            <!-- Guia Visual Patrones -->
+            <a href="01_nuevo_y_vigente/04_guias_sustentacion_y_pitch/guia_visual_patrones_grasp_gof.html" class="card" data-category="nuevo">
+                <div class="card-top">
+                    <span class="card-category">Diseño Software</span>
+                    <span class="card-format">HTML Visual</span>
+                </div>
+                <h3>Guía Visual de Patrones GRASP y GoF</h3>
+                <p>Catálogo visual con diagramas y explicaciones prácticas de los patrones aplicados en Viernes CRM (Factory, Strategy, Observer, Controller, etc.).</p>
+                <div class="card-footer">
+                    <div class="card-tags">
+                        <span class="tag">GRASP</span>
+                        <span class="tag">GoF</span>
+                        <span class="tag">Diagramas</span>
+                    </div>
+                    <span class="card-action">Explorar →</span>
+                </div>
+            </a>
+
+            <!-- Como Funciona el Sistema -->
+            <a href="01_nuevo_y_vigente/05_informes_sistema_oficiales/informe_como_funciona.html" class="card" data-category="nuevo">
+                <div class="card-top">
+                    <span class="card-category">Sistema Oficial</span>
+                    <span class="card-format">HTML</span>
+                </div>
+                <h3>Cómo Funciona Viernes CRM</h3>
+                <p>Visión integral del ciclo comercial: desde la captación de leads, pipeline de oportunidades, propuestas hasta el cierre de ventas.</p>
+                <div class="card-footer">
+                    <div class="card-tags">
+                        <span class="tag">Flujo Comercial</span>
+                        <span class="tag">Pipeline</span>
+                    </div>
+                    <span class="card-action">Ver informe →</span>
+                </div>
+            </a>
+
+            <!-- Informe Tecnico Sistema -->
+            <a href="01_nuevo_y_vigente/05_informes_sistema_oficiales/informe_tecnico_sistema_v1.html" class="card" data-category="nuevo">
+                <div class="card-top">
+                    <span class="card-category">Sistema Oficial</span>
+                    <span class="card-format">HTML</span>
+                </div>
+                <h3>Informe Técnico Consolidado V1</h3>
+                <p>Auditoría técnica exhaustiva de la solución completa: backend modular, seguridad Keycloak, base de datos y métricas del sistema.</p>
+                <div class="card-footer">
+                    <div class="card-tags">
+                        <span class="tag">Auditoría</span>
+                        <span class="tag">Arquitectura</span>
+                    </div>
+                    <span class="card-action">Ver informe →</span>
+                </div>
+            </a>
+
+            <!-- Relaciones y Transaccionalidad -->
+            <a href="01_nuevo_y_vigente/05_informes_sistema_oficiales/informe_relaciones_transaccionalidad.html" class="card" data-category="nuevo">
+                <div class="card-top">
+                    <span class="card-category">Sistema Oficial</span>
+                    <span class="card-format">HTML</span>
+                </div>
+                <h3>Relaciones N:M y Transaccionalidad</h3>
+                <p>Explicación del manejo ACID en transacciones complejas: oportunidades con múltiples productos, colaboradores y contactos.</p>
+                <div class="card-footer">
+                    <div class="card-tags">
+                        <span class="tag">ACID</span>
+                        <span class="tag">Relaciones N:M</span>
+                    </div>
+                    <span class="card-action">Ver informe →</span>
+                </div>
+            </a>
+
+            <!-- Mensajeria y Chat Interno -->
+            <a href="01_nuevo_y_vigente/05_informes_sistema_oficiales/informe_mensajeria_v1.html" class="card" data-category="nuevo">
+                <div class="card-top">
+                    <span class="card-category">Sistema Oficial</span>
+                    <span class="card-format">HTML</span>
+                </div>
+                <h3>Módulo de Mensajería y Colaboración Interna</h3>
+                <p>Arquitectura del módulo de mensajería comercial entre miembros de equipos, hilos de conversación y notificaciones.</p>
+                <div class="card-footer">
+                    <div class="card-tags">
+                        <span class="tag">Mensajería</span>
+                        <span class="tag">Colaboración</span>
+                    </div>
+                    <span class="card-action">Ver informe →</span>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- SECCIÓN 02: DESARROLLO Y TÉCNICO -->
+    <!-- ==================================================================== -->
+    <section class="section-block" data-section="desarrollo">
+        <div class="section-header">
+            <div class="section-title">
+                <span>🛠️</span> 02. Desarrollo y Técnico (C4, Dominio DDD, Base de Datos y Evidencias LP2)
             </div>
-            <a href="informe_que_es_viernes_crm.html" class="btn-open">Abrir Informe: ¿Qué es Viernes CRM? →</a>
+            <span class="section-badge badge-desarrollo">INGENIERÍA / EVIDENCIAS</span>
         </div>
 
-        <!-- 3. CÓMO FUNCIONA EL SISTEMA -->
-        <div class="report-card card-star-how" data-keywords="como funciona flujo de datos ciclo peticion angular spring boot api rest token jwt keycloak arquitectura transaccion">
-            <div>
-                <div class="report-header">
-                    <span class="report-type type-how">⚙️ ARQUITECTURA EN MOVIMIENTO</span>
-                    <span class="report-num">INF-03</span>
+        <div class="cards-grid">
+            <!-- Consolidado 08-09-10 -->
+            <a href="02_desarrollo_y_tecnico/02_analisis_dominio_y_patrones/Informe_Consolidado_Secciones_08_09_10.html" class="card" data-category="desarrollo">
+                <div class="card-top">
+                    <span class="card-category">Ingeniería</span>
+                    <span class="card-format">HTML Consolidado</span>
                 </div>
-                <div class="report-title">¿Cómo Funciona el Sistema? (Flujo E2E y Ciclo de Petición)</div>
-                <p class="report-desc">
-                    Explicación paso a paso de cómo viaja un dato desde el clic del usuario en Angular 22, pasando por el 
-                    Bearer Token JWT, el Security Filter Chain, los Controladores Hexagonales, Servicios de Dominio, 
-                    repositorios Spring Data JPA y motor de base de datos Oracle 23c.
-                </p>
-                <div class="report-tags">
-                    <span class="tag">Ciclo Petición E2E</span>
-                    <span class="tag">Bearer JWT</span>
-                    <span class="tag">Puertos & Adaptadores</span>
-                    <span class="tag">Angular Zoneless</span>
-                    <span class="tag">Oracle Hikari</span>
+                <h3>Informe Consolidado: Secciones 08, 09 y 10</h3>
+                <p>Documento unificado con Análisis de Dominio DDD, Arquitectura de Software Limpia y catálogo de patrones GRASP y GoF.</p>
+                <div class="card-footer">
+                    <div class="card-tags">
+                        <span class="tag">DDD</span>
+                        <span class="tag">Clean Arch</span>
+                        <span class="tag">Patrones</span>
+                    </div>
+                    <span class="card-action">Abrir consolidado →</span>
                 </div>
+            </a>
+
+            <!-- Evidencias Academicas LP2 -->
+            <a href="02_desarrollo_y_tecnico/03_evidencias_academicas_lp2/Informe_academico_consolidado.html" class="card" data-category="desarrollo">
+                <div class="card-top">
+                    <span class="card-category">Académico</span>
+                    <span class="card-format">HTML Académico</span>
+                </div>
+                <h3>Informe Académico Consolidado LP2</h3>
+                <p>Entregable formal para el curso Lenguaje de Programación II con criterios de aceptación, diagramas BPMN, UML y matriz de pruebas.</p>
+                <div class="card-footer">
+                    <div class="card-tags">
+                        <span class="tag">BPMN</span>
+                        <span class="tag">UML</span>
+                        <span class="tag">Pruebas</span>
+                    </div>
+                    <span class="card-action">Ver entrega →</span>
+                </div>
+            </a>
+
+            <!-- Base de Datos Oracle -->
+            <a href="02_desarrollo_y_tecnico/02_analisis_dominio_y_patrones/11_Base_de_Datos_Oracle.md" class="card" data-category="desarrollo">
+                <div class="card-top">
+                    <span class="card-category">Base de Datos</span>
+                    <span class="card-format">Markdown</span>
+                </div>
+                <h3>Arquitectura de Base de Datos Oracle 21c/23c</h3>
+                <p>Diseño de tablespaces independientes (DATOS e INDICES), scripts modulares, procedimientos PL/SQL, funciones y vistas analíticas.</p>
+                <div class="card-footer">
+                    <div class="card-tags">
+                        <span class="tag">Oracle 21c/23c</span>
+                        <span class="tag">Tablespaces</span>
+                        <span class="tag">PL/SQL</span>
+                    </div>
+                    <span class="card-action">Ver especificación →</span>
+                </div>
+            </a>
+
+            <!-- Arquitectura C4 Nivel 3 -->
+            <a href="02_desarrollo_y_tecnico/01_arquitectura_c4_nivel3/" class="card" data-category="desarrollo">
+                <div class="card-top">
+                    <span class="card-category">Modelo C4</span>
+                    <span class="card-format">Diagramas</span>
+                </div>
+                <h3>Modelo C4 — Nivel 3 (Componentes)</h3>
+                <p>Colección de diagramas C4 con la descomposición interna de cada módulo del backend: clientes, productos, actividades, oportunidades y auth.</p>
+                <div class="card-footer">
+                    <div class="card-tags">
+                        <span class="tag">C4 Model</span>
+                        <span class="tag">Nivel 3</span>
+                        <span class="tag">Componentes</span>
+                    </div>
+                    <span class="card-action">Ver carpeta →</span>
+                </div>
+            </a>
+
+            <!-- Auditoría Código Ajeno -->
+            <a href="02_desarrollo_y_tecnico/02_analisis_dominio_y_patrones/13_Auditoria_Codigo_Ajeno.md" class="card" data-category="desarrollo">
+                <div class="card-top">
+                    <span class="card-category">Auditoría</span>
+                    <span class="card-format">Markdown</span>
+                </div>
+                <h3>Auditoría de Código y Calidad de Software</h3>
+                <p>Revisión técnica de dependencias, desacoplamiento hexagonal, cobertura de excepciones y estándares de codificación Java 21.</p>
+                <div class="card-footer">
+                    <div class="card-tags">
+                        <span class="tag">Code Review</span>
+                        <span class="tag">Java 21</span>
+                    </div>
+                    <span class="card-action">Leer auditoría →</span>
+                </div>
+            </a>
+
+            <!-- Guia Keycloak -->
+            <a href="02_desarrollo_y_tecnico/04_guias_tecnicas_keycloak/informe_keycloak_v1.html" class="card" data-category="desarrollo">
+                <div class="card-top">
+                    <span class="card-category">Seguridad</span>
+                    <span class="card-format">HTML</span>
+                </div>
+                <h3>Guía de Implementación Keycloak 25 OIDC</h3>
+                <p>Configuración de Spring Security Resource Server, validación de JWT, mapeo de roles RBAC y realm viernes-realm.</p>
+                <div class="card-footer">
+                    <div class="card-tags">
+                        <span class="tag">Keycloak</span>
+                        <span class="tag">OAuth2</span>
+                        <span class="tag">JWT</span>
+                    </div>
+                    <span class="card-action">Ver guía →</span>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- SECCIÓN 03: HISTÓRICO Y ANTIGUO -->
+    <!-- ==================================================================== -->
+    <section class="section-block" data-section="antiguo">
+        <div class="section-header">
+            <div class="section-title">
+                <span>📦</span> 03. Histórico y Antiguo (Versiones Anteriores y Backups)
             </div>
-            <a href="informe_como_funciona.html" class="btn-open btn-cyan">Abrir Informe: ¿Cómo Funciona? →</a>
+            <span class="section-badge badge-antiguo">HISTÓRICO / ARCHIVADO</span>
         </div>
 
-    </div>
+        <div class="cards-grid">
+            <!-- Manual V1 Legacy -->
+            <a href="03_antiguo_e_historico/02_manual_usuario_v1_legacy/manual_usuario_v1.html" class="card" data-category="antiguo">
+                <div class="card-top">
+                    <span class="card-category">Histórico V1</span>
+                    <span class="card-format">HTML</span>
+                </div>
+                <h3>Manual de Usuario V1 (Versión Inicial)</h3>
+                <p>Primer manual interactivo del sistema generado durante la primera fase del proyecto.</p>
+                <div class="card-footer">
+                    <div class="card-tags">
+                        <span class="tag">Manual V1</span>
+                        <span class="tag">Legacy</span>
+                    </div>
+                    <span class="card-action">Ver versión V1 →</span>
+                </div>
+            </a>
 
-    <!-- SECCIÓN 1.5: MANUAL DE USUARIO -->
-    <div class="section-header">
-        <div class="section-title">
-            <span style="color: #10b981;">📘</span>
-            <span>Manual de Usuario & Adopción Operativa</span>
+            <!-- Informes desactualizados -->
+            <a href="03_antiguo_e_historico/01_versiones_desactualizadas/" class="card" data-category="antiguo">
+                <div class="card-top">
+                    <span class="card-category">Borradores</span>
+                    <span class="card-format">10 Archivos</span>
+                </div>
+                <h3>Informes Desactualizados de Desarrollo</h3>
+                <p>Colección de 10 borradores y notas de trabajo preliminares de sprints anteriores (módulo 7, propuestas iniciales, auditorías previas).</p>
+                <div class="card-footer">
+                    <div class="card-tags">
+                        <span class="tag">Borradores</span>
+                        <span class="tag">Sprints Previos</span>
+                    </div>
+                    <span class="card-action">Abrir carpeta →</span>
+                </div>
+            </a>
+
+            <!-- Backups ZIP -->
+            <a href="03_antiguo_e_historico/03_backups_comprimidos_zip/" class="card" data-category="antiguo">
+                <div class="card-top">
+                    <span class="card-category">Respaldo</span>
+                    <span class="card-format">11 Archivos ZIP</span>
+                </div>
+                <h3>Archivos Comprimidos de Respaldo (ZIP)</h3>
+                <p>Copias de seguridad en formato ZIP preservadas por seguridad histórica (capturas, evidencias y manuales comprimidos).</p>
+                <div class="card-footer">
+                    <div class="card-tags">
+                        <span class="tag">Backups ZIP</span>
+                        <span class="tag">Archivados</span>
+                    </div>
+                    <span class="card-action">Ver respaldos →</span>
+                </div>
+            </a>
         </div>
-        <span class="section-badge" style="background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3);">Guía práctica</span>
-    </div>
+    </section>
 
-    <div class="grid" id="manualGrid">
-        <div class="report-card card-star-sys" data-keywords="manual usuario guia operativa uso modulos clientes leads oportunidades pipeline actividades propuestas productos usuarios equipos mensajeria roles permisos faq glosario capturas">
-            <div>
-                <div class="report-header">
-                    <span class="report-type type-sys">📘 MANUAL OFICIAL DE USUARIO</span>
-                    <span class="report-num">INF-11</span>
-                </div>
-                <div class="report-title">Manual de Usuario Viernes CRM V2.0</div>
-                <p class="report-desc">
-                    Guía práctica de operación de principio a fin: acceso con Keycloak, dashboard, clientes y contactos,
-                    mapa de relaciones, leads, oportunidades y pipeline, actividades y etiquetas, propuestas, productos,
-                    usuarios y roles, equipos y mensajería interna. Incluye flujo de trabajo recomendado, preguntas
-                    frecuentes, glosario, matriz de permisos y capturas reales del sistema.
-                </p>
-                <div class="report-tags">
-                    <span class="tag tag-highlight">20 Secciones</span>
-                    <span class="tag tag-highlight">28 Capturas Reales</span>
-                    <span class="tag">Paso a Paso</span>
-                    <span class="tag">Matriz de Permisos</span>
-                    <span class="tag">FAQ & Glosario</span>
-                    <span class="tag">Imprimible / PDF</span>
-                </div>
-            </div>
-            <div style="display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap;">
-                <a href="V2/index.html" class="btn-open btn-green" style="margin-top:0; flex: 1 1 200px; text-align: center;">Abrir Manual de Usuario →</a>
-                <a href="V2.zip" class="btn-open" style="margin-top:0; flex: 1 1 180px; text-align: center; background: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.35); color: #93c5fd;">Descargar ZIP (5 MB) 📦</a>
-            </div>
-        </div>
-    </div>
-
-    <!-- SECCIÓN 2: SUSTENTACIÓN Y DESPLIEGUE OPERATIVO -->
-    <div class="section-header">
-        <div class="section-title">
-            <span style="color: #a855f7;">🏆</span>
-            <span>Sustentación, Pitch de 5 Minutos & Guía Operativa</span>
-        </div>
-        <span class="section-badge" style="background: rgba(168, 85, 247, 0.15); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.3);">Criterio 6 (20%)</span>
-    </div>
-
-    <div class="grid" id="defenseGrid">
-
-        <!-- 4. GUÍA DE SUSTENTACIÓN Y PITCH -->
-        <div class="report-card card-star-pitch" data-keywords="sustentacion pitch demo guion jurado preguntas trampa 403 forbidden rol vendedor 5 minutos diapositivas">
-            <div>
-                <div class="report-header">
-                    <span class="report-type type-pitch">🎤 GUÍA DE SUSTENTACIÓN MAESTRA</span>
-                    <span class="report-num">INF-04</span>
-                </div>
-                <div class="report-title">Guía de Sustentación, Pitch y Demo Técnica (5 Minutos)</div>
-                <p class="report-desc">
-                    Estrategia minutada para la defensa ante el jurado calificador: guion paso a paso de 5 minutos, provocación 
-                    del error 403 Forbidden real con usuario VENDEDOR, respuestas a las 3 preguntas trampa de arquitectura 
-                    y estructura para 5 diapositivas ejecutivas.
-                </p>
-                <div class="report-tags">
-                    <span class="tag">Guion 5 min</span>
-                    <span class="tag">403 Forbidden Real</span>
-                    <span class="tag">Defensa Oral</span>
-                    <span class="tag">Respuestas Trampa</span>
-                </div>
-            </div>
-            <a href="guia_sustentacion_pitch_demo.html" class="btn-open btn-purple">Abrir Guía de Sustentación y Pitch →</a>
-        </div>
-
-        <!-- 5. ACTIVACIÓN EN OTRA PC -->
-        <div class="report-card" data-keywords="activacion otra pc despliegue script bat instalacion docker oracle keycloak java npm requisitos">
-            <div>
-                <div class="report-header">
-                    <span class="report-type type-deploy">💻 DESPLIEGUE MULTI-PC</span>
-                    <span class="report-num">INF-05</span>
-                </div>
-                <div class="report-title">Guía de Activación y Despliegue en Otra PC</div>
-                <p class="report-desc">
-                    Manual operativo completo para clonar, activar y levantar Viernes CRM V1 en una computadora limpia. 
-                    Incluye script automatizado <code>.bat</code> de 1 solo clic, aprovisionamiento de Oracle 23c y Docker Keycloak.
-                </p>
-                <div class="report-tags">
-                    <span class="tag">Script 1-Click</span>
-                    <span class="tag">Docker Compose</span>
-                    <span class="tag">Oracle Free</span>
-                    <span class="tag">Variables de Entorno</span>
-                </div>
-            </div>
-            <a href="informe_guia_activacion_otra_pc.html" class="btn-open btn-amber">Abrir Guía de Activación →</a>
-        </div>
-
-    </div>
-
-    <!-- SECCIÓN 3: ARQUITECTURA, CÓDIGO Y PERSISTENCIA -->
-    <div class="section-header">
-        <div class="section-title">
-            <span style="color: #3b82f6;">🏛️</span>
-            <span>Arquitectura Global, Transaccionalidad & Auditoría de Código</span>
-        </div>
-        <span class="section-badge" style="background: rgba(59, 130, 246, 0.15); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.3);">Técnico Profundo</span>
-    </div>
-
-    <div class="grid" id="archGrid">
-
-        <!-- EVALUACIÓN: EXAMEN TÉCNICO DE CÓDIGO (ACTIVIDADES) -->
-        <div class="report-card" style="border-color: rgba(59, 130, 246, 0.4); background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, var(--surface) 100%);" data-keywords="examen codigo actividades hexagonal puertos adaptadores prueba evaluacion simulador modulith">
-            <div>
-                <div class="report-header">
-                    <span class="report-type" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3);">🎓 EVALUACIÓN & CÓDIGO</span>
-                    <span class="report-num" style="color: #60a5fa;">EXAM-01</span>
-                </div>
-                <div class="report-title">Examen Técnico de Código: Módulo Actividades</div>
-                <p class="report-desc">
-                    Evaluación interactiva a nivel código: flujo Hexagonal end-to-end, límites Spring Modulith, 
-                    balotario de sustentación con anclas a archivos y simulador interactivo de 5 preguntas tipo examen con puntaje.
-                </p>
-                <div class="report-tags">
-                    <span class="tag tag-blue">Hexagonal Flow</span>
-                    <span class="tag tag-purple">Modulith Open</span>
-                    <span class="tag tag-green">Simulador Interactivo</span>
-                    <span class="tag">Mockito Mocks</span>
-                </div>
-            </div>
-            <a href="examen_modulo_actividades.html" class="btn-open btn-blue">Abrir Examen Interactivo →</a>
-        </div>
-
-        <!-- 6. ESTRUCTURA GLOBAL DEL SISTEMA -->
-        <div class="report-card" data-keywords="estructura global sistema arquitectura monolito modular puertos adaptadores topologia monorepo paquetes">
-            <div>
-                <div class="report-header">
-                    <span class="report-type type-sys">ARQUITECTURA MONORREPOSITORIO</span>
-                    <span class="report-num">INF-06</span>
-                </div>
-                <div class="report-title">Estructura Global del Sistema (Viernes CRM V1)</div>
-                <p class="report-desc">
-                    Documentación de la topología general: monorepo Spring Boot 4 + Angular 22 Zoneless, capas hexagonales 
-                    (domain, application, infrastructure, web), desacoplamiento modular y mapa de carpetas físicas.
-                </p>
-                <div class="report-tags">
-                    <span class="tag">Monolito Modular</span>
-                    <span class="tag">Ports & Adapters</span>
-                    <span class="tag">Topología</span>
-                </div>
-            </div>
-            <a href="informe_estructura_sistema.html" class="btn-open">Abrir Informe de Estructura →</a>
-        </div>
-
-        <!-- 7. RELACIONES Y TRANSACCIONALIDAD -->
-        <div class="report-card" data-keywords="transaccionalidad transactional acid rollback aislamiento open in view hikari oracle atomicidad">
-            <div>
-                <div class="report-header">
-                    <span class="report-type type-nm">TRANSACCIONES Y PERSISTENCIA</span>
-                    <span class="report-num">INF-07</span>
-                </div>
-                <div class="report-title">Conexiones Relacionales y Sistema Transaccional</div>
-                <p class="report-desc">
-                    Auditoría rigurosa de <code>@Transactional</code>: configuración <code>readOnly = true</code> para consultas, 
-                    rollback automático ante RuntimeException, desactivación de <code>open-in-view: false</code> y pool HikariCP.
-                </p>
-                <div class="report-tags">
-                    <span class="tag">ACID</span>
-                    <span class="tag">@Transactional</span>
-                    <span class="tag">HikariCP Pool</span>
-                    <span class="tag">Open-in-View: false</span>
-                </div>
-            </div>
-            <a href="informe_relaciones_transaccionalidad.html" class="btn-open">Abrir Informe de Transacciones →</a>
-        </div>
-
-        <!-- 8. INFORME TÉCNICO INTEGRAL -->
-        <div class="report-card" data-keywords="informe tecnico integral carpetas modulos endpoints 260 pruebas testing junit spring test">
-            <div>
-                <div class="report-header">
-                    <span class="report-type type-pitch">AUDITORÍA TÉCNICA INTEGRAL</span>
-                    <span class="report-num">INF-08</span>
-                </div>
-                <div class="report-title">Sistema, Carpetas y Módulos (Viernes CRM V1)</div>
-                <p class="report-desc">
-                    Radiografía exhaustiva del código fuente actual: 13 paquetes backend, 12 módulos funcionales, 19 tablas Oracle, 
-                    13 controladores REST documentados y suite de 260 pruebas unitarias y de integración.
-                </p>
-                <div class="report-tags">
-                    <span class="tag">13 Paquetes</span>
-                    <span class="tag">19 Tablas</span>
-                    <span class="tag">260 Tests OK</span>
-                </div>
-            </div>
-            <a href="informe_tecnico_sistema_v1.html" class="btn-open">Abrir Informe Técnico Integral →</a>
-        </div>
-
-    </div>
-
-    <!-- SECCIÓN 4: MÓDULOS ESPECIALIZADOS & SEGURIDAD -->
-    <div class="section-header">
-        <div class="section-title">
-            <span style="color: #06b6d4;">🛡️</span>
-            <span>Módulos Especializados, Mensajería & Seguridad Keycloak</span>
-        </div>
-        <span class="section-badge" style="background: rgba(6, 182, 212, 0.15); color: #67e8f9; border: 1px solid rgba(6, 182, 212, 0.3);">Seguridad & Colaboración</span>
-    </div>
-
-    <div class="grid" id="securityGrid">
-
-        <!-- 9. MENSAJERÍA INTERNA CRM -->
-        <div class="report-card" data-keywords="mensajeria chat interno crm mensajes sala general polling notificaciones colas">
-            <div>
-                <div class="report-header">
-                    <span class="report-type type-how">💬 COMUNICACIÓN EN TIEMPO REAL</span>
-                    <span class="report-num">INF-09</span>
-                </div>
-                <div class="report-title">Mensajería Interna del CRM (Sala General)</div>
-                <p class="report-desc">
-                    Implementación completa de la sala de comunicación general del equipo de ventas: tabla CRM_MENSAJES, 
-                    polling inteligente cada 5 segundos, badge reactivo de mensajes no leídos y panel de chat flotante.
-                </p>
-                <div class="report-tags">
-                    <span class="tag">Chat Sala General</span>
-                    <span class="tag">Polling 5s</span>
-                    <span class="tag">Badge Reactivo</span>
-                    <span class="tag">11 Tests</span>
-                </div>
-            </div>
-            <a href="informe_mensajeria_v1.html" class="btn-open btn-cyan">Abrir Informe de Mensajería →</a>
-        </div>
-
-        <!-- 10. SEGURIDAD KEYCLOAK OIDC -->
-        <div class="report-card" data-keywords="keycloak seguridad oauth2 oidc rbac jwt roles realm pkce resource server">
-            <div>
-                <div class="report-header">
-                    <span class="report-type type-sys">🔐 IDENTIDAD & ACCESO</span>
-                    <span class="report-num">INF-10</span>
-                </div>
-                <div class="report-title">Seguridad Keycloak (OAuth2 / OIDC / RBAC)</div>
-                <p class="report-desc">
-                    Arquitectura de seguridad empresarial: configuración de Realm <code>viernes-realm</code>, Resource Server 
-                    con Spring Security 6.x, flujo Authorization Code con PKCE para Angular y matriz de roles ADMIN, JEFE, VENDEDOR.
-                </p>
-                <div class="report-tags">
-                    <span class="tag">Keycloak 25</span>
-                    <span class="tag">OAuth2 / OIDC</span>
-                    <span class="tag">Resource Server</span>
-                    <span class="tag">RBAC Matriz</span>
-                </div>
-            </div>
-            <a href="informe_keycloak_v1.html" class="btn-open">Abrir Informe Keycloak →</a>
-        </div>
-
-    </div>
-
-    <!-- SECCIÓN 5: HISTÓRICO DE DESARROLLO (ARCHIVADOS) -->
-    <div style="margin: 50px 0 20px; padding-top: 30px; border-top: 1px dashed var(--border); display: flex; align-items: center; justify-content: space-between;">
-        <h2 style="font-size: 18px; font-weight: 700; color: #94a3b8; display: flex; align-items: center; gap: 8px;">
-            <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #64748b;"></span>
-            📁 Informes de Desarrollo Anteriores (Histórico / Archivados)
-        </h2>
-        <span style="font-size: 12px; color: #64748b;">Subcarpeta: <code>informes de desarrollo desactualizados/</code></span>
-    </div>
-
-    <div class="grid" style="opacity: 0.85;">
-        <div class="report-card" style="background: rgba(17, 23, 38, 0.6); border-color: rgba(255, 255, 255, 0.07);">
-            <div>
-                <div class="report-header">
-                    <span class="report-type" style="background: rgba(100, 116, 139, 0.2); color: #94a3b8;">HISTÓRICO</span>
-                </div>
-                <div class="report-title" style="font-size: 16px; color: #cbd5e1;">Módulo 7: Propuestas Comerciales (V1 inicial)</div>
-                <p class="report-desc" style="font-size: 12.5px;">Auditoría inicial previa a dropdowns inteligentes y nuevas reglas de roles.</p>
-            </div>
-            <a href="informes de desarrollo desactualizados/informe_modulo7_propuestas.html" class="btn-open btn-secondary" style="font-size: 12.5px;">Ver Histórico →</a>
-        </div>
-
-        <div class="report-card" style="background: rgba(17, 23, 38, 0.6); border-color: rgba(255, 255, 255, 0.07);">
-            <div>
-                <div class="report-header">
-                    <span class="report-type" style="background: rgba(100, 116, 139, 0.2); color: #94a3b8;">HISTÓRICO</span>
-                </div>
-                <div class="report-title" style="font-size: 16px; color: #cbd5e1;">Dashboard Inicial (HTML & MD)</div>
-                <p class="report-desc" style="font-size: 12.5px;">Primer prototipo previo a la conexión directa con Oracle 23c y eliminación de mocks.</p>
-            </div>
-            <a href="informes de desarrollo desactualizados/informe_modulo_dashboard.html" class="btn-open btn-secondary" style="font-size: 12.5px;">Ver Histórico →</a>
-        </div>
-
-        <div class="report-card" style="background: rgba(17, 23, 38, 0.6); border-color: rgba(255, 255, 255, 0.07);">
-            <div>
-                <div class="report-header">
-                    <span class="report-type" style="background: rgba(100, 116, 139, 0.2); color: #94a3b8;">HISTÓRICO</span>
-                </div>
-                <div class="report-title" style="font-size: 16px; color: #cbd5e1;">Arquitectura General de Código (Pre-Wave)</div>
-                <p class="report-desc" style="font-size: 12.5px;">Diagrama de paquetes preliminar sustituido por los informes oficiales V1.</p>
-            </div>
-            <a href="informes de desarrollo desactualizados/arquitectura_codigo.html" class="btn-open btn-secondary" style="font-size: 12.5px;">Ver Histórico →</a>
-        </div>
-    </div>
-
-    <!-- FOOTER -->
-    <footer>
-        <p><strong>VIERNES CRM V1.0</strong> • Proyecto de Lenguaje de Programación II (LP2)</p>
-        <p style="margin-top: 6px; font-size: 12.5px; color: #64748b;">
-            Todos los informes HTML están ubicados directamente en: <code>e:/LPII/Viernes/informe/</code> y respaldados en <code>informes de sistema V1/</code>.
+    <!-- Footer -->
+    <footer class="footer">
+        <p>
+            <strong>VIERNES CRM V1</strong> &nbsp;|&nbsp; Proyecto de Lenguaje de Programación II (LP2) &nbsp;|&nbsp; Arquitectura Hexagonal y Spring Modulith
+        </p>
+        <p style="margin-top: 8px; font-size: 0.78rem;">
+            Directorio estructurado en <code>informe/01_nuevo_y_vigente</code>, <code>informe/02_desarrollo_y_tecnico</code> e <code>informe/03_antiguo_e_historico</code>.
         </p>
     </footer>
-
 </div>
 
-<!-- SCRIPT FILTRADO RÁPIDO EN TIEMPO REAL -->
 <script>
+    // Live Search & Category Filter Logic
+    const searchInput = document.getElementById('searchInput');
+    const filterPills = document.querySelectorAll('.pill-btn');
+    const cards = document.querySelectorAll('.card');
+    const sections = document.querySelectorAll('.section-block');
+    const emptySearch = document.getElementById('emptySearch');
+
+    let currentFilter = 'all';
+
     function filterReports() {
-        const query = document.getElementById('searchInput').value.toLowerCase().trim();
-        const cards = document.querySelectorAll('.report-card');
-        
-        cards.forEach(card => {
-            const keywords = (card.getAttribute('data-keywords') || '').toLowerCase();
-            const text = card.innerText.toLowerCase();
-            if (!query || keywords.includes(query) || text.includes(query)) {
-                card.style.display = 'flex';
+        const query = searchInput.value.toLowerCase().trim();
+        let visibleCount = 0;
+
+        sections.forEach(section => {
+            const sectionCategory = section.getAttribute('data-section');
+            const sectionCards = section.querySelectorAll('.card');
+            let sectionVisibleCards = 0;
+
+            const categoryMatch = (currentFilter === 'all' || currentFilter === sectionCategory);
+
+            sectionCards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                const matchesQuery = !query || text.includes(query);
+
+                if (categoryMatch && matchesQuery) {
+                    card.style.display = 'flex';
+                    sectionVisibleCards++;
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // Ocultar sección si ninguna tarjeta es visible
+            if (sectionVisibleCards > 0) {
+                section.style.display = 'block';
             } else {
-                card.style.display = 'none';
+                section.style.display = 'none';
             }
         });
+
+        // Mostrar estado vacío si no hay coincidencias
+        if (visibleCount === 0) {
+            emptySearch.style.display = 'block';
+        } else {
+            emptySearch.style.display = 'none';
+        }
     }
+
+    searchInput.addEventListener('input', filterReports);
+
+    filterPills.forEach(pill => {
+        pill.addEventListener('click', () => {
+            filterPills.forEach(p => p.classList.remove('active'));
+            pill.classList.add('active');
+            currentFilter = pill.getAttribute('data-filter');
+            filterReports();
+        });
+    });
 </script>
 
 </body>

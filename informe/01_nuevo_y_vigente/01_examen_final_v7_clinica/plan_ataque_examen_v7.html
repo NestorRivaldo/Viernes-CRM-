@@ -1,0 +1,535 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plan de Ataque V7 — Examen Módulo Clínica — Viernes CRM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#090d16; --surface:#111726; --surface2:#172033; --border:#232f48;
+  --text:#f1f5f9; --muted:#94a3b8; --subtle:#64748b;
+  --accent:#3b82f6; --accent-soft:rgba(59,130,246,.12);
+  --green:#10b981; --green-soft:rgba(16,185,129,.12);
+  --purple:#a855f7; --purple-soft:rgba(168,85,247,.12);
+  --amber:#f59e0b; --amber-soft:rgba(245,158,11,.12);
+  --cyan:#06b6d4; --cyan-soft:rgba(6,182,212,.12);
+  --rose:#f43f5e; --rose-soft:rgba(244,63,94,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;padding:40px 20px 80px;
+  background-image:radial-gradient(circle at 10% 10%,rgba(59,130,246,.08) 0%,transparent 45%),radial-gradient(circle at 90% 90%,rgba(168,85,247,.06) 0%,transparent 45%);background-attachment:fixed}
+.container{max-width:1200px;margin:0 auto}
+.top-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+.back-link{display:inline-flex;align-items:center;gap:8px;color:#60a5fa;text-decoration:none;font-size:13.5px;font-weight:600}
+header{text-align:center;margin-bottom:44px}
+.brand-badge{display:inline-flex;align-items:center;gap:8px;background:var(--accent-soft);color:#60a5fa;border:1px solid rgba(59,130,246,.3);padding:6px 16px;border-radius:30px;font-size:13px;font-weight:700;margin-bottom:18px;letter-spacing:.04em}
+h1{font-size:38px;font-weight:800;letter-spacing:-.025em;background:linear-gradient(135deg,#fff 30%,#93c5fd 80%,#38bdf8 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:14px;line-height:1.2}
+.subtitle{font-size:16.5px;color:var(--muted);max-width:860px;margin:0 auto 26px}
+.pills{display:flex;justify-content:center;flex-wrap:wrap;gap:10px}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;font-size:12.5px;font-weight:600}
+.p-green{background:var(--green-soft);color:#34d399;border:1px solid rgba(16,185,129,.3)}
+.p-blue{background:var(--accent-soft);color:#93c5fd;border:1px solid rgba(59,130,246,.3)}
+.p-purple{background:var(--purple-soft);color:#c084fc;border:1px solid rgba(168,85,247,.3)}
+.p-amber{background:var(--amber-soft);color:#fbbf24;border:1px solid rgba(245,158,11,.3)}
+.p-cyan{background:var(--cyan-soft);color:#67e8f9;border:1px solid rgba(6,182,212,.3)}
+.p-rose{background:var(--rose-soft);color:#fda4af;border:1px solid rgba(244,63,94,.3)}
+.banner{display:flex;gap:14px;align-items:flex-start;background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:12px;padding:16px 18px;margin:0 0 30px;font-size:14px}
+.banner .bi{font-size:20px;line-height:1}
+.banner b{color:#93c5fd}
+h2{font-size:23px;font-weight:700;color:#fff;margin:48px 0 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);padding-bottom:12px}
+h2 .num{display:flex;align-items:center;justify-content:center;min-width:34px;height:34px;border-radius:8px;background:var(--accent-soft);color:#60a5fa;font-size:15px;font-family:'JetBrains Mono',monospace}
+h3{font-size:16.5px;font-weight:600;color:#e2e8f0;margin:24px 0 10px}
+p{margin:10px 0;color:#cbd5e1;font-size:14.5px}
+.sec-intro{color:var(--muted);font-size:14.5px;margin-bottom:16px}
+code{font-family:'JetBrains Mono',Consolas,monospace;font-size:12.5px;background:var(--surface2);border:1px solid var(--border);padding:1px 6px;border-radius:5px;color:#a5f3fc}
+.anchor{font-family:'JetBrains Mono',Consolas,monospace;font-size:12px;background:rgba(59,130,246,.1);color:#93c5fd;border:1px solid rgba(59,130,246,.2);padding:1px 7px;border-radius:6px;white-space:nowrap;display:inline-block;margin:1px 0}
+.note{border-radius:10px;padding:13px 16px;margin:16px 0;font-size:13.5px;border:1px solid}
+.note.info{background:var(--accent-soft);border-color:rgba(59,130,246,.3);color:#bfdbfe}
+.note.warn{background:var(--amber-soft);border-color:rgba(245,158,11,.3);color:#fde68a}
+.note.danger{background:var(--rose-soft);border-color:rgba(244,63,94,.3);color:#fecdd3}
+.note.ok{background:var(--green-soft);border-color:rgba(16,185,129,.3);color:#a7f3d0}
+.badge{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.05em;padding:2px 8px;border-radius:5px;vertical-align:middle}
+.b-done{background:var(--green-soft);color:#6ee7b7;border:1px solid rgba(16,185,129,.35)}
+.b-half{background:var(--amber-soft);color:#fbbf24;border:1px solid rgba(245,158,11,.35)}
+.b-todo{background:var(--rose-soft);color:#fda4af;border:1px solid rgba(244,63,94,.35)}
+.b-tip{background:var(--cyan-soft);color:#67e8f9;border:1px solid rgba(6,182,212,.35)}
+.tree{font-family:'JetBrains Mono',Consolas,monospace;font-size:12.5px;line-height:1.75;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;overflow-x:auto;white-space:pre;color:#cbd5e1}
+.tree .dir{color:#60a5fa;font-weight:600}
+.tree .cm{color:var(--subtle)}
+.tree .f{color:#a5f3fc}
+.tree .ok{color:#34d399}
+.tree .warn{color:#fbbf24}
+.tree .miss{color:#fda4af}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13.5px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+th{background:var(--surface2);color:#e2e8f0;text-align:left;padding:10px 14px;font-weight:600;font-size:12.5px;letter-spacing:.03em;text-transform:uppercase;border-bottom:1px solid var(--border)}
+td{padding:10px 14px;border-bottom:1px solid var(--border);color:#cbd5e1;vertical-align:top}
+tr:last-child td{border-bottom:none}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:16px 0}
+.mini{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+.mini .k{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--subtle)}
+.mini .v{font-size:15px;font-weight:600;color:#e2e8f0;margin:4px 0}
+.mini p{font-size:13px;margin:6px 0 0}
+.toc{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin:0 0 10px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:6px 22px}
+.toc a{color:#93c5fd;text-decoration:none;font-size:13.5px;display:flex;gap:8px;align-items:baseline}
+.toc a:hover{color:#bfdbfe}
+.toc a .n{font-family:'JetBrains Mono',monospace;color:var(--subtle);font-size:12px}
+.timeline{position:relative;margin:20px 0;padding-left:8px}
+.tl-step{display:flex;gap:14px;margin:0 0 20px;position:relative}
+.tl-step .sn{flex:0 0 36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;z-index:1}
+.tl-step.done .sn{background:var(--green-soft);border:2px solid rgba(16,185,129,.5);color:#34d399}
+.tl-step.half .sn{background:var(--amber-soft);border:2px solid rgba(245,158,11,.5);color:#fbbf24}
+.tl-step.todo .sn{background:var(--rose-soft);border:2px solid rgba(244,63,94,.5);color:#fda4af}
+.tl-step .sb{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 18px;flex:1}
+.tl-step .st{font-weight:700;color:#e2e8f0;font-size:15px;margin-bottom:6px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tl-step .sd{color:var(--muted);font-size:13.5px}
+.tl-step .sd b{color:#93c5fd}
+.code-block{font-family:'JetBrains Mono',Consolas,monospace;font-size:12.5px;line-height:1.75;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;overflow-x:auto;white-space:pre;color:#cbd5e1}
+.code-block .kw{color:#c084fc}
+.code-block .str{color:#6ee7b7}
+.code-block .cm{color:var(--subtle)}
+.code-block .ann{color:#fbbf24}
+.reuse-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin:14px 0}
+.reuse-box .rh{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:14px;font-weight:600;color:#e2e8f0}
+.reuse-box .rh .tag{font-size:11px;font-weight:700;padding:3px 8px;border-radius:5px}
+.reuse-box .rt{font-size:13.5px;color:var(--muted)}
+.reuse-box .rt b{color:#93c5fd}
+.reuse-box .copy-list{list-style:none;margin:8px 0 0;padding:0}
+.reuse-box .copy-list li{font-size:13px;color:#cbd5e1;padding:3px 0;padding-left:20px;position:relative}
+.reuse-box .copy-list li::before{content:'\2192';position:absolute;left:0;color:var(--subtle)}
+.svgwrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin:16px 0;overflow-x:auto}
+.svgwrap svg{display:block;margin:0 auto;max-width:100%}
+.legend{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:10px;font-size:12px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.dot{width:10px;height:10px;border-radius:3px;display:inline-block}
+footer{margin-top:50px;padding-top:20px;border-top:1px solid var(--border);color:var(--subtle);font-size:12.5px;text-align:center}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="top-nav">
+    <a class="back-link" href="index.html">&#8592; Portal de informes</a>
+    <span style="color:var(--subtle);font-size:12.5px;font-family:'JetBrains Mono',monospace">VIERNES CRM &middot; EXAMEN V7 &middot; PLAN DE ATAQUE</span>
+  </div>
+
+  <header>
+    <div class="brand-badge">&#9889; EXAMEN V7 &middot; LP2</div>
+    <h1>Plan de Ataque: M&oacute;dulo Cl&iacute;nica</h1>
+    <p class="subtitle">D&oacute;nde est&aacute;s parado, qu&eacute; ya tienes, de qu&eacute; m&oacute;dulos puedes copiar y en qu&eacute; orden avanzar. Una gu&iacute;a te&oacute;rica y pr&aacute;ctica basada en el c&oacute;digo real de tu proyecto.</p>
+    <div class="pills">
+      <span class="pill p-green">Frontend: listo</span>
+      <span class="pill p-amber">Backend: parcial</span>
+      <span class="pill p-rose">Base de datos: pendiente</span>
+      <span class="pill p-cyan">120 min &middot; 20 pts</span>
+    </div>
+  </header>
+
+  <div class="banner">
+    <span class="bi">&#127919;</span>
+    <div><b>Estrategia:</b> el examen no te pide que inventes nada. Te pide que reutilices el patr&oacute;n que ya usaste en otros m&oacute;dulos y lo apliques a una capacidad nueva (cl&iacute;nicas y consultorios). El frontend ya existe. El backend ya existe en versi&oacute;n simplificada. Lo que falta es: ejecutar la base de datos, verificar que el backend compila y conecta, y asegurar que todo funciona desde la SPA.</div>
+  </div>
+
+  <nav class="toc">
+    <a href="#s01"><span class="n">01</span> Estado actual: qu&eacute; ya tienes</a>
+    <a href="#s02"><span class="n">02</span> Qu&eacute; falta por hacer</a>
+    <a href="#s03"><span class="n">03</span> De qu&eacute; m&oacute;dulos copiar</a>
+    <a href="#s04"><span class="n">04</span> Orden de ejecuci&oacute;n (timeline)</a>
+    <a href="#s05"><span class="n">05</span> Pregunta 1: Cl&iacute;nicas (7 pts)</a>
+    <a href="#s06"><span class="n">06</span> Pregunta 2: Consultorios + Especialidades (13 pts)</a>
+    <a href="#s07"><span class="n">07</span> El patr&oacute;n N:M explicado</a>
+    <a href="#s08"><span class="n">08</span> La base de datos: qu&eacute; ejecutar</a>
+    <a href="#s09"><span class="n">09</span> Validaciones que el docente revisar&aacute;</a>
+    <a href="#s10"><span class="n">10</span> Errores que te pueden bajar puntos</a>
+    <a href="#s11"><span class="n">11</span> Distribuci&oacute;n del tiempo</a>
+  </nav>
+
+  <!-- ============ 01 ============ -->
+  <h2 id="s01"><span class="num">01</span> Estado actual: qu&eacute; ya tienes</h2>
+  <p class="sec-intro">Revisamos tu proyecto y esto es lo que ya existe del m&oacute;dulo <code>clinica</code>. Es mucho m&aacute;s de lo que parece.</p>
+
+  <h3>Frontend (Angular) &mdash; COMPLETO</h3>
+  <div class="tree"><span class="dir">viernes-frontend/src/app/features/clinica/</span>
+├─ <span class="f">clinica.model.ts</span>                 <span class="ok">&#10003; Clinica, Especialidad, ConsultorioRequest/Response, EstadoConsultorio</span>
+├─ <span class="f">clinica.service.ts</span>               <span class="ok">&#10003; todas las llamadas API (cl&iacute;nicas, especialidades, consultorios)</span>
+├─ <span class="dir">clinica-list/</span>                   <span class="ok">&#10003; listado con signals, modal, editar/eliminar</span>
+├─ <span class="dir">clinica-form/</span>                   <span class="ok">&#10003; formulario crear/editar con validaciones</span>
+├─ <span class="dir">consultorio-list/</span>               <span class="ok">&#10003; listado de consultorios</span>
+├─ <span class="dir">consultorio-form/</span>              <span class="ok">&#10003; formulario con dropdown de cl&iacute;nica, tarifa, estado, tabla de especialidades</span>
+└─ <span class="dir">consultorio-detail/</span>           <span class="ok">&#10003; vista de solo lectura con especialidades asignadas</span></div>
+  <div class="note ok"><b>El frontend est&aacute; listo.</b> Tiene las 6 pantallas del examen (Figuras 2&ndash;6): listado de cl&iacute;nicas, formulario de cl&iacute;nica con errores, listado de consultorios, formulario de consultorio con asignaci&oacute;n de especialidades, y vista de detalle. El <code>consultorio-form.ts</code> ya maneja la tabla din&aacute;mica de especialidades (agregar/quitar) y env&iacute;a <code>especialidadIds</code> al guardar.</div>
+
+  <h3>Backend (Spring Boot) &mdash; PARCIAL</h3>
+  <div class="tree"><span class="dir">viernes-backend/.../com/viernes/clinica/</span>
+├─ <span class="f miss">package-info.java</span>              <span class="miss">&#10007; FALTA &mdash; Spring Modulith no reconoce el m&oacute;dulo</span>
+├─ <span class="dir">adapters/in/web/</span>
+│  ├─ <span class="f ok">ClinicaController.java</span>        <span class="ok">&#10003; CRUD /api/clinica/clinicas</span>
+│  ├─ <span class="f ok">ConsultorioController.java</span>   <span class="ok">&#10003; CRUD /api/clinica/consultorios</span>
+│  └─ <span class="f ok">EspecialidadController.java</span> <span class="ok">&#10003; GET /api/clinica/especialidades</span>
+├─ <span class="dir">adapters/out/persistence/</span>
+│  ├─ <span class="dir">entity/</span>
+│  │  ├─ <span class="f ok">ClinicaEntity.java</span>         <span class="ok">&#10003; @Table(schema="EXA_CLINICA")</span>
+│  │  ├─ <span class="f ok">ConsultorioEntity.java</span>     <span class="ok">&#10003; @ManyToMany con @JoinTable (N:M)</span>
+│  │  └─ <span class="f ok">EspecialidadEntity.java</span>   <span class="ok">&#10003; cat&aacute;logo</span>
+│  └─ <span class="dir">repository/</span>
+│     ├─ <span class="f ok">ClinicaRepository.java</span>    <span class="ok">&#10003; Spring Data</span>
+│     ├─ <span class="f ok">ConsultorioRepository.java</span><span class="ok">&#10003; Spring Data</span>
+│     └─ <span class="f ok">EspecialidadRepository.java</span><span class="ok">&#10003; Spring Data</span>
+├─ <span class="dir">application/</span>
+│  ├─ <span class="dir">dto/</span>5 records               <span class="ok">&#10003; Request/Response</span>
+│  ├─ <span class="dir">service/</span>
+│  │  ├─ <span class="f ok">ClinicaService.java</span>       <span class="ok">&#10003; CRUD + validaci&oacute;n RUC</span>
+│  │  └─ <span class="f ok">ConsultorioService.java</span>   <span class="ok">&#10003; crea con especialidades, lista, elimina</span>
+│  ├─ <span class="f miss">port/in/</span>                   <span class="miss">&#10007; Sin interfaces de use case (patr&oacute;n simplificado)</span>
+│  └─ <span class="f miss">port/out/</span>                  <span class="miss">&#10007; Sin puertos de persistencia (service usa repo directo)</span>
+└─ <span class="dir">domain/</span>
+   └─ <span class="f ok">EstadoConsultorio.java</span>       <span class="ok">&#10003; enum DISPONIBLE/OCUPADO/MANTENIMIENTO</span>
+   <span class="miss">&#10007; Faltan POJOs de dominio (Clinica, Consultorio, Especialidad)</span></div>
+
+  <div class="note warn"><b>El backend funciona pero NO sigue el hex&aacute;gono completo.</b> Los servicios usan los repositorios directamente (sin puertos) y lanzan <code>ResponseStatusException</code> en vez de excepciones de dominio. <b>Para el examen esto es aceptable</b>: el docente califica que funcione, no que siga el patr&oacute;n perfecto. Pero si te sobra tiempo, a&ntilde;adir el <code>package-info.java</code> es lo m&aacute;s urgente.</div>
+
+  <h3>Base de datos &mdash; PENDIENTE</h3>
+  <p>El esquema <code>EXA_CLINICA</code> con sus 4 tablas no existe en tu Oracle. Necesitas ejecutar los scripts del examen (secci&oacute;n 08).</p>
+
+  <!-- ============ 02 ============ -->
+  <h2 id="s02"><span class="num">02</span> Qu&eacute; falta por hacer</h2>
+  <p class="sec-intro">Lista priorizada de lo que falta, de lo m&aacute;s urgente a lo opcional.</p>
+  <table>
+    <thead><tr><th>#</th><th>Tarea</th><th>Puntos que arriesgas</th><th>Tiempo est.</th><th>Estado</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Ejecutar scripts SQL del examen (esquema + tablas + semillas + permisos)</td><td>2 pts (esquema)</td><td>10 min</td><td><span class="badge b-todo">PENDIENTE</span></td></tr>
+      <tr><td>2</td><td>Ajustar el usuario de la BD: el examen usa <code>BOMERP_APP</code>, tu proyecto usa <code>BOM_VENTAS</code></td><td>Todo</td><td>5 min</td><td><span class="badge b-todo">PENDIENTE</span></td></tr>
+      <tr><td>3</td><td>Crear <code>package-info.java</code> del m&oacute;dulo clinica</td><td>0 (pero sin &eacute;l Spring puede fallar)</td><td>2 min</td><td><span class="badge b-todo">PENDIENTE</span></td></tr>
+      <tr><td>4</td><td>Verificar que el backend compila y levanta</td><td>Todo</td><td>5 min</td><td><span class="badge b-todo">PENDIENTE</span></td></tr>
+      <tr><td>5</td><td>Verificar que el frontend conecta con el backend</td><td>Todo</td><td>5 min</td><td><span class="badge b-todo">PENDIENTE</span></td></tr>
+      <tr><td>6</td><td>Probar CRUD de cl&iacute;nicas desde la SPA (crear, editar, eliminar)</td><td>4 pts</td><td>10 min</td><td><span class="badge b-half">C&oacute;digo listo, sin probar</span></td></tr>
+      <tr><td>7</td><td>Probar validaci&oacute;n de RUC (11 d&iacute;gitos) y raz&oacute;n social obligatoria</td><td>1 pt</td><td>5 min</td><td><span class="badge b-half">C&oacute;digo listo, sin probar</span></td></tr>
+      <tr><td>8</td><td>Probar listar especialidades (5 precargadas)</td><td>1 pt</td><td>3 min</td><td><span class="badge b-half">C&oacute;digo listo, sin probar</span></td></tr>
+      <tr><td>9</td><td>Probar crear consultorio con especialidades (agregar 2, quitar 1, guardar)</td><td>7 pts</td><td>10 min</td><td><span class="badge b-half">C&oacute;digo listo, sin probar</span></td></tr>
+      <tr><td>10</td><td>Probar ver detalle de consultorio con especialidades</td><td>(incluido en 9)</td><td>3 min</td><td><span class="badge b-half">C&oacute;digo listo, sin probar</span></td></tr>
+      <tr><td>11</td><td>Probar eliminar consultorio</td><td>2 pts</td><td>2 min</td><td><span class="badge b-half">C&oacute;digo listo, sin probar</span></td></tr>
+      <tr><td>12</td><td>Verificar script 3 (listar 4 tablas) para la revisi&oacute;n en vivo</td><td>2 pts</td><td>2 min</td><td><span class="badge b-todo">PENDIENTE</span></td></tr>
+    </tbody>
+  </table>
+  <div class="note ok"><b>La buena noticia:</b> 8 de 12 tareas son "probar que funciona" porque el c&oacute;digo ya est&aacute; escrito. El trabajo real es la base de datos (tareas 1-2) y verificar (tareas 4-5).</div>
+
+  <!-- ============ 03 ============ -->
+  <h2 id="s03"><span class="num">03</span> De qu&eacute; m&oacute;dulos copiar</h2>
+  <p class="sec-intro">Tu idea de reutilizar c&oacute;digo es correcta. Esto es lo que cada m&oacute;dulo te aporta para el examen.</p>
+
+  <div class="reuse-box">
+    <div class="rh"><span class="tag" style="background:var(--green-soft);color:#6ee7b7;border:1px solid rgba(16,185,129,.3)">CRUD SIMPLE</span> <code>etiquetas</code> &mdash; el m&oacute;dulo m&aacute;s simple (14 archivos)</div>
+    <div class="rt"><b>Qu&eacute; copiar de &eacute;l:</b></div>
+    <ul class="copy-list">
+      <li>La estructura m&iacute;nima: <code>domain/</code>, <code>application/dto/</code>, <code>application/port/</code>, <code>application/service/</code>, <code>adapters/</code></li>
+      <li>El patr&oacute;n <code>EtiquetaEntity &rarr; EtiquetaSpringDataRepository &rarr; EtiquetaPersistenceAdapter &rarr; EtiquetaPersistencePort &rarr; EtiquetaService</code></li>
+      <li>El <code>@Service @Transactional</code> con inyecci&oacute;n por constructor (<code>@RequiredArgsConstructor</code>)</li>
+      <li>El mapeo manual <code>toEntity</code>/<code>toDomain</code> entre dominio y entidad JPA</li>
+      <li>La excepci&oacute;n <code>ResourceNotFoundException</code> de <code>shared.exception</code></li>
+    </ul>
+    <div class="rt" style="margin-top:8px"><b>Tu m&oacute;dulo clinica ya tiene una versi&oacute;n simplificada de esto</b>, pero sin puertos. Si necesitas seguir el patr&oacute;n, copia de etiquetas.</div>
+  </div>
+
+  <div class="reuse-box">
+    <div class="rh"><span class="tag" style="background:var(--purple-soft);color:#c084fc;border:1px solid rgba(168,85,247,.3)">CRUD CON ENUM</span> <code>productos</code> &mdash; CRUD con estado enum</div>
+    <div class="rt"><b>Qu&eacute; copiar de &eacute;l:</b></div>
+    <ul class="copy-list">
+      <li>El enum <code>EstadoProducto</code> y c&oacute;mo se mapea con <code>@Enumerated(EnumType.STRING)</code> en la entidad</li>
+      <li>El patr&oacute;n de validar que el estado sea uno de los valores permitidos</li>
+    </ul>
+    <div class="rt" style="margin-top:8px"><b>Tu m&oacute;dulo ya tiene</b> <code>EstadoConsultorio</code> con el mismo patr&oacute;n. Solo verifica que <code>@Enumerated(EnumType.STRING)</code> est&eacute; en <code>ConsultorioEntity</code>.</div>
+  </div>
+
+  <div class="reuse-box">
+    <div class="rh"><span class="tag" style="background:var(--amber-soft);color:#fbbf24;border:1px solid rgba(245,158,11,.3)">RELACI&Oacute;N N:M</span> <code>actividades</code> &mdash; cabecera con detalles (N:M)</div>
+    <div class="rt"><b>Qu&eacute; copiar de &eacute;l:</b></div>
+    <ul class="copy-list">
+      <li>El patr&oacute;n de <code>ActividadEtiquetaPersistenceAdapter</code>: c&oacute;mo se gestiona la tabla intermedia N:M</li>
+      <li>C&oacute;mo <code>ActividadService</code> sincroniza etiquetas al crear (<code>sincronizarEtiquetas</code>)</li>
+      <li>El <code>ConsultorioEtiquetaPersistenceAdapter</code> que reemplaza todas las relaciones de una vez</li>
+    </ul>
+    <div class="rt" style="margin-top:8px"><b>Pero tu m&oacute;dulo ya lo resolvi&oacute; diferente:</b> usa <code>@ManyToMany</code> + <code>@JoinTable</code> directamente en la entidad JPA. JPA maneja la tabla intermedia autom&aacute;ticamente. Es m&aacute;s simple que el patr&oacute;n de actividades. <b>Para el examen, esto es suficiente.</b></div>
+  </div>
+
+  <div class="reuse-box">
+    <div class="rh"><span class="tag" style="background:var(--cyan-soft);color:#67e8f9;border:1px solid rgba(6,182,212,.3)">FRONTEND SPA</span> <code>productos</code> y <code>clientes</code> &mdash; patrones Angular</div>
+    <div class="rt"><b>Qu&eacute; copiar de &eacute;l:</b></div>
+    <ul class="copy-list">
+      <li>El <code>producto-list</code> + <code>producto-form</code>: patr&oacute;n listado + formulario para CRUD</li>
+      <li>El <code>clientes.service.ts</code>: c&oacute;mo se construyen las URLs con <code>ApiService.buildUrl()</code></li>
+      <li>El <code>cliente-form</code> con validaciones reactivas de Angular (<code>Validators.required</code>, <code>Validators.maxLength</code>)</li>
+    </ul>
+    <div class="rt" style="margin-top:8px"><b>Tu frontend ya est&aacute; hecho.</b> Pero si algo falla, mira c&oacute;mo lo hacen <code>productos</code> o <code>clientes</code>.</div>
+  </div>
+
+  <div class="note ok"><b>Resumen de reutilizaci&oacute;n:</b> tu idea de reutilizar es correcta y de hecho ya se hizo. El m&oacute;dulo <code>clinica</code> actual es una adaptaci&oacute;n simplificada de <code>etiquetas</code> (para cl&iacute;nicas) + <code>productos</code> (para el enum de estado) + el patr&oacute;n <code>@ManyToMany</code> de JPA (para la relaci&oacute;n N:M, m&aacute;s simple que el de <code>actividades</code>).</div>
+
+  <!-- ============ 04 ============ -->
+  <h2 id="s04"><span class="num">04</span> Orden de ejecuci&oacute;n (timeline)</h2>
+  <p class="sec-intro">As&iacute; deber&iacute;as avanzar en los 120 minutos. Cada paso dice qu&eacute; hacer, de d&oacute;nde copiar y cu&aacute;ntos puntos asegura.</p>
+  <div class="timeline">
+    <div class="tl-step todo">
+      <div class="sn">1</div>
+      <div class="sb">
+        <div class="st">Base de datos: ejecutar scripts <span class="badge b-todo">0/10 min</span></div>
+        <div class="sd">Ejecuta los 3 scripts del examen (esquema, tablas+semillas, verificaci&oacute;n). <b>Ojo:</b> el examen usa <code>BOMERP_APP</code> como usuario, pero tu <code>application-dev.yml</code> usa <code>BOM_VENTAS</code>. Cambia los <code>GRANT ... TO BOMERP_APP</code> por <code>TO BOM_VENTAS</code>, o el backend no podr&aacute; leer las tablas. <b>Asegura 2 pts del esquema.</b></div>
+      </div>
+    </div>
+    <div class="tl-step todo">
+      <div class="sn">2</div>
+      <div class="sb">
+        <div class="st">Crear package-info.java <span class="badge b-todo">0/2 min</span></div>
+        <div class="sd">Copia el de cualquier m&oacute;dulo (ej: <code>etiquetas/package-info.java</code>) y c&aacute;mbialo a <code>package com.viernes.clinica;</code>. Sin <code>allowedDependencies</code> (es un m&oacute;dulo aislado) o solo con <code>"shared"</code>.</div>
+      </div>
+    </div>
+    <div class="tl-step todo">
+      <div class="sn">3</div>
+      <div class="sb">
+        <div class="st">Levantar backend y verificar que compila <span class="badge b-todo">0/5 min</span></div>
+        <div class="sd">Arranca el backend. Si hay errores de compilaci&oacute;n, l&eacute;elos. Los m&aacute;s probables: falta alg&uacute;n import, o el <code>schema = "EXA_CLINICA"</code> no existe porque no ejecutaste los scripts. Si Hibernate dice "tabla no encontrada", vuelve al paso 1.</div>
+      </div>
+    </div>
+    <div class="tl-step half">
+      <div class="sn">4</div>
+      <div class="sb">
+        <div class="st">Probar CRUD de cl&iacute;nicas desde la SPA <span class="badge b-half">4 pts / 10 min</span></div>
+        <div class="sd">Abre la SPA, ve a la pantalla de cl&iacute;nicas. Crea una cl&iacute;nica nueva, ed&iacute;tala, elim&iacute;nala. Debe aparecer en el listado. <b>Si funciona desde la SPA = 4 pts. Si solo desde Swagger = 2 pts.</b></div>
+      </div>
+    </div>
+    <div class="tl-step half">
+      <div class="sn">5</div>
+      <div class="sb">
+        <div class="st">Probar validaciones de cl&iacute;nica <span class="badge b-half">1 pt / 5 min</span></div>
+        <div class="sd">Intenta crear una cl&iacute;nica con RUC de menos de 11 d&iacute;gitos y raz&oacute;n social vac&iacute;a. Los errores deben verse en el formulario, no como alerta gen&eacute;rica. Revisa que <code>ClinicaRequest</code> tenga <code>@NotBlank</code> y <code>@Size(min=11, max=11)</code> en <code>ruc</code>.</div>
+      </div>
+    </div>
+    <div class="tl-step half">
+      <div class="sn">6</div>
+      <div class="sb">
+        <div class="st">Probar listar especialidades <span class="badge b-half">1 pt / 3 min</span></div>
+        <div class="sd">Deben aparecer las 5 especialidades precargadas: Medicina general, Pediatr&iacute;a, Cardiolog&iacute;a, Odontolog&iacute;a, Nutrici&oacute;n. Si no aparecen, verifica que el script 2 insert&oacute; las filas en <code>EXA_CLINICA.ESPECIALIDADES</code>.</div>
+      </div>
+    </div>
+    <div class="tl-step half">
+      <div class="sn">7</div>
+      <div class="sb">
+        <div class="st">Probar crear consultorio con especialidades <span class="badge b-half">7 pts / 10 min</span></div>
+        <div class="sd">El paso m&aacute;s valioso. En el formulario de consultorio: elige una cl&iacute;nica del dropdown, pon c&oacute;digo, tarifa y estado. Agrega 2 especialidades a la tabla, quita 1, guarda. Luego abre el detalle del consultorio creado y verifica que la especialidad que dejaste est&aacute; ah&iacute;. <b>Si la N:M no guarda, revisa que <code>@ManyToMany</code> est&eacute; bien y que <code>especialidadIds</code> llegue al backend.</b></div>
+      </div>
+    </div>
+    <div class="tl-step half">
+      <div class="sn">8</div>
+      <div class="sb">
+        <div class="st">Probar eliminar consultorio <span class="badge b-half">2 pts / 2 min</span></div>
+        <div class="sd">Desde el listado de consultorios, elimina el que creaste. La N:M se borra autom&aacute;ticamente (cascade de JPA). Verifica que desaparece del listado.</div>
+      </div>
+    </div>
+    <div class="tl-step todo">
+      <div class="sn">9</div>
+      <div class="sb">
+        <div class="st">Verificar script 3 y dejar todo corriendo <span class="badge b-todo">2 pts / 5 min</span></div>
+        <div class="sd">Ejecuta el script de verificaci&oacute;n (listar tablas del esquema). Deben aparecer 4: CLINICAS, CONSULTORIOS, CONSULTORIO_ESPECIALIDAD, ESPECIALIDADES. Deja backend y SPA corriendo para la revisi&oacute;n en vivo.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 05 ============ -->
+  <h2 id="s05"><span class="num">05</span> Pregunta 1: Cl&iacute;nicas (7 pts)</h2>
+  <p class="sec-intro">La pregunta m&aacute;s f&aacute;cil. Es un CRUD simple de una sola tabla, igual que <code>etiquetas</code> o <code>productos</code>.</p>
+  <table>
+    <thead><tr><th>&Iacute;tem</th><th>Pts</th><th>Qu&eacute; necesitas</th><th>Estado</th></tr></thead>
+    <tbody>
+      <tr><td>Esquema creado y tablas listadas</td><td>2</td><td>Ejecutar scripts SQL y mostrar las 4 tablas</td><td><span class="badge b-todo">PENDIENTE</span></td></tr>
+      <tr><td>CRUD de cl&iacute;nicas desde la SPA</td><td>4</td><td>Listar, crear, editar y eliminar &mdash; todo desde Angular</td><td><span class="badge b-half">C&oacute;digo listo</span></td></tr>
+      <tr><td>Validaciones: RUC 11 d&iacute;gitos + raz&oacute;n social obligatoria</td><td>1</td><td>Error visible en el formulario (no como alerta)</td><td><span class="badge b-half">C&oacute;digo listo, verificar</span></td></tr>
+    </tbody>
+  </table>
+  <div class="note warn"><b>Verifica las validaciones.</b> Abre <code>ClinicaRequest.java</code> y confirma que tiene algo como: <code>@NotBlank(message="La raz&oacute;n social es obligatoria") String razonSocial</code> y <code>@Size(min=11, max=11, message="El RUC debe tener 11 d&iacute;gitos") String ruc</code>. Si no lo tiene, el backend no rechazar&aacute; los datos inv&aacute;lidos y pierdes el punto.</div>
+
+  <!-- ============ 06 ============ -->
+  <h2 id="s06"><span class="num">06</span> Pregunta 2: Consultorios + Especialidades (13 pts)</h2>
+  <p class="sec-intro">La pregunta dif&iacute;cil. Es un patr&oacute;n cabecera-detalle: el consultorio es la cabecera y las especialidades son sus l&iacute;neas, como una venta con sus productos.</p>
+  <table>
+    <thead><tr><th>&Iacute;tem</th><th>Pts</th><th>Qu&eacute; necesitas</th><th>Estado</th></tr></thead>
+    <tbody>
+      <tr><td>Especialidades: listar (precargadas)</td><td>1</td><td>GET que devuelva las 5 especialidades de la BD</td><td><span class="badge b-half">C&oacute;digo listo</span></td></tr>
+      <tr><td>Crear consultorio (cl&iacute;nica dropdown, c&oacute;digo, tarifa, estado)</td><td>3</td><td>Form con dropdown de cl&iacute;nicas + campos validados + estado como select</td><td><span class="badge b-half">C&oacute;digo listo</span></td></tr>
+      <tr><td>Asignar especialidades al crear (agregar, quitar, guardar)</td><td>4</td><td>Tabla din&aacute;mica en el form + N:M en el backend</td><td><span class="badge b-half">C&oacute;digo listo, verificar N:M</span></td></tr>
+      <tr><td>Listar y ver detalle con especialidades</td><td>3</td><td>Listado + vista de detalle que muestre las especialidades asignadas</td><td><span class="badge b-half">C&oacute;digo listo</span></td></tr>
+      <tr><td>Eliminar consultorio desde el listado</td><td>2</td><td>DELETE que borre el consultorio (y sus relaciones N:M en cascade)</td><td><span class="badge b-half">C&oacute;digo listo</span></td></tr>
+    </tbody>
+  </table>
+  <div class="note danger"><b>El punto cr&iacute;tico es la relaci&oacute;n N:M.</b> Si al crear un consultorio con especialidades el backend no las guarda, pierdes 4 + 3 = 7 puntos. La causa m&aacute;s com&uacute;n: el <code>ConsultorioRequest</code> no incluye <code>especialidadIds</code> o el <code>ConsultorioService</code> no las procesa. Revisa que el servicio busca las especialidades por ID y las asigna al <code>Set&lt;EspecialidadEntity&gt;</code> antes de guardar.</div>
+
+  <!-- ============ 07 ============ -->
+  <h2 id="s07"><span class="num">07</span> El patr&oacute;n N:M explicado</h2>
+  <p class="sec-intro">La relaci&oacute;n muchos-a-muchos entre consultorios y especialidades es lo que m&aacute;s puntos vale. As&iacute; funciona en tu c&oacute;digo.</p>
+  <div class="svgwrap">
+  <svg viewBox="0 0 860 200" width="860" height="200" role="img" aria-label="Relación N:M entre consultorios y especialidades">
+    <defs><marker id="arr3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c084fc"/></marker></defs>
+    <rect x="30" y="50" width="180" height="90" rx="12" fill="#1e2942" stroke="#06b6d4"/>
+    <text x="50" y="80" fill="#67e8f9" font-size="14" font-weight="600">CONSULTORIOS</text>
+    <text x="50" y="100" fill="#94a3b8" font-size="11.5">Cabecera (1 lado)</text>
+    <text x="50" y="118" fill="#64748b" font-size="11">id, codigo, tarifa, estado</text>
+    <rect x="340" y="50" width="180" height="90" rx="12" fill="#172033" stroke="#a855f7"/>
+    <text x="360" y="80" fill="#c084fc" font-size="13" font-weight="600">CONSULTORIO_ESPECIALIDAD</text>
+    <text x="360" y="100" fill="#94a3b8" font-size="11.5">Tabla intermedia (N:M)</text>
+    <text x="360" y="118" fill="#64748b" font-size="11">PK compuesta: id_consultorio + id_especialidad</text>
+    <rect x="650" y="50" width="180" height="90" rx="12" fill="#1e2942" stroke="#f59e0b"/>
+    <text x="670" y="80" fill="#fbbf24" font-size="14" font-weight="600">ESPECIALIDADES</text>
+    <text x="670" y="100" fill="#94a3b8" font-size="11.5">Detalle (N lado)</text>
+    <text x="670" y="118" fill="#64748b" font-size="11">id, codigo, nombre</text>
+    <line x1="210" y1="95" x2="335" y2="95" stroke="#c084fc" stroke-width="2" marker-end="url(#arr3)"/>
+    <line x1="520" y1="95" x2="645" y2="95" stroke="#c084fc" stroke-width="2" marker-end="url(#arr3)"/>
+    <text x="230" y="85" fill="#64748b" font-size="11">1</text>
+    <text x="535" y="85" fill="#64748b" font-size="11">N</text>
+  </svg>
+  </div>
+
+  <h3>C&oacute;mo lo resuelve tu c&oacute;digo</h3>
+  <p>Tu <code>ConsultorioEntity</code> usa <code>@ManyToMany</code> con <code>@JoinTable</code>. JPA crea y maneja la tabla intermedia <code>CONSULTORIO_ESPECIALIDAD</code> autom&aacute;ticamente:</p>
+  <div class="code-block"><span class="kw">@ManyToMany</span>(fetch = FetchType.EAGER)
+<span class="kw">@JoinTable</span>(
+    name = <span class="str">"CONSULTORIO_ESPECIALIDAD"</span>,
+    schema = <span class="str">"EXA_CLINICA"</span>,
+    joinColumns = <span class="kw">@JoinColumn</span>(name = <span class="str">"ID_CONSULTORIO"</span>),
+    inverseJoinColumns = <span class="kw">@JoinColumn</span>(name = <span class="str">"ID_ESPECIALIDAD"</span>)
+)
+<span class="kw">private</span> Set&lt;EspecialidadEntity&gt; especialidades = <span class="kw">new</span> HashSet&lt;&gt;();</div>
+
+  <p>Y tu <code>ConsultorioService.crearConsultorio()</code> ya hace lo correcto:</p>
+  <div class="code-block"><span class="cm">// 1. Busca la cl&iacute;nica por ID</span>
+ClinicaEntity clinica = clinicaRepository.findById(request.idClinica())...;
+
+<span class="cm">// 2. Busca las especialidades por los IDs que mand&oacute; el frontend</span>
+Set&lt;EspecialidadEntity&gt; especialidades = <span class="kw">new</span> HashSet&lt;&gt;();
+<span class="kw">if</span> (request.especialidadIds() != <span class="kw">null</span> &amp;&amp; !request.especialidadIds().isEmpty()) {
+    especialidades.addAll(especialidadRepository.findAllById(request.especialidadIds()));
+}
+
+<span class="cm">// 3. Crea el consultorio con las especialidades asignadas</span>
+ConsultorioEntity entity = ConsultorioEntity.builder()
+    .clinica(clinica)
+    .codigo(request.codigo())
+    .tarifaHora(request.tarifaHora())
+    .estado(request.estado())
+    .especialidades(especialidades)
+    .build();
+
+<span class="cm">// 4. Guarda &mdash; JPA inserta en CONSULTORIOS y en CONSULTORIO_ESPECIALIDAD</span>
+<span class="kw">return</span> toResponse(consultorioRepository.save(entity));</div>
+  <div class="note ok"><b>El c&oacute;digo ya est&aacute; bien.</b> JPA se encarga de la tabla intermedia. Solo necesitas que la BD exista y que el backend conecte. Lo que debes verificar es que <code>FetchType.EAGER</code> est&eacute; activo (s&iacute; lo est&aacute;) para que al consultar el consultorio traiga las especialidades de una vez.</div>
+
+  <!-- ============ 08 ============ -->
+  <h2 id="s08"><span class="num">08</span> La base de datos: qu&eacute; ejecutar</h2>
+  <p class="sec-intro">El examen trae 3 scripts para PowerShell. El &uacute;nico cambio que necesitas es el usuario de los <code>GRANT</code>.</p>
+  <table>
+    <thead><tr><th>Script</th><th>Qu&eacute; hace</th><th>Tu cambio</th></tr></thead>
+    <tbody>
+      <tr><td>Script 1: Esquema</td><td><code>CREATE USER EXA_CLINICA IDENTIFIED BY "123456"</code> + permisos</td><td>Ninguno. Funciona igual.</td></tr>
+      <tr><td>Script 2: Tablas + semillas + permisos</td><td>Crea 4 tablas, inserta datos, hace <code>GRANT ... TO BOMERP_APP</code></td><td><b>Cambia <code>BOMERP_APP</code> por <code>BOM_VENTAS</code></b> en las 4 l&iacute;neas de GRANT</td></tr>
+      <tr><td>Script 3: Verificar</td><td><code>SELECT table_name FROM dba_tables WHERE owner='EXA_CLINICA'</code></td><td>Ninguno. Debe listar 4 tablas.</td></tr>
+    </tbody>
+  </table>
+  <div class="note danger"><b>Esto es lo que m&aacute;s puede fallar.</b> Si tu backend usa <code>BOM_VENTAS</code> y el script le da permisos a <code>BOMERP_APP</code>, el backend no puede leer <code>EXA_CLINICA.CLINICAS</code> y todo falla con "tabla no existe" o "permiso insuficiente". <b>Soluci&oacute;n:</b> cambia las 4 l&iacute;neas de GRANT a <code>TO BOM_VENTAS</code>, o ejecuta los GRANT manualmente despu&eacute;s del script 2.</div>
+
+  <h3>Verificar tu contenedor Oracle</h3>
+  <div class="code-block"><span class="cm"># Ver el nombre de tu contenedor Oracle</span>
+docker ps
+<span class="cm"># Busca la l&iacute;nea que dice algo con "oracle" y copia el NOMBRE</span>
+<span class="cm"># C&aacute;mbialo en la variable $DB del script</span>
+
+<span class="cm"># Tu application-dev.yml dice:</span>
+<span class="cm">#   username: BOM_VENTAS</span>
+<span class="cm">#   password: 123456</span>
+<span class="cm">#   url: jdbc:oracle:thin:@localhost:1521/FREEPDB1</span>
+<span class="cm"># Por eso los GRANT deben ir a BOM_VENTAS, no a BOMERP_APP</span></div>
+
+  <!-- ============ 09 ============ -->
+  <h2 id="s09"><span class="num">09</span> Validaciones que el docente revisar&aacute;</h2>
+  <p class="sec-intro">En la revisi&oacute;n en vivo, el docente te pedir&aacute; hacer esto espec&iacute;ficamente. Practica cada uno antes.</p>
+  <table>
+    <thead><tr><th>El docente te pide...</th><th>Qu&eacute; debe pasar</th><th>D&oacute;nde verificar</th></tr></thead>
+    <tbody>
+      <tr><td>Ejecutar script 3 y mostrar las 4 tablas</td><td>Aparecen CLINICAS, CONSULTORIOS, CONSULTORIO_ESPECIALIDAD, ESPECIALIDADES</td><td>PowerShell</td></tr>
+      <tr><td>Crear una cl&iacute;nica, editarla y eliminarla</td><td>Se ve en el listado, se actualiza, desaparece</td><td>SPA &mdash; pantalla cl&iacute;nicas</td></tr>
+      <tr><td>Guardar cl&iacute;nica con RUC de menos de 11 d&iacute;gitos y raz&oacute;n social vac&iacute;a</td><td>Errores visibles <b>en el formulario</b>, no como alerta</td><td>SPA &mdash; formulario cl&iacute;nica</td></tr>
+      <tr><td>Mostrar las 5 especialidades precargadas</td><td>Lista: Medicina general, Pediatr&iacute;a, Cardiolog&iacute;a, Odontolog&iacute;a, Nutrici&oacute;n</td><td>SPA &mdash; formulario consultorio</td></tr>
+      <tr><td>Crear un consultorio eligiendo cl&iacute;nica, con c&oacute;digo, tarifa y estado</td><td>Se guarda y aparece en el listado</td><td>SPA &mdash; formulario consultorio</td></tr>
+      <tr><td>Agregar 2 especialidades, quitar 1 y guardar</td><td>La especialidad que queda se ve en el detalle</td><td>SPA &mdash; formulario + detalle consultorio</td></tr>
+      <tr><td>Eliminar ese consultorio</td><td>Desaparece del listado</td><td>SPA &mdash; listado consultorios</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ============ 10 ============ -->
+  <h2 id="s10"><span class="num">10</span> Errores que te pueden bajar puntos</h2>
+  <p class="sec-intro">Lo que m&aacute;s comunmente falla y c&oacute;mo evitarlo.</p>
+  <table>
+    <thead><tr><th>Error</th><th>Consecuencia</th><th>Prevenci&oacute;n</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="badge b-todo">CR&Iacute;TICO</span> GRANT a <code>BOMERP_APP</code> en vez de <code>BOM_VENTAS</code></td>
+        <td>Backend no puede leer las tablas &rarr; todo falla &rarr; 0 pts</td>
+        <td>Cambia el usuario en los GRANT antes de ejecutar el script 2</td>
+      </tr>
+      <tr>
+        <td><span class="badge b-todo">CR&Iacute;TICO</span> No ejecutar los scripts SQL</td>
+        <td>Las tablas no existen &rarr; Hibernate falla al arrancar</td>
+        <td>Ejecuta los 3 scripts primero, antes de levantar el backend</td>
+      </tr>
+      <tr>
+        <td><span class="badge b-todo">CR&Iacute;TICO</span> No tener <code>package-info.java</code></td>
+        <td>Spring Modulith puede no escanear el paquete &rarr; controllers no se registran</td>
+        <td>Crea el archivo (2 minutos) copiando de otro m&oacute;dulo</td>
+      </tr>
+      <tr>
+        <td><span class="badge b-half">IMPORTANTE</span> Validaci&oacute;n de RUC no visible en el form</td>
+        <td>Pierdes 1 pt de validaciones</td>
+        <td>Verifica que <code>ClinicaRequest</code> tiene <code>@Size(min=11, max=11)</code> y que el form Angular muestra el error</td>
+      </tr>
+      <tr>
+        <td><span class="badge b-half">IMPORTANTE</span> Especialidades no se guardan</td>
+        <td>Pierdes 7 pts (asignar + ver detalle)</td>
+        <td>Verifica que <code>ConsultorioRequest</code> incluye <code>especialidadIds</code> y que el service los busca y asigna</td>
+      </tr>
+      <tr>
+        <td><span class="badge b-half">IMPORTANTE</span> Funciona en Swagger pero no en la SPA</td>
+        <td> Cada &iacute;tem vale la mitad</td>
+        <td>Verifica que el frontend usa la URL correcta (<code>/api/clinica/clinicas</code>) y que CORS est&aacute; configurado</td>
+      </tr>
+      <tr>
+        <td><span class="badge b-tip">MENOR</span> <code>FetchType.LAZY</code> en especialidades</td>
+        <td>Al ver el detalle, lanza <code>LazyInitializationException</code></td>
+        <td>Tu c&oacute;digo ya usa <code>EAGER</code>. No lo cambies.</td>
+      </tr>
+      <tr>
+        <td><span class="badge b-tip">MENOR</span> Olvidar <code>@Transactional</code> en el service</td>
+        <td>La N:M no se guarda (no hay transacci&oacute;n)</td>
+        <td>Tu c&oacute;digo ya tiene <code>@Transactional</code> en la clase. Verifica que siga ah&iacute;.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ============ 11 ============ -->
+  <h2 id="s11"><span class="num">11</span> Distribuci&oacute;n del tiempo</h2>
+  <p class="sec-intro">120 minutos. La sugerencia del examen y la realidad de tu proyecto.</p>
+  <table>
+    <thead><tr><th>Bloque</th><th>Minutos sugeridos</th><th>Tu realidad</th></tr></thead>
+    <tbody>
+      <tr><td>Base de datos (scripts + permisos)</td><td>10</td><td><b>15 min</b> &mdash; el cambio de usuario y la verificaci&oacute;n toman tiempo</td></tr>
+      <tr><td>Pregunta 1: Cl&iacute;nicas (CRUD + validaciones)</td><td>50</td><td><b>15 min</b> &mdash; el c&oacute;digo ya est&aacute;, solo probar</td></tr>
+      <tr><td>Pregunta 2: Consultorios + Especialidades</td><td>65</td><td><b>25 min</b> &mdash; el c&oacute;digo ya est&aacute;, la N:M es lo que debes probar m&aacute;s</td></tr>
+      <tr><td>Cierre: dejar todo en ejecuci&oacute;n</td><td>5</td><td><b>5 min</b></td></tr>
+      <tr><td><b>TIEMPO LIBRE SOBRANTE</b></td><td>&mdash;</td><td><b>~60 min</b> para arreglar lo que falle</td></tr>
+    </tbody>
+  </table>
+  <div class="note ok"><b>Tu ventaja:</b> como el c&oacute;digo ya est&aacute; escrito (frontend y backend), tienes unos 60 minutos de margen para corregir errores. Ese tiempo debe ir a: (1) la base de datos si los scripts fallan, (2) la N:M si las especialidades no se guardan, y (3) las validaciones si los errores no aparecen en el formulario.</div>
+
+  <div class="note info"><b>Si te atascas:</b> el examen dice "los &iacute;tems se califican por separado: si te atascas en uno, pasa al siguiente". No pierdas 30 minutos en un punto que vale 1. Avanza, asegura lo f&aacute;cil y vuelve despu&eacute;s.</div>
+
+  <footer>VIERNES CRM V7 &middot; Plan de ataque examen m&oacute;dulo cl&iacute;nica &middot; basado en el c&oacute;digo real de E:\Viernes\Viernes &middot; noviembre 2026.</footer>
+</div>
+</body>
+</html>
