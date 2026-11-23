@@ -116,22 +116,6 @@ export const routes: Routes = [
         data: { abrirEdicionPropuesta: true },
       },
       {
-        path: 'clinicas',
-        loadComponent: () => import('./features/clinica/clinica-list/clinica-list').then((m) => m.ClinicaList),
-      },
-      {
-        path: 'consultorios',
-        loadComponent: () => import('./features/clinica/consultorio-list/consultorio-list').then((m) => m.ConsultorioList),
-      },
-      {
-        path: 'consultorios/nuevo',
-        loadComponent: () => import('./features/clinica/consultorio-form/consultorio-form').then((m) => m.ConsultorioForm),
-      },
-      {
-        path: 'consultorios/:id',
-        loadComponent: () => import('./features/clinica/consultorio-detail/consultorio-detail').then((m) => m.ConsultorioDetail),
-      },
-      {
         path: 'usuarios',
         loadComponent: () => import('./features/usuarios/usuario-list/usuario-list').then((m) => m.UsuarioList),
         canActivate: [roleGuard],
